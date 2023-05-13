@@ -1,0 +1,30 @@
+{
+  "name": "sigmadevs/easy-demo-importer",
+  "description": "A one-click, user-friendly WordPress plugin for effortlessly importing theme demos and customizing your website in no time.",
+  "type": "wordpress-plugin",
+  "keywords": ["WordPress", "Demo Importer", "One Click", "One Click Demo Importer", "Theme Demo Importer", "WordPress Importer"],
+  "homepage": "https://github.com/wp-sigmadevs/easy-demo-importer",
+  "license": "GPL",
+  "authors": [
+    {
+      "name": "S.M. Rafiz",
+      "email": "s.m.rafiz@gmail.com"
+    }
+  ],
+  "support": {
+    "issues": "https://github.com/wp-sigmadevs/easy-demo-importer/issues",
+    "source": "https://github.com/wp-sigmadevs/easy-demo-importer"
+  },
+  "autoload": {
+    "psr-4": {
+      "SigmaDevs\\EasyDemoImporter\\": "./inc"
+    }
+  },
+  "scripts": {
+    "cs": "phpcs --standard=phpcs.xml .",
+    "cbf": "phpcbf --standard=phpcs.xml ."
+  },
+  "require": {
+    "php": ">=7.4"
+  }
+}
