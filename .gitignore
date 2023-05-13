@@ -1,0 +1,88 @@
+# NPM #
+##########
+# Ignore all directories called node_modules in current folder and any subfolders.
+node_modules/
+/node_modules/
+
+# Packages #
+############
+*.7z
+*.dmg
+*.gz
+*.bz2
+*.iso
+*.jar
+*.rar
+*.tarzip
+*.tgz
+*.map
+
+# Logs and databases #
+######################
+*.log
+*.sql
+*.env
+
+# OS generated files #
+######################
+**.DS_Store*
+ehthumbs.db
+Thumbs.db
+._*
+.cache
+.project
+.settings
+.tmproj
+*.esproj
+nbproject
+*.sublime-project
+*.sublime-workspace
+.vscode/
+/.vscode/
+*.phar
+
+# Editor/IDE generated files #
+######################
+*.un~
+.vscode
+.idea
+
+# SASS #
+##########
+**/.sass-cache
+**/.sass-cache/*
+
+# Numerous always-ignore extensions #
+######################
+*.diff
+*.err
+*.orig
+*.rej
+*.swo
+*.swp
+*.vi
+*~
+
+# Dreamweaver added files #
+######################
+_notes
+dwsync.xml
+
+# Komodo #
+########
+*.komodoproject
+.komodotools
+
+# EXTRAS #
+##########
+package-lock.json
+mix-manifest.json
+composer.lock
+yarn.lock
+_ext_dev
+dist
+assets/css
+assets/js
+tmp
+_ext_**
+.fleet
