@@ -2,8 +2,8 @@
 /**
  * Trait: Requester.
  *
- * The requester trait to determine what we request; used to determine
- * which classes we instantiate in the Bootstrap class
+ * The requester trait to determine what we request,
+ * which classes we instantiate in the Bootstrap class.
  *
  * @package SigmaDevs\EasyDemoImporter
  * @since   1.0.0

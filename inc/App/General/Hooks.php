@@ -27,7 +27,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * General Class: Actions Hooks.
+ * General Class: Hooks.
  *
  * @since 1.0.0
  */

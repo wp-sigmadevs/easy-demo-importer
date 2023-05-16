@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Class: Classes.
+ * Config Class: Classes.
  *
  * @since 1.0.0
  */

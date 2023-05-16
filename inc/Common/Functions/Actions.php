@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Class: Actions.
+ * Functions Class: Actions.
  *
  * @since 1.0.0
  */

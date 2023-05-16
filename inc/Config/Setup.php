@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Class: Setup.
+ * Config Class: Setup.
  *
  * @since 1.0.0
  */

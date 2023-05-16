@@ -1,6 +1,6 @@
 <?php
 /**
- * Class: Plugin.
+ * Config Class: Plugin.
  *
  * Plugin data which are used through the plugin, most of them are defined
  * by the root file metadata. The data is being inserted in each class
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Class: Plugin.
+ * Config Class: Plugin.
  *
  * @since 1.0.0
  */
@@ -52,6 +52,9 @@ final class Plugin {
 			'settings'            => get_option( 'sd-edi-settings' ),
 			'plugin_path'         => \untrailingslashit( \plugin_dir_path( SD_EDI_ROOT_FILE ) ),
 			'plugin_uri'          => \untrailingslashit( \plugin_dir_url( SD_EDI_ROOT_FILE ) ),
+			'plugin_active_file'  => plugin_basename( SD_EDI_ROOT_FILE ),
+			'demo_import_page'    => 'sd-easy-demo-importer',
+			'system_status_page'  => 'sd-edi-demo-importer-status',
 			'views_folder'        => 'views',
 			'template_folder'     => 'templates',
 			'ext_template_folder' => 'sd-edi-templates',
@@ -71,6 +74,7 @@ final class Plugin {
 			[
 				'name'         => 'Plugin Name',
 				'version'      => 'Version',
+				'uri'          => 'Plugin URI',
 				'text-domain'  => 'Text Domain',
 				'domain-path'  => 'Domain Path',
 				'namespace'    => 'Namespace',

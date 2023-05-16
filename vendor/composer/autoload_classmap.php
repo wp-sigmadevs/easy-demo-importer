@@ -7,9 +7,10 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'Composer\\InstalledVersions' => $vendorDir . '/composer/InstalledVersions.php',
+    'SigmaDevs\\EasyDemoImporter\\App\\Backend\\DeactivateNotice' => $baseDir . '/inc/App/Backend/DeactivateNotice.php',
     'SigmaDevs\\EasyDemoImporter\\App\\Backend\\Enqueue' => $baseDir . '/inc/App/Backend/Enqueue.php',
-    'SigmaDevs\\EasyDemoImporter\\App\\Backend\\Notice' => $baseDir . '/inc/App/Backend/Notice.php',
     'SigmaDevs\\EasyDemoImporter\\App\\Backend\\Pages' => $baseDir . '/inc/App/Backend/Pages.php',
+    'SigmaDevs\\EasyDemoImporter\\App\\Backend\\PluginRowMeta' => $baseDir . '/inc/App/Backend/PluginRowMeta.php',
     'SigmaDevs\\EasyDemoImporter\\App\\General\\Hooks' => $baseDir . '/inc/App/General/Hooks.php',
     'SigmaDevs\\EasyDemoImporter\\Bootstrap' => $baseDir . '/inc/Bootstrap.php',
     'SigmaDevs\\EasyDemoImporter\\Common\\Abstracts\\Base' => $baseDir . '/inc/Common/Abstracts/Base.php',
@@ -23,6 +24,7 @@ return array(
     'SigmaDevs\\EasyDemoImporter\\Common\\Traits\\Requester' => $baseDir . '/inc/Common/Traits/Requester.php',
     'SigmaDevs\\EasyDemoImporter\\Common\\Traits\\Singleton' => $baseDir . '/inc/Common/Traits/Singleton.php',
     'SigmaDevs\\EasyDemoImporter\\Common\\Utils\\Errors' => $baseDir . '/inc/Common/Utils/Errors.php',
+    'SigmaDevs\\EasyDemoImporter\\Common\\Utils\\Notice' => $baseDir . '/inc/Common/Utils/Notice.php',
     'SigmaDevs\\EasyDemoImporter\\Config\\Classes' => $baseDir . '/inc/Config/Classes.php',
     'SigmaDevs\\EasyDemoImporter\\Config\\I18n' => $baseDir . '/inc/Config/I18n.php',
     'SigmaDevs\\EasyDemoImporter\\Config\\Plugin' => $baseDir . '/inc/Config/Plugin.php',
