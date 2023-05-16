@@ -1,0 +1,57 @@
+/**
+ * Component: Grid System.
+ */
+.rtdi-container {
+	[class*="rtdi-col-"] {
+		@extend %column-default;
+	}
+
+	@for $i from 1 through 12 {
+		.rtdi-col-xs-#{$i} {
+			flex: 0 0 calc($i * 100% / 12);
+			max-width: calc($i * 100% / 12);
+		}
+	}
+
+	@media only screen and (min-width: 768px) {
+		.rtdi-col-sm-24 {
+			flex: 0 0 20%;
+			max-width: 20%;
+		}
+
+		@for $i from 1 through 12 {
+			.rtdi-col-sm-#{$i} {
+				flex: 0 0 calc($i * 100% / 12);
+				max-width: calc($i * 100% / 12);
+			}
+		}
+	}
+
+	@media only screen and (min-width: 992px) {
+		.rtdi-col-md-24 {
+			flex: 0 0 20%;
+			max-width: 20%;
+		}
+
+		@for $i from 1 through 12 {
+			.rtdi-col-md-#{$i} {
+				flex: 0 0 calc($i * 100% / 12);
+				max-width: calc($i * 100% / 12);
+			}
+		}
+	}
+
+	@media only screen and (min-width: 1200px) {
+		.rtdi-col-lg-24 {
+			flex: 0 0 20%;
+			max-width: 20%;
+		}
+
+		@for $i from 1 through 12 {
+			.rtdi-col-lg-#{$i} {
+				flex: 0 0 calc($i * 100% / 12);
+				max-width: calc($i * 100% / 12);
+			}
+		}
+	}
+}

@@ -1,0 +1,13 @@
+/**
+ * Layout: Content.
+ */
+
+.appearance_page_rtdi-demo-importer {
+	.rtdi-content {
+		padding: $default-gutter;
+		margin: $default-gutter;
+
+		@extend .rtdi-white-color-bg;
+		@extend .rtdi-box-shadow;
+	}
+}

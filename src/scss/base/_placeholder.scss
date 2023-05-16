@@ -1,0 +1,109 @@
+// ===========================
+//	Placeholders
+// ===========================
+
+%clearfix {
+	content: " ";
+	display: table;
+}
+
+%box-sizing {
+	box-sizing: border-box;
+}
+
+%transition {
+	transition: all 0.3s;
+}
+
+%d-flex {
+	display: flex;
+}
+
+%d-inline-flex {
+	display: inline-flex;
+}
+
+%flex-wrap {
+	flex-wrap: wrap;
+}
+
+%justify-content-center {
+	justify-content: center;
+}
+
+%align-items-center {
+	align-items: center;
+}
+
+%pos-s {
+	position: static !important;
+}
+
+%pos-r {
+	position: relative;
+}
+
+%pos-a {
+	position: absolute;
+}
+
+%default-gutter {
+	margin-bottom: $default-gutter;
+}
+
+%gutter-half {
+	margin-top: calc($default-gutter / 2);
+	margin-bottom: calc($default-gutter / 2);
+}
+
+%primary-color {
+	color: $color-primary;
+}
+
+%primary-color-bg {
+	background-color: $color-primary;
+}
+
+%secondary-color {
+	color: $color-secondary;
+}
+
+%secondary-color-bg {
+	background-color: $color-secondary;
+}
+
+%white-color {
+	color: $color-white;
+}
+
+%white-color-bg {
+	background-color: $color-white;
+}
+
+%black-color {
+	color: $color-black;
+}
+
+%black-color-bg {
+	background-color: $color-black;
+}
+
+%text-center {
+	text-align: center;
+}
+
+%mb-0 {
+	margin-bottom: 0;
+}
+
+%column-default {
+	position: relative;
+	width: 100%;
+	min-height: 1px;
+	padding-right: calc($default-gutter / 2);
+	padding-left: calc($default-gutter / 2);
+}
+
+%box-shadow {
+	box-shadow: 0 0 15px rgba(0, 0, 0, 0.06);
+}

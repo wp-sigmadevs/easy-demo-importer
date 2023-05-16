@@ -9,6 +9,8 @@
  * License: GPLv2 or later
  * Text Domain: easy-demo-importer
  * Domain Path: /languages
+ * Requires PHP: 7.1
+ * Requires WP: 5.5
  * Namespace: SigmaDevs\EasyDemoImporter
  *
  * @package SigmaDevs\EasyDemoImporter
@@ -33,6 +35,10 @@
 
 declare( strict_types=1 );
 
+use SigmaDevs\EasyDemoImporter\Bootstrap;
+use SigmaDevs\EasyDemoImporter\Config\Setup;
+use SigmaDevs\EasyDemoImporter\Common\Functions\Functions;
+
 // Do not allow directly accessing this file.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit( 'This script cannot be accessed directly.' );
@@ -43,23 +49,27 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 1.0.0
  */
-define( 'SD_EDI_PLUGIN_ROOT_FILE', __FILE__ );
+define( 'SD_EDI_ROOT_FILE', __FILE__ );
 
 /**
  * Load PSR4 autoloader.
  *
  * @since 1.0.0
  */
-$sd_edi_autoloader = require plugin_dir_path( SD_EDI_PLUGIN_ROOT_FILE ) . 'vendor/autoload.php';
+$sd_edi_autoloader = require plugin_dir_path( SD_EDI_ROOT_FILE ) . 'vendor/autoload.php';
 
 /**
  * Setup hooks (activation, deactivation, uninstall)
  *
  * @since 1.0.0
  */
-register_activation_hook( SD_EDI_PLUGIN_ROOT_FILE, [ 'SigmaDevs\EasyDemoImporter\Config\Setup', 'activation' ] );
-register_deactivation_hook( SD_EDI_PLUGIN_ROOT_FILE, [ 'SigmaDevs\EasyDemoImporter\Config\Setup', 'deactivation' ] );
-register_uninstall_hook( SD_EDI_PLUGIN_ROOT_FILE, [ 'SigmaDevs\EasyDemoImporter\Config\Setup', 'uninstall' ] );
+register_activation_hook( SD_EDI_ROOT_FILE, [ setup::class, 'activation' ] );
+register_deactivation_hook( SD_EDI_ROOT_FILE, [ setup::class, 'deactivation' ] );
+register_uninstall_hook( SD_EDI_ROOT_FILE, [ setup::class, 'uninstall' ] );
+
+if ( ! class_exists( 'SigmaDevs\EasyDemoImporter\\Bootstrap' ) ) {
+	wp_die( esc_html__( 'Easy Demo Importer is unable to find the Bootstrap class.', 'easy-demo-importer' ) );
+}
 
 /**
  * Bootstrap the plugin.
@@ -68,14 +78,10 @@ register_uninstall_hook( SD_EDI_PLUGIN_ROOT_FILE, [ 'SigmaDevs\EasyDemoImporter\
  *
  * @since 1.0.0
  */
-if ( ! class_exists( 'SigmaDevs\EasyDemoImporter\\Bootstrap' ) ) {
-	wp_die( esc_html__( 'Easy Demo Importer is unable to find the Bootstrap class.', 'easy-demo-importer' ) );
-}
-
 add_action(
 	'plugins_loaded',
 	static function () use ( $sd_edi_autoloader ) {
-		$app = \SigmaDevs\EasyDemoImporter\Bootstrap::instance();
+		$app = new Bootstrap();
 		$app->registerServices( $sd_edi_autoloader );
 	}
 );
@@ -83,9 +89,9 @@ add_action(
 /**
  * Create a function for external uses.
  *
- * @return \SigmaDevs\EasyDemoImporter\Common\Functions\Functions
+ * @return Functions
  * @since 1.0.0
  */
 function sd_edi() {
-	return new \SigmaDevs\EasyDemoImporter\Common\Functions\Functions();
+	return new Functions();
 }

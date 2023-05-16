@@ -1,0 +1,19 @@
+/**
+ * Component: Header.
+ */
+
+.appearance_page_rtdi-demo-importer {
+	.rtdi-header {
+		padding: $default-gutter;
+
+		@extend .rtdi-white-color-bg;
+		@extend .rtdi-box-shadow;
+
+		h2 {
+			text-align: center;
+			font-size: 25px;
+			color: #333;
+			margin: 0;
+		}
+	}
+}

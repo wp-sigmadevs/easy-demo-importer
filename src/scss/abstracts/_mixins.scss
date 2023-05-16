@@ -1,0 +1,70 @@
+// ===========================
+//	Mixin definitions
+// ===========================
+
+//usage: @include shift([property],[duration],[easing]);
+@mixin transition($property: all, $duration: 0.3s, $ease: ease-in-out) {
+	transition: $property $duration $ease;
+}
+
+// background-content
+@mixin background-content($repeat: no-repeat,
+$size: cover,
+$position: center center) {
+	background-repeat: $repeat;
+	background-size: $size;
+	background-position: $position;
+}
+
+// flex position
+@mixin flex-position($display, $content, $items) {
+	display: $display;
+	justify-content: $content;
+	align-items: $items;
+}
+
+// center position
+@mixin center-position($top: 50%, $left: 50%) {
+	top: $top;
+	left: $left;
+	transform: translate(-#{$top}, -#{$left});
+}
+
+// Square
+@mixin square($size, $radius: 0) {
+	width: $size;
+	height: $size;
+
+	@if $radius  !=0 {
+		border-radius: $radius;
+	}
+}
+
+// Functions
+@mixin toRem($property, $value) {
+	#{$property}: ($value / 16) + rem;
+}
+
+// Functions
+@function calculateRem($size) {
+	$vwSize: $size / 4px;
+	@return $vwSize * 1vw;
+}
+
+//   Font Size Convert To Rem
+@mixin font-size($size) {
+	font-size: $size;
+	font-size: calculateRem($size);
+}
+
+// media quaries
+@mixin breakpoint($breakpoint) {
+	@if map-has-key($breakpoints, $breakpoint) {
+		@media #{inspect(map-get($breakpoints, $breakpoint))} {
+			@content;
+		}
+	} @else {
+		@warn "Unfortunately, no value could be retrieved from `#{$breakpoint}`. "
+			+"Available breakpoints are: #{map-keys($breakpoints)}.";
+	}
+}
