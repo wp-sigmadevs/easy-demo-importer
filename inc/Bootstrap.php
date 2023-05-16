@@ -1,6 +1,6 @@
 <?php
 /**
- * Class: Bootstrap.
+ * Class: Plugin Bootstrap.
  *
  * The main handler class responsible for initializing Easy Demo Importer.
  * This class registers all the core modules required to run the plugin.
@@ -32,7 +32,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Plugin Initialization Class.
+ * Class: Plugin Bootstrap.
  *
  * @since 1.0.0
  */

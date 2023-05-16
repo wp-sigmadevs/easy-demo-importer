@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Class: Filters.
+ * Functions Class: Filters.
  *
  * @since 1.0.0
  */

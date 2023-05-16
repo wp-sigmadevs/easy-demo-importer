@@ -1,8 +1,8 @@
 <?php
 /**
- * Backend Class: Notice.
+ * Utility Class: Notice.
  *
- * Gives a notice if plugin requirements are not met.
+ * Gives an admin notice.
  *
  * @package SigmaDevs\EasyDemoImporter
  * @since   1.0.0
@@ -10,13 +10,9 @@
 
 declare( strict_types=1 );
 
-namespace SigmaDevs\EasyDemoImporter\App\Backend;
+namespace SigmaDevs\EasyDemoImporter\Common\Utils;
 
-use SigmaDevs\EasyDemoImporter\Common\
-{
-	Abstracts\Base,
-	Traits\Singleton
-};
+use SigmaDevs\EasyDemoImporter\Common\Functions\Helpers;
 
 // Do not allow directly accessing this file.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -24,47 +20,47 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Class: Notice.
+ * Utility Class: Notice.
  *
  * @since 1.0.0
  */
-class Notice extends Base {
-	/**
-	 * Singleton trait.
-	 *
-	 * @see Singleton
-	 * @since 1.0.0
-	 */
-	use Singleton;
-
+class Notice {
 	/**
 	 * Notice message.
+	 *
+	 * @static
 	 *
 	 * @var string
 	 * @since 1.0.0
 	 */
-	private $message;
+	private static $message;
 
 	/**
 	 * Type of notice.
 	 * Possible values are error, warning, success, info.
 	 *
+	 * @static
+	 *
 	 * @var string
 	 * @since 1.0.0
 	 */
-	private $type;
+	private static $type;
 
 	/**
 	 * Close button.
 	 * If true, notice will include a close button.
 	 *
+	 * @static
+	 *
 	 * @var bool
 	 * @since 1.0.0
 	 */
-	private $close = false;
+	private static $close = false;
 
 	/**
 	 * Initialize the class.
+	 *
+	 * @static
 	 *
 	 * @param string  $message Notice message.
 	 * @param string  $type Type of notice.
@@ -73,28 +69,30 @@ class Notice extends Base {
 	 * @return void
 	 * @since 1.0.0
 	 */
-	public function trigger( $message, $type, $close = false ) {
-		$this->message = $message;
-		$this->type    = $type;
-		$this->close   = $close;
+	public static function trigger( $message, $type, $close = false ) {
+		self::$message = $message;
+		self::$type    = $type;
+		self::$close   = $close;
 
-		add_action( 'admin_notices', [ $this, 'notice' ] );
+		add_action( 'admin_notices', [ __CLASS__, 'notice' ] );
 	}
 
 	/**
 	 * Admin notice.
 	 *
+	 * @static
 	 * @return void
 	 * @since 1.0.0
 	 */
-	public function notice() {
-		$hasClose = $this->close ? ' is-dismissible' : '';
+	public static function notice() {
+		$hasClose = self::$close ? ' is-dismissible' : '';
 
-		echo wp_kses_post(
+		echo wp_kses(
 			sprintf(
-				'<div class="notice notice-' . $this->type . esc_attr( $hasClose ) . '">%s</div>',
-				$this->message
-			)
+				'<div class="notice notice-' . self::$type . esc_attr( $hasClose ) . '">%s</div>',
+				self::$message
+			),
+			Helpers::allowedTags()
 		);
 	}
 }

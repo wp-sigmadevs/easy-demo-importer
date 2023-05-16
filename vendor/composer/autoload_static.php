@@ -22,9 +22,10 @@ class ComposerStaticInita3a0f0cbb9b6e205034676f5e8e4d4d6
 
     public static $classMap = array (
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
+        'SigmaDevs\\EasyDemoImporter\\App\\Backend\\DeactivateNotice' => __DIR__ . '/../..' . '/inc/App/Backend/DeactivateNotice.php',
         'SigmaDevs\\EasyDemoImporter\\App\\Backend\\Enqueue' => __DIR__ . '/../..' . '/inc/App/Backend/Enqueue.php',
-        'SigmaDevs\\EasyDemoImporter\\App\\Backend\\Notice' => __DIR__ . '/../..' . '/inc/App/Backend/Notice.php',
         'SigmaDevs\\EasyDemoImporter\\App\\Backend\\Pages' => __DIR__ . '/../..' . '/inc/App/Backend/Pages.php',
+        'SigmaDevs\\EasyDemoImporter\\App\\Backend\\PluginRowMeta' => __DIR__ . '/../..' . '/inc/App/Backend/PluginRowMeta.php',
         'SigmaDevs\\EasyDemoImporter\\App\\General\\Hooks' => __DIR__ . '/../..' . '/inc/App/General/Hooks.php',
         'SigmaDevs\\EasyDemoImporter\\Bootstrap' => __DIR__ . '/../..' . '/inc/Bootstrap.php',
         'SigmaDevs\\EasyDemoImporter\\Common\\Abstracts\\Base' => __DIR__ . '/../..' . '/inc/Common/Abstracts/Base.php',
@@ -38,6 +39,7 @@ class ComposerStaticInita3a0f0cbb9b6e205034676f5e8e4d4d6
         'SigmaDevs\\EasyDemoImporter\\Common\\Traits\\Requester' => __DIR__ . '/../..' . '/inc/Common/Traits/Requester.php',
         'SigmaDevs\\EasyDemoImporter\\Common\\Traits\\Singleton' => __DIR__ . '/../..' . '/inc/Common/Traits/Singleton.php',
         'SigmaDevs\\EasyDemoImporter\\Common\\Utils\\Errors' => __DIR__ . '/../..' . '/inc/Common/Utils/Errors.php',
+        'SigmaDevs\\EasyDemoImporter\\Common\\Utils\\Notice' => __DIR__ . '/../..' . '/inc/Common/Utils/Notice.php',
         'SigmaDevs\\EasyDemoImporter\\Config\\Classes' => __DIR__ . '/../..' . '/inc/Config/Classes.php',
         'SigmaDevs\\EasyDemoImporter\\Config\\I18n' => __DIR__ . '/../..' . '/inc/Config/I18n.php',
         'SigmaDevs\\EasyDemoImporter\\Config\\Plugin' => __DIR__ . '/../..' . '/inc/Config/Plugin.php',

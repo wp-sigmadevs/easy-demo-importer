@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Class: Helpers.
+ * Functions Class: Helpers.
  *
  * @since 1.0.0
  */
@@ -169,6 +169,9 @@ class Helpers {
 				'style' => [],
 			],
 			'strong'     => [],
+			'small'      => [],
+			'hr'         => [],
+			'br'         => [],
 			'ul'         => [
 				'class' => [],
 			],

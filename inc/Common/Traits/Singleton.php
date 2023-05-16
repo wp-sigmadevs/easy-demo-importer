@@ -1,6 +1,7 @@
 <?php
 /**
  * Trait: Singleton.
+ *
  * The singleton skeleton trait to instantiate the class only once.
  *
  * @package SigmaDevs\EasyDemoImporter

@@ -12,8 +12,8 @@ declare( strict_types=1 );
 
 namespace SigmaDevs\EasyDemoImporter\Config;
 
-use SigmaDevs\EasyDemoImporter\App\Backend\Notice;
 use SigmaDevs\EasyDemoImporter\Common\{
+	Utils\Notice,
 	Utils\Errors,
 	Abstracts\Base,
 	Traits\Singleton
@@ -25,7 +25,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Class: Requirements.
+ * Config Class: Requirements.
  *
  * @since 1.0.0
  */
@@ -68,9 +68,8 @@ final class Requirements extends Base {
 				'>='
 			) ) {
 				$error = Errors::errorMessage(
-					$compatCheck['message'],
 					$compatCheck['title'],
-					'',
+					$compatCheck['message'],
 					plugin_basename( __FILE__ )
 				);
 
@@ -125,7 +124,7 @@ final class Requirements extends Base {
 	 */
 	public function throughError( $error ) {
 		// Gives a error notice.
-		Notice::instance()->trigger( $error, 'error' );
+		Notice::trigger( $error, 'error' );
 
 		// Kill plugin.
 		Errors::pluginDie();

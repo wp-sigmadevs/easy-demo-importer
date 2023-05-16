@@ -1,6 +1,6 @@
 <?php
 /**
- * Model Class: Settings
+ * Model Class: Admin Page
  *
  * This class taps into WordPress Settings API to create admin pages.
  *
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Model Class: Settings
+ * Model Class: Admin Page
  *
  * @since 1.0.0
  */

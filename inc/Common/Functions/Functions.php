@@ -1,6 +1,6 @@
 <?php
 /**
- * Functions Class: Functions
+ * Functions Class: Functions.
  *
  * Main function class for external uses
  *
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Functions Class: Functions
+ * Functions Class: Functions.
  *
  * @since 1.0.0
  */

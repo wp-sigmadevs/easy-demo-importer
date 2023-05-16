@@ -24,7 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Class: I18n.
+ * Config Class: I18n.
  *
  * @since 1.0.0
  */

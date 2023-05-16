@@ -12,12 +12,12 @@ declare( strict_types=1 );
 
 namespace SigmaDevs\EasyDemoImporter\App\Backend;
 
-use SigmaDevs\EasyDemoImporter\Common\Models\AdminPage;
-use SigmaDevs\EasyDemoImporter\Common\Functions\Callbacks;
 use SigmaDevs\EasyDemoImporter\Common\
 {
 	Abstracts\Base,
-	Traits\Singleton
+	Traits\Singleton,
+	Models\AdminPage,
+	Functions\Callbacks
 };
 
 // Do not allow directly accessing this file.
@@ -31,7 +31,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 1.0.0
  */
 class Pages extends Base {
-
 	/**
 	 * Singleton trait.
 	 *
@@ -46,11 +45,11 @@ class Pages extends Base {
 	 * This backend class is only being instantiated in the backend
 	 * as requested in the Bootstrap class.
 	 *
-	 * @see Requester::isAdminBackend()
-	 * @see Bootstrap::registerServices
-	 *
 	 * @return void
 	 * @since 1.0.0
+	 *
+	 * @see Bootstrap::registerServices
+	 * @see Requester::isAdminBackend()
 	 */
 	public function register() {
 		$this
@@ -86,7 +85,15 @@ class Pages extends Base {
 				'page_title'  => __( 'Easy Demo Importer', 'easy-demo-importer' ),
 				'menu_title'  => __( 'Install Demo Content', 'easy-demo-importer' ),
 				'capability'  => 'manage_options',
-				'menu_slug'   => 'sd-easy-demo-importer',
+				'menu_slug'   => $this->plugin->data()['demo_import_page'],
+				'callback'    => [ Callbacks::class, 'renderDemoImportPage' ],
+			],
+			[
+				'parent_slug' => 'themes.php',
+				'page_title'  => __( 'System Status Report', 'easy-demo-importer' ),
+				'menu_title'  => __( 'Easy System Status', 'easy-demo-importer' ),
+				'capability'  => 'manage_options',
+				'menu_slug'   => $this->plugin->data()['system_status_page'],
 				'callback'    => [ Callbacks::class, 'renderDemoImportPage' ],
 			],
 		];

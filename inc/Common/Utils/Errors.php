@@ -8,7 +8,7 @@
  * @since   1.0.0
  */
 
-declare( strict_types = 1 );
+declare( strict_types=1 );
 
 namespace SigmaDevs\EasyDemoImporter\Common\Utils;
 
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Class: Errors.
+ * Utility Class: Error
  *
  * @since 1.0.0
  */
@@ -48,17 +48,19 @@ class Errors {
 	}
 
 	/**
-	 * De-activates the plugin and shows notice error in back-end.
+	 * Shows notice error in back-end.
 	 *
 	 * @static
-	 * @param string $message The error message.
+	 *
 	 * @param string $title General title of the error.
-	 * @param string $subtitle General subtitle of the error.
+	 * @param string $message The error message.
 	 * @param string $source File source of the error.
+	 * @param string $subtitle Specified title of the error.
+	 *
 	 * @return string
 	 * @since 1.0.0
 	 */
-	public static function errorMessage( $message = '', $title = '', $subtitle = '', $source = '' ) {
+	public static function errorMessage( $title = '', $message = '', $source = '', $subtitle = '' ) {
 		$error = '';
 
 		if ( $message ) {
@@ -66,19 +68,18 @@ class Errors {
 			$title    = $title ? esc_html( $title ) : $plugin['name'] . ' ' . $plugin['version'] . ' ' . esc_html__( '&rsaquo; Fatal Error', 'easy-demo-importer' );
 			$subtitle = $subtitle ? esc_html( $subtitle ) : $plugin['name'] . ' ' . $plugin['version'] . ' ' . __( '&#10230; Plugin Disabled', 'easy-demo-importer' );
 			$footer   = $source ? '<small>' .
-				sprintf(
-				/* translators: %s: file path */
-					__( 'Error source: %s', 'easy-demo-importer' ),
-					esc_html( $source )
-				) . '</small>' : '';
-			$error = "<h3>$title</h3><strong>$subtitle</strong><p>$message</p><hr><p>$footer</p>";
+								sprintf( /* translators: %s: file path */
+									__( 'Error source: %s', 'easy-demo-importer' ),
+									esc_html( $source )
+								) . '</small>' : '';
+			$error    = "<h3>$title</h3><strong>$subtitle</strong><p>$message</p><hr><p>$footer</p>";
 		}
 
 		return $error;
 	}
 
 	/**
-	 * Deactivate plugin.
+	 * Force deactivate plugin.
 	 *
 	 * @return void
 	 * @since 1.0.0
@@ -88,5 +89,22 @@ class Errors {
 		deactivate_plugins( plugin_basename( SD_EDI_ROOT_FILE ) );
 
 		unset( $_GET['activate'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	}
+
+	/**
+	 * Deactivate plugin.
+	 *
+	 * @return void
+	 * @since 1.0.0
+	 */
+	public static function deactivate() {
+		$plugin = SD_EDI_ROOT_FILE;
+
+		if ( is_plugin_active( $plugin ) ) {
+			deactivate_plugins( $plugin );
+		}
+
+		// Redirect to main dashboard page.
+		wp_safe_redirect( admin_url( 'plugins.php' ) );
 	}
 }

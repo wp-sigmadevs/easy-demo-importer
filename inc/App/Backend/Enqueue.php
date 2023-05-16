@@ -24,7 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Class: Enqueue
+ * Backend Class: Enqueue
  *
  * @package ThePluginName\App\Backend
  * @since 1.0.0
@@ -44,11 +44,11 @@ class Enqueue extends EnqueueBase {
 	 * This backend class is only being instantiated in the backend
 	 * as requested in the Bootstrap class.
 	 *
-	 * @see Requester::isAdminBackend()
-	 * @see Bootstrap::registerServices
-	 *
 	 * @return void
 	 * @since 1.0.0
+	 *
+	 * @see Bootstrap::registerServices
+	 * @see Requester::isAdminBackend()
 	 */
 	public function register() {
 		$this->assets();
