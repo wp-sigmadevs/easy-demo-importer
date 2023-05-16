@@ -1,0 +1,25 @@
+// ===========================
+//	Variables
+// ===========================
+
+$color-primary: var(--rtdi-color-primary);
+$color-secondary: var(--rtdi-color-secondary);
+$color-heading: var(--rtdi-color-heading);
+$color-white: #ffffff;
+$color-black: #000000;
+$color-grey: var(--rtdi-color-grey);
+$color-border: var(--rtdi-color-border);
+
+$default-gutter: 30px;
+
+// Breakpoints
+$breakpoints: (
+	"xs": (max-width: 575px,
+	),
+	"sm": (max-width: 767px,
+	),
+	"md": (max-width: 991px,
+	),
+	"lg": (max-width: 1199px,
+	),
+) !default;

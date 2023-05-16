@@ -1,0 +1,74 @@
+/**
+ * Utility CSS.
+ */
+.rtdi-d-flex {
+	@extend %d-flex;
+}
+
+.rtdi-flex-wrap {
+	@extend %flex-wrap;
+}
+
+.rtdi-justify-content-center {
+	@extend %justify-content-center;
+}
+
+.rtdi-align-items-center {
+	@extend %align-items-center;
+}
+
+.rtdi-primary-color {
+	@extend %primary-color;
+}
+
+.rtdi-primary-color-bg {
+	@extend %primary-color-bg;
+}
+
+.rtdi-secondary-color {
+	@extend %secondary-color;
+}
+
+.rtdi-secondary-color-bg {
+	@extend %secondary-color-bg;
+}
+
+.rtdi-white-color {
+	@extend %white-color;
+}
+
+.rtdi-white-color-bg {
+	@extend %white-color-bg;
+}
+
+.rtdi-black-color {
+	@extend %black-color;
+}
+
+.rtdi-black-color-bg {
+	@extend %black-color-bg;
+}
+
+.rtdi-default-gutter {
+	@extend %default-gutter;
+}
+
+.rtdi-mb-0 {
+	@extend %mb-0;
+}
+
+.rtdi-pos-s {
+	@extend %pos-s;
+}
+
+.rtdi-pos-r {
+	@extend %pos-r;
+}
+
+.rtdi-pos-a {
+	@extend %pos-a;
+}
+
+.rtdi-box-shadow {
+	@extend %box-shadow;
+}
