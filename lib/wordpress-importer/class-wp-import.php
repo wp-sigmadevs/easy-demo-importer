@@ -3,13 +3,14 @@
  * WordPress Importer class for managing the import
  * process of a WXR file
  *
- * @package RT\DemoImporter
+ * @package SigmaDevs\EasyDemoImporter
+ * @since   1.0.0
  */
 
 /**
  * WordPress importer class.
  */
-class RTDI_WP_Import extends WP_Importer {
+class SD_EDI_WP_Import extends WP_Importer {
 	var $max_wxr_version = 1.2; // max. supported WXR version
 
 	var $id; // WXR attachment ID
@@ -258,7 +259,7 @@ class RTDI_WP_Import extends WP_Importer {
 				<p>
 					<input type="checkbox" value="1" name="fetch_attachments" id="import-attachments"/>
 					<label
-						for="import-attachments"><?php _e( 'Download and import file attachments', 'radius-demo-importer' ); ?></label>
+							for="import-attachments"><?php _e( 'Download and import file attachments', 'radius-demo-importer' ); ?></label>
 				</p>
 			<?php endif; ?>
 
@@ -1379,7 +1380,7 @@ class RTDI_WP_Import extends WP_Importer {
 	 * @return array Information gathered from the WXR file
 	 */
 	function parse( $file ) {
-		$parser = new RTDI_WXR_Parser();
+		$parser = new SD_EDI_WXR_Parser();
 
 		return $parser->parse( $file );
 	}

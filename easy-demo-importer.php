@@ -79,7 +79,7 @@ if ( ! class_exists( 'SigmaDevs\EasyDemoImporter\\Bootstrap' ) ) {
  * @since 1.0.0
  */
 add_action(
-	'plugins_loaded',
+	'init',
 	static function () use ( $sd_edi_autoloader ) {
 		$app = new Bootstrap();
 		$app->registerServices( $sd_edi_autoloader );

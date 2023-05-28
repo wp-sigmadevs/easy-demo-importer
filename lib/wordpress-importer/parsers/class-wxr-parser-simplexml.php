@@ -2,13 +2,14 @@
 /**
  * WordPress eXtended RSS file parser implementations
  *
- * @package RT\DemoImporter
+ * @package SigmaDevs\EasyDemoImporter
+ * @since   1.0.0
  */
 
 /**
  * WXR Parser that makes use of the SimpleXML PHP extension.
  */
-class RTDI_WXR_Parser_SimpleXML {
+class SD_EDI_WXR_Parser_SimpleXML {
 	function parse( $file ) {
 		$authors    = [];
 		$posts      = [];

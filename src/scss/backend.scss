@@ -2,17 +2,34 @@
 	Admin CSS.
 ===================================*/
 
-// Abstracts
-@import "abstracts/__abstracts-dir";
+//// Abstracts
+//@import "abstracts/__abstracts-dir";
+//
+//// Base Styles
+//@import "base/__base-dir";
+//
+//// Components
+//@import 'components/_components-dir';
+//
+//// Layouts
+//@import 'layouts/__layouts-dir';
 
-// Base Styles
-@import "base/__base-dir";
+@keyframes ediFadeIn {
+	0% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
+}
 
-// Components
-@import 'components/_components-dir';
+.edi-fade-in {
+	animation: ediFadeIn 0.5s ease-in-out;
+}
 
-// Layouts
-@import 'layouts/__layouts-dir';
+//.edi-demo-card {
+//	opacity: 0;
+//}
 
 /*
 @keyframes "rtdi-check-left" {

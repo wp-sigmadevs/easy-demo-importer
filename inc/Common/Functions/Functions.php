@@ -49,6 +49,16 @@ class Functions extends Base {
 	}
 
 	/**
+	 * Get plugin path.
+	 *
+	 * @return string
+	 * @since 1.0.0
+	 */
+	public function getPluginPath() {
+		return $this->plugin->pluginPath();
+	}
+
+	/**
 	 * Init Demo Config.
 	 *
 	 * @return void
@@ -86,7 +96,7 @@ class Functions extends Base {
 	 */
 	public function supportedThemes() {
 		return apply_filters(
-			'sd/edi/importer/themes',
+			'sd/edi/supported_themes',
 			[
 				! empty( $this->getDemoConfig()['themeSlug'] ) ? esc_html( $this->getDemoConfig()['themeSlug'] ) : '',
 			]

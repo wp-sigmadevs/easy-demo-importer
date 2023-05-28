@@ -35,7 +35,8 @@ final class Classes {
 		// Ignore for readable array values on a single line.
 		return [
 			[ 'register' => 'App\\General' ],
-			[ 'register' => 'App\\Backend', 'on_request' => 'backend' ],
+			[ 'register' => 'App\\Rest' ],
+			[ 'register' => 'App\\Backend', 'onRequest' => 'backend' ],
 		];
 		// phpcs:enable
 	}

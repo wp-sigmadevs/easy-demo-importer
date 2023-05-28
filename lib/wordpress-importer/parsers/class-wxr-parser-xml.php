@@ -2,13 +2,14 @@
 /**
  * WordPress eXtended RSS file parser implementations
  *
- * @package RT\DemoImporter
+ * @package SigmaDevs\EasyDemoImporter
+ * @since   1.0.0
  */
 
 /**
  * WXR Parser that makes use of the XML Parser PHP extension.
  */
-class RTDI_WXR_Parser_XML {
+class SD_EDI_WXR_Parser_XML {
 	public $wp_tags     = [
 		'wp:post_id',
 		'wp:post_date',

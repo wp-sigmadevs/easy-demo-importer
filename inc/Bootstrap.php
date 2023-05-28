@@ -145,7 +145,14 @@ final class Bootstrap extends Base {
 	 */
 	public function loadServices( $services ) {
 		foreach ( $services as $service ) {
-			if ( isset( $service['on_request'] ) && ! $this->request( $service['on_request'] )
+			if ( isset( $service['onRequest'] ) && is_array( $service['onRequest'] )
+			) {
+				foreach ( $service['onRequest'] as $onRequest ) {
+					if ( ! $this->request( $onRequest ) ) {
+						continue;
+					}
+				}
+			} elseif ( isset( $service['onRequest'] ) && ! $this->request( $service['onRequest'] )
 			) {
 				continue;
 			}

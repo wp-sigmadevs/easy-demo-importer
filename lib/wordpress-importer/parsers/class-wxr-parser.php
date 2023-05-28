@@ -2,17 +2,18 @@
 /**
  * WordPress eXtended RSS file parser implementations
  *
- * @package RT\DemoImporter
+ * @package SigmaDevs\EasyDemoImporter
+ * @since   1.0.0
  */
 
 /**
  * WordPress Importer class for managing parsing of WXR files.
  */
-class RTDI_WXR_Parser {
+class SD_EDI_WXR_Parser {
 	function parse( $file ) {
 		// Attempt to use proper XML parsers first
 		if ( extension_loaded( 'simplexml' ) ) {
-			$parser = new RTDI_WXR_Parser_SimpleXML();
+			$parser = new SD_EDI_WXR_Parser_SimpleXML();
 			$result = $parser->parse( $file );
 
 			// If SimpleXML succeeds or this is an invalid WXR file then return the results
@@ -20,7 +21,7 @@ class RTDI_WXR_Parser {
 				return $result;
 			}
 		} elseif ( extension_loaded( 'xml' ) ) {
-			$parser = new RTDI_WXR_Parser_XML();
+			$parser = new SD_EDI_WXR_Parser_XML();
 			$result = $parser->parse( $file );
 
 			// If XMLParser succeeds or this is an invalid WXR file then return the results
@@ -46,7 +47,7 @@ class RTDI_WXR_Parser {
 		}
 
 		// use regular expressions if nothing else available or this is bad XML
-		$parser = new RTDI_WXR_Parser_Regex();
+		$parser = new SD_EDI_WXR_Parser_Regex();
 
 		return $parser->parse( $file );
 	}
