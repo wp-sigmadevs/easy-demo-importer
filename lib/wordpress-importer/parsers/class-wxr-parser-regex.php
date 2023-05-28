@@ -2,13 +2,14 @@
 /**
  * WordPress eXtended RSS file parser implementations
  *
- * @package RT\DemoImporter
+ * @package SigmaDevs\EasyDemoImporter
+ * @since   1.0.0
  */
 
 /**
  * WXR Parser that uses regular expressions. Fallback for installs without an XML parser.
  */
-class WXR_Parser_Regex {
+class RT_EDI_Parser_Regex {
 	public $authors       = [];
 	public $posts         = [];
 	public $categories    = [];

@@ -5,7 +5,8 @@
  * Import posts, pages, comments, custom fields, categories, tags
  * and more from a WordPress export file.
  *
- * @package RT\DemoImporter
+ * @package SigmaDevs\EasyDemoImporter
+ * @since   1.0.0
  */
 
 if ( ! defined( 'WP_LOAD_IMPORTERS' ) ) {
@@ -29,17 +30,17 @@ if ( ! class_exists( 'WP_Importer' ) ) {
 /** Functions missing in older WordPress versions. */
 require_once dirname( __FILE__ ) . '/compat.php';
 
-/** RTDI_WXR_Parser class */
+/** SD_EDI_WXR_Parser class */
 require_once dirname( __FILE__ ) . '/parsers/class-wxr-parser.php';
 
-/** RTDI_WXR_Parser_SimpleXML class */
+/** SD_EDI_WXR_Parser_SimpleXML class */
 require_once dirname( __FILE__ ) . '/parsers/class-wxr-parser-simplexml.php';
 
-/** RTDI_WXR_Parser_XML class */
+/** SD_EDI_WXR_Parser_XML class */
 require_once dirname( __FILE__ ) . '/parsers/class-wxr-parser-xml.php';
 
-/** RTDI_WXR_Parser_Regex class */
+/** SD_EDI_WXR_Parser_Regex class */
 require_once dirname( __FILE__ ) . '/parsers/class-wxr-parser-regex.php';
 
-/** RTDI_WP_Import class */
+/** SD_EDI_WP_Import class */
 require_once dirname( __FILE__ ) . '/class-wp-import.php';

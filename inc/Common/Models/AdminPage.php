@@ -23,7 +23,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 1.0.0
  */
 class AdminPage {
-
 	/**
 	 * Admin pages.
 	 *

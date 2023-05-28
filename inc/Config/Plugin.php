@@ -50,8 +50,8 @@ final class Plugin {
 	public function getOwnPluginData() {
 		return [
 			'settings'            => get_option( 'sd-edi-settings' ),
-			'plugin_path'         => \untrailingslashit( \plugin_dir_path( SD_EDI_ROOT_FILE ) ),
-			'plugin_uri'          => \untrailingslashit( \plugin_dir_url( SD_EDI_ROOT_FILE ) ),
+			'plugin_path'         => untrailingslashit( plugin_dir_path( SD_EDI_ROOT_FILE ) ),
+			'plugin_uri'          => untrailingslashit( plugin_dir_url( SD_EDI_ROOT_FILE ) ),
 			'plugin_active_file'  => plugin_basename( SD_EDI_ROOT_FILE ),
 			'demo_import_page'    => 'sd-easy-demo-importer',
 			'system_status_page'  => 'sd-edi-demo-importer-status',

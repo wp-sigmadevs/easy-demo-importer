@@ -34,7 +34,6 @@ if (process.env.npm_config_package) {
 			"vendor",
 			"index.php",
 			"README.txt",
-			"uninstall.php",
 			`${package_slug}.php`,
 		];
 
@@ -85,15 +84,15 @@ if (
 	/**
 	 * JS
 	 */
-	mix.js('src/js/admin.js', 'assets/js/')
+	mix.js('src/js/backend.js', 'assets/js/backend.min.js').react();
 
 	/**
 	 * CSS
 	 */
 	if (!mix.inProduction()) {
-		mix.sass("src/sass/admin.scss", "assets/css/",).sourceMaps(true, 'source-map');
+		mix.sass("src/scss/backend.scss", "assets/css/backend.min.css",).sourceMaps(true, 'source-map');
 	} else {
-		mix.sass("src/sass/admin.scss", "assets/css/");
+		mix.sass("src/scss/backend.scss", "assets/css/backend.min.css");
 	}
 }
 if (process.env.npm_config_zip) {

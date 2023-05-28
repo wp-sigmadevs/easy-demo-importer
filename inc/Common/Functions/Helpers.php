@@ -12,6 +12,7 @@ declare( strict_types=1 );
 
 namespace SigmaDevs\EasyDemoImporter\Common\Functions;
 
+use WP_Post;
 use WP_Error;
 
 // Do not allow directly accessing this file.
@@ -34,7 +35,7 @@ class Helpers {
 	 * @since  1.0.0
 	 */
 	public static function ajaxUrl() {
-		return admin_url( 'admin-ajax.php', 'relative' );
+		return admin_url( 'admin-ajax.php' );
 	}
 
 	/**
@@ -50,6 +51,27 @@ class Helpers {
 	}
 
 	/**
+	 * Check if the AJAX call is valid.
+	 *
+	 * @return void
+	 * @since  1.0.0
+	 */
+	public static function verifyAjaxCall() {
+		check_ajax_referer( self::nonceText(), self::nonceId() );
+
+		if ( ! current_user_can( 'import' ) ) {
+			wp_die(
+				sprintf(
+				/* translators: %1$s - opening div and paragraph HTML tags, %2$s - closing div and paragraph HTML tags. */
+					__( '%1$sYour user role isn\'t high enough. You don\'t have permission to import demo data.%2$s', 'easy-demo-importer' ),
+					'<div class="notice notice-error"><p>',
+					'</p></div>'
+				)
+			);
+		}
+	}
+
+	/**
 	 * Nonce ID.
 	 *
 	 * @static
@@ -59,41 +81,6 @@ class Helpers {
 	 */
 	public static function nonceId() {
 		return 'sd_edi_nonce';
-	}
-
-	/**
-	 * Creates Nonce.
-	 *
-	 * @static
-	 *
-	 * @return void
-	 * @since  1.0.0
-	 */
-	public static function createNonce() {
-		wp_nonce_field( self::nonceText(), self::nonceId() );
-	}
-
-	/**
-	 * Verifies the Nonce.
-	 *
-	 * @static
-	 *
-	 * @return bool
-	 * @since  1.0.0
-	 */
-	public static function verifyNonce() {
-		$nonce     = null;
-		$nonceText = self::nonceText();
-
-		if ( isset( $_REQUEST[ self::nonceId() ] ) ) {
-			$nonce = sanitize_text_field( wp_unslash( $_REQUEST[ self::nonceId() ] ) );
-		}
-
-		if ( ! wp_verify_nonce( $nonce, $nonceText ) ) {
-			return false;
-		}
-
-		return true;
 	}
 
 	/**
@@ -214,31 +201,6 @@ class Helpers {
 	}
 
 	/**
-	 * Sanitizes Hex Color.
-	 *
-	 * @param string $color Hex Color.
-	 *
-	 * @return string
-	 * @since  1.0.0
-	 */
-	public static function sanitizeHexColor( $color ) {
-		if ( function_exists( 'sanitize_hex_color' ) ) {
-			return sanitize_hex_color( $color );
-		} else {
-			if ( '' === $color ) {
-				return '';
-			}
-
-			// 3 or 6 hex digits, or the empty string.
-			if ( preg_match( '|^#([A-Fa-f0-9]{3}){1,2}$|', $color ) ) {
-				return $color;
-			}
-		}
-
-		return '';
-	}
-
-	/**
 	 * Renders Admin View.
 	 *
 	 * @param string $viewName View name.
@@ -263,5 +225,165 @@ class Helpers {
 		}
 
 		load_template( $viewFile, true, $args );
+	}
+
+
+	/**
+	 * Determines the active status of a plugin given its file path.
+	 *
+	 * @param string $filePath The file path of the plugin.
+	 *
+	 * @return string
+	 * @since  1.0.0
+	 */
+	public static function pluginActivationStatus( $filePath ) {
+		$status     = 'install';
+		$pluginPath = WP_PLUGIN_DIR . '/' . esc_attr( $filePath );
+
+		if ( file_exists( $pluginPath ) ) {
+			$status = is_plugin_active( $filePath ) ? 'active' : 'inactive';
+		}
+
+		return $status;
+	}
+
+	/**
+	 * Returns the display status of a plugin given its status code.
+	 *
+	 * @param string $status The status code of the plugin.
+	 *
+	 * @return string
+	 * @since  1.0.0
+	 */
+	public static function getPluginStatus( $status ) {
+		switch ( $status ) {
+			case 'install':
+				$pluginStatus = esc_html__( 'Not Installed', 'easy-demo-importer' );
+				break;
+
+			case 'active':
+				$pluginStatus = esc_html__( 'Installed and Active', 'easy-demo-importer' );
+				break;
+
+			case 'inactive':
+				$pluginStatus = esc_html__( 'Installed but Not Active', 'easy-demo-importer' );
+				break;
+
+			default:
+				$pluginStatus = '';
+		}
+
+		return $pluginStatus;
+	}
+
+	/**
+	 * Delete widgets.
+	 *
+	 * @return void
+	 * @since  1.0.0
+	 */
+	public static function deleteWidgets() {
+		global $wp_registered_widget_controls;
+
+		$widgetControls = $wp_registered_widget_controls;
+
+		$availableWidgets = [];
+
+		foreach ( $widgetControls as $widget ) {
+			if ( ! empty( $widget['id_base'] ) && ! isset( $availableWidgets[ $widget['id_base'] ] ) ) {
+				$availableWidgets[] = $widget['id_base'];
+			}
+		}
+
+		update_option( 'sidebars_widgets', [ 'wp_inactive_widgets' => [] ] );
+
+		foreach ( $availableWidgets as $widgetData ) {
+			update_option( 'widget_' . $widgetData, [] );
+		}
+	}
+
+	/**
+	 * Delete ThemeMods.
+	 *
+	 * @return void
+	 * @since  1.0.0
+	 */
+	public static function deleteThemeMods() {
+		$themeSlug = get_option( 'stylesheet' );
+		$mods      = get_option( "theme_mods_$themeSlug" );
+
+		if ( false !== $mods ) {
+			delete_option( "theme_mods_$themeSlug" );
+		}
+	}
+
+	/**
+	 * Deletes any registered navigation menus
+	 *
+	 * @return void
+	 * @since  1.0.0
+	 */
+	public static function deleteNavMenus() {
+		$nav_menus = wp_get_nav_menus();
+
+		// Delete navigation menus.
+		if ( ! empty( $nav_menus ) ) {
+			foreach ( $nav_menus as $nav_menu ) {
+				wp_delete_nav_menu( $nav_menu->slug );
+			}
+		}
+	}
+
+	/**
+	 * Check if array key exists;
+	 *
+	 * @param string $key Key to check.
+	 * @param string $dataType Data type.
+	 *
+	 * @return array|string
+	 * @since  1.0.0
+	 */
+	public static function keyExists( $key, $dataType = 'string' ) {
+		if ( 'array' === $dataType ) {
+			$data = [];
+		} else {
+			$data = '';
+		}
+
+		return ! empty( $key ) ? $key : $data;
+	}
+
+	/**
+	 * Get page by title.
+	 *
+	 * @param string $title Page name.
+	 * @param string $post_type Post type.
+	 *
+	 * @return WP_Post|null
+	 * @since  1.0.0
+	 */
+	public static function getPageByTitle( $title, $post_type = 'page' ) {
+		$query = new \WP_Query(
+			[
+				'post_type'              => esc_html( $post_type ),
+				'title'                  => esc_html( $title ),
+				'post_status'            => 'all',
+				'posts_per_page'         => 1,
+				'no_found_rows'          => true,
+				'ignore_sticky_posts'    => true,
+				'update_post_term_cache' => false,
+				'update_post_meta_cache' => false,
+				'orderby'                => 'post_date ID',
+				'order'                  => 'ASC',
+			]
+		);
+
+		if ( ! empty( $query->post ) ) {
+			$pageByTitle = $query->post;
+		} else {
+			$pageByTitle = null;
+		}
+
+		return $pageByTitle;
 	}
 }

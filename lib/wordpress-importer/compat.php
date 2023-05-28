@@ -3,7 +3,8 @@
  * Implementation for WordPress functions missing
  * in older WordPress versions.
  *
- * @package RT\DemoImporter
+ * @package SigmaDevs\EasyDemoImporter
+ * @since   1.0.0
  */
 
 if ( ! function_exists( 'wp_slash_strings_only' ) ) {
