@@ -27,7 +27,7 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 		}
 
 		const request = {
-			id,
+			demo: id,
 			reset,
 			nextPhase: 'sd_edi_install_demo',
 			excludeImages,
@@ -38,11 +38,53 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 			// setCurrentStep(2); // Move to the next step (import progress)
 
 			setTimeout(function () {
-				doFetch(request);
+				doAxios(request);
 			}, 2000);
 		} catch (error) {
 			console.error('Error:', error);
 			// Handle the import error
+		}
+	};
+
+	const doAxios = async (request) => {
+		if (request.nextPhase) {
+			// const data = {
+			// 	action: request.nextPhase,
+			// 	demo: request.id,
+			// 	reset: request.reset,
+			// 	excludeImages: request.excludeImages,
+			// 	sd_edi_nonce: sdEdiAdminParams.sd_edi_nonce,
+			// };
+
+			const params = new FormData();
+			params.append('action', request.nextPhase);
+			params.append('demo', request.demo);
+			params.append('reset', request.reset);
+			params.append('excludeImages', request.excludeImages);
+			params.append('sd_edi_nonce', sdEdiAdminParams.sd_edi_nonce);
+
+			const requestUrl = sdEdiAdminParams.ajaxUrl;
+
+			console.log(request)
+
+			try {
+				const response = await axios.post(requestUrl, params);
+
+				// if (!response.error) {
+				// console.log(response)
+				setTimeout(() => {
+					doAxios(response.data);
+				}, 2000);
+				// } else {
+				// 	// console.log(data.errorMessage)
+				// }
+				// Handle the response data here
+			} catch (error) {
+				console.error('Error:', error);
+				// Handle any errors here
+			}
+		} else {
+			console.log(sdEdiAdminParams.importSuccess)
 		}
 	};
 
@@ -62,65 +104,5 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 		</Modal>
 	);
 };
-
-async function doFetch(info) {
-	if (info.nextPhase) {
-		const data = {
-			action: info.nextPhase,
-			demo: info.demo,
-			reset: info.reset,
-			excludeImages: info.excludeImages,
-			sd_edi_nonce: sdEdiAdminParams.sd_edi_nonce,
-		};
-
-		axios.post(sdEdiAdminParams.ajaxurl, data)
-			.then(response => {
-				console.log(response)
-				const info = JSON.parse(response.data);
-
-				if (!info.error) {
-
-				}
-			})
-			.catch(error => {
-				console.log(error)
-			});
-
-
-		// try {
-		// 	const response = await fetch(sdEdiAdminParams.ajaxUrl, {
-		// 		method: 'POST',
-		// 		headers: {
-		// 			'Content-Type': 'application/json',
-		// 		},
-		// 		body: JSON.stringify(data),
-		// 	});
-		//
-		// 	if (!response.ok) {
-		// 		throw new Error('Network response was not ok');
-		// 	}
-		//
-		// 	const responseData = await response.json();
-		//
-		// 	if (!responseData.error) {
-		// 		if (responseData.completedMessage) {
-		// 			// 	const importProgressMessage = document.querySelector(
-		// 			// 		'#rtdi-import-progress .rtdi-import-progress-message'
-		// 			// 	);
-		// 			// 	importProgressMessage.style.display = 'none';
-		// 			// 	importProgressMessage.innerHTML = '';
-		// 			// 	importProgressMessage.style.display = 'block';
-		// 			// 	importProgressMessage.innerHTML =
-		// 			// 		responseData.completedMessage;
-		// 			// }
-		// 			setTimeout(function () {
-		// 				doFetch(responseData);
-		// 			}, 2000);
-		// 		}
-		// 	}
-		// } catch (error) {
-		// }
-	}
-}
 
 export default ModalComponent;

@@ -12,6 +12,8 @@ declare( strict_types=1 );
 
 namespace SigmaDevs\EasyDemoImporter\Common\Abstracts;
 
+use SigmaDevs\EasyDemoImporter\Common\Functions\Helpers;
+
 // Do not allow directly accessing this file.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit( 'This script cannot be accessed directly.' );
@@ -102,17 +104,33 @@ abstract class ImporterAjax {
 		// Check if multiple demo is configured.
 		$this->multiple = ! empty( $this->config['multipleZip'] ) ? $this->config['multipleZip'] : false;
 
-		// First demo slug.
-		$firstDemoSlug = array_key_first( $this->config['demoData'] );
-
 		// Demo slug.
-		$this->demoSlug = ! empty( $_POST['demo'] ) ? $this->multiple ? sanitize_text_field( wp_unslash( $_POST['demo'] ) ) : $firstDemoSlug : $firstDemoSlug;
+		$this->demoSlug = $this->getDemoSlug();
 
 		// Check if images import is needed.
 		$this->excludeImages = ! empty( $_POST['excludeImages'] ) ? sanitize_text_field( wp_unslash( $_POST['excludeImages'] ) ) : '';
 
 		// Check if database reset needed.
 		$this->reset = isset( $_POST['reset'] ) && 'true' === $_POST['reset'];
+	}
+
+	/**
+	 * Get demo slug.
+	 *
+	 * @return int|string|null
+	 *
+	 * @since 1.0.0
+	 */
+	private function getDemoSlug() {
+		$firstDemoSlug = array_key_first( $this->config['demoData'] );
+
+		if ( empty( $_POST['demo'] ) ) {
+			return $firstDemoSlug;
+		}
+
+		$demoSlug = sanitize_text_field( wp_unslash( $_POST['demo'] ) );
+
+		return $this->multiple ? $this->config['demoData'][ $demoSlug ] : $demoSlug;
 	}
 
 	/**
@@ -148,9 +166,7 @@ abstract class ImporterAjax {
 	 * @since 1.0.0
 	 */
 	private function sendResponse() {
-		$json = wp_json_encode( $this->response );
-
-		wp_send_json( $json );
+		wp_send_json( $this->response );
 	}
 
 	/**
@@ -163,6 +179,18 @@ abstract class ImporterAjax {
 	 */
 	public function demoUploadDir( $path = '' ) {
 		return $this->uploadsDir['basedir'] . '/easy-demo-importer/' . $path;
+	}
+
+	/**
+	 * Demo directory.
+	 *
+	 * @return array|string
+	 * @since 1.0.0
+	 */
+	public function demoDir() {
+		$demoZip = $this->multiple ? Helpers::keyExists( $this->config['demoData'][ $this->demoSlug ]['demoZip'] ) : Helpers::keyExists( $this->config['demoZip'] );
+
+		return pathinfo( basename( $demoZip ), PATHINFO_FILENAME );
 	}
 
 	/**

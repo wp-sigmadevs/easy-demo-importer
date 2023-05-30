@@ -65,7 +65,7 @@ class CustomizerImport extends ImporterAjax {
 	public function response() {
 		Helpers::verifyAjaxCall();
 
-		$customizerFilePath = $this->demoUploadDir( $this->demoSlug ) . '/customizer.dat';
+		$customizerFilePath = $this->demoUploadDir( $this->demoDir() ) . '/customizer.dat';
 		$fileExists         = file_exists( $customizerFilePath );
 
 		if ( $fileExists ) {

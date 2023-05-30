@@ -14,6 +14,7 @@ namespace SigmaDevs\EasyDemoImporter\App\Backend\Ajax;
 
 use SigmaDevs\EasyDemoImporter\Common\Abstracts\ImporterAjax;
 use SigmaDevs\EasyDemoImporter\Common\{
+	Models\Widgets,
 	Traits\Singleton,
 	Functions\Helpers
 };
@@ -64,7 +65,7 @@ class ImportWidgets extends ImporterAjax {
 	public function response() {
 		Helpers::verifyAjaxCall();
 
-		$widgetsFilePath = $this->demoUploadDir( $this->demoSlug ) . '/widget.wie';
+		$widgetsFilePath = $this->demoUploadDir( $this->demoDir() ) . '/widget.wie';
 		$fileExists      = file_exists( $widgetsFilePath );
 
 		if ( $fileExists ) {
