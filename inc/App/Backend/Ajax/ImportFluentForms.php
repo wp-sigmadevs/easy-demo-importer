@@ -90,7 +90,7 @@ class ImportFluentForms extends ImporterAjax {
 	 * @since 1.0.0
 	 */
 	private function importFluentForms( $form ) {
-		$formFile   = $this->demoUploadDir( $this->demoSlug ) . '/' . $form . '.json';
+		$formFile   = $this->demoUploadDir( $this->demoDir() ) . '/' . $form . '.json';
 		$fileExists = file_exists( $formFile );
 
 		if ( $fileExists ) {

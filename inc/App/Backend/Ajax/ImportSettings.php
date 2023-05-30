@@ -64,13 +64,13 @@ class ImportSettings extends ImporterAjax {
 	public function response() {
 		Helpers::verifyAjaxCall();
 
-		$settings = $this->multiple ? Fns::keyExists( $this->config['demoData'][ $this->demoSlug ]['settingsJson'] ) : Fns::keyExists( $this->config['settingsJson'] );
+		$settings = $this->multiple ? Helpers::keyExists( $this->config['demoData'][ $this->demoSlug ]['settingsJson'] ) : Helpers::keyExists( $this->config['settingsJson'] );
 
 		$settingsExists = isset( $settings ) && is_array( $settings );
 
 		if ( $settingsExists ) {
 			foreach ( $settings as $option ) {
-				$optionFile = $this->demoUploadDir( $this->demoSlug ) . '/' . $option . '.json';
+				$optionFile = $this->demoUploadDir( $this->demoDir() ) . '/' . $option . '.json';
 				$fileExists = file_exists( $optionFile );
 
 				if ( $fileExists ) {

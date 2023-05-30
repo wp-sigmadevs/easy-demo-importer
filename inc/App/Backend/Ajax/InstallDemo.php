@@ -53,7 +53,7 @@ class InstallDemo extends ImporterAjax {
 	public function register() {
 		parent::register();
 
-		add_action( 'wp_ajax_ds_edi_import_xml', [ $this, 'response' ] );
+		add_action( 'wp_ajax_sd_edi_import_xml', [ $this, 'response' ] );
 	}
 
 	/**
@@ -65,7 +65,7 @@ class InstallDemo extends ImporterAjax {
 	public function response() {
 		Helpers::verifyAjaxCall();
 
-		$xmlFile = $this->demoUploadDir( $this->demoSlug ) . '/content.xml';
+		$xmlFile = $this->demoUploadDir( $this->demoDir() ) . '/content.xml';
 
 		$fileExists = file_exists( $xmlFile );
 
@@ -101,7 +101,7 @@ class InstallDemo extends ImporterAjax {
 		}
 
 		if ( ! class_exists( 'SD_EDI_WP_Import' ) ) {
-			$wpImporter = sd_edi()->getPluginPath() . 'lib/wordpress-importer/wordpress-importer.php';
+			$wpImporter = sd_edi()->getPluginPath() . '/lib/wordpress-importer/wordpress-importer.php';
 
 			if ( file_exists( $wpImporter ) ) {
 				require_once $wpImporter;
