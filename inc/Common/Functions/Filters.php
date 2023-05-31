@@ -24,16 +24,17 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Filters {
 	/**
-	 * Testing hooked function.
+	 * Update the list of file types support.
 	 *
-	 * @static
+	 * @param array $file_types List of supported file types.
 	 *
-	 * @param string $title Title.
-	 *
-	 * @return string
-	 * @since  1.0.0
+	 * @return array
+	 * @since 1.0.0
 	 */
-	public static function testFilter( $title ) {
-		return $title;
+	public static function supportedFileTypes( $file_types ) {
+		$new_filetypes        = [];
+		$new_filetypes['svg'] = 'image/svg+xml';
+
+		return array_merge( $file_types, $new_filetypes );
 	}
 }

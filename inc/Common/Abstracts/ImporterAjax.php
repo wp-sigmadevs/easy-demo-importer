@@ -94,9 +94,12 @@ abstract class ImporterAjax {
 	 * @see Requester::isAdminBackend()
 	 */
 	public function register() {
-
 		// Theme config.
 		$this->config = sd_edi()->getDemoConfig();
+
+		if ( empty( $this->config ) ) {
+			return;
+		}
 
 		// Uploads Directory.
 		$this->uploadsDir = wp_get_upload_dir();

@@ -64,10 +64,10 @@ class DeactivateNotice extends Base {
 	 * @since 1.0.0
 	 */
 	public function deactivateNotice() {
-		$importSuccess          = get_option( 'sd-edi-import-success' );
-		$ignoreDeactivateNotice = get_option( 'sd-edi-plugin-deactivate-notice' );
+		$importSuccess          = get_option( 'edi_import_success' );
+		$ignoreDeactivateNotice = get_option( 'edi_plugin_deactivate_notice' );
 
-		if ( ! $importSuccess || ! current_user_can( 'deactivate_plugin' ) || ( $ignoreDeactivateNotice && current_user_can( 'deactivate_plugin' ) ) ) {
+		if ( ! $importSuccess || ! current_user_can( 'deactivate_plugin' ) || ( 'true' === $ignoreDeactivateNotice && current_user_can( 'deactivate_plugin' ) ) ) {
 			return $this;
 		}
 
@@ -96,7 +96,6 @@ class DeactivateNotice extends Base {
 	private function noticeMarkup() {
 		ob_start();
 		?>
-
 		<p>
 			<?php
 			echo sprintf( /* translators: %s: Plugin name */
@@ -147,7 +146,9 @@ class DeactivateNotice extends Base {
 	public function ignoreNotice() {
 		/* If user clicks to ignore the notice, add that to the options table. */
 		if ( isset( $_GET['nag_sd_edi_plugin_deactivate_notice'] ) && '0' === $_GET['nag_sd_edi_plugin_deactivate_notice'] ) {
-			update_option( 'sd-edi-plugin-deactivate-notice', 'true' );
+			update_option( 'edi_plugin_deactivate_notice', 'true' );
+
+			wp_safe_redirect( admin_url( 'plugins.php' ) );
 		}
 	}
 }
