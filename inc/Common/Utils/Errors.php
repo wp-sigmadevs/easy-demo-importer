@@ -98,7 +98,7 @@ class Errors {
 	 * @since 1.0.0
 	 */
 	public static function deactivate() {
-		$plugin = SD_EDI_ROOT_FILE;
+		$plugin = sd_edi()->getData()['plugin_active_file'];
 
 		if ( is_plugin_active( $plugin ) ) {
 			deactivate_plugins( $plugin );

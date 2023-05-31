@@ -64,7 +64,9 @@ class Hooks extends Base {
 	 * @return Hooks
 	 */
 	public function actions() {
-		add_action( 'init', [ Actions::class, 'testAction' ] );
+		add_action( 'init', [ Actions::class, 'rewriteFlushCheck' ] );
+		add_action( 'sd/edi/importer_init', [ Actions::class, 'beforeImportActions' ] );
+		add_action( 'sd/edi/after_import', [ Actions::class, 'afterImportActions' ] );
 
 		return $this;
 	}
@@ -75,7 +77,7 @@ class Hooks extends Base {
 	 * @return Hooks
 	 */
 	public function filters() {
-		add_filter( 'my_plugin_boilerplate_post_type_title', [ Filters::class, 'testFilter' ], 99 );
+		add_filter( 'upload_mimes', [ Filters::class, 'supportedFileTypes' ] );
 
 		return $this;
 	}
