@@ -166,41 +166,6 @@ class Helpers {
 	}
 
 	/**
-	 * Sanitize field value
-	 *
-	 * @static
-	 *
-	 * @param array $field Meta Fields.
-	 * @param mixed $value Value to sanitize.
-	 *
-	 * @return string|void
-	 * @since  1.0.0
-	 */
-	public static function sanitize( $field = [], $value = null ) {
-		if ( ! is_array( $field ) ) {
-			return;
-		}
-
-		$type = ( ! empty( $field['type'] ) ? $field['type'] : 'text' );
-
-		if ( 'number' === $type || 'select' === $type || 'checkbox' === $type || 'radio' === $type ) {
-			$sanitizedValue = sanitize_text_field( $value );
-		} elseif ( 'text' === $type ) {
-			$sanitizedValue = wp_kses( $value, self::allowedTags() );
-		} elseif ( 'url' === $type ) {
-			$sanitizedValue = esc_url( $value );
-		} elseif ( 'textarea' === $type ) {
-			$sanitizedValue = wp_kses_post( $value );
-		} elseif ( 'color' === $type ) {
-			$sanitizedValue = self::sanitizeHexColor( $value );
-		} else {
-			$sanitizedValue = sanitize_text_field( $value );
-		}
-
-		return $sanitizedValue;
-	}
-
-	/**
 	 * Renders Admin View.
 	 *
 	 * @param string $viewName View name.
@@ -241,39 +206,14 @@ class Helpers {
 		$pluginPath = WP_PLUGIN_DIR . '/' . esc_attr( $filePath );
 
 		if ( file_exists( $pluginPath ) ) {
-			$status = is_plugin_active( $filePath ) ? 'active' : 'inactive';
+			include_once ABSPATH . 'wp-admin/includes/plugin.php';
+
+			if ( function_exists( 'is_plugin_active' ) ) {
+				$status = is_plugin_active( $filePath ) ? 'active' : 'inactive';
+			}
 		}
 
 		return $status;
-	}
-
-	/**
-	 * Returns the display status of a plugin given its status code.
-	 *
-	 * @param string $status The status code of the plugin.
-	 *
-	 * @return string
-	 * @since  1.0.0
-	 */
-	public static function getPluginStatus( $status ) {
-		switch ( $status ) {
-			case 'install':
-				$pluginStatus = esc_html__( 'Not Installed', 'easy-demo-importer' );
-				break;
-
-			case 'active':
-				$pluginStatus = esc_html__( 'Installed and Active', 'easy-demo-importer' );
-				break;
-
-			case 'inactive':
-				$pluginStatus = esc_html__( 'Installed but Not Active', 'easy-demo-importer' );
-				break;
-
-			default:
-				$pluginStatus = '';
-		}
-
-		return $pluginStatus;
 	}
 
 	/**

@@ -83,6 +83,7 @@ class ImportSettings extends ImporterAjax {
 			}
 		}
 
+		// TODO: Need to check form file before giving response.
 		$forms = $this->multiple ? Helpers::keyExists( $this->config['demoData'][ $this->demoSlug ]['fluentFormsJson'] ) : Helpers::keyExists( $this->config['fluentFormsJson'] );
 
 		$formsExists = isset( $forms ) || is_plugin_active( 'fluentform/fluentform.php' );
