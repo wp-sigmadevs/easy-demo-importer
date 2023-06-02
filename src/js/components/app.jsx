@@ -26,22 +26,6 @@ const App = () => {
 		importList.success && importList.data && importList.data.demoData;
 	const pluginData =
 		importList.success && importList.data && importList.data.plugins;
-	// if (!importList.success) {
-	// 	return (
-	// 		<>
-	// 			<div className="wrap rtdi-demo-importer-wrapper">
-	// 				<div className="rtdi-header">
-	// 					<h1>Easy Demo Importer</h1>
-	// 				</div>
-	// 				<div className="rtdi-content">
-	// 					<div className="rtdi-container">
-	// 						<div className="error-message">{errorMessage}</div>
-	// 					</div>
-	// 				</div>
-	// 			</div>
-	// 		</>
-	// 	);
-	// }
 
 	const showModal = (data) => {
 		setModalVisible(true);
