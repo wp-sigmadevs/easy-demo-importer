@@ -1,21 +1,47 @@
 import { Row, Col, Button } from 'antd';
 import React, { useState, useEffect } from 'react';
 import gridSkeleton from './skeleton';
-import { useImportListStore } from '../utils/importListStore';
+import { usePluginListStore } from '../utils/pluginListStore';
 import ModalComponent from './ModalComponent';
 
 /* global sdEdiAdminParams */
 
 const App = () => {
-	const { importList, loading, fetchImportList } = useImportListStore();
+	const { importList, loading, fetchImportList } = usePluginListStore();
 	const [modalVisible, setModalVisible] = useState(false);
 	const [modalData, setModalData] = useState(null);
+	const [errorMessage, setErrorMessage] = useState('');
 
 	useEffect(() => {
 		fetchImportList('/sd/edi/v1/import/list');
 	}, [fetchImportList]);
 
-	const demoData = importList.data && importList.data.demoData;
+	useEffect(() => {
+		if (!importList.success) {
+			setErrorMessage(importList.message);
+		}
+	}, [importList]);
+
+	const demoData =
+		importList.success && importList.data && importList.data.demoData;
+	const pluginData =
+		importList.success && importList.data && importList.data.plugins;
+	// if (!importList.success) {
+	// 	return (
+	// 		<>
+	// 			<div className="wrap rtdi-demo-importer-wrapper">
+	// 				<div className="rtdi-header">
+	// 					<h1>Easy Demo Importer</h1>
+	// 				</div>
+	// 				<div className="rtdi-content">
+	// 					<div className="rtdi-container">
+	// 						<div className="error-message">{errorMessage}</div>
+	// 					</div>
+	// 				</div>
+	// 			</div>
+	// 		</>
+	// 	);
+	// }
 
 	const showModal = (data) => {
 		setModalVisible(true);
@@ -65,65 +91,92 @@ const App = () => {
 								</>
 							) : (
 								<>
-									{Object.keys(demoData).map((key, index) => (
-										<Col
-											className="gutter-row edi-demo-card edi-fade-in"
-											xs={24}
-											sm={24}
-											md={12}
-											lg={8}
-											xl={6}
-											key={`demo-${index}`}
-										>
-											<div className="demo-wrapper">
-												<header>
-													<img
-														src={
-															demoData[key]
-																.previewImage
-														}
-														alt="Preview"
-													/>
-													<a
-														className="details"
-														target="_blank"
-														href={
-															demoData[key]
-																.previewUrl
-														}
-														rel="noreferrer"
+									{!importList.success ? (
+										<>
+											<Col>
+												{errorMessage && (
+													<div className="error-message">
+														{errorMessage}
+													</div>
+												)}
+											</Col>
+										</>
+									) : (
+										<>
+											{Object.keys(demoData).map(
+												(key, index) => (
+													<Col
+														className="gutter-row edi-demo-card edi-fade-in"
+														xs={24}
+														sm={24}
+														md={12}
+														lg={8}
+														xl={6}
+														key={`demo-${index}`}
 													>
-														Preview
-													</a>
-												</header>
-												<div className="edi-demo-content">
-													<div className="demo-name">
-														<h2>
-															{demoData[key].name}
-														</h2>
-													</div>
-													<div className="edi-demo-actions">
-														<Button
-															className="edi-modal-button"
-															type="primary"
-															onClick={() =>
-																showModal({
-																	id: key,
-																	data: demoData[
-																		key
-																	],
-																	reset: true,
-																	excludeImages: true,
-																})
-															}
-														>
-															Import
-														</Button>
-													</div>
-												</div>
-											</div>
-										</Col>
-									))}
+														<div className="demo-wrapper">
+															<header>
+																<img
+																	src={
+																		demoData[
+																			key
+																		]
+																			.previewImage
+																	}
+																	alt="Preview"
+																/>
+																<a
+																	className="details"
+																	target="_blank"
+																	href={
+																		demoData[
+																			key
+																		]
+																			.previewUrl
+																	}
+																	rel="noreferrer"
+																>
+																	Preview
+																</a>
+															</header>
+															<div className="edi-demo-content">
+																<div className="demo-name">
+																	<h2>
+																		{
+																			demoData[
+																				key
+																			]
+																				.name
+																		}
+																	</h2>
+																</div>
+																<div className="edi-demo-actions">
+																	<Button
+																		className="edi-modal-button"
+																		type="primary"
+																		onClick={() =>
+																			showModal(
+																				{
+																					id: key,
+																					data: demoData[
+																						key
+																					],
+																					reset: true,
+																					excludeImages: true,
+																				}
+																			)
+																		}
+																	>
+																		Import
+																	</Button>
+																</div>
+															</div>
+														</div>
+													</Col>
+												)
+											)}
+										</>
+									)}
 								</>
 							)}
 						</Row>
@@ -133,6 +186,7 @@ const App = () => {
 					visible={modalVisible}
 					onCancel={handleModalCancel}
 					modalData={modalData}
+					pluginData={pluginData}
 				/>
 			</div>
 		</>

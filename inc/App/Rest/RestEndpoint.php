@@ -12,10 +12,10 @@ namespace SigmaDevs\EasyDemoImporter\App\Rest;
 
 use WP_Error;
 use WP_REST_Response;
-use SigmaDevs\EasyDemoImporter\Common\
-{
+use SigmaDevs\EasyDemoImporter\Common\{
 	Abstracts\Base,
-	Traits\Singleton
+	Traits\Singleton,
+	Functions\Helpers
 };
 
 // Do not allow directly accessing this file.
@@ -65,8 +65,10 @@ class RestEndpoint extends Base {
 	 */
 	public function register() {
 		if ( class_exists( 'WP_REST_Server' ) ) {
-			add_action( 'rest_api_init', [ $this, 'addPluginRestApi' ] );
+			add_action( 'rest_api_init', [ $this, 'addPluginApiEndpoint' ] );
 		}
+
+		$this->pluginList();
 	}
 
 	/**
@@ -129,28 +131,47 @@ class RestEndpoint extends Base {
 	}
 
 	/**
-	 * Add REST API.
+	 * Add Endpoint for Demo Data.
 	 *
 	 * @return void
 	 * @since 1.0.0
 	 */
-	public function addPluginRestApi() {
-		$this->addCustomRoute();
+	public function addPluginApiEndpoint() {
+		$this->addDemoDataEndpoint();
+		$this->addPluginStatusEndpoint();
 	}
 
 	/**
-	 * Add Custom Route.
+	 * Add Demo Data Route.
 	 *
 	 * @return void
 	 * @since 1.0.0
 	 */
-	public function addCustomRoute() {
+	public function addDemoDataEndpoint() {
 		register_rest_route(
 			$this->getNamespace(),
 			'/import/list',
 			[
 				'methods'             => 'GET',
 				'callback'            => [ $this, 'buildList' ],
+				'permission_callback' => [ $this, 'permission' ],
+			]
+		);
+	}
+
+	/**
+	 * Add Plugin Status Route.
+	 *
+	 * @return void
+	 * @since 1.0.0
+	 */
+	public function addPluginStatusEndpoint() {
+		register_rest_route(
+			$this->getNamespace(),
+			'/plugin/list',
+			[
+				'methods'             => 'GET',
+				'callback'            => [ $this, 'pluginList' ],
 				'permission_callback' => [ $this, 'permission' ],
 			]
 		);
@@ -165,13 +186,13 @@ class RestEndpoint extends Base {
 	public function permission() {
 		$hasPermission = current_user_can( 'manage_options' );
 
-		if ( ! $hasPermission ) {
-			return new WP_Error(
-				'authentication_error',
-				esc_html__( 'Sorry, you are not allowed to do that!', 'easy-demo-importer' ),
-				[ 'status' => rest_authorization_required_code() ]
-			);
-		}
+//		if ( ! $hasPermission ) {
+//			return new WP_Error(
+//				'authentication_error',
+//				esc_html__( 'Sorry, you are not allowed to do that!', 'easy-demo-importer' ),
+//				[ 'status' => rest_authorization_required_code() ]
+//			);
+//		}
 
 		return true;
 	}
@@ -196,5 +217,38 @@ class RestEndpoint extends Base {
 		}
 
 		return $this->sendResponse( $themeConfig, esc_html__( 'Data is ready to fetch', 'easy-demo-importer' ) );
+	}
+
+	/**
+	 * Builds a list of plugin with status.
+	 *
+	 * @return WP_REST_Response
+	 * @since 1.0.0
+	 */
+	public function pluginList() {
+		$themeConfig     = sd_edi()->getDemoConfig();
+		$requiredPlugins = [];
+
+		if ( ! $themeConfig['multipleZip'] ) {
+			$requiredPlugins = ! empty( $themeConfig['plugins'] ) ? $themeConfig['plugins'] : [];
+		} else {
+			foreach ( $themeConfig['demoData'] as $demo ) {
+				if ( isset( $demo['plugins'] ) && is_array( $demo['plugins'] ) ) {
+					foreach ( $demo['plugins'] as $key => $plugin ) {
+						$requiredPlugins[ $key ] = $plugin;
+					}
+				}
+			}
+		}
+
+		foreach ( $requiredPlugins as $plugin => $pluginData ) {
+			$requiredPlugins[ $plugin ]['status'] = Helpers::pluginActivationStatus( $pluginData['filePath'] );
+
+			if ( ! empty( $pluginData['location'] ) ) {
+				unset( $requiredPlugins[ $plugin ]['location'] );
+			}
+		}
+
+		return $this->sendResponse( $requiredPlugins, esc_html__( 'Data is ready to fetch', 'easy-demo-importer' ) );
 	}
 }
