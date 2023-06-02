@@ -186,13 +186,13 @@ class RestEndpoint extends Base {
 	public function permission() {
 		$hasPermission = current_user_can( 'manage_options' );
 
-//		if ( ! $hasPermission ) {
-//			return new WP_Error(
-//				'authentication_error',
-//				esc_html__( 'Sorry, you are not allowed to do that!', 'easy-demo-importer' ),
-//				[ 'status' => rest_authorization_required_code() ]
-//			);
-//		}
+		if ( ! $hasPermission ) {
+			return new WP_Error(
+				'authentication_error',
+				esc_html__( 'Sorry, you are not allowed to do that!', 'easy-demo-importer' ),
+				[ 'status' => rest_authorization_required_code() ]
+			);
+		}
 
 		return true;
 	}

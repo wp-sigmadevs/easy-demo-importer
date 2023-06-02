@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Modal, Button, Row, Col } from 'antd';
-import axios from 'axios';
 import { usePluginListStore } from '../utils/pluginListStore';
 import PluginList from './Plugins';
+import { doAxios } from '../utils/Api';
 
 /* global sdEdiAdminParams */
 
@@ -54,10 +54,12 @@ const ModalComponent = ({ visible, onCancel, modalData, pluginData }) => {
 	};
 	const demoPluginData = pluginList.success ? pluginList.data : [];
 
-	const pluginDataArray = Object.entries(demoPluginData).map(([key, value]) => ({
-		key,
-		...value,
-	}));
+	const pluginDataArray = Object.entries(demoPluginData).map(
+		([key, value]) => ({
+			key,
+			...value,
+		})
+	);
 
 	const filteredPluginDataArray =
 		Object.keys(modalData?.data?.plugins || {}).length > 0
@@ -71,38 +73,6 @@ const ModalComponent = ({ visible, onCancel, modalData, pluginData }) => {
 	const handlePreview = () => {
 		if (modalData && modalData.data && modalData.data.previewUrl) {
 			window.open(modalData.data.previewUrl, '_blank');
-		}
-	};
-
-	const doAxios = async (request) => {
-		if (request.nextPhase) {
-			const params = new FormData();
-			params.append('action', request.nextPhase);
-			params.append('demo', request.demo);
-			params.append('reset', request.reset);
-			params.append('excludeImages', request.excludeImages);
-			params.append('sd_edi_nonce', sdEdiAdminParams.sd_edi_nonce);
-
-			const requestUrl = sdEdiAdminParams.ajaxUrl;
-
-			try {
-				const response = await axios.post(requestUrl, params);
-
-				// if (!response.error) {
-				// console.log(response)
-				setTimeout(() => {
-					doAxios(response.data);
-				}, 2000);
-				// } else {
-				// 	// console.log(data.errorMessage)
-				// }
-				// Handle the response data here
-			} catch (error) {
-				console.error('Error:', error);
-				// Handle any errors here
-			}
-		} else {
-			console.log(sdEdiAdminParams.importSuccess);
 		}
 	};
 
@@ -128,7 +98,7 @@ const ModalComponent = ({ visible, onCancel, modalData, pluginData }) => {
 						</Col>
 						<Col span={12}>
 							<div className="modal-header">
-								<h3>Before You Import Demo Data</h3>
+								<h3>Before You Proceed</h3>
 							</div>
 							<div className="modal-content">
 								<div className="notice">
@@ -152,7 +122,9 @@ const ModalComponent = ({ visible, onCancel, modalData, pluginData }) => {
 									</p>
 								</div>
 								<div className="required-plugins">
-									<PluginList plugins={filteredPluginDataArray} />
+									<PluginList
+										plugins={filteredPluginDataArray}
+									/>
 								</div>
 							</div>
 
