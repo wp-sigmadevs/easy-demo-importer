@@ -80,7 +80,7 @@ const ModalComponent = ({ visible, onCancel, modalData, pluginData }) => {
 							request,
 							setImportProgress,
 							setImportComplete,
-							setCurrentStep,
+							setCurrentStep
 							// prevPhaseMessageRef
 						);
 					}, 2000);
@@ -151,6 +151,40 @@ const ModalComponent = ({ visible, onCancel, modalData, pluginData }) => {
 		return 'wait';
 	};
 
+	// const ProgressMessage = ({ message, fade }) => {
+	// 	return (
+	// 		<div className={`progress-message ${fade ? 'fade' : 'fade fade-in'}`}>
+	// 			<span>{message}</span>
+	// 		</div>
+	// 	);
+	// };
+
+	const ProgressMessage = ({ message }) => {
+		const [showMessage, setShowMessage] = useState(false);
+		const [isSuccess, setIsSuccess] = useState(false);
+
+		useEffect(() => {
+			setTimeout(() => {
+				setShowMessage(true);
+				setTimeout(() => {
+					setIsSuccess(true);
+				}, 2000);
+			}, 0);
+		}, []);
+
+		return (
+			<div className={`progress-message ${isSuccess ? 'success' : ''}`}>
+				<span
+					className={`fade ${
+						showMessage ? 'msg-fade-in' : 'msg-fade-out'
+					}`}
+				>
+					{message}
+				</span>
+			</div>
+		);
+	};
+
 	const renderImportProgress = () => {
 		// console.log(importProgress)
 		return (
@@ -165,7 +199,12 @@ const ModalComponent = ({ visible, onCancel, modalData, pluginData }) => {
 									: ''
 							}
 						>
-							<p>{progress.message}</p>
+							{/*<p>{progress.message}</p>*/}
+							<ProgressMessage
+								key={index}
+								message={progress.message}
+								fade={progress.fade}
+							/>
 						</Timeline.Item>
 					))}
 				</Timeline>

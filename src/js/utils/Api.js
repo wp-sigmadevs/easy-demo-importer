@@ -47,6 +47,7 @@ export const doAxios = async (
 							index === prevProgress.length - 2
 								? {
 										message: response.data.completedMessage,
+										fade: true,
 								  }
 								: progress
 						)
@@ -67,7 +68,7 @@ export const doAxios = async (
 							setImportComplete(true);
 							setCurrentStep(3); // Move to the final step
 						}
-					}, 2000);
+					}, 3000);
 				} else {
 					// No next phase message, import is finished
 					setImportComplete(true);
