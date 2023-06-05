@@ -24,6 +24,51 @@
 	transition: opacity 0.5s;
 }
 
+.ant-timeline-item {
+	&.active {
+		.msg-fade-in {
+			opacity: 1;
+			transition: opacity 0.5s ease-in;
+		}
+
+		.msg-fade-out {
+			opacity: 0;
+			transition: opacity 0.5s ease-in;
+		}
+	}
+
+	.progress-message {
+		&.success {
+			.msg-fade-out {
+				opacity: 1;
+			}
+		}
+	}
+}
+
+.import-progress {
+	height: 400px;
+	overflow: hidden;
+	position: relative;
+
+	ul {
+		&.ant-timeline {
+			position: absolute;
+			left: 0;
+			bottom: 0;
+		}
+	}
+}
+
+//.fade {
+//	opacity: 0;
+//	transition: opacity 0.5s ease-in-out;
+//}
+//
+//.fade.fade-in {
+//	opacity: 1;
+//}
+
 @keyframes ediFadeIn {
 	0% {
 		opacity: 0;
