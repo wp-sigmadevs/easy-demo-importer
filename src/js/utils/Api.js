@@ -14,7 +14,12 @@ export const Api = Axios.create({
 	},
 });
 
-export const doAxios = async (request) => {
+export const doAxios = async (
+	request,
+	setImportProgress,
+	setImportComplete,
+	setCurrentStep
+) => {
 	if (request.nextPhase) {
 		const params = new FormData();
 		params.append('action', request.nextPhase);
@@ -27,13 +32,46 @@ export const doAxios = async (request) => {
 
 		try {
 			const response = await Axios.post(requestUrl, params);
-			// doAxios(response.data);
 
 			if (!response.error) {
-				console.log(response.data);
-				setTimeout(() => {
-					doAxios(response.data);
-				}, 2000);
+				if (response.data.nextPhaseMessage) {
+					// Update import progress with next phase message
+					setImportProgress((prevProgress) => [
+						...prevProgress,
+						{ message: response.data.nextPhaseMessage },
+					]);
+
+					// Replace the loading message with the completed message
+					setImportProgress((prevProgress) =>
+						prevProgress.map((progress, index) =>
+							index === prevProgress.length - 2
+								? {
+										message: response.data.completedMessage,
+								  }
+								: progress
+						)
+					);
+
+					// Recursive call to continue the import process
+					setTimeout(() => {
+						if (response.data.nextPhase) {
+							// Move to the next phase
+							doAxios(
+								response.data,
+								setImportProgress,
+								setImportComplete,
+								setCurrentStep
+							);
+						} else {
+							// Import is complete
+							setImportComplete(true);
+							setCurrentStep(3); // Move to the final step
+						}
+					}, 2000);
+				} else {
+					// No next phase message, import is finished
+					setImportComplete(true);
+				}
 			} else {
 				console.log(response.data.errorMessage);
 			}
@@ -44,3 +82,4 @@ export const doAxios = async (request) => {
 		console.log(sdEdiAdminParams.importSuccess);
 	}
 };
+

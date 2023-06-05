@@ -14,6 +14,16 @@
 //// Layouts
 //@import 'layouts/__layouts-dir';
 
+.fade-in {
+	opacity: 1;
+	transition: opacity 0.5s;
+}
+
+.fade-out {
+	opacity: 0;
+	transition: opacity 0.5s;
+}
+
 @keyframes ediFadeIn {
 	0% {
 		opacity: 0;

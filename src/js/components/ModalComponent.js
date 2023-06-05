@@ -1,59 +1,99 @@
-import React, { useEffect, useState } from 'react';
-import { Modal, Button, Row, Col } from 'antd';
+import React, { useEffect, useRef, useState } from 'react';
+import {
+	Modal,
+	Button,
+	Row,
+	Col,
+	Switch,
+	Checkbox,
+	Steps,
+	Timeline,
+	Result,
+	Spin,
+	Progress,
+} from 'antd';
 import { usePluginListStore } from '../utils/pluginListStore';
 import PluginList from './Plugins';
 import { doAxios } from '../utils/Api';
 
-/* global sdEdiAdminParams */
+const { Step } = Steps;
 
 const ModalComponent = ({ visible, onCancel, modalData, pluginData }) => {
 	const { pluginList, fetchPluginList } = usePluginListStore();
 	const [currentStep, setCurrentStep] = useState(1);
+	const [excludeImages, setExcludeImages] = useState(
+		modalData?.excludeImages || false
+	);
+	const [reset, setReset] = useState(modalData?.reset || true);
 	const [importStatus, setImportStatus] = useState('');
 	const [showImportProgress, setShowImportProgress] = useState(false);
+	const [importProgress, setImportProgress] = useState([]);
+	const [importComplete, setImportComplete] = useState(false);
+	const [selectedOptions, setSelectedOptions] = useState({
+		selectiveImport: false,
+		content: true,
+		widgets: true,
+		customizer: true,
+		settings: true,
+	});
 
 	useEffect(() => {
 		fetchPluginList('/sd/edi/v1/plugin/list');
 	}, [fetchPluginList]);
 
 	const handleImport = async () => {
-		const { id, demo, reset, excludeImages } = modalData;
+		const { id, demo } = modalData;
 		let resetMessage = '';
-		let confirmMessage = 'Are you sure to proceed?';
+		let confirmMessage = 'Are you sure you want to proceed?';
 
 		if (reset) {
-			resetMessage = sdEdiAdminParams.resetDatabase;
+			resetMessage =
+				'Resetting the database will delete all your contents.';
 			confirmMessage =
-				'Are you sure to proceed? Resetting the database will delete all your contents.';
+				'Are you sure you want to proceed? Resetting the database will delete all your contents.';
 		}
 
-		const importConfirmed = window.confirm(confirmMessage);
+		Modal.confirm({
+			title: confirmMessage,
+			okText: 'Yes',
+			cancelText: 'No',
+			onOk: async () => {
+				const request = {
+					demo: id,
+					reset,
+					excludeImages,
+					nextPhase: 'sd_edi_install_demo',
+					nextPhaseMessage: resetMessage,
+				};
 
-		if (!importConfirmed) {
-			return;
-		}
+				try {
+					setCurrentStep(3); // Move to the next step (import progress)
+					setShowImportProgress(true);
 
-		const request = {
-			demo: id,
-			reset,
-			nextPhase: 'sd_edi_install_demo',
-			excludeImages,
-			nextPhaseMessage: resetMessage,
-		};
+					// Start the import process
+					const initialProgress = [{ message: 'Importing...' }];
+					setImportProgress(initialProgress);
 
-		try {
-			// setCurrentStep(2); // Move to the next step (import progress)
-
-			setTimeout(function () {
-				doAxios(request);
-			}, 2000);
-		} catch (error) {
-			console.error('Error:', error);
-			// Handle the import error
-		}
+					setTimeout(function () {
+						// doAxios(request, setImportProgress, setImportComplete);
+						doAxios(
+							request,
+							setImportProgress,
+							setImportComplete,
+							setCurrentStep,
+							// prevPhaseMessageRef
+						);
+					}, 2000);
+				} catch (error) {
+					console.error('Error:', error);
+					// Handle the import error
+					setImportStatus('error');
+				}
+			},
+		});
 	};
-	const demoPluginData = pluginList.success ? pluginList.data : [];
 
+	const demoPluginData = pluginList.success ? pluginList.data : [];
 	const pluginDataArray = Object.entries(demoPluginData).map(
 		([key, value]) => ({
 			key,
@@ -68,19 +108,99 @@ const ModalComponent = ({ visible, onCancel, modalData, pluginData }) => {
 			  )
 			: pluginDataArray;
 
-	// console.log(modalData)
-
 	const handlePreview = () => {
 		if (modalData && modalData.data && modalData.data.previewUrl) {
 			window.open(modalData.data.previewUrl, '_blank');
 		}
 	};
 
+	const steps = [
+		{
+			title: 'Disclaimer',
+		},
+		{
+			title: 'Configure',
+		},
+		{
+			title: 'Import',
+		},
+	];
+
+	const handleReset = () => {
+		onCancel();
+		setCurrentStep(1);
+		setExcludeImages(false); // Reset excludeImages value
+		setReset(true); // Reset resetDatabase value
+		setImportProgress([]); // Reset import progress
+		setImportComplete(false); // Reset import complete status
+		setSelectedOptions({
+			content: true,
+			widgets: true,
+			customizer: true,
+			settings: true,
+			fluentForm: false,
+		});
+	};
+
+	const getCurrentStatus = (index) => {
+		if (index === currentStep - 1) {
+			return 'process';
+		} else if (index < currentStep) {
+			return 'finish';
+		}
+		return 'wait';
+	};
+
+	const renderImportProgress = () => {
+		// console.log(importProgress)
+		return (
+			<>
+				<Timeline>
+					{importProgress.map((progress, index) => (
+						<Timeline.Item
+							key={index}
+							className={
+								index === importProgress.length - 1
+									? 'active'
+									: ''
+							}
+						>
+							<p>{progress.message}</p>
+						</Timeline.Item>
+					))}
+				</Timeline>
+				{importComplete && (
+					<Result
+						status="success"
+						title="Import Completed Successfully"
+						extra={[
+							<Button key="view-site" type="primary">
+								View Site
+							</Button>,
+							<Button key="close" onClick={handleReset}>
+								Close
+							</Button>,
+						]}
+					/>
+				)}
+			</>
+		);
+	};
+
+	const handleOptionChange = (option, value) => {
+		setSelectedOptions((prevOptions) => ({
+			...prevOptions,
+			[option]: value,
+		}));
+	};
+
 	return (
 		<>
 			<Modal
 				open={visible}
-				onCancel={onCancel}
+				onCancel={() => {
+					handleReset();
+				}}
 				footer={null}
 				width={800}
 				bodyStyle={{ height: '500px' }}
@@ -97,46 +217,291 @@ const ModalComponent = ({ visible, onCancel, modalData, pluginData }) => {
 							</Button>
 						</Col>
 						<Col span={12}>
-							<div className="modal-header">
-								<h3>Before You Proceed</h3>
-							</div>
-							<div className="modal-content">
-								<div className="notice">
-									<p>
-										Before importing this demo, we recommend
-										that you backup your site's data and
-										files. You can use a backup plugin like
-										XYZ Backup for WordPress to ensure you
-										have a copy of your site in case
-										anything goes wrong during the import
-										process.
-									</p>
-									<p>
-										Please note that this demo import will
-										install all the required plugins, import
-										contents, settings, customizer data,
-										widgets, and other necessary elements to
-										replicate the demo site. Make sure to
-										review your existing data and settings
-										as they may be overwritten.
-									</p>
-								</div>
-								<div className="required-plugins">
-									<PluginList
-										plugins={filteredPluginDataArray}
+							<Steps
+								progressDot
+								current={currentStep - 1}
+								style={{ marginBottom: '20px' }}
+							>
+								{steps.map((step, index) => (
+									<Step
+										key={step.title}
+										title={step.title}
+										icon={step.icon}
+										status={getCurrentStatus(index)}
 									/>
-								</div>
+								))}
+							</Steps>
+							<div
+								className={`modal-content step ${
+									currentStep === 1 ? 'fade-in' : 'fade-out'
+								}`}
+							>
+								{currentStep === 1 && (
+									<>
+										<div className="modal-header">
+											<h3>
+												Step {currentStep}: Before You
+												Proceed
+											</h3>
+											<div className="step-indicator">
+												{/* Step Indicator */}
+												{[1, 2, 3].map((step) => (
+													<div
+														key={step}
+														className={`step-dot ${
+															step === currentStep
+																? 'active'
+																: ''
+														}`}
+													/>
+												))}
+											</div>
+										</div>
+										<div className="notice">
+											<p>
+												Before importing this demo, we
+												recommend that you backup your
+												site's data and files. You can
+												use a backup plugin like XYZ
+												Backup for WordPress to ensure
+												you have a copy of your site in
+												case anything goes wrong during
+												the import process.
+											</p>
+											<p>
+												Please note that this demo
+												import will install all the
+												required plugins, import
+												contents, settings, customizer
+												data, widgets, and other
+												necessary elements to replicate
+												the demo site. Make sure to
+												review your existing data and
+												settings as they may be
+												overwritten.
+											</p>
+										</div>
+										<div className="step-actions">
+											<Button
+												type="primary"
+												onClick={onCancel}
+											>
+												Cancel
+											</Button>
+											<Button
+												type="primary"
+												onClick={() =>
+													setCurrentStep(2)
+												}
+											>
+												Next
+											</Button>
+										</div>
+									</>
+								)}
 							</div>
-
-							<Button type="primary" onClick={onCancel}>
-								Cancel
-							</Button>
-							<Button type="primary" onClick={handlePreview}>
-								Preview
-							</Button>
-							<Button type="primary" onClick={handleImport}>
-								Import
-							</Button>
+							<div
+								className={`modal-content step ${
+									currentStep === 2 ? 'fade-in' : 'fade-out'
+								}`}
+							>
+								{currentStep === 2 && (
+									<>
+										<div className="modal-header">
+											<h3>
+												Step {currentStep}: Configure
+												Import Options
+											</h3>
+											<div className="step-indicator">
+												{/* Step Indicator */}
+												{[1, 2, 3].map((step) => (
+													<div
+														key={step}
+														className={`step-dot ${
+															step === currentStep
+																? 'active'
+																: ''
+														}`}
+													/>
+												))}
+											</div>
+										</div>
+										<div className="import-options">
+											<div>
+												<h4>Exclude Images</h4>
+												<Switch
+													checked={excludeImages}
+													onChange={(checked) =>
+														setExcludeImages(
+															checked
+														)
+													}
+												/>
+											</div>
+											<div>
+												<h4>Reset Database</h4>
+												<Switch
+													checked={reset}
+													onChange={(checked) =>
+														setReset(checked)
+													}
+												/>
+											</div>
+										</div>
+										<div>
+											<h4>Selective Import</h4>
+											<Switch
+												checked={
+													selectedOptions.selectiveImport
+												}
+												onChange={(checked) =>
+													setSelectedOptions({
+														...selectedOptions,
+														selectiveImport:
+															checked,
+													})
+												}
+											/>
+										</div>
+										{selectedOptions.selectiveImport && (
+											<div>
+												<h4>Select Options</h4>
+												<Checkbox
+													checked={
+														selectedOptions.content
+													}
+													onChange={(e) =>
+														setSelectedOptions({
+															...selectedOptions,
+															content:
+																e.target
+																	.checked,
+														})
+													}
+												>
+													Import Content
+												</Checkbox>
+												<Checkbox
+													checked={
+														selectedOptions.widgets
+													}
+													onChange={(e) =>
+														setSelectedOptions({
+															...selectedOptions,
+															widgets:
+																e.target
+																	.checked,
+														})
+													}
+												>
+													Import Widgets
+												</Checkbox>
+												<Checkbox
+													checked={
+														selectedOptions.customizer
+													}
+													onChange={(e) =>
+														setSelectedOptions({
+															...selectedOptions,
+															customizer:
+																e.target
+																	.checked,
+														})
+													}
+												>
+													Import Customizer Settings
+												</Checkbox>
+												<Checkbox
+													checked={
+														selectedOptions.settings
+													}
+													onChange={(e) =>
+														setSelectedOptions({
+															...selectedOptions,
+															settings:
+																e.target
+																	.checked,
+														})
+													}
+												>
+													Import Settings
+												</Checkbox>
+												{pluginDataArray.some(
+													(plugin) =>
+														plugin.key ===
+														'fluent-form'
+												) && (
+													<Checkbox
+														checked={
+															selectedOptions.fluentForm
+														}
+														onChange={(e) =>
+															setSelectedOptions({
+																...selectedOptions,
+																fluentForm:
+																	e.target
+																		.checked,
+															})
+														}
+													>
+														Import Fluent Form
+													</Checkbox>
+												)}
+											</div>
+										)}
+										<div className="required-plugins">
+											<PluginList
+												plugins={
+													filteredPluginDataArray
+												}
+											/>
+										</div>
+										<div className="step-actions">
+											<Button
+												type="primary"
+												onClick={() =>
+													setCurrentStep(1)
+												}
+											>
+												Previous
+											</Button>
+											<Button
+												type="primary"
+												onClick={handleImport}
+											>
+												Import
+											</Button>
+										</div>
+									</>
+								)}
+							</div>
+							<div
+								className={`modal-content step ${
+									currentStep === 3 ? 'fade-in' : 'fade-out'
+								}`}
+							>
+								{currentStep === 3 && (
+									<>
+										<div
+											className={`import-progress ${importStatus}`}
+										>
+											{showImportProgress ? (
+												renderImportProgress()
+											) : (
+												<>
+													{/* ...existing code... */}
+													<Button
+														type="primary"
+														onClick={handleImport}
+													>
+														Import
+													</Button>
+												</>
+											)}
+										</div>
+									</>
+								)}
+							</div>
 						</Col>
 					</Row>
 				)}
