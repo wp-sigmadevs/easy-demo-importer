@@ -2,17 +2,17 @@
 	Admin CSS.
 ===================================*/
 
-//// Abstracts
-//@import "abstracts/__abstracts-dir";
-//
-//// Base Styles
-//@import "base/__base-dir";
-//
-//// Components
-//@import 'components/_components-dir';
-//
-//// Layouts
-//@import 'layouts/__layouts-dir';
+// Abstracts
+@import "abstracts/__abstracts-dir";
+
+// Base Styles
+@import "base/__base-dir";
+
+// Components
+@import 'components/_components-dir';
+
+// Layouts
+@import 'layouts/__layouts-dir';
 
 .fade-in {
 	opacity: 1;

@@ -4,7 +4,7 @@
 
 //usage: @include shift([property],[duration],[easing]);
 @mixin transition($property: all, $duration: 0.3s, $ease: ease-in-out) {
-	transition: $property $duration $ease;
+	transition: $property $duration;
 }
 
 // background-content

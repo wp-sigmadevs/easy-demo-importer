@@ -2,18 +2,29 @@
  * Component: Header.
  */
 
-.appearance_page_rtdi-demo-importer {
-	.rtdi-header {
-		padding: $default-gutter;
+.appearance_page_sd-easy-demo-importer {
+	.edi-header {
+		padding: 20px $default-gutter;
 
-		@extend .rtdi-white-color-bg;
-		@extend .rtdi-box-shadow;
+		@extend .edi-white-color-bg;
+		@extend .edi-box-shadow;
+		@extend .edi-d-flex;
+		@extend .edi-justify-content-center;
+		@extend .edi-align-items-center;
 
-		h2 {
+		img {
+			width: 160px;
+			height: 45px;
+		}
+
+		h1 {
 			text-align: center;
 			font-size: 25px;
-			color: #333;
-			margin: 0;
+			color: #403a3a;
+			display: block !important;
+			font-weight: 500;
+			margin-left: 10px;
+			padding: 0;
 		}
 	}
 }

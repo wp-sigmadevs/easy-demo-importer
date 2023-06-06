@@ -129,6 +129,7 @@ class Enqueue extends EnqueueBase {
 				'ajaxUrl'          => esc_url( Helpers::ajaxUrl() ),
 				'restApiUrl'       => esc_url_raw( rest_url() ),
 				'restNonce'        => wp_create_nonce( 'wp_rest' ),
+				'ediLogo'          => $this->plugin->assetsUri() . '/images/sd-edi-logo.svg',
 				'numberOfDemos'    => ! empty( sd_edi()->getDemoConfig()['demoData'] ) ? count( sd_edi()->getDemoConfig()['demoData'] ) : 0,
 				Helpers::nonceId() => wp_create_nonce( Helpers::nonceText() ),
 				'prepareImporting' => esc_html__( 'Preparing to install demo data', 'easy-demo-importer' ),
