@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
 	Modal,
 	Button,
@@ -9,22 +9,22 @@ import {
 	Steps,
 	Timeline,
 	Result,
-	Spin,
-	Progress,
 } from 'antd';
 import { usePluginListStore } from '../utils/pluginListStore';
 import PluginList from './Plugins';
 import { doAxios } from '../utils/Api';
+import { ProgressMessage } from './ProgressMessage';
 
 const { Step } = Steps;
 
-const ModalComponent = ({ visible, onCancel, modalData, pluginData }) => {
+const ModalComponent = ({ visible, onCancel, modalData }) => {
 	const { pluginList, fetchPluginList } = usePluginListStore();
 	const [currentStep, setCurrentStep] = useState(1);
 	const [excludeImages, setExcludeImages] = useState(
 		modalData?.excludeImages || false
 	);
 	const [reset, setReset] = useState(modalData?.reset || true);
+	const [importSuccess, setImportSuccess] = useState(false);
 	const [importStatus, setImportStatus] = useState('');
 	const [showImportProgress, setShowImportProgress] = useState(false);
 	const [importProgress, setImportProgress] = useState([]);
@@ -75,15 +75,16 @@ const ModalComponent = ({ visible, onCancel, modalData, pluginData }) => {
 					setImportProgress(initialProgress);
 
 					setTimeout(function () {
-						// doAxios(request, setImportProgress, setImportComplete);
 						doAxios(
 							request,
 							setImportProgress,
 							setImportComplete,
 							setCurrentStep
-							// prevPhaseMessageRef
 						);
 					}, 2000);
+
+					setImportComplete(true);
+					setImportSuccess(true);
 				} catch (error) {
 					console.error('Error:', error);
 					// Handle the import error
@@ -116,13 +117,16 @@ const ModalComponent = ({ visible, onCancel, modalData, pluginData }) => {
 
 	const steps = [
 		{
-			title: 'Disclaimer',
+			title: 'Start',
 		},
 		{
 			title: 'Configure',
 		},
 		{
 			title: 'Import',
+		},
+		{
+			title: 'Success',
 		},
 	];
 
@@ -140,6 +144,7 @@ const ModalComponent = ({ visible, onCancel, modalData, pluginData }) => {
 			settings: true,
 			fluentForm: false,
 		});
+		setImportSuccess(false);
 	};
 
 	const getCurrentStatus = (index) => {
@@ -147,81 +152,51 @@ const ModalComponent = ({ visible, onCancel, modalData, pluginData }) => {
 			return 'process';
 		} else if (index < currentStep) {
 			return 'finish';
+		} else if (index === 3 && importSuccess) {
+			return 'finish';
 		}
+
 		return 'wait';
-	};
-
-	// const ProgressMessage = ({ message, fade }) => {
-	// 	return (
-	// 		<div className={`progress-message ${fade ? 'fade' : 'fade fade-in'}`}>
-	// 			<span>{message}</span>
-	// 		</div>
-	// 	);
-	// };
-
-	const ProgressMessage = ({ message }) => {
-		const [showMessage, setShowMessage] = useState(false);
-		const [isSuccess, setIsSuccess] = useState(false);
-
-		useEffect(() => {
-			setTimeout(() => {
-				setShowMessage(true);
-				setTimeout(() => {
-					setIsSuccess(true);
-				}, 2000);
-			}, 0);
-		}, []);
-
-		return (
-			<div className={`progress-message ${isSuccess ? 'success' : ''}`}>
-				<span
-					className={`fade ${
-						showMessage ? 'msg-fade-in' : 'msg-fade-out'
-					}`}
-				>
-					{message}
-				</span>
-			</div>
-		);
 	};
 
 	const renderImportProgress = () => {
 		// console.log(importProgress)
 		return (
 			<>
-				<Timeline>
-					{importProgress.map((progress, index) => (
-						<Timeline.Item
-							key={index}
-							className={
-								index === importProgress.length - 1
-									? 'active'
-									: ''
-							}
-						>
-							{/*<p>{progress.message}</p>*/}
+				{/*<Timeline>*/}
+				{/*	{importProgress.map((progress, index) => (*/}
+				{/*		<Timeline.Item*/}
+				{/*			key={index}*/}
+				{/*className={index === importProgress.length - 1 ? 'active' : ''}*/}
+				{/*		>*/}
+				{/*			<ProgressMessage*/}
+				{/*				key={index}*/}
+				{/*				message={progress.message}*/}
+				{/*				fade={progress.fade}*/}
+				{/*			/>*/}
+				{/*		</Timeline.Item>*/}
+				{/*	))}*/}
+				{/*</Timeline>*/}
+				<Timeline
+					items={importProgress.map((progress, index) => ({
+						children: (
 							<ProgressMessage
 								key={index}
 								message={progress.message}
 								fade={progress.fade}
 							/>
-						</Timeline.Item>
-					))}
-				</Timeline>
-				{importComplete && (
-					<Result
-						status="success"
-						title="Import Completed Successfully"
-						extra={[
-							<Button key="view-site" type="primary">
-								View Site
-							</Button>,
-							<Button key="close" onClick={handleReset}>
-								Close
-							</Button>,
-						]}
-					/>
-				)}
+						),
+						key: index.toString(),
+						className:
+							index === importProgress.length - 1 ? 'active' : '',
+					}))}
+				/>
+				{/*<Timeline*/}
+				{/*	items={importProgress.map((progress, index) => ({*/}
+				{/*		children: progress,*/}
+				{/*		key: index.toString(),*/}
+				{/*	}))}*/}
+				{/*/>*/}
 			</>
 		);
 	};
@@ -245,31 +220,17 @@ const ModalComponent = ({ visible, onCancel, modalData, pluginData }) => {
 				bodyStyle={{ height: '500px' }}
 			>
 				{modalData && (
-					<Row gutter={30}>
-						<Col span={12}>
-							<img
-								src={modalData.data.previewImage}
-								alt="Preview"
-							/>
-							<Button type="primary" onClick={handlePreview}>
-								Preview
-							</Button>
-						</Col>
-						<Col span={12}>
+					<Row>
+						<Col span={24}>
 							<Steps
 								progressDot
 								current={currentStep - 1}
 								style={{ marginBottom: '20px' }}
-							>
-								{steps.map((step, index) => (
-									<Step
-										key={step.title}
-										title={step.title}
-										icon={step.icon}
-										status={getCurrentStatus(index)}
-									/>
-								))}
-							</Steps>
+								items={steps.map((step, index) => ({
+									title: step.title,
+									status: getCurrentStatus(index),
+								}))}
+							/>
 							<div
 								className={`modal-content step ${
 									currentStep === 1 ? 'fade-in' : 'fade-out'
@@ -528,7 +489,6 @@ const ModalComponent = ({ visible, onCancel, modalData, pluginData }) => {
 												renderImportProgress()
 											) : (
 												<>
-													{/* ...existing code... */}
 													<Button
 														type="primary"
 														onClick={handleImport}
@@ -539,6 +499,34 @@ const ModalComponent = ({ visible, onCancel, modalData, pluginData }) => {
 											)}
 										</div>
 									</>
+								)}
+							</div>
+							<div
+								className={`modal-content step ${
+									currentStep === 4 ? 'fade-in' : 'fade-out'
+								}`}
+							>
+								{currentStep === 4 && importSuccess && (
+									<div>
+										<Result
+											status="success"
+											title="Import Completed Successfully"
+											extra={[
+												<Button
+													key="view-site"
+													type="primary"
+												>
+													View Site
+												</Button>,
+												<Button
+													key="close"
+													onClick={handleReset}
+												>
+													Close
+												</Button>,
+											]}
+										/>
+									</div>
 								)}
 							</div>
 						</Col>

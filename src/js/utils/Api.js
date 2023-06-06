@@ -66,12 +66,13 @@ export const doAxios = async (
 						} else {
 							// Import is complete
 							setImportComplete(true);
-							setCurrentStep(3); // Move to the final step
+							setCurrentStep(4); // Move to the final step
 						}
 					}, 3000);
 				} else {
 					// No next phase message, import is finished
 					setImportComplete(true);
+					setCurrentStep(4); // Move to step 4
 				}
 			} else {
 				console.log(response.data.errorMessage);

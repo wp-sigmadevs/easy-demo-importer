@@ -1,17 +1,8 @@
 /**
  * Layout: Container.
  */
-.rtdi-container {
+.edi-container {
 	max-width: 100%;
 	margin-right: auto;
 	margin-left: auto;
-}
-
-.rtdi-row {
-	margin-left: -15px;
-	margin-right: -15px;
-
-	@extend .rtdi-d-flex;
-	@extend .rtdi-flex-wrap;
-	@extend .rtdi-pos-r;
 }

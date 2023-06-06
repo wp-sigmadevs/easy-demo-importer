@@ -1,8 +1,9 @@
-import { Row, Col, Button } from 'antd';
+import { Row, Col, Button, Image, Space } from 'antd';
 import React, { useState, useEffect } from 'react';
 import gridSkeleton from './skeleton';
 import { usePluginListStore } from '../utils/pluginListStore';
 import ModalComponent from './ModalComponent';
+import { DownloadOutlined, FullscreenOutlined } from '@ant-design/icons';
 
 /* global sdEdiAdminParams */
 
@@ -24,8 +25,6 @@ const App = () => {
 
 	const demoData =
 		importList.success && importList.data && importList.data.demoData;
-	const pluginData =
-		importList.success && importList.data && importList.data.plugins;
 
 	const showModal = (data) => {
 		setModalVisible(true);
@@ -36,18 +35,15 @@ const App = () => {
 		setModalVisible(false);
 	};
 
-	const handleModalOk = () => {
-		// Handle the OK button action if needed
-	};
-
 	return (
 		<>
-			<div className="wrap rtdi-demo-importer-wrapper">
-				<div className="rtdi-header">
-					<h1>Easy Demo Importer</h1>
+			<div className="wrap edi-demo-importer-wrapper">
+				<div className="edi-header">
+					<img src={sdEdiAdminParams.ediLogo} alt="EDI Logo" />
+					<h1>Demo Importer</h1>
 				</div>
-				<div className="rtdi-content">
-					<div className="rtdi-container">
+				<div className="edi-content">
+					<div className="edi-container">
 						<Row gutter={[30, 30]}>
 							{loading && !demoData ? (
 								<>
@@ -60,7 +56,7 @@ const App = () => {
 											sm={24}
 											md={12}
 											lg={8}
-											xl={6}
+											xl={8}
 											key={i}
 										>
 											<div
@@ -95,18 +91,37 @@ const App = () => {
 														sm={24}
 														md={12}
 														lg={8}
-														xl={6}
+														xl={8}
 														key={`demo-${index}`}
 													>
 														<div className="demo-wrapper">
 															<header>
-																<img
+																{/*<image*/}
+																{/*	src={*/}
+																{/*	// 	demoData[*/}
+																{/*	// 		key*/}
+																{/*	// 	]*/}
+																{/*	// 		.previewImage*/}
+																{/*	// }*/}
+																{/*	alt="Preview"*/}
+																{/*/>*/}
+																<Image
 																	src={
 																		demoData[
 																			key
 																		]
 																			.previewImage
 																	}
+																	preview={{
+																		maskClassName:
+																			'custom-mask',
+																		mask: (
+																			<Space>
+																				<FullscreenOutlined />
+																				Click to Enlarge
+																			</Space>
+																		),
+																	}}
 																	alt="Preview"
 																/>
 																<a
@@ -151,7 +166,7 @@ const App = () => {
 																			)
 																		}
 																	>
-																		Import
+																		Import <DownloadOutlined />
 																	</Button>
 																</div>
 															</div>
@@ -170,7 +185,6 @@ const App = () => {
 					visible={modalVisible}
 					onCancel={handleModalCancel}
 					modalData={modalData}
-					pluginData={pluginData}
 				/>
 			</div>
 		</>

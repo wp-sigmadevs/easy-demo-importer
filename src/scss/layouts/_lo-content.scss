@@ -2,12 +2,151 @@
  * Layout: Content.
  */
 
-.appearance_page_rtdi-demo-importer {
-	.rtdi-content {
+.appearance_page_sd-easy-demo-importer {
+	.edi-content {
 		padding: $default-gutter;
 		margin: $default-gutter;
 
-		@extend .rtdi-white-color-bg;
-		@extend .rtdi-box-shadow;
+		@extend .edi-white-color-bg;
+		@extend .edi-box-shadow;
+
+		.demo-wrapper {
+			box-shadow: 0 4px 50px rgba(0, 0, 0, 0.1);
+			border-radius: 5px;
+			overflow: hidden;
+
+			@include transition();
+
+			header {
+				overflow: hidden;
+
+				@extend .edi-pos-r;
+
+				> .ant-image {
+					height: 350px;
+				}
+
+				.ant-image-mask {
+					&.custom-mask {
+						.ant-space {
+							flex-wrap: nowrap;
+							overflow: hidden;
+							min-width: 50px;
+							height: 50px;
+							border-radius: 30px;
+							box-shadow: 0 0 5px rgba(0, 0, 0, 0.08);
+							color: #666;
+							font-size: 13px;
+							text-align: center;
+							display: inline-flex;
+							gap: 0 !important;
+
+							@extend .edi-white-color-bg;
+							@extend .edi-justify-content-center;
+							@extend .edi-align-items-center;
+
+							.ant-space-item {
+								&:last-child {
+									overflow: hidden;
+									padding: 0;
+									max-width: 0;
+									white-space: nowrap;
+									font-weight: 600;
+									color: #666;
+									transition: padding 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.15), max-width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.15);
+								}
+							}
+
+							&:hover {
+								.ant-space-item {
+									&:last-child {
+										padding-right: 15px;
+										max-width: 280px;
+									}
+								}
+							}
+						}
+
+						.anticon {
+							font-size: 24px;
+							width: 50px;
+						}
+					}
+				}
+			}
+
+			.edi-demo-content {
+				padding: 20px;
+				justify-content: space-between;
+				column-gap: 15px;
+				border-top: 1px solid rgba(0, 0, 0, 0.05);
+
+				@extend .edi-d-flex;
+				@extend .edi-align-items-center;
+
+				h2 {
+					margin: 0;
+					font-size: 16px;
+					font-weight: 500;
+				}
+
+				.ant-btn {
+					background-image: linear-gradient(109.6deg, rgba(45, 116, 213, 1) 11.2%, rgba(121, 137, 212, 1) 91.2%);
+					background-size: 200% auto;
+					min-width: 130px;
+					font-weight: 500;
+					height: 40px;
+					font-size: 15px;
+
+					@include transition();
+
+					.anticon {
+						font-size: 18px;
+					}
+
+					&:hover {
+						background-position: right center;
+					}
+				}
+			}
+
+			.details {
+				left: 0;
+				bottom: 0;
+				width: 100%;
+				height: 45px;
+				font-size: 14px;
+				font-weight: 500;
+				text-transform: uppercase;
+				line-height: 1;
+				background-image: linear-gradient(109.6deg, rgba(45, 116, 213, 1) 11.2%, rgba(121, 137, 212, 1) 91.2%);
+				background-size: 200% auto;
+				transform: translateY(150%);
+
+				@extend .edi-pos-a;
+				@extend .edi-white-color;
+				@extend .edi-d-flex;
+				@extend .edi-justify-content-center;
+				@extend .edi-align-items-center;
+				@include transition();
+
+				&:hover {
+					background-position: right center;
+					text-decoration: none;
+				}
+			}
+
+			&:hover {
+				box-shadow: 0 4px 40px rgba(0, 0, 0, 0.2);
+
+				.details {
+					transform: translateY(0);
+				}
+			}
+		}
+	}
+
+	.ant-image-preview-operations-wrapper {
+		top: 32px !important;
 	}
 }
