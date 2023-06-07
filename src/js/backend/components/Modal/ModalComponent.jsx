@@ -1,21 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import {
-	Modal,
-	Button,
-	Row,
-	Col,
-	Switch,
-	Checkbox,
-	Steps,
-	Timeline,
-	Result,
-} from 'antd';
-import { usePluginListStore } from '../utils/pluginListStore';
-import PluginList from './Plugins';
-import { doAxios } from '../utils/Api';
-import { ProgressMessage } from './ProgressMessage';
-
-const { Step } = Steps;
+import { Modal, Button, Row, Col, Switch, Steps, Timeline } from 'antd';
+import { usePluginListStore } from '../../utils/pluginListStore';
+import PluginList from '../Plugins';
+import { doAxios } from '../../utils/Api';
+import { ProgressMessage } from '../ProgressMessage';
+import ModalHeader from './ModalHeader';
+import ImportResult from './ModalResult';
 
 const ModalComponent = ({ visible, onCancel, modalData }) => {
 	const { pluginList, fetchPluginList } = usePluginListStore();
@@ -162,50 +152,21 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 	const renderImportProgress = () => {
 		// console.log(importProgress)
 		return (
-			<>
-				{/*<Timeline>*/}
-				{/*	{importProgress.map((progress, index) => (*/}
-				{/*		<Timeline.Item*/}
-				{/*			key={index}*/}
-				{/*className={index === importProgress.length - 1 ? 'active' : ''}*/}
-				{/*		>*/}
-				{/*			<ProgressMessage*/}
-				{/*				key={index}*/}
-				{/*				message={progress.message}*/}
-				{/*				fade={progress.fade}*/}
-				{/*			/>*/}
-				{/*		</Timeline.Item>*/}
-				{/*	))}*/}
-				{/*</Timeline>*/}
-				<Timeline
-					items={importProgress.map((progress, index) => ({
-						children: (
-							<ProgressMessage
-								key={index}
-								message={progress.message}
-								fade={progress.fade}
-							/>
-						),
-						key: index.toString(),
-						className:
-							index === importProgress.length - 1 ? 'active' : '',
-					}))}
-				/>
-				{/*<Timeline*/}
-				{/*	items={importProgress.map((progress, index) => ({*/}
-				{/*		children: progress,*/}
-				{/*		key: index.toString(),*/}
-				{/*	}))}*/}
-				{/*/>*/}
-			</>
+			<Timeline
+				items={importProgress.map((progress, index) => ({
+					children: (
+						<ProgressMessage
+							key={index}
+							message={progress.message}
+							fade={progress.fade}
+						/>
+					),
+					key: index.toString(),
+					className:
+						index === importProgress.length - 1 ? 'active' : '',
+				}))}
+			/>
 		);
-	};
-
-	const handleOptionChange = (option, value) => {
-		setSelectedOptions((prevOptions) => ({
-			...prevOptions,
-			[option]: value,
-		}));
 	};
 
 	return (
@@ -238,25 +199,9 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 							>
 								{currentStep === 1 && (
 									<>
-										<div className="modal-header">
-											<h3>
-												Step {currentStep}: Before You
-												Proceed
-											</h3>
-											<div className="step-indicator">
-												{/* Step Indicator */}
-												{[1, 2, 3].map((step) => (
-													<div
-														key={step}
-														className={`step-dot ${
-															step === currentStep
-																? 'active'
-																: ''
-														}`}
-													/>
-												))}
-											</div>
-										</div>
+										<ModalHeader
+											currentStep={currentStep}
+										/>
 										<div className="notice">
 											<p>
 												Before importing this demo, we
@@ -348,107 +293,6 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 												/>
 											</div>
 										</div>
-										<div>
-											<h4>Selective Import</h4>
-											<Switch
-												checked={
-													selectedOptions.selectiveImport
-												}
-												onChange={(checked) =>
-													setSelectedOptions({
-														...selectedOptions,
-														selectiveImport:
-															checked,
-													})
-												}
-											/>
-										</div>
-										{selectedOptions.selectiveImport && (
-											<div>
-												<h4>Select Options</h4>
-												<Checkbox
-													checked={
-														selectedOptions.content
-													}
-													onChange={(e) =>
-														setSelectedOptions({
-															...selectedOptions,
-															content:
-																e.target
-																	.checked,
-														})
-													}
-												>
-													Import Content
-												</Checkbox>
-												<Checkbox
-													checked={
-														selectedOptions.widgets
-													}
-													onChange={(e) =>
-														setSelectedOptions({
-															...selectedOptions,
-															widgets:
-																e.target
-																	.checked,
-														})
-													}
-												>
-													Import Widgets
-												</Checkbox>
-												<Checkbox
-													checked={
-														selectedOptions.customizer
-													}
-													onChange={(e) =>
-														setSelectedOptions({
-															...selectedOptions,
-															customizer:
-																e.target
-																	.checked,
-														})
-													}
-												>
-													Import Customizer Settings
-												</Checkbox>
-												<Checkbox
-													checked={
-														selectedOptions.settings
-													}
-													onChange={(e) =>
-														setSelectedOptions({
-															...selectedOptions,
-															settings:
-																e.target
-																	.checked,
-														})
-													}
-												>
-													Import Settings
-												</Checkbox>
-												{pluginDataArray.some(
-													(plugin) =>
-														plugin.key ===
-														'fluent-form'
-												) && (
-													<Checkbox
-														checked={
-															selectedOptions.fluentForm
-														}
-														onChange={(e) =>
-															setSelectedOptions({
-																...selectedOptions,
-																fluentForm:
-																	e.target
-																		.checked,
-															})
-														}
-													>
-														Import Fluent Form
-													</Checkbox>
-												)}
-											</div>
-										)}
 										<div className="required-plugins">
 											<PluginList
 												plugins={
@@ -506,27 +350,11 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 									currentStep === 4 ? 'fade-in' : 'fade-out'
 								}`}
 							>
-								{currentStep === 4 && importSuccess && (
-									<div>
-										<Result
-											status="success"
-											title="Import Completed Successfully"
-											extra={[
-												<Button
-													key="view-site"
-													type="primary"
-												>
-													View Site
-												</Button>,
-												<Button
-													key="close"
-													onClick={handleReset}
-												>
-													Close
-												</Button>,
-											]}
-										/>
-									</div>
+								{currentStep === 4 && (
+									<ImportResult
+										importSuccess={importSuccess}
+										handleReset={handleReset}
+									/>
 								)}
 							</div>
 						</Col>

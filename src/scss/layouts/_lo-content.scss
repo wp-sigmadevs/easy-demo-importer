@@ -10,7 +10,7 @@
 		@extend .edi-white-color-bg;
 		@extend .edi-box-shadow;
 
-		.demo-wrapper {
+		.demo-card {
 			box-shadow: 0 4px 50px rgba(0, 0, 0, 0.1);
 			border-radius: 5px;
 			overflow: hidden;
@@ -70,6 +70,8 @@
 						.anticon {
 							font-size: 24px;
 							width: 50px;
+
+							@extend .edi-justify-content-center;
 						}
 					}
 				}
@@ -146,7 +148,9 @@
 		}
 	}
 
-	.ant-image-preview-operations-wrapper {
-		top: 32px !important;
+	&.admin-bar {
+		.ant-image-preview-operations-wrapper {
+			top: 32px !important;
+		}
 	}
 }
