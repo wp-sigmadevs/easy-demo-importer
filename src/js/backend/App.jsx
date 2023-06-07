@@ -1,16 +1,16 @@
 import { Row, Col } from 'antd';
-import React, { useState, useEffect } from 'react';
-import gridSkeleton from './components/skeleton';
-import { usePluginListStore } from './utils/pluginListStore';
-import ModalComponent from './components/Modal/ModalComponent';
-import DemoCard from './components/DemoCard';
 import Header from './Layouts/Header';
+import DemoCard from './components/DemoCard';
+import gridSkeleton from './components/skeleton';
+import React, { useState, useEffect } from 'react';
 import ErrorMessage from './components/ErrorMessage';
+import useSharedDataStore from './utils/sharedDataStore';
+import ModalComponent from './components/Modal/ModalComponent';
 
 /* global sdEdiAdminParams */
 
 const App = () => {
-	const { importList, loading, fetchImportList } = usePluginListStore();
+	const { importList, loading, fetchImportList } = useSharedDataStore();
 	const [modalVisible, setModalVisible] = useState(false);
 	const [modalData, setModalData] = useState(null);
 	const [errorMessage, setErrorMessage] = useState('');

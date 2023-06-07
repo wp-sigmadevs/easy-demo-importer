@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import { Modal, Button, Row, Col, Switch, Steps, Timeline } from 'antd';
-import { usePluginListStore } from '../../utils/pluginListStore';
 import PluginList from '../Plugins';
-import { doAxios } from '../../utils/Api';
-import { ProgressMessage } from '../ProgressMessage';
 import ModalHeader from './ModalHeader';
 import ImportResult from './ModalResult';
+import { doAxios } from '../../utils/Api';
+import React, { useEffect, useState } from 'react';
+import { ProgressMessage } from '../ProgressMessage';
+import useSharedDataStore from '../../utils/sharedDataStore';
+import { Modal, Button, Row, Col, Switch, Steps, Timeline } from 'antd';
 
 const ModalComponent = ({ visible, onCancel, modalData }) => {
-	const { pluginList, fetchPluginList } = usePluginListStore();
+	const { pluginList, fetchPluginList } = useSharedDataStore();
 	const [currentStep, setCurrentStep] = useState(1);
 	const [excludeImages, setExcludeImages] = useState(
 		modalData?.excludeImages || false
@@ -107,16 +107,16 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 
 	const steps = [
 		{
-			title: 'Start',
+			title: 'Begin',
 		},
 		{
-			title: 'Configure',
+			title: 'Setup',
 		},
 		{
-			title: 'Import',
+			title: 'Imports',
 		},
 		{
-			title: 'Success',
+			title: 'End',
 		},
 	];
 
