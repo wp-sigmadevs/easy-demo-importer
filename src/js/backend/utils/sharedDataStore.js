@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { Api } from './Api';
 
-export const usePluginListStore = create((set) => ({
+const useSharedDataStore = create((set) => ({
 	importList: {},
 	pluginList: {},
 	loading: true,
@@ -24,3 +24,5 @@ export const usePluginListStore = create((set) => ({
 			});
 	},
 }));
+
+export default useSharedDataStore;
