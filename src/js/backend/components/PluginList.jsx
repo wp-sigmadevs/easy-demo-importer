@@ -9,6 +9,7 @@ const PluginList = ({ plugins }) => {
 
 	return (
 		<List
+			className="edi-fade-in"
 			dataSource={plugins}
 			renderItem={(plugin) => (
 				<List.Item>

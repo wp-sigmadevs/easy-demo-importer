@@ -10,13 +10,25 @@ import ModalComponent from './components/Modal/ModalComponent';
 /* global sdEdiAdminParams */
 
 const App = () => {
-	const { importList, loading, fetchImportList } = useSharedDataStore();
-	const [modalVisible, setModalVisible] = useState(false);
 	const [modalData, setModalData] = useState(null);
 	const [errorMessage, setErrorMessage] = useState('');
+	const {
+		importList,
+		loading,
+		fetchImportList,
+		modalVisible,
+		setModalVisible,
+		handleModalCancel,
+	} = useSharedDataStore();
 
 	useEffect(() => {
-		fetchImportList('/sd/edi/v1/import/list');
+		(async () => {
+			try {
+				await fetchImportList('/sd/edi/v1/import/list');
+			} catch (error) {
+				console.error(error);
+			}
+		})();
 	}, [fetchImportList]);
 
 	useEffect(() => {
@@ -31,10 +43,6 @@ const App = () => {
 	const showModal = (data) => {
 		setModalVisible(true);
 		setModalData(data);
-	};
-
-	const handleModalCancel = () => {
-		setModalVisible(false);
 	};
 
 	return (
