@@ -1,5 +1,11 @@
 import React from 'react';
 
+/**
+ * Component representing the header of a modal.
+ *
+ * @param {number} currentStep - The current step of the modal.
+ * @param {string} title       - The title of the modal.
+ */
 const ModalHeader = ({ currentStep, title }) => {
 	return (
 		<div className="modal-header">

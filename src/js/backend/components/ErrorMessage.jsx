@@ -1,6 +1,11 @@
 import React from 'react';
 import { Col } from 'antd';
 
+/**
+ * Component to display an error message.
+ *
+ * @param {string} message - The error message to display.
+ */
 const ErrorMessage = ({ message }) => {
 	return (
 		<div>

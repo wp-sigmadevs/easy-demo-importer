@@ -9,9 +9,19 @@ import ModalComponent from './components/Modal/ModalComponent';
 
 /* global sdEdiAdminParams */
 
+/**
+ * The main component representing the demo import application.
+ */
 const App = () => {
+	/**
+	 * State hooks
+	 */
 	const [modalData, setModalData] = useState(null);
 	const [errorMessage, setErrorMessage] = useState('');
+
+	/**
+	 * Values from the shared data store.
+	 */
 	const {
 		importList,
 		loading,
@@ -21,6 +31,9 @@ const App = () => {
 		handleModalCancel,
 	} = useSharedDataStore();
 
+	/**
+	 * Effect hook to fetch the import list when the component mounts.
+	 */
 	useEffect(() => {
 		(async () => {
 			try {
@@ -31,15 +44,26 @@ const App = () => {
 		})();
 	}, [fetchImportList]);
 
+	/**
+	 * Effect hook to set the error message if the import list is not successful.
+	 */
 	useEffect(() => {
 		if (!importList.success) {
 			setErrorMessage(importList.message);
 		}
 	}, [importList]);
 
+	/**
+	 * Extracting the demo data from the import list.
+	 */
 	const demoData =
 		importList.success && importList.data && importList.data.demoData;
 
+	/**
+	 * Function to show the modal and set the modal data.
+	 *
+	 * @param {Object} data - The data to be passed to the modal component.
+	 */
 	const showModal = (data) => {
 		setModalVisible(true);
 		setModalData(data);

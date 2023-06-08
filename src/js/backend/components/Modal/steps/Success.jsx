@@ -1,6 +1,12 @@
 import React from 'react';
 import { Result, Button } from 'antd';
 
+/**
+ * Component representing the import success or failure message.
+ *
+ * @param {boolean}  importSuccess - Flag indicating whether the import was successful.
+ * @param {Function} handleReset   - Function to handle the reset action.
+ */
 const Success = ({ importSuccess, handleReset }) => {
 	if (importSuccess) {
 		return (

@@ -1,12 +1,16 @@
-/*
- * Create an Api object with Axios and
- * configure it for the WordPress Rest Api.
+/**
+ * Create and configure an Api object with Axios
  */
 
 /* global sdEdiAdminParams */
 
 import Axios from 'axios';
 
+/**
+ * Axios instance for making API requests.
+ *
+ * @type {Object}
+ */
 export const Api = Axios.create({
 	baseURL: sdEdiAdminParams.restApiUrl,
 	headers: {
@@ -14,6 +18,14 @@ export const Api = Axios.create({
 	},
 });
 
+/**
+ * Perform Axios request for import process.
+ *
+ * @param {Object}   request           - The import request data.
+ * @param {Function} setImportProgress - The function to set the import progress.
+ * @param {Function} setImportComplete - The function to set the import completion status.
+ * @param {Function} setCurrentStep    - The function to set the current step in the import process.
+ */
 export const doAxios = async (
 	request,
 	setImportProgress,
@@ -84,4 +96,3 @@ export const doAxios = async (
 		console.log(sdEdiAdminParams.importSuccess);
 	}
 };
-

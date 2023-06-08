@@ -1,10 +1,19 @@
+import ModalHeader from '../ModalHeader';
 import React, { useEffect } from 'react';
+import PluginList from '../../PluginList';
 import { Button, Skeleton, Switch } from 'antd';
 import useSharedDataStore from '../../../utils/sharedDataStore';
-import PluginList from '../../PluginList';
-import ModalHeader from '../ModalHeader';
 
+/**
+ * Component representing the setup step in the modal.
+ *
+ * @param {Object}   modalData    - The data for the modal.
+ * @param {Function} handleImport - Function to handle the import process.
+ */
 const Setup = ({ modalData, handleImport }) => {
+	/**
+	 * Values from the shared data store.
+	 */
 	const {
 		excludeImages,
 		setExcludeImages,
@@ -18,10 +27,16 @@ const Setup = ({ modalData, handleImport }) => {
 		setCurrentStep,
 	} = useSharedDataStore();
 
+	/**
+	 * Sets the loading state to true.
+	 */
 	useEffect(() => {
 		setLoading(true);
 	}, [setLoading]);
 
+	/**
+	 * Fetches the plugin list from the server.
+	 */
 	useEffect(() => {
 		(async () => {
 			try {
@@ -33,6 +48,10 @@ const Setup = ({ modalData, handleImport }) => {
 	}, [fetchPluginList]);
 
 	const demoPluginData = pluginList.success ? pluginList.data : [];
+
+	/**
+	 * Array of plugin data objects.
+	 */
 	const pluginDataArray = Object.entries(demoPluginData).map(
 		([key, value]) => ({
 			key,
@@ -40,6 +59,9 @@ const Setup = ({ modalData, handleImport }) => {
 		})
 	);
 
+	/**
+	 * Filtered array of plugin data objects based on modal data.
+	 */
 	const filteredPluginDataArray =
 		Object.keys(modalData?.data?.plugins || {}).length > 0
 			? pluginDataArray.filter(
@@ -47,6 +69,9 @@ const Setup = ({ modalData, handleImport }) => {
 			  )
 			: pluginDataArray;
 
+	/**
+	 * Function to handle the previous step action.
+	 */
 	const handlePrevious = () => {
 		setCurrentStep(currentStep - 1);
 	};

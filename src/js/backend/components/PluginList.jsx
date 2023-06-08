@@ -1,7 +1,12 @@
+import React from 'react';
 import { List } from 'antd';
 import { getPluginText, getStatusIcon } from '../utils/helpers';
-import React from 'react';
 
+/**
+ * Component to display a list of plugins.
+ *
+ * @param {Array} plugins - The array of plugins to display.
+ */
 const PluginList = ({ plugins }) => {
 	if (plugins.length === 0) {
 		return false;

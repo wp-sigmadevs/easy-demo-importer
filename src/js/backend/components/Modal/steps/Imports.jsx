@@ -2,12 +2,23 @@ import React from 'react';
 import { Button, Timeline } from 'antd';
 import { ProgressMessage } from '../../ProgressMessage';
 
+/**
+ * Component representing the imports step in the modal.
+ *
+ * @param {string}   importStatus       - The import status.
+ * @param {Array}    importProgress     - The progress of the import.
+ * @param {boolean}  showImportProgress - Flag indicating whether to show the import progress.
+ * @param {Function} handleImport       - Function to handle the import process.
+ */
 const Imports = ({
 	importStatus,
 	importProgress,
 	showImportProgress,
 	handleImport,
 }) => {
+	/**
+	 * Renders the import progress timeline.
+	 */
 	const renderImportProgress = () => {
 		return (
 			<Timeline
