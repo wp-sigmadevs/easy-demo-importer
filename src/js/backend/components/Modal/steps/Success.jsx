@@ -1,7 +1,7 @@
 import React from 'react';
 import { Result, Button } from 'antd';
 
-const ImportResult = ({ importSuccess, handleReset }) => {
+const Success = ({ importSuccess, handleReset }) => {
 	if (importSuccess) {
 		return (
 			<Result
@@ -39,4 +39,4 @@ const ImportResult = ({ importSuccess, handleReset }) => {
 	);
 };
 
-export default ImportResult;
+export default Success;

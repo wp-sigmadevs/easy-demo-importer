@@ -33,3 +33,32 @@ export const getPluginText = (status) => {
 			return null;
 	}
 };
+
+export const getCurrentStatus = (currentStep, importSuccess, index) => {
+	if (index === currentStep - 1) {
+		return 'process';
+	} else if (index < currentStep) {
+		return 'finish';
+	} else if (index === 3 && importSuccess) {
+		return 'finish';
+	}
+
+	return 'wait';
+};
+
+export const progressSteps = () => {
+	return [
+		{
+			title: 'Begin',
+		},
+		{
+			title: 'Setup',
+		},
+		{
+			title: 'Imports',
+		},
+		{
+			title: 'Success',
+		},
+	];
+}
