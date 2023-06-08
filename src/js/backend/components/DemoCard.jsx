@@ -1,7 +1,13 @@
+import React from 'react';
 import { Button, Image, Space } from 'antd';
 import { DownloadOutlined, FullscreenOutlined } from '@ant-design/icons';
-import React from 'react';
 
+/**
+ * Component representing a demo card.
+ *
+ * @param {Object}   data      - The data object for the demo card.
+ * @param {Function} showModal - Function to show the modal with the demo card details.
+ */
 const DemoCard = ({ data, showModal }) => {
 	return (
 		<div className="demo-card">

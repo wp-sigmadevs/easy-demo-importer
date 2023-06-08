@@ -8,6 +8,11 @@ import {
 	ExclamationCircleTwoTone,
 } from '@ant-design/icons';
 
+/**
+ * Get the corresponding status icon based on the provided status.
+ *
+ * @param {string} status - The status value to determine the icon.
+ */
 export const getStatusIcon = (status) => {
 	switch (status) {
 		case 'install':
@@ -21,6 +26,11 @@ export const getStatusIcon = (status) => {
 	}
 };
 
+/**
+ * Get the corresponding plugin text based on the provided status.
+ *
+ * @param {string} status - The status value to determine the plugin text.
+ */
 export const getPluginText = (status) => {
 	switch (status) {
 		case 'install':
@@ -34,6 +44,13 @@ export const getPluginText = (status) => {
 	}
 };
 
+/**
+ * Get the current status for a step in the import process.
+ *
+ * @param {number}  currentStep   - The current step in the import process.
+ * @param {boolean} importSuccess - The import success status.
+ * @param {number}  index         - The index of the step.
+ */
 export const getCurrentStatus = (currentStep, importSuccess, index) => {
 	if (index === currentStep - 1) {
 		return 'process';
@@ -46,6 +63,9 @@ export const getCurrentStatus = (currentStep, importSuccess, index) => {
 	return 'wait';
 };
 
+/**
+ * Get the progress steps for the import process.
+ */
 export const progressSteps = () => {
 	return [
 		{
@@ -61,4 +81,4 @@ export const progressSteps = () => {
 			title: 'Success',
 		},
 	];
-}
+};

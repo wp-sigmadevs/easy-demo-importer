@@ -5,10 +5,20 @@ import Success from './steps/Success';
 import React, { useState } from 'react';
 import { doAxios } from '../../utils/Api';
 import { Modal, Row, Col, Steps } from 'antd';
-import { getCurrentStatus, progressSteps } from '../../utils/helpers';
 import useSharedDataStore from '../../utils/sharedDataStore';
+import { getCurrentStatus, progressSteps } from '../../utils/helpers';
 
+/**
+ * Component representing the Modal.
+ *
+ * @param {boolean}  visible   - Specifies whether the Modal is visible.
+ * @param {function} onCancel  - Callback function invoked when the Modal is canceled.
+ * @param {object}   modalData - Data for the Modal.
+ */
 const ModalComponent = ({ visible, onCancel, modalData }) => {
+	/**
+	 * Values from the shared data store.
+	 */
 	const {
 		reset,
 		setReset,
@@ -17,13 +27,19 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 		currentStep,
 		setCurrentStep,
 	} = useSharedDataStore();
-	// const [currentStep, setCurrentStep] = useState(1);
+
+	/**
+	 * State hooks
+	 */
 	const [importSuccess, setImportSuccess] = useState(false);
 	const [importStatus, setImportStatus] = useState('');
 	const [showImportProgress, setShowImportProgress] = useState(false);
 	const [importProgress, setImportProgress] = useState([]);
 	const [importComplete, setImportComplete] = useState(false);
 
+	/**
+	 * Handles the import process.
+	 */
 	const handleImport = async () => {
 		const { id } = modalData;
 		let resetMessage = '';
@@ -50,7 +66,7 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 				};
 
 				try {
-					setCurrentStep(3); // Move to the next step (import progress)
+					setCurrentStep(3);
 					setShowImportProgress(true);
 
 					// Start the import process
@@ -77,14 +93,23 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 		});
 	};
 
+	/**
+	 * Handles previewing the modal data.
+	 */
 	const handlePreview = () => {
 		if (modalData && modalData.data && modalData.data.previewUrl) {
 			window.open(modalData.data.previewUrl, '_blank');
 		}
 	};
 
+	/**
+	 * Progress steps.
+	 */
 	const steps = progressSteps();
 
+	/**
+	 * Handles resetting the modal.
+	 */
 	const handleReset = () => {
 		onCancel();
 		setCurrentStep(1);

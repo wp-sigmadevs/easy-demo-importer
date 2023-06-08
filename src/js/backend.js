@@ -2,15 +2,24 @@
  * Demo Import Page
  */
 
-// Imports
-import ReactDOM from 'react-dom/client';
 import App from './backend/App';
+import ReactDOM from 'react-dom/client';
 
-// Container
+/**
+ * The container element where the demo import page will be rendered.
+ *
+ * @type {HTMLElement}
+ */
 const container = document.getElementById('sd-edi-demo-import-container');
 
-// Root
+/**
+ * The root element for rendering the demo import page.
+ *
+ * @type {ReactDOM.Root}
+ */
 const root = ReactDOM.createRoot(container);
 
-// Render
+/**
+ * Render the demo import page.
+ */
 root.render(<App />);

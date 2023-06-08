@@ -3,10 +3,18 @@ import { Button } from 'antd';
 import ModalHeader from '../ModalHeader';
 import useSharedDataStore from '../../../utils/sharedDataStore';
 
+/**
+ * Component representing the "Begin" step in the modal.
+ */
 const Begin = () => {
-	// const setCurrentStep = useSharedDataStore((state) => state.setCurrentStep);
+	/**
+	 * Values from the shared data store.
+	 */
 	const { handleReset, currentStep, setCurrentStep } = useSharedDataStore();
 
+	/**
+	 * Handles moving to the next step.
+	 */
 	const onNext = () => {
 		setCurrentStep(currentStep + 1);
 	};
