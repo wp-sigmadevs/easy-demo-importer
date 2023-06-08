@@ -152,12 +152,7 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 									currentStep === 1 ? 'fade-in' : 'fade-out'
 								}`}
 							>
-								{currentStep === 1 && (
-									<Begin
-									// currentStep={currentStep}
-									// setCurrentStep={setCurrentStep}
-									/>
-								)}
+								{currentStep === 1 && <Begin />}
 							</div>
 							<div
 								className={`modal-content step ${
@@ -166,8 +161,6 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 							>
 								{currentStep === 2 && (
 									<Setup
-										// currentStep={currentStep}
-										// setCurrentStep={setCurrentStep}
 										modalData={modalData}
 										handleImport={handleImport}
 									/>
