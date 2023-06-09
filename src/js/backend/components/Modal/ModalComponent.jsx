@@ -12,8 +12,8 @@ import { getCurrentStatus, progressSteps } from '../../utils/helpers';
  * Component representing the Modal.
  *
  * @param {boolean}  visible   - Specifies whether the Modal is visible.
- * @param {function} onCancel  - Callback function invoked when the Modal is canceled.
- * @param {object}   modalData - Data for the Modal.
+ * @param {Function} onCancel  - Callback function invoked when the Modal is canceled.
+ * @param {Object}   modalData - Data for the Modal.
  */
 const ModalComponent = ({ visible, onCancel, modalData }) => {
 	/**
@@ -124,9 +124,10 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 		<>
 			<Modal
 				open={visible}
-				onCancel={() => {
-					handleReset();
-				}}
+				// onCancel={() => {
+				// 	handleReset();
+				// }}
+				closable={false}
 				footer={null}
 				width={800}
 				bodyStyle={{ height: '500px' }}
@@ -152,7 +153,9 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 									currentStep === 1 ? 'fade-in' : 'fade-out'
 								}`}
 							>
-								{currentStep === 1 && <Begin />}
+								{currentStep === 1 && (
+									<Begin handleReset={handleReset} />
+								)}
 							</div>
 							<div
 								className={`modal-content step ${
