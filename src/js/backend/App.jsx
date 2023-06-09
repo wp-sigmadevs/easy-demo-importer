@@ -14,7 +14,7 @@ import ModalComponent from './components/Modal/ModalComponent';
  */
 const App = () => {
 	/**
-	 * State hooks
+	 * State hooks.
 	 */
 	const [modalData, setModalData] = useState(null);
 	const [errorMessage, setErrorMessage] = useState('');
