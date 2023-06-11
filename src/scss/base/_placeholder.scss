@@ -107,3 +107,18 @@
 %box-shadow {
 	box-shadow: 0 0 15px rgba(0, 0, 0, 0.06);
 }
+
+%primary-btn {
+	background-image: linear-gradient(109.6deg, rgba(45, 116, 213, 1) 11.2%, rgba(121, 137, 212, 1) 91.2%);
+	background-size: 200% auto;
+	min-width: 130px;
+	font-weight: 500;
+	height: 40px;
+	font-size: 15px;
+
+	@include transition();
+
+	&:hover {
+		background-position: right center;
+	}
+}

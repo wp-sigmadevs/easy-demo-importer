@@ -1,0 +1,79 @@
+/**
+ * Layout: Import Progress.
+ */
+
+.appearance_page_sd-easy-demo-importer {
+	.modal-content {
+		&.import-step {
+			text-align: center;
+		}
+
+		.import-progress {
+			text-align: center;
+			display: inline-block;
+			width: 400px;
+			margin: 0 auto;
+			height: 230px;
+			overflow: hidden;
+			position: relative;
+
+			.ant-timeline {
+				text-align: left;
+				position: absolute;
+				left: 0;
+				bottom: 0;
+				transform-style: preserve-3d;
+				perspective: 500px;
+
+				.ant-timeline-item {
+					//visibility: hidden;
+					display: none;
+					font-size: 20px !important;
+					//height: 70px;
+
+					&:nth-last-child(1),
+					&:nth-last-child(2),
+					&:nth-last-child(3),
+					&:nth-last-child(4),
+					&:nth-last-child(5) {
+						//height: 50px;
+						display: block;
+						@extend .edi-white-color-bg;
+					}
+
+					&:nth-last-child(1) {
+						transform: translateZ(0) translateY(0);
+						opacity: 1;
+						transition: 0.5s;
+						//min-height: auto;
+					}
+
+					&:nth-last-child(2) {
+						transform: translateZ(-75px) translateY(15px);
+						opacity: 0.8;
+					}
+
+					&:nth-last-child(3) {
+						transform: translateZ(-200px) translateY(25px);
+						opacity: 0.6;
+					}
+
+					&:nth-last-child(4) {
+						transform: translateZ(-350px) translateY(25px);
+						opacity: 0.4;
+					}
+
+					&:nth-last-child(5) {
+						transform: translateZ(-525px) translateY(13px);
+						opacity: 0.2;
+					}
+
+					.ant-timeline-item-head,
+					.ant-timeline-item-tail {
+						display: none;
+					}
+				}
+			}
+		}
+	}
+}

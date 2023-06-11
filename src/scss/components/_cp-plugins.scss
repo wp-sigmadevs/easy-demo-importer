@@ -3,8 +3,18 @@
  */
 
 .required-plugins {
+	.skeleton-list {
+		margin-top: 30px;
+	}
+
+	.ant-skeleton {
+		padding: 6px 0 10px;
+		margin-bottom: 6px;
+	}
+
 	.ant-skeleton-title {
 		margin-top: 0 !important;
+		border: 0 !important;
 	}
 
 	.ant-skeleton-paragraph {
@@ -13,7 +23,7 @@
 	}
 
 	.ant-skeleton-avatar {
-		width: 25px !important;
-		height: 25px !important;
+		width: 20px !important;
+		height: 20px !important;
 	}
 }

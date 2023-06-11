@@ -5,6 +5,9 @@
 .appearance_page_sd-easy-demo-importer {
 	.edi-header {
 		padding: 20px $default-gutter;
+		position: sticky;
+		top: 0;
+		z-index: 1;
 
 		@extend .edi-white-color-bg;
 		@extend .edi-box-shadow;
@@ -25,6 +28,12 @@
 			font-weight: 500;
 			margin-left: 10px;
 			padding: 0;
+		}
+	}
+
+	&.admin-bar {
+		.edi-header {
+			top: 32px;
 		}
 	}
 }

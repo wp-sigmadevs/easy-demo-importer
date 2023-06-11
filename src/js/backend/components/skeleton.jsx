@@ -7,19 +7,11 @@ import { Skeleton } from 'antd';
  */
 const gridSkeleton = (props) => (
 	<>
-		<Skeleton.Node
-			block={true}
-			active={props}
-			style={{ width: '100%', height: 200 }}
-		>
-			<p></p>
-		</Skeleton.Node>
-		<Skeleton
-			style={{
-				padding: '10px',
-			}}
-			active={props}
-		/>
+		<Skeleton.Node block={true} active={props} />
+		<div className="details edi-d-flex edi-align-items-center">
+			<Skeleton active={props} paragraph={{ rows: 0 }} />
+			<Skeleton.Button active={props} />
+		</div>
 	</>
 );
 

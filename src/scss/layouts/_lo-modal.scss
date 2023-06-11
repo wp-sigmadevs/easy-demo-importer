@@ -1,0 +1,213 @@
+/**
+ * Layout: Modal.
+ */
+
+.appearance_page_sd-easy-demo-importer {
+	.ant-modal-content {
+		height: 600px;
+
+		@media only screen and (min-height: 680px) {
+			height: 650px;
+		}
+
+		@media only screen and (min-height: 765px) {
+			height: 700px;
+		}
+	}
+
+	.confirmation-modal {
+		.ant-modal-content {
+			height: auto !important;
+
+			.ant-btn-primary {
+				background-image: linear-gradient(109.6deg, rgb(45, 116, 213) 11.2%, rgb(121, 137, 212) 91.2%);
+				background-size: 200% auto;
+
+				&:hover {
+					background-position: right center;
+				}
+			}
+
+			.ant-btn-default {
+				&:hover {
+					color: #2d74d5;
+					border-color: #2d74d5;
+				}
+			}
+
+			.ant-modal-confirm-body {
+				.anticon {
+					font-size: 30px;
+					margin-right: 20px;
+					margin-top: 5px;
+				}
+			}
+		}
+	}
+
+	.ant-modal-body {
+		.ant-col {
+			@extend .edi-pos-s;
+		}
+
+		.modal-content {
+			&.step {
+				margin: 0 6px;
+
+				//&.fade-in {
+				//	max-height: 400px;
+				//	overflow-y: auto;
+				//}
+			}
+
+			.modal-content-inner {
+				h3 {
+					padding: 6px 15px;
+					border-left: 5px solid #2d74d5;
+					font-size: 18px;
+					font-weight: 500;
+					margin: 0;
+					margin-bottom: 20px;
+				}
+			}
+
+			.import-notice {
+				p {
+					font-size: 18px;
+				}
+			}
+
+			.required-plugins {
+				@extend .edi-pos-r;
+
+				&::before {
+					content: '';
+					display: block;
+					background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0, rgba(255, 255, 255, 0.7) 50%, #fff 100%);
+					bottom: 0;
+					left: 0;
+					height: 60px;
+					width: 100%;
+					z-index: 1;
+
+					@extend .edi-pos-a;
+				}
+
+				p {
+					font-size: 15px;
+				}
+
+				.ant-list {
+					max-height: 145px;
+					overflow-y: auto;
+					margin-top: 30px;
+
+					@media only screen and (min-height: 680px) {
+						max-height: 195px;
+					}
+
+					@extend .no-scrollbar;
+
+					@media only screen and (min-height: 765px) {
+						max-height: 220px;
+					}
+
+					.ant-list-items {
+						margin-bottom: 40px;
+					}
+
+					.ant-list-item-meta-avatar {
+						font-size: 20px;
+						top: -2px;
+
+						@extend .edi-pos-r;
+					}
+
+					.ant-list-item {
+						padding: 6px 0 10px;
+					}
+				}
+			}
+
+			.import-options {
+				padding: 30px;
+				border: 2px solid #2d74d5;
+				height: 300px;
+
+				@media only screen and (min-height: 765px) {
+					height: 310px;
+				}
+
+				h3 {
+					margin-bottom: 30px;
+				}
+
+				.option-details {
+					p {
+						font-size: 14px;
+						color: #777;
+						font-style: italic;
+					}
+
+					&.warn-text {
+						p {
+							@extend .warn-text;
+						}
+					}
+				}
+
+				.choose {
+					column-gap: 15px;
+
+					h4 {
+						margin-bottom: 0;
+						margin-top: 0;
+					}
+
+					.ant-switch {
+						&.ant-switch-checked {
+							background-image: linear-gradient(109.6deg, rgb(45, 116, 213) 11.2%, rgb(121, 137, 212) 91.2%);
+							background-size: 200% auto;
+
+							&:hover {
+								background-position: right center;
+							}
+						}
+					}
+				}
+
+				.import-option {
+					&:not(:last-child) {
+						border-bottom: 1px solid rgba(5, 5, 5, 0.06);
+						margin-bottom: 20px;
+					}
+				}
+			}
+		}
+
+		.step-actions {
+			left: 0;
+			bottom: 0;
+			width: calc(100% - 60px);
+			padding: 20px 30px;
+			display: flex;
+			justify-content: space-between;
+			//box-shadow: 0 -5px 30px -5px rgba(0, 0, 0, 0.05);
+			//border-top: 1px solid rgba(0, 0, 0, 0.05);
+			border-top: 1px solid #eee;
+			border-bottom-left-radius: 8px;
+			border-bottom-right-radius: 8px;
+
+			@extend .edi-pos-a;
+			@extend .edi-white-color-bg;
+
+			.ant-btn {
+				@extend %primary-btn;
+			}
+
+			.actions-right {
+				column-gap: 20px;
+			}
+		}
+	}
+}

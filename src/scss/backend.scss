@@ -46,20 +46,6 @@
 	}
 }
 
-.import-progress {
-	height: 400px;
-	overflow: hidden;
-	position: relative;
-
-	ul {
-		&.ant-timeline {
-			position: absolute;
-			left: 0;
-			bottom: 0;
-		}
-	}
-}
-
 //.fade {
 //	opacity: 0;
 //	transition: opacity 0.5s ease-in-out;

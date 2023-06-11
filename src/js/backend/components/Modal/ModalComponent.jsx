@@ -54,6 +54,8 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 
 		Modal.confirm({
 			title: confirmMessage,
+			centered: true,
+			className: 'confirmation-modal',
 			okText: 'Yes',
 			cancelText: 'No',
 			onOk: async () => {
@@ -124,30 +126,32 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 		<>
 			<Modal
 				open={visible}
-				// onCancel={() => {
-				// 	handleReset();
-				// }}
 				closable={false}
 				footer={null}
-				width={800}
-				bodyStyle={{ height: '500px' }}
+				width={900}
+				centered
+				// bodyStyle={{ height: '600px' }}
 			>
 				{modalData && (
 					<Row>
 						<Col span={24}>
-							<Steps
-								progressDot
-								current={currentStep - 1}
-								style={{ marginBottom: '20px' }}
-								items={steps.map((step, index) => ({
-									title: step.title,
-									status: getCurrentStatus(
-										currentStep,
-										importSuccess,
-										index
-									),
-								}))}
-							/>
+							<div className="modal-steps">
+								<h2>
+									Importing Demo:
+									<span>{modalData?.data?.name}</span>
+								</h2>
+								<Steps
+									progressDot
+									current={currentStep - 1}
+									items={steps.map((step, index) => ({
+										status: getCurrentStatus(
+											currentStep,
+											importSuccess,
+											index
+										),
+									}))}
+								/>
+							</div>
 							<div
 								className={`modal-content step ${
 									currentStep === 1 ? 'fade-in' : 'fade-out'
@@ -166,11 +170,12 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 									<Setup
 										modalData={modalData}
 										handleImport={handleImport}
+										handleReset={handleReset}
 									/>
 								)}
 							</div>
 							<div
-								className={`modal-content step ${
+								className={`modal-content step import-step ${
 									currentStep === 3 ? 'fade-in' : 'fade-out'
 								}`}
 							>
