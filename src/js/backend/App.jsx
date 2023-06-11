@@ -91,11 +91,7 @@ const App = () => {
 											xl={8}
 											key={i}
 										>
-											<div
-												style={{
-													border: '1px solid #ccc',
-												}}
-											>
+											<div className="skeleton-wrapper">
 												{gridSkeleton(loading)}
 											</div>
 										</Col>

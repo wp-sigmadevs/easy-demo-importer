@@ -31,7 +31,7 @@ const DemoCard = ({ data, showModal }) => {
 					href={data?.previewUrl}
 					rel="noreferrer"
 				>
-					Preview
+					Live Preview
 				</a>
 			</header>
 			<div className="edi-demo-content">
