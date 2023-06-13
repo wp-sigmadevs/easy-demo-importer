@@ -2,6 +2,8 @@
  * Admin JS Helpers.
  */
 
+/* global sdEdiAdminParams */
+
 import {
 	CheckCircleTwoTone,
 	CloseCircleTwoTone,
@@ -34,11 +36,11 @@ export const getStatusIcon = (status) => {
 export const getPluginText = (status) => {
 	switch (status) {
 		case 'install':
-			return 'Not Installed';
+			return sdEdiAdminParams.notInstalled;
 		case 'active':
-			return 'Installed and Active';
+			return sdEdiAdminParams.installedAndActive;
 		case 'inactive':
-			return 'Installed but Not Active';
+			return sdEdiAdminParams.installedNotActive;
 		default:
 			return null;
 	}
@@ -47,16 +49,16 @@ export const getPluginText = (status) => {
 /**
  * Get the current status for a step in the import process.
  *
- * @param {number}  currentStep   - The current step in the import process.
- * @param {boolean} importSuccess - The import success status.
- * @param {number}  index         - The index of the step.
+ * @param {number}  currentStep    - The current step in the import process.
+ * @param {boolean} importComplete - The import complete status.
+ * @param {number}  index          - The index of the step.
  */
-export const getCurrentStatus = (currentStep, importSuccess, index) => {
+export const getCurrentStatus = (currentStep, importComplete, index) => {
 	if (index === currentStep - 1) {
 		return 'process';
 	} else if (index < currentStep) {
 		return 'finish';
-	} else if (index === 3 && importSuccess) {
+	} else if (index === 3 && importComplete) {
 		return 'finish';
 	}
 

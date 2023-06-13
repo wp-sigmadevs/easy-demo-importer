@@ -82,7 +82,7 @@ class InstallDemo extends ImporterAjax {
 			$fileExists ? esc_html__( 'Importing customizer settings', 'easy-demo-importer' ) : '',
 			$fileExists ? esc_html__( 'All content imported', 'easy-demo-importer' ) : '',
 			! $fileExists,
-			! $fileExists ? esc_html__( 'Demo import process failed. No content file found', 'easy-demo-importer' ) : '',
+			! $fileExists ? esc_html__( 'Demo import process failed. No content file found.', 'easy-demo-importer' ) : '',
 		);
 	}
 

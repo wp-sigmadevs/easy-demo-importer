@@ -2,6 +2,8 @@ import React from 'react';
 import { Button, Image, Space } from 'antd';
 import { DownloadOutlined, FullscreenOutlined } from '@ant-design/icons';
 
+/* global sdEdiAdminParams */
+
 /**
  * Component representing a demo card.
  *
@@ -31,7 +33,7 @@ const DemoCard = ({ data, showModal }) => {
 					href={data?.previewUrl}
 					rel="noreferrer"
 				>
-					Live Preview
+					{sdEdiAdminParams.btnLivePreview}
 				</a>
 			</header>
 			<div className="edi-demo-content">

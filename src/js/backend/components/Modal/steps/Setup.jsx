@@ -3,14 +3,23 @@ import React, { useEffect } from 'react';
 import PluginList from '../../PluginList';
 import { Button, Col, Row, Skeleton, Switch } from 'antd';
 import useSharedDataStore from '../../../utils/sharedDataStore';
-import {ArrowLeftOutlined, CloseOutlined, DownloadOutlined} from '@ant-design/icons';
+import {
+	ArrowLeftOutlined,
+	CloseOutlined,
+	DownloadOutlined,
+} from '@ant-design/icons';
+
+/* global sdEdiAdminParams */
 
 /**
  * Component representing the setup step in the modal.
  *
- * @param {Object}   modalData    - The data for the modal.
- * @param {Function} handleImport - Function to handle the import process.
- * @param {Function} handleReset  - Handles resetting the modal.
+ * @param            modalData.modalData
+ * @param {Object}   modalData              - The data for the modal.
+ * @param {Function} handleImport           - Function to handle the import process.
+ * @param {Function} handleReset            - Handles resetting the modal.
+ * @param            modalData.handleImport
+ * @param            modalData.handleReset
  */
 const Setup = ({ modalData, handleImport, handleReset }) => {
 	/**
@@ -80,10 +89,8 @@ const Setup = ({ modalData, handleImport, handleReset }) => {
 
 	return (
 		<>
-			<ModalHeader
-				currentStep={currentStep}
-				title="Configure your import"
-			/>
+			<ModalHeader currentStep={currentStep} />
+
 			<div className="modal-content-inner">
 				<Row gutter={[30, 30]}>
 					<Col
@@ -95,15 +102,8 @@ const Setup = ({ modalData, handleImport, handleReset }) => {
 						xl={12}
 					>
 						<div className="required-plugins">
-							<h3>Required Plugins</h3>
-							<p>
-								In order to replicate the exact appearance of
-								the demo site, the import process will
-								automatically install and activate the following
-								plugins, provided they are not already installed
-								or activated on your website. You may need to
-								scroll through to see the full list:
-							</p>
+							<h3>{sdEdiAdminParams.requiredPluginsTitle}</h3>
+							<p>{sdEdiAdminParams.requiredPluginsIntro}</p>
 							{loading ? (
 								<div className="skeleton-list">
 									<Skeleton
@@ -135,7 +135,7 @@ const Setup = ({ modalData, handleImport, handleReset }) => {
 						xl={12}
 					>
 						<div className="import-options">
-							<h3>Configure Your Import</h3>
+							<h3>{sdEdiAdminParams.configureImportTitle}</h3>
 							<div className="import-option">
 								<div className="choose exclude-images edi-d-flex edi-align-items-center">
 									<Switch
@@ -144,14 +144,12 @@ const Setup = ({ modalData, handleImport, handleReset }) => {
 											setExcludeImages(checked)
 										}
 									/>
-									<h4>Exclude Demo Images</h4>
+									<h4>
+										{sdEdiAdminParams.excludeImagesTitle}
+									</h4>
 								</div>
 								<div className="option-details">
-									<p>
-										Select this option if demo import fails
-										repeatedly. Excluding images speeds up
-										the import process.
-									</p>
+									<p>{sdEdiAdminParams.excludeImagesHint}</p>
 								</div>
 							</div>
 							<div>
@@ -163,19 +161,22 @@ const Setup = ({ modalData, handleImport, handleReset }) => {
 												setReset(checked)
 											}
 										/>
-										<h4>Reset Exisiting Database</h4>
+										<h4>
+											{
+												sdEdiAdminParams.resetDatabaseTitle
+											}
+										</h4>
 									</div>
 									<div className="option-details warn-text">
 										<p>
 											<b>
-												<i>Caution</i>
+												<i>
+													{
+														sdEdiAdminParams.resetDatabaseWarning
+													}
+												</i>
 											</b>
-											: Resetting the database will erase
-											all of your content, including
-											posts, pages, images, custom post
-											types, taxonomies and settings. It
-											is advised to reset the database for
-											a full demo import.
+											{sdEdiAdminParams.resetDatabaseHint}
 										</p>
 									</div>
 								</div>
@@ -187,18 +188,18 @@ const Setup = ({ modalData, handleImport, handleReset }) => {
 					<div className="actions-left">
 						<Button type="primary" onClick={handleReset}>
 							<CloseOutlined />
-							<span>Cancel</span>
+							<span>{sdEdiAdminParams.btnCancel}</span>
 						</Button>
 					</div>
 					<div className="actions-right edi-d-flex edi-align-items-center">
 						{currentStep > 1 && (
 							<Button type="primary" onClick={handlePrevious}>
 								<ArrowLeftOutlined />
-								<span>Previous</span>
+								<span>{sdEdiAdminParams.btnPrevious}</span>
 							</Button>
 						)}
 						<Button type="primary" onClick={handleImport}>
-							<span>Start Import</span>
+							<span>{sdEdiAdminParams.btnStartImport}</span>
 							<DownloadOutlined />
 						</Button>
 					</div>

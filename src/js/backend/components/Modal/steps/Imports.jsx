@@ -2,6 +2,8 @@ import React from 'react';
 import { Button, Timeline } from 'antd';
 import { ProgressMessage } from '../../ProgressMessage';
 
+/* global sdEdiAdminParams */
+
 /**
  * Component representing the imports step in the modal.
  *
@@ -44,7 +46,7 @@ const Imports = ({
 				renderImportProgress()
 			) : (
 				<Button type="primary" onClick={handleImport}>
-					Import
+					{sdEdiAdminParams.btnImport}
 				</Button>
 			)}
 		</div>
