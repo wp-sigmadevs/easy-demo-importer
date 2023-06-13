@@ -2,14 +2,25 @@ import React from 'react';
 import { Result, Button } from 'antd';
 import { ExportOutlined, CloseOutlined, RedoOutlined } from '@ant-design/icons';
 
+/* global sdEdiAdminParams */
+
 /**
  * Component representing the import success or failure message.
  *
- * @param {boolean}  importSuccess - Flag indicating whether the import was successful.
- * @param {Function} handleReset   - Function to handle the reset action.
+ * @param {boolean}  importComplete - Flag indicating whether the import was completed.
+ * @param {Function} handleReset    - Function to handle the reset action.
+ * @param {string}   message        - Import messages.
  */
-const Success = ({ importSuccess, handleReset }) => {
-	if (importSuccess) {
+const Success = ({ importComplete, handleReset, message }) => {
+	if (importComplete) {
+		/**
+		 * Handle 'View Site' button behavior.
+		 */
+		const handleViewSite = () => {
+			const homeUrl = sdEdiAdminParams.homeUrl;
+			window.open(homeUrl, '_blank');
+		};
+
 		return (
 			<>
 				<div className="ant-result ant-result-success">
@@ -40,16 +51,20 @@ const Success = ({ importSuccess, handleReset }) => {
 						</span>
 					</div>
 					<div className="ant-result-title">
-						<h3>All Done. Have fun!</h3>
+						<h3>{message}</h3>
 					</div>
 					<div className="ant-result-extra edi-d-flex edi-justify-content-center">
-						<Button key="view-site" type="primary">
-							<span>View Site</span>
-							<ExportOutlined />
-						</Button>
 						<Button key="close" onClick={handleReset}>
 							<CloseOutlined />
-							<span>Close</span>
+							<span>{sdEdiAdminParams.btnClose}</span>
+						</Button>
+						<Button
+							key="view-site"
+							type="primary"
+							onClick={handleViewSite}
+						>
+							<span>{sdEdiAdminParams.btnViewSite}</span>
+							<ExportOutlined />
 						</Button>
 					</div>
 				</div>
@@ -60,8 +75,12 @@ const Success = ({ importSuccess, handleReset }) => {
 	return (
 		<Result
 			status="error"
-			title="Something went wrong with the import"
+			title={message}
 			extra={[
+				<Button key="close" onClick={handleReset}>
+					<CloseOutlined />
+					<span>Close</span>
+				</Button>,
 				<Button
 					key="retry"
 					type="primary"
@@ -69,10 +88,6 @@ const Success = ({ importSuccess, handleReset }) => {
 				>
 					<RedoOutlined />
 					<span>Reload & Retry</span>
-				</Button>,
-				<Button key="close" onClick={handleReset}>
-					<CloseOutlined />
-					<span>Close</span>
 				</Button>,
 			]}
 		/>

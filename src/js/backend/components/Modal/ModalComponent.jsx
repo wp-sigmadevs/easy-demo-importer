@@ -8,6 +8,8 @@ import { Modal, Row, Col, Steps } from 'antd';
 import useSharedDataStore from '../../utils/sharedDataStore';
 import { getCurrentStatus, progressSteps } from '../../utils/helpers';
 
+/* global sdEdiAdminParams */
+
 /**
  * Component representing the Modal.
  *
@@ -26,16 +28,18 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 		setExcludeImages,
 		currentStep,
 		setCurrentStep,
+		importComplete,
+		setImportComplete,
+		message,
+		setMessage,
 	} = useSharedDataStore();
 
 	/**
 	 * State hooks
 	 */
-	const [importSuccess, setImportSuccess] = useState(false);
 	const [importStatus, setImportStatus] = useState('');
 	const [showImportProgress, setShowImportProgress] = useState(false);
 	const [importProgress, setImportProgress] = useState([]);
-	const [importComplete, setImportComplete] = useState(false);
 
 	/**
 	 * Handles the import process.
@@ -43,21 +47,21 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 	const handleImport = async () => {
 		const { id } = modalData;
 		let resetMessage = '';
-		let confirmMessage = 'Are you sure you want to proceed?';
+		let confirmMessage = sdEdiAdminParams.confirmationModal;
+		let importInitMessage = sdEdiAdminParams.prepareImporting;
 
 		if (reset) {
-			resetMessage =
-				'Resetting the database will delete all your contents.';
-			confirmMessage =
-				'Are you sure you want to proceed? Resetting the database will delete all your contents.';
+			resetMessage = sdEdiAdminParams.resetMessage;
+			confirmMessage = sdEdiAdminParams.confirmationModalWithReset;
+			importInitMessage = sdEdiAdminParams.resetDatabase;
 		}
 
 		Modal.confirm({
 			title: confirmMessage,
 			centered: true,
 			className: 'confirmation-modal',
-			okText: 'Yes',
-			cancelText: 'No',
+			okText: sdEdiAdminParams.confirmYes,
+			cancelText: sdEdiAdminParams.confirmNo,
 			onOk: async () => {
 				const request = {
 					demo: id,
@@ -72,23 +76,20 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 					setShowImportProgress(true);
 
 					// Start the import process
-					const initialProgress = [{ message: 'Importing...' }];
+					const initialProgress = [{ message: importInitMessage }];
 					setImportProgress(initialProgress);
 
 					setTimeout(function () {
 						doAxios(
 							request,
 							setImportProgress,
-							setImportComplete,
-							setCurrentStep
+							setCurrentStep,
+							handleImportResponse,
+							setMessage
 						);
 					}, 2000);
-
-					setImportComplete(true);
-					setImportSuccess(true);
 				} catch (error) {
 					console.error('Error:', error);
-					// Handle the import error
 					setImportStatus('error');
 				}
 			},
@@ -96,11 +97,20 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 	};
 
 	/**
-	 * Handles previewing the modal data.
+	 * Handles the import response and updates the import message.
+	 *
+	 * @param {Object} response - The response object from the import request.
 	 */
-	const handlePreview = () => {
-		if (modalData && modalData.data && modalData.data.previewUrl) {
-			window.open(modalData.data.previewUrl, '_blank');
+	const handleImportResponse = (response) => {
+		if (!response.data.error) {
+			if (response.data.nextPhase) {
+				setImportComplete(false);
+			} else {
+				setMessage(response.data.completedMessage);
+				setImportComplete(true);
+			}
+		} else {
+			setImportComplete(false);
 		}
 	};
 
@@ -119,7 +129,6 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 		setReset(true);
 		setImportProgress([]);
 		setImportComplete(false);
-		setImportSuccess(false);
 	};
 
 	return (
@@ -137,7 +146,7 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 						<Col span={24}>
 							<div className="modal-steps">
 								<h2>
-									Importing Demo:
+									{sdEdiAdminParams.modalHeaderPrefix}
 									<span>{modalData?.data?.name}</span>
 								</h2>
 								<Steps
@@ -146,7 +155,7 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 									items={steps.map((step, index) => ({
 										status: getCurrentStatus(
 											currentStep,
-											importSuccess,
+											importComplete,
 											index
 										),
 									}))}
@@ -195,8 +204,9 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 							>
 								{currentStep === 4 && (
 									<Success
-										importSuccess={importSuccess}
+										importComplete={importComplete}
 										handleReset={handleReset}
+										message={message}
 									/>
 								)}
 							</div>

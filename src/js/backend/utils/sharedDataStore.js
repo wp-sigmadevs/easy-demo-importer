@@ -4,14 +4,16 @@ import { Api } from './Api';
 /**
  * Shared data store for managing shared state and actions.
  *
- * @typedef  {Object}   SharedDataStore
+ * @typedef  {Object}    SharedDataStore
  * @property {Object}   importList        - The import list data.
  * @property {Object}   pluginList        - The plugin list data.
  * @property {boolean}  loading           - The loading state.
  * @property {number}   currentStep       - The current step in the process.
  * @property {boolean}  modalVisible      - The visibility of the modal.
  * @property {boolean}  excludeImages     - The exclude images option.
+ * @property {boolean}  importComplete    - The import completion status.
  * @property {boolean}  reset             - The reset option.
+ * @property {string}   message           - The message.
  * @property {Function} fetchImportList   - Fetch the import list data.
  * @property {Function} fetchPluginList   - Fetch the plugin list data.
  * @property {Function} setCurrentStep    - Set the current step.
@@ -20,6 +22,8 @@ import { Api } from './Api';
  * @property {Function} setExcludeImages  - Set the exclude images option.
  * @property {Function} setReset          - Set the reset option.
  * @property {Function} setLoading        - Set the loading state.
+ * @property {Function} setImportComplete - Set the import completion status.
+ * @property {Function} setMessage        - Set the message.
  */
 
 /**
@@ -34,7 +38,9 @@ const useSharedDataStore = create((set) => ({
 	currentStep: 1,
 	modalVisible: false,
 	excludeImages: false,
+	importComplete: false,
 	reset: true,
+	message: '',
 	fetchImportList: async (endpoint) => {
 		try {
 			const response = await Api.get(endpoint, {});
@@ -57,6 +63,8 @@ const useSharedDataStore = create((set) => ({
 	setExcludeImages: (value) => set({ excludeImages: value }),
 	setReset: (value) => set({ reset: value }),
 	setLoading: (value) => set({ loading: value }),
+	setImportComplete: (value) => set({ importComplete: value }),
+	setMessage: (message) => set(() => ({ message })),
 }));
 
 export default useSharedDataStore;

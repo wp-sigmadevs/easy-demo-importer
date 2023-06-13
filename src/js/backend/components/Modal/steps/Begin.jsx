@@ -4,6 +4,8 @@ import ModalHeader from '../ModalHeader';
 import useSharedDataStore from '../../../utils/sharedDataStore';
 import { ArrowRightOutlined, CloseOutlined } from '@ant-design/icons';
 
+/* global sdEdiAdminParams */
+
 /**
  * Component representing the "Begin" step in the modal.
  *
@@ -26,29 +28,18 @@ const Begin = ({ handleReset }) => {
 		<>
 			<ModalHeader currentStep={currentStep} />
 			<div className="modal-content-inner">
-				<h3>Before You Proceed</h3>
+				<h3>{sdEdiAdminParams.beforeYouPreceed}</h3>
 				<div className="import-notice">
-					<p>
-						Before importing demo data, we recommend that you backup
-						your site&apos;s data and files. You can use a popular
-						backup plugin to ensure you have a copy of your site in
-						case anything goes wrong during the import process.
-					</p>
-					<p>
-						Please note that this demo import will install all the
-						required plugins, import contents, media, settings,
-						customizer data, widgets, and other necessary elements
-						to replicate the demo site. Make sure to review your
-						existing data and settings as they may be overwritten.
-					</p>
+					<p>{sdEdiAdminParams.stepOneIntro1}</p>
+					<p>{sdEdiAdminParams.stepOneIntro2}</p>
 				</div>
 				<div className="step-actions">
 					<Button type="primary" onClick={handleReset}>
 						<CloseOutlined />
-						<span>Cancel</span>
+						<span>{sdEdiAdminParams.btnCancel}</span>
 					</Button>
 					<Button type="primary" onClick={onNext}>
-						<span>Continue</span>
+						<span>{sdEdiAdminParams.btnContinue}</span>
 						<ArrowRightOutlined />
 					</Button>
 				</div>

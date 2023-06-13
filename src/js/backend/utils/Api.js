@@ -2,9 +2,9 @@
  * Create and configure an Api object with Axios
  */
 
-/* global sdEdiAdminParams */
-
 import Axios from 'axios';
+
+/* global sdEdiAdminParams */
 
 /**
  * Axios instance for making API requests.
@@ -21,19 +21,22 @@ export const Api = Axios.create({
 /**
  * Perform Axios request for import process.
  *
- * @param {Object}   request           - The import request data.
- * @param {Function} setImportProgress - The function to set the import progress.
- * @param {Function} setImportComplete - The function to set the import completion status.
- * @param {Function} setCurrentStep    - The function to set the current step in the import process.
+ * @param {Object}   request              - The import request data.
+ * @param {Function} setImportProgress    - The function to set the import progress.
+ * @param {Function} setCurrentStep       - The function to set the current step in the import process.
+ * @param {Function} handleImportResponse - The function to handle the import response.
+ * @param {Function} setMessage           - Set import message.
  */
 export const doAxios = async (
 	request,
 	setImportProgress,
-	setImportComplete,
-	setCurrentStep
+	setCurrentStep,
+	handleImportResponse,
+	setMessage
 ) => {
 	if (request.nextPhase) {
 		const params = new FormData();
+
 		params.append('action', request.nextPhase);
 		params.append('demo', request.demo);
 		params.append('reset', request.reset);
@@ -45,7 +48,9 @@ export const doAxios = async (
 		try {
 			const response = await Axios.post(requestUrl, params);
 
-			if (!response.error) {
+			if (!response.data.error) {
+				handleImportResponse(response);
+
 				if (response.data.nextPhaseMessage) {
 					// Update import progress with next phase message
 					setImportProgress((prevProgress) => [
@@ -68,31 +73,28 @@ export const doAxios = async (
 					// Recursive call to continue the import process
 					setTimeout(() => {
 						if (response.data.nextPhase) {
-							// Move to the next phase
 							doAxios(
 								response.data,
 								setImportProgress,
-								setImportComplete,
-								setCurrentStep
+								setCurrentStep,
+								handleImportResponse,
+								setMessage
 							);
 						} else {
-							// Import is complete
-							setImportComplete(true);
-							setCurrentStep(4); // Move to the final step
+							setCurrentStep(4);
 						}
 					}, 3000);
 				} else {
-					// No next phase message, import is finished
-					setImportComplete(true);
-					setCurrentStep(4); // Move to step 4
+					setCurrentStep(4);
 				}
 			} else {
-				console.log(response.data.errorMessage);
+				setMessage(response.data.errorMessage);
+				setCurrentStep(4);
 			}
 		} catch (error) {
-			console.error('Error:', error);
+			setMessage(sdEdiAdminParams.importError);
 		}
 	} else {
-		console.log(sdEdiAdminParams.importSuccess);
+		setMessage(sdEdiAdminParams.importSuccess);
 	}
 };
