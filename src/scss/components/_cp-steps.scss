@@ -16,8 +16,10 @@
 				font-size: 20px;
 
 				span {
-					color: #2d74d5;
+					//color: #2d74d5;
 					margin-left: 5px;
+
+					@extend .edi-primary-color;
 				}
 			}
 		}

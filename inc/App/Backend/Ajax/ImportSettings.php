@@ -83,15 +83,21 @@ class ImportSettings extends ImporterAjax {
 			}
 		}
 
-		// TODO: Need to check form file before giving response.
 		$forms = $this->multiple ? Helpers::keyExists( $this->config['demoData'][ $this->demoSlug ]['fluentFormsJson'] ) : Helpers::keyExists( $this->config['fluentFormsJson'] );
 
 		$formsExists = isset( $forms ) || is_plugin_active( 'fluentform/fluentform.php' );
 
+		$formsFileExists = false;
+
+		if ( $formsExists ) {
+			$formFile        = $this->demoUploadDir( $this->demoDir() ) . '/' . $forms . '.json';
+			$formsFileExists = file_exists( $formFile );
+		}
+
 		// Response.
 		$this->prepareResponse(
-			$formsExists ? 'sd_edi_import_fluent_forms' : 'sd_edi_import_widgets',
-			$formsExists ? esc_html__( 'Importing Fluent forms', 'easy-demo-importer' ) : esc_html__( 'Importing widgets', 'easy-demo-importer' ),
+			$formsFileExists ? 'sd_edi_import_fluent_forms' : 'sd_edi_import_widgets',
+			$formsFileExists ? esc_html__( 'Importing Fluent forms', 'easy-demo-importer' ) : esc_html__( 'Importing widgets', 'easy-demo-importer' ),
 			$settingsExists ? esc_html__( 'Theme settings imported', 'easy-demo-importer' ) : esc_html__( 'Settings import not needed', 'easy-demo-importer' )
 		);
 	}

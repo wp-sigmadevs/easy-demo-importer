@@ -30,8 +30,11 @@
 
 			.ant-btn-default {
 				&:hover {
-					color: #2d74d5;
-					border-color: #2d74d5;
+					//color: #2d74d5;
+					//border-color: #2d74d5;
+					border-color: $color-primary;
+
+					@extend .edi-primary-color;
 				}
 			}
 
@@ -63,7 +66,8 @@
 			.modal-content-inner {
 				h3 {
 					padding: 6px 15px;
-					border-left: 5px solid #2d74d5;
+					//border-left: 5px solid #2d74d5;
+					border-left: 5px solid $color-primary;
 					font-size: 18px;
 					font-weight: 500;
 					margin: 0;
@@ -131,7 +135,8 @@
 
 			.import-options {
 				padding: 30px;
-				border: 2px solid #2d74d5;
+				//border: 2px solid #2d74d5;
+				border: 2px solid $color-primary;
 				height: 300px;
 
 				@media only screen and (min-height: 765px) {

@@ -105,8 +105,11 @@
 
 				&.ant-btn-default {
 					&:hover {
-						color: #2d74d5;
-						border-color: #2d74d5;
+						//color: #2d74d5;
+						//border-color: #2d74d5;
+						border-color: $color-primary;
+
+						@extend .edi-primary-color;
 					}
 				}
 			}
