@@ -134,6 +134,7 @@ class Enqueue extends EnqueueBase {
 				'ediLogo'                    => $this->plugin->assetsUri() . '/images/sd-edi-logo.svg',
 				'numberOfDemos'              => ! empty( sd_edi()->getDemoConfig()['demoData'] ) ? count( sd_edi()->getDemoConfig()['demoData'] ) : 0,
 				Helpers::nonceId()           => wp_create_nonce( Helpers::nonceText() ),
+				'enableSupportButton'        => apply_filters( 'sd/edi/support_button', 'yes' ),
 
 				// Imports messages.
 				'prepareImporting'           => esc_html__( 'Doing some cleanups', 'easy-demo-importer' ),
@@ -175,6 +176,20 @@ class Enqueue extends EnqueueBase {
 				'btnStartImport'             => esc_html__( 'Start Import', 'easy-demo-importer' ),
 				'btnViewSite'                => esc_html__( 'View Site', 'easy-demo-importer' ),
 				'btnClose'                   => esc_html__( 'Close', 'easy-demo-importer' ),
+				'clickEnlarge'               => esc_html__( 'Click to Enlarge', 'easy-demo-importer' ),
+				'createATicket'              => esc_html__( 'Create a Ticket', 'easy-demo-importer' ),
+				'viewDocumentation'          => esc_html__( 'View Documentation', 'easy-demo-importer' ),
+				'needHelp'                   => esc_html__( 'Need help?', 'easy-demo-importer' ),
+				'onlineDoc'                  => esc_html__( 'Documentation & FAQ', 'easy-demo-importer' ),
+
+				// Support Modal.
+				'supportTitle'               => esc_html__( 'Need Help?', 'easy-demo-importer' ),
+				'docTitle'                   => esc_html__( 'Documentation & FAQs', 'easy-demo-importer' ),
+				'supportDesc'                => esc_html__( 'In case you encounter any issues, we encourage you to generate a support ticket for prompt assistance. This allows our team to address your concerns effectively and provide you with the necessary guidance and solutions.', 'easy-demo-importer' ),
+				'docDesc'                    => esc_html__( 'Embark on your journey by immersing yourself in our FAQ-rich documentation. It provides an extensive guide, featuring step-by-step instructions, screenshots, and informative videos to address common issues and help you to import demo data successfully.', 'easy-demo-importer' ),
+				'docUrl'                     => esc_url( 'https://sigmadevs.com' ),
+				'ticketUrl'                  => esc_url( 'https://sigmadevs.freshdesk.com/' ),
+
 
 				// Plugin Status.
 				'notInstalled'               => esc_html__( 'Not Installed', 'easy-demo-importer' ),

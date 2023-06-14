@@ -6,6 +6,7 @@ import React, { useState, useEffect } from 'react';
 import ErrorMessage from './components/ErrorMessage';
 import useSharedDataStore from './utils/sharedDataStore';
 import ModalComponent from './components/Modal/ModalComponent';
+import Support from './components/Support';
 
 /* global sdEdiAdminParams */
 
@@ -144,6 +145,7 @@ const App = () => {
 					modalData={modalData}
 				/>
 			</div>
+			{'yes' === sdEdiAdminParams.enableSupportButton && <Support />}
 		</>
 	);
 };

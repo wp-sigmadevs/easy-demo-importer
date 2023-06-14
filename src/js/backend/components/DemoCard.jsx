@@ -21,7 +21,7 @@ const DemoCard = ({ data, showModal }) => {
 						mask: (
 							<Space>
 								<FullscreenOutlined />
-								<span>Click to Enlarge</span>
+								<span>{sdEdiAdminParams.clickEnlarge}</span>
 							</Space>
 						),
 					}}
@@ -53,7 +53,7 @@ const DemoCard = ({ data, showModal }) => {
 							})
 						}
 					>
-						<span>Import</span> <DownloadOutlined />
+						<span>{sdEdiAdminParams.btnImport}</span> <DownloadOutlined />
 					</Button>
 				</div>
 			</div>
