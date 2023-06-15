@@ -70,7 +70,7 @@ class ActivatePlugins extends ImporterAjax {
 
 		$this->activeCount = 0;
 
-		if ( empty( $this->config['plugins'] ) || empty( $this->config['demoData'][ $this->demoSlug ]['plugins'] ) ) {
+		if ( empty( $this->config['plugins'] ) && empty( $this->config['demoData'][ $this->demoSlug ]['plugins'] ) ) {
 			return;
 		}
 
@@ -94,8 +94,8 @@ class ActivatePlugins extends ImporterAjax {
 		// Response.
 		$this->prepareResponse(
 			'sd_edi_download_demo_files',
-			esc_html__( 'Downloading demo files', 'easy-demo-importer' ),
-			$this->activeCount > 0 ? esc_html__( 'All the required plugins activated', 'easy-demo-importer' ) : esc_html__( 'No plugin required to activate', 'easy-demo-importer' )
+			esc_html__( 'Demo files download in progress.', 'easy-demo-importer' ),
+			$this->activeCount > 0 ? esc_html__( 'All the required plugins activated.', 'easy-demo-importer' ) : esc_html__( 'All the required plugins already activated.', 'easy-demo-importer' )
 		);
 	}
 

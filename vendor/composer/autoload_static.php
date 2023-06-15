@@ -51,6 +51,7 @@ class ComposerStaticInita3a0f0cbb9b6e205034676f5e8e4d4d6
         'SigmaDevs\\EasyDemoImporter\\Common\\Models\\AdminPage' => __DIR__ . '/../..' . '/inc/Common/Models/AdminPage.php',
         'SigmaDevs\\EasyDemoImporter\\Common\\Models\\Customizer' => __DIR__ . '/../..' . '/inc/Common/Models/Customizer.php',
         'SigmaDevs\\EasyDemoImporter\\Common\\Models\\CustomizerOption' => __DIR__ . '/../..' . '/inc/Common/Models/CustomizerOption.php',
+        'SigmaDevs\\EasyDemoImporter\\Common\\Models\\Widgets' => __DIR__ . '/../..' . '/inc/Common/Models/Widgets.php',
         'SigmaDevs\\EasyDemoImporter\\Common\\Traits\\Requester' => __DIR__ . '/../..' . '/inc/Common/Traits/Requester.php',
         'SigmaDevs\\EasyDemoImporter\\Common\\Traits\\Singleton' => __DIR__ . '/../..' . '/inc/Common/Traits/Singleton.php',
         'SigmaDevs\\EasyDemoImporter\\Common\\Utils\\Errors' => __DIR__ . '/../..' . '/inc/Common/Utils/Errors.php',

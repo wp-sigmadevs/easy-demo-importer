@@ -70,28 +70,32 @@ const App = () => {
 		setModalData(data);
 	};
 
+	let containerClassName = 'edi-container';
+
+	if (!importList.success) {
+		if (loading && !demoData) {
+			containerClassName += ' loading';
+		} else {
+			containerClassName += ' no-theme-config';
+		}
+	} else {
+		containerClassName += ' theme-config-found';
+	}
+
 	return (
 		<>
 			<div className="wrap edi-demo-importer-wrapper">
 				<Header logo={sdEdiAdminParams.ediLogo} />
 
 				<div className="edi-content">
-					<div className="edi-container">
+					<div className={containerClassName}>
 						<Row gutter={[30, 30]}>
 							{loading && !demoData ? (
 								<>
 									{Array.from({
 										length: sdEdiAdminParams.numberOfDemos,
 									}).map((_, i) => (
-										<Col
-											className="gutter-row"
-											xs={24}
-											sm={24}
-											md={12}
-											lg={8}
-											xl={8}
-											key={i}
-										>
+										<Col key={i} className="gutter-row">
 											<div className="skeleton-wrapper">
 												{gridSkeleton(loading)}
 											</div>
@@ -114,11 +118,6 @@ const App = () => {
 													return (
 														<Col
 															className="gutter-row edi-demo-card edi-fade-in"
-															xs={24}
-															sm={24}
-															md={12}
-															lg={8}
-															xl={8}
 															key={`demo-${index}`}
 														>
 															<DemoCard

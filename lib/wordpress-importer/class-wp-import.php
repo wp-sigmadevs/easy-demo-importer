@@ -1069,7 +1069,7 @@ class SD_EDI_WP_Import extends WP_Importer {
 	 *
 	 * @return array|WP_Error Local file location details on success, WP_Error otherwise
 	 */
-	function fetch_remote_file_old( $url, $post ) {
+	function fetch_remote_file( $url, $post ) {
 		// Extract the file name from the URL.
 		$path      = parse_url( $url, PHP_URL_PATH );
 		$file_name = '';
@@ -1083,30 +1083,29 @@ class SD_EDI_WP_Import extends WP_Importer {
 
 		$tmp_file_name = wp_tempnam( $file_name );
 		if ( ! $tmp_file_name ) {
-			return new WP_Error( 'import_no_file', __( 'Could not create temporary file.', 'radius-demo-importer' ) );
+			return new WP_Error( 'import_no_file', __( 'Could not create temporary file.', 'wordpress-importer' ) );
 		}
 
 		// Fetch the remote URL and write it to the placeholder file.
 		$remote_response = wp_safe_remote_get(
 			$url,
-			[
+			array(
 				'timeout'  => 300,
 				'stream'   => true,
 				'filename' => $tmp_file_name,
-				'headers'  => [
+				'headers'  => array(
 					'Accept-Encoding' => 'identity',
-				],
-			]
+				),
+			)
 		);
 
 		if ( is_wp_error( $remote_response ) ) {
 			@unlink( $tmp_file_name );
-
 			return new WP_Error(
 				'import_file_error',
 				sprintf(
 				/* translators: 1: The WordPress error message. 2: The WordPress error code. */
-					__( 'Request failed due to an error: %1$s (%2$s)', 'radius-demo-importer' ),
+					__( 'Request failed due to an error: %1$s (%2$s)', 'wordpress-importer' ),
 					esc_html( $remote_response->get_error_message() ),
 					esc_html( $remote_response->get_error_code() )
 				)
@@ -1118,12 +1117,11 @@ class SD_EDI_WP_Import extends WP_Importer {
 		// Make sure the fetch was successful.
 		if ( 200 !== $remote_response_code ) {
 			@unlink( $tmp_file_name );
-
 			return new WP_Error(
 				'import_file_error',
 				sprintf(
 				/* translators: 1: The HTTP error message. 2: The HTTP error code. */
-					__( 'Remote server returned the following unexpected result: %1$s (%2$s)', 'radius-demo-importer' ),
+					__( 'Remote server returned the following unexpected result: %1$s (%2$s)', 'wordpress-importer' ),
 					get_status_header_desc( $remote_response_code ),
 					esc_html( $remote_response_code )
 				)
@@ -1135,29 +1133,25 @@ class SD_EDI_WP_Import extends WP_Importer {
 		// Request failed.
 		if ( ! $headers ) {
 			@unlink( $tmp_file_name );
-
-			return new WP_Error( 'import_file_error', __( 'Remote server did not respond', 'radius-demo-importer' ) );
+			return new WP_Error( 'import_file_error', __( 'Remote server did not respond', 'wordpress-importer' ) );
 		}
 
 		$filesize = (int) filesize( $tmp_file_name );
 
 		if ( 0 === $filesize ) {
 			@unlink( $tmp_file_name );
-
-			return new WP_Error( 'import_file_error', __( 'Zero size file downloaded', 'radius-demo-importer' ) );
+			return new WP_Error( 'import_file_error', __( 'Zero size file downloaded', 'wordpress-importer' ) );
 		}
 
 		if ( ! isset( $headers['content-encoding'] ) && isset( $headers['content-length'] ) && $filesize !== (int) $headers['content-length'] ) {
 			@unlink( $tmp_file_name );
-
-			return new WP_Error( 'import_file_error', __( 'Downloaded file has incorrect size', 'radius-demo-importer' ) );
+			return new WP_Error( 'import_file_error', __( 'Downloaded file has incorrect size', 'wordpress-importer' ) );
 		}
 
 		$max_size = (int) $this->max_attachment_size();
 		if ( ! empty( $max_size ) && $filesize > $max_size ) {
 			@unlink( $tmp_file_name );
-
-			return new WP_Error( 'import_file_error', sprintf( __( 'Remote file is too large, limit is %s', 'radius-demo-importer' ), size_format( $max_size ) ) );
+			return new WP_Error( 'import_file_error', sprintf( __( 'Remote file is too large, limit is %s', 'wordpress-importer' ), size_format( $max_size ) ) );
 		}
 
 		// Override file name with Content-Disposition header value.
@@ -1189,7 +1183,7 @@ class SD_EDI_WP_Import extends WP_Importer {
 		}
 
 		if ( ( ! $type || ! $ext ) && ! current_user_can( 'unfiltered_upload' ) ) {
-			return new WP_Error( 'import_file_error', __( 'Sorry, this file type is not permitted for security reasons.', 'radius-demo-importer' ) );
+			return new WP_Error( 'import_file_error', __( 'Sorry, this file type is not permitted for security reasons.', 'wordpress-importer' ) );
 		}
 
 		$uploads = wp_upload_dir( $post['upload_date'] );
@@ -1204,8 +1198,7 @@ class SD_EDI_WP_Import extends WP_Importer {
 
 		if ( ! $move_new_file ) {
 			@unlink( $tmp_file_name );
-
-			return new WP_Error( 'import_file_error', __( 'The uploaded file could not be moved', 'radius-demo-importer' ) );
+			return new WP_Error( 'import_file_error', __( 'The uploaded file could not be moved', 'wordpress-importer' ) );
 		}
 
 		// Set correct file permissions.
@@ -1213,12 +1206,12 @@ class SD_EDI_WP_Import extends WP_Importer {
 		$perms = $stat['mode'] & 0000666;
 		chmod( $new_file, $perms );
 
-		$upload = [
+		$upload = array(
 			'file'  => $new_file,
 			'url'   => $uploads['url'] . "/$file_name",
 			'type'  => $wp_filetype['type'],
 			'error' => false,
-		];
+		);
 
 		// keep track of the old and new urls so we can substitute them later
 		$this->url_remap[ $url ]          = $upload['url'];
@@ -1231,7 +1224,7 @@ class SD_EDI_WP_Import extends WP_Importer {
 		return $upload;
 	}
 
-	function fetch_remote_file( $url, $post ) {
+	function fetch_remote_file_old( $url, $post ) {
 		// extract the file name and extension from the url.
 		$file_name = basename( $url );
 

@@ -229,6 +229,10 @@ class RestEndpoint extends Base {
 		$themeConfig     = sd_edi()->getDemoConfig();
 		$requiredPlugins = [];
 
+		if ( ! isset( $themeConfig['multipleZip'] ) || ! isset( $themeConfig['demoData'] ) ) {
+			return $this->sendError( esc_html__( 'Demo data Configuration not found.', 'easy-demo-importer' ) );
+		}
+
 		if ( ! $themeConfig['multipleZip'] ) {
 			$requiredPlugins = ! empty( $themeConfig['plugins'] ) ? $themeConfig['plugins'] : [];
 		} else {

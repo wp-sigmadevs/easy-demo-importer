@@ -137,8 +137,8 @@ class Enqueue extends EnqueueBase {
 				'enableSupportButton'        => apply_filters( 'sd/edi/support_button', 'yes' ),
 
 				// Imports messages.
-				'prepareImporting'           => esc_html__( 'Doing some cleanups', 'easy-demo-importer' ),
-				'resetDatabase'              => esc_html__( 'Resetting database', 'easy-demo-importer' ),
+				'prepareImporting'           => esc_html__( 'Preparing to install demo data. Doing some cleanups first.', 'easy-demo-importer' ),
+				'resetDatabase'              => esc_html__( 'Preparing to install demo data. Resetting database first.', 'easy-demo-importer' ),
 				'importError'                => esc_html__( 'Something went wrong with the import.', 'easy-demo-importer' ),
 				'importSuccess'              => esc_html__( 'All done. Have fun!', 'easy-demo-importer' ),
 

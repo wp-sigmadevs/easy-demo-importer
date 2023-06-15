@@ -6,7 +6,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2023-05-23 15:30+0000\n"
+"POT-Creation-Date: 2023-06-15 19:29+0000\n"
 "Report-Msgid-Bugs-To: https://github.com/wp-sigmadevs/easy-demo-importer/issues\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -37,29 +37,185 @@ msgstr ""
 msgid "You must be using WordPress %1$s or greater. You are currently using WordPress %2$s."
 msgstr ""
 
-#: ../dist/easy-demo-importer/inc/App/Backend/Ajax.php:72, ../dist/easy-demo-importer/inc/App/Backend/PluginRowMeta.php:72, ../inc/App/Backend/Ajax.php:72, ../inc/App/Backend/PluginRowMeta.php:72
-msgid "Install Demo Data"
-msgstr ""
-
-#: ../dist/easy-demo-importer/inc/App/Backend/Ajax.php:73, ../dist/easy-demo-importer/inc/App/Backend/PluginRowMeta.php:73, ../inc/App/Backend/Ajax.php:73, ../inc/App/Backend/PluginRowMeta.php:73
-msgid "System Status"
-msgstr ""
-
 #. translators: %s: Plugin name
-#: ../dist/easy-demo-importer/inc/App/Backend/DeactivateNotice.php:103, ../inc/App/Backend/DeactivateNotice.php:103
+#: ../dist/easy-demo-importer/inc/App/Backend/DeactivateNotice.php:102, ../inc/App/Backend/DeactivateNotice.php:102
 msgid "It seems you've imported the theme demo data successfully. So, the purpose of <b>%s</b> plugin is fulfilled and it has no more use. <br />If you're satisfied with the imported theme demo data, you can safely deactivate it by clicking below <b>Deactivate</b> button."
 msgstr ""
 
-#: ../dist/easy-demo-importer/inc/App/Backend/DeactivateNotice.php:115, ../inc/App/Backend/DeactivateNotice.php:115
+#: ../dist/easy-demo-importer/inc/App/Backend/DeactivateNotice.php:114, ../inc/App/Backend/DeactivateNotice.php:114
 msgid "Deactivate Plugin"
 msgstr ""
 
-#: ../dist/easy-demo-importer/inc/App/Backend/DeactivateNotice.php:118, ../inc/App/Backend/DeactivateNotice.php:118
+#: ../dist/easy-demo-importer/inc/App/Backend/DeactivateNotice.php:117, ../inc/App/Backend/DeactivateNotice.php:117
 msgid "Dismiss This Notice"
 msgstr ""
 
-#: ../dist/easy-demo-importer/inc/App/Backend/DeactivateNotice.php:134, ../inc/App/Backend/DeactivateNotice.php:134
+#: ../dist/easy-demo-importer/inc/App/Backend/DeactivateNotice.php:133, ../inc/App/Backend/DeactivateNotice.php:133
 msgid "Action failed. Please refresh the page and retry."
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Enqueue.php:140, ../inc/App/Backend/Enqueue.php:140
+msgid "Preparing to install demo data. Doing some cleanups first."
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Enqueue.php:141, ../inc/App/Backend/Enqueue.php:141
+msgid "Preparing to install demo data. Resetting database first."
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Enqueue.php:142, ../inc/App/Backend/Enqueue.php:142
+msgid "Something went wrong with the import."
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Enqueue.php:143, ../inc/App/Backend/Enqueue.php:143
+msgid "All done. Have fun!"
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Enqueue.php:146, ../inc/App/Backend/Enqueue.php:146
+msgid "Importing Demo:"
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Enqueue.php:149, ../inc/App/Backend/Enqueue.php:149
+msgid "Before You Proceed"
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Enqueue.php:150, ../inc/App/Backend/Enqueue.php:150
+msgid "Before importing demo data, we recommend that you backup your site's data and files. You can use a popular backup plugin to ensure you have a copy of your site in case anything goes wrong during the import process."
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Enqueue.php:151, ../inc/App/Backend/Enqueue.php:151
+msgid "Please note that this demo import will install all the required plugins, import contents, media, settings, customizer data, widgets, and other necessary elements to replicate the demo site. Make sure to review your existing data and settings as they may be overwritten."
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Enqueue.php:154, ../inc/App/Backend/Enqueue.php:154
+msgid "Required Plugins"
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Enqueue.php:155, ../inc/App/Backend/Enqueue.php:155
+msgid "Configure Your Import"
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Enqueue.php:156, ../inc/App/Backend/Enqueue.php:156
+msgid "In order to replicate the exact appearance of the demo site, the import process will automatically install and activate the following plugins, provided they are not already installed or activated on your website. You may need to scroll through to see the full list:"
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Enqueue.php:157, ../inc/App/Backend/Enqueue.php:157
+msgid "Exclude Demo Images"
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Enqueue.php:158, ../inc/App/Backend/Enqueue.php:158
+msgid "Select this option if demo import fails repeatedly. Excluding images will speed up the import process."
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Enqueue.php:159, ../inc/App/Backend/Enqueue.php:159
+msgid "Reset Existing Database"
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Enqueue.php:160, ../inc/App/Backend/Enqueue.php:160
+msgid "Caution:"
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Enqueue.php:161, ../inc/App/Backend/Enqueue.php:161
+msgid "Resetting the database will erase all of your content, including posts, pages, images, custom post types, taxonomies and settings. It is advised to reset the database for a full demo import."
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Enqueue.php:164, ../inc/App/Backend/Enqueue.php:164
+msgid "Are you sure you want to proceed?"
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Enqueue.php:165, ../inc/App/Backend/Enqueue.php:165
+msgid "Resetting the database will delete all your contents."
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Enqueue.php:166, ../inc/App/Backend/Enqueue.php:166
+msgid "Are you sure you want to proceed? Resetting the database will delete all your contents."
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Enqueue.php:167, ../inc/App/Backend/Enqueue.php:167
+msgid "Yes"
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Enqueue.php:168, ../inc/App/Backend/Enqueue.php:168
+msgid "No"
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Enqueue.php:171, ../inc/App/Backend/Enqueue.php:171
+msgid "Live Preview"
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Enqueue.php:172, ../inc/App/Backend/Enqueue.php:172
+msgid "Import"
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Enqueue.php:173, ../inc/App/Backend/Enqueue.php:173
+msgid "Cancel"
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Enqueue.php:174, ../inc/App/Backend/Enqueue.php:174
+msgid "Continue"
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Enqueue.php:175, ../inc/App/Backend/Enqueue.php:175
+msgid "Previous"
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Enqueue.php:176, ../inc/App/Backend/Enqueue.php:176
+msgid "Start Import"
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Enqueue.php:177, ../inc/App/Backend/Enqueue.php:177
+msgid "View Site"
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Enqueue.php:178, ../inc/App/Backend/Enqueue.php:178
+msgid "Close"
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Enqueue.php:179, ../inc/App/Backend/Enqueue.php:179
+msgid "Click to Enlarge"
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Enqueue.php:180, ../inc/App/Backend/Enqueue.php:180
+msgid "Create a Ticket"
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Enqueue.php:181, ../inc/App/Backend/Enqueue.php:181
+msgid "View Documentation"
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Enqueue.php:182, ../inc/App/Backend/Enqueue.php:182
+msgid "Need help?"
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Enqueue.php:183, ../inc/App/Backend/Enqueue.php:183
+msgid "Documentation & FAQ"
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Enqueue.php:186, ../inc/App/Backend/Enqueue.php:186
+msgid "Need Help?"
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Enqueue.php:187, ../inc/App/Backend/Enqueue.php:187
+msgid "Documentation & FAQs"
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Enqueue.php:188, ../inc/App/Backend/Enqueue.php:188
+msgid "In case you encounter any issues, we encourage you to generate a support ticket for prompt assistance. This allows our team to address your concerns effectively and provide you with the necessary guidance and solutions."
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Enqueue.php:189, ../inc/App/Backend/Enqueue.php:189
+msgid "Embark on your journey by immersing yourself in our FAQ-rich documentation. It provides an extensive guide, featuring step-by-step instructions, screenshots, and informative videos to address common issues and help you to import demo data successfully."
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Enqueue.php:195, ../inc/App/Backend/Enqueue.php:195
+msgid "Not Installed"
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Enqueue.php:196, ../inc/App/Backend/Enqueue.php:196
+msgid "Installed and Active"
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Enqueue.php:197, ../inc/App/Backend/Enqueue.php:197
+msgid "Installed but Not Active"
 msgstr ""
 
 #: ../dist/easy-demo-importer/inc/App/Backend/Pages.php:85, ../inc/App/Backend/Pages.php:85
@@ -78,9 +234,74 @@ msgstr ""
 msgid "Easy System Status"
 msgstr ""
 
+#: ../dist/easy-demo-importer/inc/App/Backend/PluginRowMeta.php:72, ../inc/App/Backend/PluginRowMeta.php:72
+msgid "Install Demo Data"
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/PluginRowMeta.php:73, ../inc/App/Backend/PluginRowMeta.php:73
+msgid "System Status"
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Rest/RestEndpoint.php:192, ../inc/App/Rest/RestEndpoint.php:192
+msgid "Sorry, you are not allowed to do that!"
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Rest/RestEndpoint.php:216, ../inc/App/Rest/RestEndpoint.php:216
+msgid "We apologize for any inconvenience, but it appears that the configuration file for the demo importer is either missing or you are using an unsupported theme. As a result, the installation of the demo content cannot proceed any further at this time. Thank you for your understanding."
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Rest/RestEndpoint.php:219, ../dist/easy-demo-importer/inc/App/Rest/RestEndpoint.php:256, ../inc/App/Rest/RestEndpoint.php:219, ../inc/App/Rest/RestEndpoint.php:256
+msgid "Data is ready to fetch"
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Rest/RestEndpoint.php:233, ../inc/App/Rest/RestEndpoint.php:233
+msgid "Demo data Configuration not found."
+msgstr ""
+
+#. translators: %1$s - opening div and paragraph HTML tags, %2$s - closing div and paragraph HTML tags.
+#: ../dist/easy-demo-importer/inc/Common/Functions/Helpers.php:66, ../inc/Common/Functions/Helpers.php:66
+msgid "%1$sYour user role isn't high enough. You don't have permission to import demo data.%2$s"
+msgstr ""
+
 #. translators: View file name.
-#: ../dist/easy-demo-importer/inc/Common/Functions/Helpers.php:261, ../inc/Common/Functions/Helpers.php:261
+#: ../dist/easy-demo-importer/inc/Common/Functions/Helpers.php:188, ../inc/Common/Functions/Helpers.php:188
 msgid "%s file not found"
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/Common/Models/Customizer.php:50, ../dist/easy-demo-importer/inc/Common/Models/Customizer.php:56, ../inc/Common/Models/Customizer.php:50, ../inc/Common/Models/Customizer.php:56
+msgid "Error importing settings! Please check that you uploaded a customizer export file."
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/Common/Models/Customizer.php:62, ../inc/Common/Models/Customizer.php:62
+msgid "Error importing settings! The settings you uploaded are not for the current theme."
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/Common/Models/Widgets.php:43, ../inc/Common/Models/Widgets.php:43
+msgid "Widget data is not available"
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/Common/Models/Widgets.php:84, ../inc/Common/Models/Widgets.php:84
+msgid "Sidebar does not exist in theme (moving widget to Inactive)"
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/Common/Models/Widgets.php:105, ../inc/Common/Models/Widgets.php:105
+msgid "Site does not support widget"
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/Common/Models/Widgets.php:138, ../inc/Common/Models/Widgets.php:138
+msgid "Widget already exists"
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/Common/Models/Widgets.php:205, ../inc/Common/Models/Widgets.php:205
+msgid "Imported to Inactive"
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/Common/Models/Widgets.php:202, ../inc/Common/Models/Widgets.php:202
+msgid "Imported"
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/Common/Models/Widgets.php:211, ../inc/Common/Models/Widgets.php:211
+msgid "No Title"
 msgstr ""
 
 #. translators: %s: request function
@@ -103,4 +324,156 @@ msgstr ""
 #. translators: %s: file path
 #: ../dist/easy-demo-importer/inc/Common/Utils/Errors.php:72, ../inc/Common/Utils/Errors.php:72
 msgid "Error source: %s"
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/ActivatePlugins.php:97, ../inc/App/Backend/Ajax/ActivatePlugins.php:97
+msgid "Demo files download in progress."
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/ActivatePlugins.php:98, ../inc/App/Backend/Ajax/ActivatePlugins.php:98
+msgid "All the required plugins activated."
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/ActivatePlugins.php:98, ../inc/App/Backend/Ajax/ActivatePlugins.php:98
+msgid "All the required plugins already activated."
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/CustomizerImport.php:81, ../inc/App/Backend/Ajax/CustomizerImport.php:81
+msgid "Menus configuration in progress."
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/CustomizerImport.php:82, ../inc/App/Backend/Ajax/CustomizerImport.php:82
+msgid "Customizer settings imported."
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/CustomizerImport.php:82, ../inc/App/Backend/Ajax/CustomizerImport.php:82
+msgid "Customizer settings import not needed."
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/DownloadFiles.php:72, ../inc/App/Backend/Ajax/DownloadFiles.php:72
+msgid "Importing posts, pages and other contents. Kindly exercise patience."
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/DownloadFiles.php:73, ../inc/App/Backend/Ajax/DownloadFiles.php:73
+msgid "All demo files downloaded."
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/DownloadFiles.php:75, ../inc/App/Backend/Ajax/DownloadFiles.php:75
+msgid "Import failed. Demo files can not be downloaded."
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/Finalize.php:74, ../inc/App/Backend/Ajax/Finalize.php:74
+msgid "Congratulations! All done. Have fun!"
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/ImportFluentForms.php:79, ../inc/App/Backend/Ajax/ImportFluentForms.php:79
+msgid "Widgets import in progress."
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/ImportFluentForms.php:80, ../inc/App/Backend/Ajax/ImportFluentForms.php:80
+msgid "Fluent forms imported."
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/ImportFluentForms.php:80, ../inc/App/Backend/Ajax/ImportFluentForms.php:80
+msgid "Fluent forms not needed."
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/ImportMenus.php:76, ../inc/App/Backend/Ajax/ImportMenus.php:76
+msgid "Settings import in progress."
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/ImportMenus.php:77, ../inc/App/Backend/Ajax/ImportMenus.php:77
+msgid "Menus saved successfully."
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/ImportMenus.php:77, ../inc/App/Backend/Ajax/ImportMenus.php:77
+msgid "Menus not needed."
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/ImportSettings.php:100, ../inc/App/Backend/Ajax/ImportSettings.php:100
+msgid "Fluent forms import in progress."
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/ImportSettings.php:100, ../inc/App/Backend/Ajax/ImportSettings.php:100
+msgid "Importing widgets"
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/ImportSettings.php:101, ../inc/App/Backend/Ajax/ImportSettings.php:101
+msgid "Theme settings imported."
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/ImportSettings.php:101, ../inc/App/Backend/Ajax/ImportSettings.php:101
+msgid "Settings import not needed."
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/ImportWidgets.php:83, ../inc/App/Backend/Ajax/ImportWidgets.php:83
+msgid "Revolution slider import in progress."
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/ImportWidgets.php:83, ../inc/App/Backend/Ajax/ImportWidgets.php:83
+msgid "Finalizing demo data"
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/ImportWidgets.php:84, ../inc/App/Backend/Ajax/ImportWidgets.php:84
+msgid "Widgets successfully imported."
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/ImportWidgets.php:84, ../inc/App/Backend/Ajax/ImportWidgets.php:84
+msgid "Widgets import not needed."
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/Initialize.php:78, ../inc/App/Backend/Ajax/Initialize.php:78
+msgid "Required plugins installation in progress."
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/Initialize.php:79, ../inc/App/Backend/Ajax/Initialize.php:79
+msgid "Database reset completed."
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/Initialize.php:79, ../inc/App/Backend/Ajax/Initialize.php:79
+msgid "Minor cleanups done."
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/InstallDemo.php:82, ../inc/App/Backend/Ajax/InstallDemo.php:82
+msgid "Customizer settings import in progress."
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/InstallDemo.php:83, ../inc/App/Backend/Ajax/InstallDemo.php:83
+msgid "All content successfully imported"
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/InstallDemo.php:85, ../inc/App/Backend/Ajax/InstallDemo.php:85
+msgid "Demo import process failed. No content file found."
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/InstallPlugins.php:100, ../inc/App/Backend/Ajax/InstallPlugins.php:100
+msgid "Required plugins activation in progress"
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/InstallPlugins.php:101, ../inc/App/Backend/Ajax/InstallPlugins.php:101
+msgid "All the required plugins installed."
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/InstallPlugins.php:101, ../inc/App/Backend/Ajax/InstallPlugins.php:101
+msgid "All the required plugins already installed."
+msgstr ""
+
+#: ../sample-config.php:34
+msgid "News Mag"
+msgstr ""
+
+#: ../sample-config.php:46
+msgid "Elementor"
+msgstr ""
+
+#: ../sample-config.php:72
+msgid "Gadgets"
+msgstr ""
+
+#: ../sample-config.php:82
+msgid "Pro"
+msgstr ""
+
+#: ../sample-config.php:85
+msgid "Visual Composer"
 msgstr ""
