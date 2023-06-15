@@ -12,6 +12,8 @@ declare( strict_types=1 );
 
 namespace SigmaDevs\EasyDemoImporter\Common\Traits;
 
+use Exception;
+
 // Do not allow directly accessing this file.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit( 'This script cannot be accessed directly.' );
@@ -36,27 +38,30 @@ trait Singleton {
 	 * Prevent cloning of the instance.
 	 *
 	 * @return void
-	 * @since 1.0.0
+	 * @throws Exception On cloning attempt.
 	 */
-	private function __clone() {
+	public function __clone() {
+		throw new Exception( 'Cloning is not allowed.' );
 	}
 
 	/**
 	 * Prevent serialization of the instance.
 	 *
 	 * @return void
-	 * @since 1.0.0
+	 * @throws Exception On serialization attempt.
 	 */
-	private function __sleep() {
+	public function __sleep() {
+		throw new Exception( 'Serialization is not allowed.' );
 	}
 
 	/**
 	 * Prevent deserialization of the instance.
 	 *
 	 * @return void
-	 * @since 1.0.0
+	 * @throws Exception On deserialization attempt.
 	 */
-	private function __wakeup() {
+	public function __wakeup() {
+		throw new Exception( 'Deserialization is not allowed.' );
 	}
 
 	/**

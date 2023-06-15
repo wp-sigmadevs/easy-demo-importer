@@ -36,6 +36,7 @@ return array(
     'SigmaDevs\\EasyDemoImporter\\Common\\Models\\AdminPage' => $baseDir . '/inc/Common/Models/AdminPage.php',
     'SigmaDevs\\EasyDemoImporter\\Common\\Models\\Customizer' => $baseDir . '/inc/Common/Models/Customizer.php',
     'SigmaDevs\\EasyDemoImporter\\Common\\Models\\CustomizerOption' => $baseDir . '/inc/Common/Models/CustomizerOption.php',
+    'SigmaDevs\\EasyDemoImporter\\Common\\Models\\Widgets' => $baseDir . '/inc/Common/Models/Widgets.php',
     'SigmaDevs\\EasyDemoImporter\\Common\\Traits\\Requester' => $baseDir . '/inc/Common/Traits/Requester.php',
     'SigmaDevs\\EasyDemoImporter\\Common\\Traits\\Singleton' => $baseDir . '/inc/Common/Traits/Singleton.php',
     'SigmaDevs\\EasyDemoImporter\\Common\\Utils\\Errors' => $baseDir . '/inc/Common/Utils/Errors.php',

@@ -73,8 +73,8 @@ class ImportMenus extends ImporterAjax {
 		// Response.
 		$this->prepareResponse(
 			'sd_edi_import_settings',
-			esc_html__( 'Importing settings', 'easy-demo-importer' ),
-			$menus ? esc_html__( 'Menus saved', 'easy-demo-importer' ) : esc_html__( 'No menus found', 'easy-demo-importer' )
+			esc_html__( 'Settings import in progress.', 'easy-demo-importer' ),
+			$menus ? esc_html__( 'Menus saved successfully.', 'easy-demo-importer' ) : esc_html__( 'Menus not needed.', 'easy-demo-importer' )
 		);
 	}
 

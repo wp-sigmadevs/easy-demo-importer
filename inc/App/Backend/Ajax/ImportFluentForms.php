@@ -76,8 +76,8 @@ class ImportFluentForms extends ImporterAjax {
 		// Response.
 		$this->prepareResponse(
 			'sd_edi_import_widgets',
-			esc_html__( 'Importing widgets', 'easy-demo-importer' ),
-			$formsExists ? esc_html__( 'Fluent forms imported', 'easy-demo-importer' ) : esc_html__( 'Fluent forms not needed', 'easy-demo-importer' )
+			esc_html__( 'Widgets import in progress.', 'easy-demo-importer' ),
+			$formsExists ? esc_html__( 'Fluent forms imported.', 'easy-demo-importer' ) : esc_html__( 'Fluent forms not needed.', 'easy-demo-importer' )
 		);
 	}
 

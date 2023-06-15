@@ -1,0 +1,42 @@
+/**
+ * Component: Grid.
+ */
+
+.appearance_page_sd-easy-demo-importer {
+	.edi-container {
+		> .ant-row {
+			display: grid;
+			grid-template-columns: repeat(1, 1fr);
+
+			@media (min-width: 768px) {
+				grid-template-columns: repeat(2, 1fr);
+			}
+
+			@media (min-width: 992px) {
+				grid-template-columns: repeat(3, 1fr);
+			}
+
+			@media (min-width: 1200px) {
+				grid-template-columns: repeat(3, 1fr);
+			}
+
+			@media (min-width: 1600px) {
+				grid-template-columns: repeat(4, 1fr);
+			}
+
+			@media (min-width: 1801px) {
+				grid-template-columns: repeat(5, 1fr);
+			}
+
+			@media (min-width: 2001px) {
+				grid-template-columns: repeat(6, 1fr);
+			}
+		}
+
+		&.no-theme-config {
+			> .ant-row {
+				grid-template-columns: repeat(1, 1fr);
+			}
+		}
+	}
+}

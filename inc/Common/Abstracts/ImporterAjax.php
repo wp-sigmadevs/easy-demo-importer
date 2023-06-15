@@ -152,6 +152,7 @@ abstract class ImporterAjax {
 		$this->response = [
 			'demo'             => $this->demoSlug,
 			'excludeImages'    => $this->excludeImages,
+			'reset'            => $this->reset,
 			'nextPhase'        => $nextPhase,
 			'nextPhaseMessage' => $nextPhaseMessage,
 			'completedMessage' => $complete,
