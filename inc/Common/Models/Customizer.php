@@ -35,7 +35,7 @@ class Customizer {
 	 * @param string $customizerFile Customizer file.
 	 * @param string $excludeImages Exclude Images.
 	 *
-	 * @return void
+	 * @return void|WP_Error
 	 * @since 1.0.0
 	 */
 	public function import( $customizerFile, $excludeImages ) {
@@ -47,26 +47,20 @@ class Customizer {
 
 		// Data checks.
 		if ( 'array' != gettype( $data ) ) {
-			$error = __( 'Error importing settings! Please check that you uploaded a customizer export file.', 'easy-demo-importer' );
-
-			return;
+			return new WP_Error( 'sd_edi_customizer_import_data_error', __( 'The customizer import file is not in a correct format. Please make sure to use the correct customizer import file.', 'easy-demo-importer' ) );
 		}
 
 		if ( ! isset( $data['template'] ) || ! isset( $data['mods'] ) ) {
-			$error = __( 'Error importing settings! Please check that you uploaded a customizer export file.', 'easy-demo-importer' );
-
-			return;
+			return new WP_Error( 'sd_edi_customizer_import_no_data', __( 'Error importing settings! Please check that you uploaded a customizer export file.', 'easy-demo-importer' ) );
 		}
 
-		if ( $data['template'] != $template ) {
-			$error = __( 'Error importing settings! The settings you uploaded are not for the current theme.', 'easy-demo-importer' );
-
-			return;
+		if ( $data['template'] !== $template ) {
+			return new WP_Error( 'sd_edi_customizer_import_wrong_theme', __( 'The customizer import file is not suitable for current theme. You can only import customizer settings for the same theme or a child theme.', 'easy-demo-importer' ) );
 		}
 
 		// Import Images.
 		if ( ! $excludeImages ) {
-			$data['mods'] = $this->importImages( $data['mods'] );
+			$data['mods'] = $this->importCustomizerImages( $data['mods'] );
 		}
 
 		// Import custom options.
@@ -113,31 +107,10 @@ class Customizer {
 	 * @return array
 	 * @since 1.0.0
 	 */
-	private function importImages( $mods ) {
+	private function importCustomizerImages( $mods ) {
 		foreach ( $mods as $key => $value ) {
 
-			// For repeater fields.
-			if ( $this->isJSON( $value ) ) {
-				$dataArray = json_decode( $value );
-
-				foreach ( $dataArray as $dataKey => $dataObject ) {
-					foreach ( $dataObject as $subDataKey => $subDataValue ) {
-						if ( $this->isImageUrl( $subDataValue ) ) {
-							$subData = $this->mediaHandleSideload( $subDataValue );
-
-							if ( ! is_wp_error( $subData ) ) {
-								$dataObject->$subDataKey = $subData->url;
-							}
-						} else {
-							$dataObject->$subDataKey = $subDataValue;
-						}
-					}
-
-					$dataArray[ $dataKey ] = $dataObject;
-				}
-
-				$mods[ $key ] = json_encode( $dataArray );
-			} elseif ( $this->isImageUrl( $value ) ) {
+			if ( $this->isImageUrl( $value ) ) {
 				$data = $this->mediaHandleSideload( $value );
 
 				if ( ! is_wp_error( $data ) ) {
@@ -150,6 +123,29 @@ class Customizer {
 					}
 				}
 			}
+
+			// For repeater fields.
+//			if ( $this->isJSON( $value ) ) {
+//				$dataArray = json_decode( $value );
+//
+//				foreach ( $dataArray as $dataKey => $dataObject ) {
+//					foreach ( $dataObject as $subDataKey => $subDataValue ) {
+//						if ( $this->isImageUrl( $subDataValue ) ) {
+//							$subData = $this->mediaHandleSideload( $subDataValue );
+//
+//							if ( ! is_wp_error( $subData ) ) {
+//								$dataObject->$subDataKey = $subData->url;
+//							}
+//						} else {
+//							$dataObject->$subDataKey = $subDataValue;
+//						}
+//					}
+//
+//					$dataArray[ $dataKey ] = $dataObject;
+//				}
+//
+//				$mods[ $key ] = json_encode( $dataArray );
+//			}
 		}
 
 		return $mods;

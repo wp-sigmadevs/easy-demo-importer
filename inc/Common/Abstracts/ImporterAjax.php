@@ -192,7 +192,11 @@ abstract class ImporterAjax {
 	 * @since 1.0.0
 	 */
 	public function demoDir() {
-		$demoZip = $this->multiple ? Helpers::keyExists( $this->config['demoData'][ $this->demoSlug ]['demoZip'] ) : Helpers::keyExists( $this->config['demoZip'] );
+		if ( $this->multiple ) {
+			$demoZip = Helpers::keyExists( $this->config['demoData'][ $this->demoSlug ]['demoZip'] );
+		} else {
+			$demoZip = Helpers::keyExists( $this->config['demoZip'] );
+		}
 
 		return pathinfo( basename( $demoZip ), PATHINFO_FILENAME );
 	}

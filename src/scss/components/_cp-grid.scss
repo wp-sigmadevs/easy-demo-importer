@@ -27,10 +27,6 @@
 			@media (min-width: 1801px) {
 				grid-template-columns: repeat(5, 1fr);
 			}
-
-			@media (min-width: 2001px) {
-				grid-template-columns: repeat(6, 1fr);
-			}
 		}
 
 		&.no-theme-config {

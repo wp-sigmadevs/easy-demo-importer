@@ -51,6 +51,18 @@ class Helpers {
 	}
 
 	/**
+	 * Nonce ID.
+	 *
+	 * @static
+	 *
+	 * @return string
+	 * @since  1.0.0
+	 */
+	public static function nonceId() {
+		return 'sd_edi_nonce';
+	}
+
+	/**
 	 * Check if the AJAX call is valid.
 	 *
 	 * @return void
@@ -69,18 +81,6 @@ class Helpers {
 				)
 			);
 		}
-	}
-
-	/**
-	 * Nonce ID.
-	 *
-	 * @static
-	 *
-	 * @return string
-	 * @since  1.0.0
-	 */
-	public static function nonceId() {
-		return 'sd_edi_nonce';
 	}
 
 	/**
@@ -325,5 +325,34 @@ class Helpers {
 		}
 
 		return $pageByTitle;
+	}
+
+	/**
+	 * Check if plugin config exists.
+	 *
+	 * @param string $demo Demo slug.
+	 * @param array  $config Theme config.
+	 *
+	 * @return bool
+	 * @since 1.0.0
+	 */
+	public static function pluginConfigExists( $demo, $config ) {
+		$demoData = ! empty( $config['demoData'][ $demo ] ) ? $config['demoData'][ $demo ] : [];
+
+		return ! ( empty( $config['plugins'] ) && empty( $demoData['plugins'] ) );
+	}
+
+	/**
+	 * Get plugins list.
+	 *
+	 * @param string $demo Demo slug.
+	 * @param array  $config Theme config.
+	 * @param bool   $multiple Is multiple?.
+	 * @return mixed
+	 */
+	public static function getPluginsList( $demo, $config, $multiple ) {
+		$demoData = ! empty( $config['demoData'][ $demo ] ) ? $config['demoData'][ $demo ] : [];
+
+		return $multiple ? $demoData['plugins'] : $config['plugins'];
 	}
 }

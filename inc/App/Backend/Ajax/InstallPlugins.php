@@ -73,11 +73,11 @@ class InstallPlugins extends ImporterAjax {
 
 		$this->installCount = 0;
 
-		if ( empty( $this->config['plugins'] ) && empty( $this->config['demoData'][ $this->demoSlug ]['plugins'] ) ) {
+		if ( ! Helpers::pluginConfigExists( $this->demoSlug, $this->config ) ) {
 			return;
 		}
 
-		$this->plugins = $this->multiple ? $this->config['demoData'][ $this->demoSlug ]['plugins'] : $this->config['plugins'];
+		$this->plugins = Helpers::getPluginsList( $this->demoSlug, $this->config, $this->multiple );
 
 		add_action( 'wp_ajax_sd_edi_install_plugins', [ $this, 'response' ] );
 	}
