@@ -32,6 +32,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
+/**
+ * TODO: footer old link need to replace (fluent form contact)
+ * TODO: Menu need to fix (header menu & footer menu)
+ * TODO: Fluent form database error need to fix.
+ * TODO: Snitization.
+ */
 
 declare( strict_types=1 );
 

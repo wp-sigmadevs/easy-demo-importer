@@ -42,8 +42,8 @@ class SD_EDI_WXR_Parser {
 				echo $error[0] . ':' . $error[1] . ' ' . esc_html( $error[2] );
 			}
 			echo '</pre>';
-			echo '<p><strong>' . __( 'There was an error when reading this WXR file', 'radius-demo-importer' ) . '</strong><br />';
-			echo __( 'Details are shown above. The importer will now try again with a different parser...', 'radius-demo-importer' ) . '</p>';
+			echo '<p><strong>' . __( 'There was an error when reading this WXR file', 'easy-demo-importer' ) . '</strong><br />';
+			echo __( 'Details are shown above. The importer will now try again with a different parser...', 'easy-demo-importer' ) . '</p>';
 		}
 
 		// use regular expressions if nothing else available or this is bad XML
