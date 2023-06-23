@@ -94,6 +94,11 @@ class Widgets {
 			foreach ( $widgets as $widgetInstanceId => $widget ) {
 				$fail = false;
 
+				// Replace the old nav_manu ID with the new one.
+				if ( isset( $widget->nav_menu ) ) {
+					$widget->nav_menu = sd_edi()->getNewID( $widget->nav_menu );
+				}
+
 				// Get id_base (remove -# from end) and instance ID number.
 				$idBase           = preg_replace( '/-[0-9]+$/', '', $widgetInstanceId );
 				$instanceIdNumber = str_replace( $idBase . '-', '', $widgetInstanceId );

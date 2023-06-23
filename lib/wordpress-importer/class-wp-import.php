@@ -430,7 +430,10 @@ class SD_EDI_WP_Import extends WP_Importer {
 			];
 
 			$id = wp_insert_category( $data, true );
+
 			if ( ! is_wp_error( $id ) && $id > 0 ) {
+				sd_edi()->createEntry( $cat['term_id'], $id, $cat['category_nicename'] );
+
 				if ( isset( $cat['term_id'] ) ) {
 					$this->processed_terms[ intval( $cat['term_id'] ) ] = $id;
 				}
@@ -482,6 +485,8 @@ class SD_EDI_WP_Import extends WP_Importer {
 
 			$id = wp_insert_term( wp_slash( $tag['tag_name'] ), 'post_tag', $args );
 			if ( ! is_wp_error( $id ) ) {
+				sd_edi()->createEntry( $tag['term_id'], $id['term_id'], $tag['tag_slug'] );
+
 				if ( isset( $tag['term_id'] ) ) {
 					$this->processed_terms[ intval( $tag['term_id'] ) ] = $id['term_id'];
 				}
@@ -543,6 +548,8 @@ class SD_EDI_WP_Import extends WP_Importer {
 
 			$id = wp_insert_term( wp_slash( $term['term_name'] ), $term['term_taxonomy'], $args );
 			if ( ! is_wp_error( $id ) ) {
+				sd_edi()->createEntry( $term['term_id'], $id['term_id'], $term['slug'] );
+
 				if ( isset( $term['term_id'] ) ) {
 					$this->processed_terms[ intval( $term['term_id'] ) ] = $id['term_id'];
 				}

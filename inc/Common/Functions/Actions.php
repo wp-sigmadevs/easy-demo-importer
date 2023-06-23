@@ -92,7 +92,7 @@ class Actions {
 		// Delete Nav Menus.
 		Helpers::deleteNavMenus();
 
-		return new self();
+		return new static();
 	}
 
 	/**
@@ -116,7 +116,7 @@ class Actions {
 			}
 		}
 
-		return new self();
+		return new static();
 	}
 
 	/**
@@ -205,17 +205,14 @@ class Actions {
 			$commenter_new_email = esc_sql( get_bloginfo( 'admin_email' ) );
 			$commenter_new_url   = esc_sql( home_url() );
 
-			$query = $wpdb->prepare(
-				"
-					UPDATE $wpdb->comments
-					SET comment_author_email = %s, comment_author_url = %s
-					WHERE comment_author_email = %s",
-				$commenter_new_email,
-				$commenter_new_url,
-				$commenter_email
+			$wpdb->query(
+				$wpdb->prepare(
+					"UPDATE $wpdb->comments SET comment_author_email = %s, comment_author_url = %s WHERE comment_author_email = %s",
+					$commenter_new_email,
+					$commenter_new_url,
+					$commenter_email
+				)
 			);
-
-			$wpdb->query( $query );
 		}
 
 		if ( empty( $obj->config['urlToReplace'] ) ) {
@@ -224,62 +221,92 @@ class Actions {
 
 		$urls = [
 			'slash'   => [
-				'old' => trailingslashit( $obj->config['urlToReplace'] ),
+				'old' => trailingslashit( 'https://radiustheme.com/demo/wordpress/themes/faktorie/' ),
 				'new' => home_url( '/' ),
 			],
 			'unslash' => [
-				'old' => untrailingslashit( $obj->config['urlToReplace'] ),
+				'old' => untrailingslashit( 'https://radiustheme.com/demo/wordpress/themes/faktorie' ),
 				'new' => home_url(),
 			],
 		];
 
+		// Table names and columns to update.
+		$tables = [
+			$wpdb->prefix . 'posts'       => [ 'post_content' ],
+			$wpdb->prefix . 'postmeta'    => [ 'meta_value' ],
+			$wpdb->prefix . 'options'     => [ 'option_value' ],
+			$wpdb->prefix . 'comments'    => [ 'comment_content' ],
+			$wpdb->prefix . 'commentmeta' => [ 'meta_value' ],
+		];
+
 		foreach ( $urls as $url ) {
-			$oldUrl = esc_sql( $url['old'] );
-			$newUrl = esc_sql( $url['new'] );
-
-			// Table names and columns to update.
-			$tables = [
-				$wpdb->prefix . 'posts'       => [ 'post_content' ],
-				$wpdb->prefix . 'postmeta'    => [ 'meta_value' ],
-				$wpdb->prefix . 'options'     => [ 'option_value' ],
-				$wpdb->prefix . 'comments'    => [ 'comment_content' ],
-				$wpdb->prefix . 'commentmeta' => [ 'meta_value' ],
-			];
-
-			// Search and replace URLs in all tables and columns.
-			foreach ( $tables as $table => $columns ) {
-				foreach ( $columns as $column ) {
-					$sql = $wpdb->prepare( "UPDATE $table SET $column = replace($column, %s, %s)", $oldUrl, $newUrl );
-
-					$wpdb->query( $sql );
-				}
-			}
+			$oldUrl = esc_url_raw( $url['old'] );
+			$newUrl = esc_url_raw( $url['new'] );
 
 			// Search and replace URLs in Elementor data (postmeta).
-			$wpdb->query(
-				$wpdb->prepare(
-					"UPDATE {$wpdb->postmeta} " .
-					'SET `meta_value` = REPLACE(`meta_value`, %s, %s) ' .
-					"WHERE `meta_key` = '_elementor_data' AND `meta_value` LIKE '[%%' ;",
-					str_replace( '/', '\/', $oldUrl ),
-					str_replace( '/', '\/', $newUrl )
-				)
-			);
+			self::searchReplaceElementorUrls( $oldUrl, $newUrl );
 
 			// Replace GUID.
-			$query = $wpdb->prepare(
-				"
-	                UPDATE $wpdb->posts
-	                SET guid = REPLACE(guid, %s, %s)
-	                WHERE guid LIKE %s",
-				$oldUrl,
-				$newUrl,
-				$wpdb->esc_like( $oldUrl ) . '%'
-			);
-			$wpdb->query( $query );
+			self::replaceGUIDs( $oldUrl, $newUrl );
 		}
 
 		return new static();
+	}
+
+	/**
+	 * Search and replace URLs in Elementor data (postmeta).
+	 *
+	 * @param string $oldUrl The old URL to search for.
+	 * @param string $newUrl The new URL to replace with.
+	 *
+	 * @return void
+	 * @since 1.0.0
+	 */
+	public static function searchReplaceElementorUrls( $oldUrl, $newUrl ) {
+		global $wpdb;
+
+		// Sanitize the URLs for use in SQL query.
+		$oldUrl = str_replace( '/', '\/', $oldUrl );
+		$newUrl = str_replace( '/', '\/', $newUrl );
+
+		// Prepare and execute the SQL query.
+		$wpdb->query(
+			$wpdb->prepare(
+				"UPDATE {$wpdb->postmeta} " .
+				'SET `meta_value` = REPLACE(`meta_value`, %s, %s) ' .
+				"WHERE `meta_key` = '_elementor_data' AND `meta_value` LIKE '[%%' ;",
+				$oldUrl,
+				$newUrl
+			)
+		);
+	}
+
+	/**
+	 * Replace GUIDs in WordPress posts table.
+	 *
+	 * @param string $oldUrl The old URL to search for in GUIDs.
+	 * @param string $newUrl The new URL to replace with.
+	 *
+	 * @return void
+	 * @since 1.0.0
+	 */
+	public static function replaceGUIDs( $oldUrl, $newUrl ) {
+		global $wpdb;
+
+		// Sanitize the URLs for use in SQL query.
+		$oldUrlLike = $wpdb->esc_like( $oldUrl ) . '%';
+
+		// Prepare and execute the SQL query.
+		$wpdb->query(
+			$wpdb->prepare(
+				"UPDATE $wpdb->posts " .
+				'SET guid = REPLACE(guid, %s, %s) ' .
+				'WHERE guid LIKE %s',
+				$oldUrl,
+				$newUrl,
+				$oldUrlLike
+			)
+		);
 	}
 
 	/**
