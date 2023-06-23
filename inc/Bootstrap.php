@@ -14,11 +14,7 @@ declare( strict_types=1 );
 namespace SigmaDevs\EasyDemoImporter;
 
 use Composer\Autoload\ClassLoader;
-use SigmaDevs\EasyDemoImporter\Common\
-{
-	Abstracts\Base,
-	Traits\Requester
-};
+use SigmaDevs\EasyDemoImporter\Common\{Abstracts\Base, Functions\Actions, Traits\Requester};
 use SigmaDevs\EasyDemoImporter\Config\
 {
 	I18n,
