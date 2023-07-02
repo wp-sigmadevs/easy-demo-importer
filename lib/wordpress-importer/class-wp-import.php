@@ -239,7 +239,7 @@ class SD_EDI_WP_Import extends WP_Importer {
 		?>
 		<form action="<?php echo admin_url( 'admin.php?import=wordpress&amp;step=2' ); ?>" method="post">
 			<?php wp_nonce_field( 'import-wordpress' ); ?>
-			<input type="hidden" name="import_id" value="<?php echo $this->id; ?>"/>
+			<input type="hidden" name="import_id" value="<?php echo absint( $this->id ); ?>"/>
 
 			<?php if ( ! empty( $this->authors ) ) : ?>
 				<h3><?php _e( 'Assign Authors', 'easy-demo-importer' ); ?></h3>
@@ -1090,7 +1090,7 @@ class SD_EDI_WP_Import extends WP_Importer {
 
 		$tmp_file_name = wp_tempnam( $file_name );
 		if ( ! $tmp_file_name ) {
-			return new WP_Error( 'import_no_file', __( 'Could not create temporary file.', 'wordpress-importer' ) );
+			return new WP_Error( 'import_no_file', __( 'Could not create temporary file.', 'easy-demo-importer' ) );
 		}
 
 		// Fetch the remote URL and write it to the placeholder file.
@@ -1113,7 +1113,7 @@ class SD_EDI_WP_Import extends WP_Importer {
 				'import_file_error',
 				sprintf(
 				/* translators: 1: The WordPress error message. 2: The WordPress error code. */
-					__( 'Request failed due to an error: %1$s (%2$s)', 'wordpress-importer' ),
+					__( 'Request failed due to an error: %1$s (%2$s)', 'easy-demo-importer' ),
 					esc_html( $remote_response->get_error_message() ),
 					esc_html( $remote_response->get_error_code() )
 				)
@@ -1130,7 +1130,7 @@ class SD_EDI_WP_Import extends WP_Importer {
 				'import_file_error',
 				sprintf(
 				/* translators: 1: The HTTP error message. 2: The HTTP error code. */
-					__( 'Remote server returned the following unexpected result: %1$s (%2$s)', 'wordpress-importer' ),
+					__( 'Remote server returned the following unexpected result: %1$s (%2$s)', 'easy-demo-importer' ),
 					get_status_header_desc( $remote_response_code ),
 					esc_html( $remote_response_code )
 				)
@@ -1143,7 +1143,7 @@ class SD_EDI_WP_Import extends WP_Importer {
 		if ( ! $headers ) {
 			@unlink( $tmp_file_name );
 
-			return new WP_Error( 'import_file_error', __( 'Remote server did not respond', 'wordpress-importer' ) );
+			return new WP_Error( 'import_file_error', __( 'Remote server did not respond', 'easy-demo-importer' ) );
 		}
 
 		$filesize = (int) filesize( $tmp_file_name );
@@ -1151,20 +1151,20 @@ class SD_EDI_WP_Import extends WP_Importer {
 		if ( 0 === $filesize ) {
 			@unlink( $tmp_file_name );
 
-			return new WP_Error( 'import_file_error', __( 'Zero size file downloaded', 'wordpress-importer' ) );
+			return new WP_Error( 'import_file_error', __( 'Zero size file downloaded', 'easy-demo-importer' ) );
 		}
 
 		if ( ! isset( $headers['content-encoding'] ) && isset( $headers['content-length'] ) && $filesize !== (int) $headers['content-length'] ) {
 			@unlink( $tmp_file_name );
 
-			return new WP_Error( 'import_file_error', __( 'Downloaded file has incorrect size', 'wordpress-importer' ) );
+			return new WP_Error( 'import_file_error', __( 'Downloaded file has incorrect size', 'easy-demo-importer' ) );
 		}
 
 		$max_size = (int) $this->max_attachment_size();
 		if ( ! empty( $max_size ) && $filesize > $max_size ) {
 			@unlink( $tmp_file_name );
 
-			return new WP_Error( 'import_file_error', sprintf( __( 'Remote file is too large, limit is %s', 'wordpress-importer' ), size_format( $max_size ) ) );
+			return new WP_Error( 'import_file_error', sprintf( __( 'Remote file is too large, limit is %s', 'easy-demo-importer' ), size_format( $max_size ) ) );
 		}
 
 		// Override file name with Content-Disposition header value.
@@ -1196,7 +1196,7 @@ class SD_EDI_WP_Import extends WP_Importer {
 		}
 
 		if ( ( ! $type || ! $ext ) && ! current_user_can( 'unfiltered_upload' ) ) {
-			return new WP_Error( 'import_file_error', __( 'Sorry, this file type is not permitted for security reasons.', 'wordpress-importer' ) );
+			return new WP_Error( 'import_file_error', __( 'Sorry, this file type is not permitted for security reasons.', 'easy-demo-importer' ) );
 		}
 
 		$uploads = wp_upload_dir( $post['upload_date'] );
@@ -1212,7 +1212,7 @@ class SD_EDI_WP_Import extends WP_Importer {
 		if ( ! $move_new_file ) {
 			@unlink( $tmp_file_name );
 
-			return new WP_Error( 'import_file_error', __( 'The uploaded file could not be moved', 'wordpress-importer' ) );
+			return new WP_Error( 'import_file_error', __( 'The uploaded file could not be moved', 'easy-demo-importer' ) );
 		}
 
 		// Set correct file permissions.
@@ -1231,65 +1231,6 @@ class SD_EDI_WP_Import extends WP_Importer {
 		$this->url_remap[ $url ]          = $upload['url'];
 		$this->url_remap[ $post['guid'] ] = $upload['url']; // r13735, really needed?
 		// keep track of the destination if the remote url is redirected somewhere else
-		if ( isset( $headers['x-final-location'] ) && $headers['x-final-location'] != $url ) {
-			$this->url_remap[ $headers['x-final-location'] ] = $upload['url'];
-		}
-
-		return $upload;
-	}
-
-	function fetch_remote_file_old( $url, $post ) {
-		// extract the file name and extension from the url.
-		$file_name = basename( $url );
-
-		// get placeholder file in the upload dir with a unique, sanitized filename.
-		$upload = wp_upload_bits( $file_name, 0, '', $post['upload_date'] );
-		if ( $upload['error'] ) {
-			return new WP_Error( 'upload_dir_error', $upload['error'] );
-		}
-
-		// fetch the remote url and write it to the placeholder file.
-		$headers = wp_get_http( $url, $upload['file'] );
-
-		// request failed.
-		if ( ! $headers ) {
-			@unlink( $upload['file'] );
-
-			return new WP_Error( 'import_file_error', __( 'Remote server did not respond', 'easy-demo-importer' ) );
-		}
-
-		// make sure the fetch was successful.
-		if ( $headers['response'] != '200' ) {
-			@unlink( $upload['file'] );
-
-			return new WP_Error( 'import_file_error', sprintf( __( 'Remote server returned error response %1$d %2$s', 'easy-demo-importer' ), esc_html( $headers['response'] ), get_status_header_desc( $headers['response'] ) ) );
-		}
-
-		$filesize = filesize( $upload['file'] );
-
-		if ( isset( $headers['content-length'] ) && $filesize != $headers['content-length'] ) {
-			@unlink( $upload['file'] );
-
-			return new WP_Error( 'import_file_error', __( 'Remote file is incorrect size', 'easy-demo-importer' ) );
-		}
-
-		if ( 0 == $filesize ) {
-			@unlink( $upload['file'] );
-
-			return new WP_Error( 'import_file_error', __( 'Zero size file downloaded', 'easy-demo-importer' ) );
-		}
-
-		$max_size = (int) $this->max_attachment_size();
-		if ( ! empty( $max_size ) && $filesize > $max_size ) {
-			@unlink( $upload['file'] );
-
-			return new WP_Error( 'import_file_error', sprintf( __( 'Remote file is too large, limit is %s', 'easy-demo-importer' ), size_format( $max_size ) ) );
-		}
-
-		// keep track of the old and new urls so we can substitute them later.
-		$this->url_remap[ $url ]          = $upload['url'];
-		$this->url_remap[ $post['guid'] ] = $upload['url']; // r13735, really needed?
-		// keep track of the destination if the remote url is redirected somewhere else.
 		if ( isset( $headers['x-final-location'] ) && $headers['x-final-location'] != $url ) {
 			$this->url_remap[ $headers['x-final-location'] ] = $upload['url'];
 		}

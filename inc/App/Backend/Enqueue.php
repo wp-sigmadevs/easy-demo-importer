@@ -187,8 +187,8 @@ class Enqueue extends EnqueueBase {
 				'docTitle'                   => esc_html__( 'Documentation & FAQs', 'easy-demo-importer' ),
 				'supportDesc'                => esc_html__( 'In case you encounter any issues, we encourage you to generate a support ticket for prompt assistance. This allows our team to address your concerns effectively and provide you with the necessary guidance and solutions.', 'easy-demo-importer' ),
 				'docDesc'                    => esc_html__( 'Embark on your journey by immersing yourself in our FAQ-rich documentation. It provides an extensive guide, featuring step-by-step instructions, screenshots, and informative videos to address common issues and help you to import demo data successfully.', 'easy-demo-importer' ),
-				'docUrl'                     => esc_url( 'https://sigmadevs.com' ),
-				'ticketUrl'                  => esc_url( 'https://sigmadevs.freshdesk.com/' ),
+				'docUrl'                     => '#',
+				'ticketUrl'                  => '#',
 
 
 				// Plugin Status.

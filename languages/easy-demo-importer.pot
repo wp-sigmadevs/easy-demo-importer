@@ -6,7 +6,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2023-06-15 19:29+0000\n"
+"POT-Creation-Date: 2023-07-01 21:34+0000\n"
 "Report-Msgid-Bugs-To: https://github.com/wp-sigmadevs/easy-demo-importer/issues\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -14,6 +14,14 @@ msgstr ""
 "X-Poedit-SearchPathExcluded-0: *.js\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: ../dev/DBSearchReplace.php:107
+msgid "(%s MB)"
+msgstr ""
+
+#: ../dev/DBSearchReplace.php:311
+msgid "Error updating row: %d."
+msgstr ""
 
 #: ../dist/easy-demo-importer/easy-demo-importer.php:71, ../easy-demo-importer.php:71
 msgid "Easy Demo Importer is unable to find the Bootstrap class."
@@ -35,6 +43,184 @@ msgstr ""
 #. translators: %1$s: required wordpress version, %2$s: current wordpress version
 #: ../dist/easy-demo-importer/inc/Config/Requirements.php:109, ../inc/Config/Requirements.php:109
 msgid "You must be using WordPress %1$s or greater. You are currently using WordPress %2$s."
+msgstr ""
+
+#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:108, ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:117, ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:173, ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:168, ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:183, ../lib/wordpress-importer/class-wp-import.php:108, ../lib/wordpress-importer/class-wp-import.php:117, ../lib/wordpress-importer/class-wp-import.php:173, ../lib/wordpress-importer/class-wp-import.php:168, ../lib/wordpress-importer/class-wp-import.php:183
+msgid "Sorry, there has been an error."
+msgstr ""
+
+#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:109, ../lib/wordpress-importer/class-wp-import.php:109
+msgid "The file does not exist, please try again."
+msgstr ""
+
+#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:152, ../lib/wordpress-importer/class-wp-import.php:152
+msgid "All done."
+msgstr ""
+
+#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:152, ../lib/wordpress-importer/class-wp-import.php:152
+msgid "Have fun!"
+msgstr ""
+
+#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:153, ../lib/wordpress-importer/class-wp-import.php:153
+msgid "Remember to update the passwords and roles of imported users."
+msgstr ""
+
+#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:174, ../lib/wordpress-importer/class-wp-import.php:174
+msgid "The export file could not be found at <code>%s</code>. It is likely that this was caused by a permissions problem."
+msgstr ""
+
+#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:192, ../lib/wordpress-importer/class-wp-import.php:192
+msgid "This WXR file (version %s) may not be supported by this version of the importer. Please consider updating."
+msgstr ""
+
+#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:217, ../lib/wordpress-importer/class-wp-import.php:217
+msgid "Failed to import author %s. Their posts will be attributed to the current user."
+msgstr ""
+
+#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:245, ../lib/wordpress-importer/class-wp-import.php:245
+msgid "Assign Authors"
+msgstr ""
+
+#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:246, ../lib/wordpress-importer/class-wp-import.php:246
+msgid "To make it simpler for you to edit and save the imported content, you may want to reassign the author of the imported item to an existing user of this site, such as your primary administrator account."
+msgstr ""
+
+#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:248, ../lib/wordpress-importer/class-wp-import.php:248
+msgid "If a new user is created by WordPress, a new password will be randomly generated and the new user&#8217;s role will be set as %s. Manually changing the new user&#8217;s details will be necessary."
+msgstr ""
+
+#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:258, ../lib/wordpress-importer/class-wp-import.php:258
+msgid "Import Attachments"
+msgstr ""
+
+#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:262, ../lib/wordpress-importer/class-wp-import.php:262
+msgid "Download and import file attachments"
+msgstr ""
+
+#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:267, ../lib/wordpress-importer/class-wp-import.php:267
+msgid "Submit"
+msgstr ""
+
+#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:281, ../lib/wordpress-importer/class-wp-import.php:281
+msgid "Import author:"
+msgstr ""
+
+#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:299, ../lib/wordpress-importer/class-wp-import.php:299
+msgid "as a new user:"
+msgstr ""
+
+#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:296, ../lib/wordpress-importer/class-wp-import.php:296
+msgid "or create new user with login name:"
+msgstr ""
+
+#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:311, ../lib/wordpress-importer/class-wp-import.php:311
+msgid "or assign posts to an existing user:"
+msgstr ""
+
+#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:309, ../lib/wordpress-importer/class-wp-import.php:309
+msgid "assign posts to an existing user:"
+msgstr ""
+
+#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:320, ../lib/wordpress-importer/class-wp-import.php:320
+msgid "- Select -"
+msgstr ""
+
+#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:379, ../lib/wordpress-importer/class-wp-import.php:379
+msgid "Failed to create new user for %s. Their posts will be attributed to the current user."
+msgstr ""
+
+#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:441, ../lib/wordpress-importer/class-wp-import.php:441
+msgid "Failed to import category %s"
+msgstr ""
+
+#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:494, ../lib/wordpress-importer/class-wp-import.php:494
+msgid "Failed to import post tag %s"
+msgstr ""
+
+#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:557, ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:805, ../lib/wordpress-importer/class-wp-import.php:557, ../lib/wordpress-importer/class-wp-import.php:805
+msgid "Failed to import %1$s %2$s"
+msgstr ""
+
+#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:648, ../lib/wordpress-importer/class-wp-import.php:648
+msgid "Failed to import &#8220;%1$s&#8221;: Invalid post type %2$s"
+msgstr ""
+
+#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:766, ../lib/wordpress-importer/class-wp-import.php:766
+msgid "Failed to import %1$s &#8220;%2$s&#8221;"
+msgstr ""
+
+#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:689, ../lib/wordpress-importer/class-wp-import.php:689
+msgid "%1$s &#8220;%2$s&#8221; already exists."
+msgstr ""
+
+#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:952, ../lib/wordpress-importer/class-wp-import.php:952
+msgid "Menu item skipped due to missing menu slug"
+msgstr ""
+
+#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:960, ../lib/wordpress-importer/class-wp-import.php:960
+msgid "Menu item skipped due to invalid menu slug: %s"
+msgstr ""
+
+#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:1030, ../lib/wordpress-importer/class-wp-import.php:1030
+msgid "Fetching attachments is not enabled"
+msgstr ""
+
+#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:1048, ../lib/wordpress-importer/class-wp-import.php:1048
+msgid "Invalid file type"
+msgstr ""
+
+#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:1093, ../lib/wordpress-importer/class-wp-import.php:1093
+msgid "Could not create temporary file."
+msgstr ""
+
+#. translators: 1: The WordPress error message. 2: The WordPress error code.
+#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:1116, ../lib/wordpress-importer/class-wp-import.php:1116
+msgid "Request failed due to an error: %1$s (%2$s)"
+msgstr ""
+
+#. translators: 1: The HTTP error message. 2: The HTTP error code.
+#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:1133, ../lib/wordpress-importer/class-wp-import.php:1133
+msgid "Remote server returned the following unexpected result: %1$s (%2$s)"
+msgstr ""
+
+#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:1146, ../lib/wordpress-importer/class-wp-import.php:1146
+msgid "Remote server did not respond"
+msgstr ""
+
+#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:1154, ../lib/wordpress-importer/class-wp-import.php:1154
+msgid "Zero size file downloaded"
+msgstr ""
+
+#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:1160, ../lib/wordpress-importer/class-wp-import.php:1160
+msgid "Downloaded file has incorrect size"
+msgstr ""
+
+#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:1167, ../lib/wordpress-importer/class-wp-import.php:1167
+msgid "Remote file is too large, limit is %s"
+msgstr ""
+
+#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:1199, ../lib/wordpress-importer/class-wp-import.php:1199
+msgid "Sorry, this file type is not permitted for security reasons."
+msgstr ""
+
+#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:1215, ../lib/wordpress-importer/class-wp-import.php:1215
+msgid "The uploaded file could not be moved"
+msgstr ""
+
+#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:1339, ../lib/wordpress-importer/class-wp-import.php:1339
+msgid "Import WordPress"
+msgstr ""
+
+#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:1346, ../lib/wordpress-importer/class-wp-import.php:1346
+msgid "A new version of this importer is available. Please update to version %s to ensure compatibility with newer export files."
+msgstr ""
+
+#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:1361, ../lib/wordpress-importer/class-wp-import.php:1361
+msgid "Howdy! Upload your WordPress eXtended RSS (WXR) file and we&#8217;ll import the posts, pages, comments, custom fields, categories, and tags into this site."
+msgstr ""
+
+#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:1362, ../lib/wordpress-importer/class-wp-import.php:1362
+msgid "Choose a WXR (.xml) file to upload, then click Upload file and import."
 msgstr ""
 
 #. translators: %s: Plugin name
@@ -218,20 +404,8 @@ msgstr ""
 msgid "Installed but Not Active"
 msgstr ""
 
-#: ../dist/easy-demo-importer/inc/App/Backend/Pages.php:85, ../inc/App/Backend/Pages.php:85
+#: ../dist/easy-demo-importer/inc/App/Backend/Pages.php:85, ../dist/easy-demo-importer/inc/App/Backend/Pages.php:86, ../inc/App/Backend/Pages.php:85, ../inc/App/Backend/Pages.php:86
 msgid "Easy Demo Importer"
-msgstr ""
-
-#: ../dist/easy-demo-importer/inc/App/Backend/Pages.php:86, ../inc/App/Backend/Pages.php:86
-msgid "Install Demo Content"
-msgstr ""
-
-#: ../dist/easy-demo-importer/inc/App/Backend/Pages.php:93, ../inc/App/Backend/Pages.php:93
-msgid "System Status Report"
-msgstr ""
-
-#: ../dist/easy-demo-importer/inc/App/Backend/Pages.php:94, ../inc/App/Backend/Pages.php:94
-msgid "Easy System Status"
 msgstr ""
 
 #: ../dist/easy-demo-importer/inc/App/Backend/PluginRowMeta.php:72, ../inc/App/Backend/PluginRowMeta.php:72
@@ -259,21 +433,25 @@ msgid "Demo data Configuration not found."
 msgstr ""
 
 #. translators: %1$s - opening div and paragraph HTML tags, %2$s - closing div and paragraph HTML tags.
-#: ../dist/easy-demo-importer/inc/Common/Functions/Helpers.php:66, ../inc/Common/Functions/Helpers.php:66
+#: ../dist/easy-demo-importer/inc/Common/Functions/Helpers.php:78, ../inc/Common/Functions/Helpers.php:78
 msgid "%1$sYour user role isn't high enough. You don't have permission to import demo data.%2$s"
 msgstr ""
 
 #. translators: View file name.
-#: ../dist/easy-demo-importer/inc/Common/Functions/Helpers.php:188, ../inc/Common/Functions/Helpers.php:188
+#: ../dist/easy-demo-importer/inc/Common/Functions/Helpers.php:205, ../inc/Common/Functions/Helpers.php:205
 msgid "%s file not found"
 msgstr ""
 
-#: ../dist/easy-demo-importer/inc/Common/Models/Customizer.php:50, ../dist/easy-demo-importer/inc/Common/Models/Customizer.php:56, ../inc/Common/Models/Customizer.php:50, ../inc/Common/Models/Customizer.php:56
+#: ../dist/easy-demo-importer/inc/Common/Models/Customizer.php:50, ../inc/Common/Models/Customizer.php:50
+msgid "The customizer import file is not in a correct format. Please make sure to use the correct customizer import file."
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/Common/Models/Customizer.php:54, ../inc/Common/Models/Customizer.php:54
 msgid "Error importing settings! Please check that you uploaded a customizer export file."
 msgstr ""
 
-#: ../dist/easy-demo-importer/inc/Common/Models/Customizer.php:62, ../inc/Common/Models/Customizer.php:62
-msgid "Error importing settings! The settings you uploaded are not for the current theme."
+#: ../dist/easy-demo-importer/inc/Common/Models/Customizer.php:58, ../inc/Common/Models/Customizer.php:58
+msgid "The customizer import file is not suitable for current theme. You can only import customizer settings for the same theme or a child theme."
 msgstr ""
 
 #: ../dist/easy-demo-importer/inc/Common/Models/Widgets.php:43, ../inc/Common/Models/Widgets.php:43
@@ -284,23 +462,23 @@ msgstr ""
 msgid "Sidebar does not exist in theme (moving widget to Inactive)"
 msgstr ""
 
-#: ../dist/easy-demo-importer/inc/Common/Models/Widgets.php:105, ../inc/Common/Models/Widgets.php:105
+#: ../dist/easy-demo-importer/inc/Common/Models/Widgets.php:110, ../inc/Common/Models/Widgets.php:110
 msgid "Site does not support widget"
 msgstr ""
 
-#: ../dist/easy-demo-importer/inc/Common/Models/Widgets.php:138, ../inc/Common/Models/Widgets.php:138
+#: ../dist/easy-demo-importer/inc/Common/Models/Widgets.php:143, ../inc/Common/Models/Widgets.php:143
 msgid "Widget already exists"
 msgstr ""
 
-#: ../dist/easy-demo-importer/inc/Common/Models/Widgets.php:205, ../inc/Common/Models/Widgets.php:205
+#: ../dist/easy-demo-importer/inc/Common/Models/Widgets.php:210, ../inc/Common/Models/Widgets.php:210
 msgid "Imported to Inactive"
 msgstr ""
 
-#: ../dist/easy-demo-importer/inc/Common/Models/Widgets.php:202, ../inc/Common/Models/Widgets.php:202
+#: ../dist/easy-demo-importer/inc/Common/Models/Widgets.php:207, ../inc/Common/Models/Widgets.php:207
 msgid "Imported"
 msgstr ""
 
-#: ../dist/easy-demo-importer/inc/Common/Models/Widgets.php:211, ../inc/Common/Models/Widgets.php:211
+#: ../dist/easy-demo-importer/inc/Common/Models/Widgets.php:216, ../inc/Common/Models/Widgets.php:216
 msgid "No Title"
 msgstr ""
 
@@ -324,6 +502,18 @@ msgstr ""
 #. translators: %s: file path
 #: ../dist/easy-demo-importer/inc/Common/Utils/Errors.php:72, ../inc/Common/Utils/Errors.php:72
 msgid "Error source: %s"
+msgstr ""
+
+#: ../dist/easy-demo-importer/lib/wordpress-importer/parsers/class-wxr-parser-regex.php:102, ../dist/easy-demo-importer/lib/wordpress-importer/parsers/class-wxr-parser-simplexml.php:46, ../dist/easy-demo-importer/lib/wordpress-importer/parsers/class-wxr-parser-simplexml.php:52, ../dist/easy-demo-importer/lib/wordpress-importer/parsers/class-wxr-parser-xml.php:116, ../lib/wordpress-importer/parsers/class-wxr-parser-regex.php:102, ../lib/wordpress-importer/parsers/class-wxr-parser-simplexml.php:46, ../lib/wordpress-importer/parsers/class-wxr-parser-simplexml.php:52, ../lib/wordpress-importer/parsers/class-wxr-parser-xml.php:116
+msgid "This does not appear to be a WXR file, missing/invalid WXR version number"
+msgstr ""
+
+#: ../dist/easy-demo-importer/lib/wordpress-importer/parsers/class-wxr-parser-simplexml.php:33, ../dist/easy-demo-importer/lib/wordpress-importer/parsers/class-wxr-parser-simplexml.php:41, ../dist/easy-demo-importer/lib/wordpress-importer/parsers/class-wxr-parser.php:45, ../lib/wordpress-importer/parsers/class-wxr-parser-simplexml.php:33, ../lib/wordpress-importer/parsers/class-wxr-parser-simplexml.php:41, ../lib/wordpress-importer/parsers/class-wxr-parser.php:45
+msgid "There was an error when reading this WXR file"
+msgstr ""
+
+#: ../dist/easy-demo-importer/lib/wordpress-importer/parsers/class-wxr-parser.php:46, ../lib/wordpress-importer/parsers/class-wxr-parser.php:46
+msgid "Details are shown above. The importer will now try again with a different parser..."
 msgstr ""
 
 #: ../dist/easy-demo-importer/inc/App/Backend/Ajax/ActivatePlugins.php:97, ../inc/App/Backend/Ajax/ActivatePlugins.php:97
@@ -350,15 +540,15 @@ msgstr ""
 msgid "Customizer settings import not needed."
 msgstr ""
 
-#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/DownloadFiles.php:72, ../inc/App/Backend/Ajax/DownloadFiles.php:72
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/DownloadFiles.php:76, ../inc/App/Backend/Ajax/DownloadFiles.php:76
 msgid "Importing posts, pages and other contents. Kindly exercise patience."
 msgstr ""
 
-#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/DownloadFiles.php:73, ../inc/App/Backend/Ajax/DownloadFiles.php:73
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/DownloadFiles.php:77, ../inc/App/Backend/Ajax/DownloadFiles.php:77
 msgid "All demo files downloaded."
 msgstr ""
 
-#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/DownloadFiles.php:75, ../inc/App/Backend/Ajax/DownloadFiles.php:75
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/DownloadFiles.php:79, ../inc/App/Backend/Ajax/DownloadFiles.php:79
 msgid "Import failed. Demo files can not be downloaded."
 msgstr ""
 
@@ -422,15 +612,15 @@ msgstr ""
 msgid "Widgets import not needed."
 msgstr ""
 
-#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/Initialize.php:78, ../inc/App/Backend/Ajax/Initialize.php:78
-msgid "Required plugins installation in progress."
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/Initialize.php:80, ../inc/App/Backend/Ajax/Initialize.php:80
+msgid "Plugins installation in progress."
 msgstr ""
 
-#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/Initialize.php:79, ../inc/App/Backend/Ajax/Initialize.php:79
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/Initialize.php:81, ../inc/App/Backend/Ajax/Initialize.php:81
 msgid "Database reset completed."
 msgstr ""
 
-#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/Initialize.php:79, ../inc/App/Backend/Ajax/Initialize.php:79
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/Initialize.php:81, ../inc/App/Backend/Ajax/Initialize.php:81
 msgid "Minor cleanups done."
 msgstr ""
 
@@ -447,7 +637,7 @@ msgid "Demo import process failed. No content file found."
 msgstr ""
 
 #: ../dist/easy-demo-importer/inc/App/Backend/Ajax/InstallPlugins.php:100, ../inc/App/Backend/Ajax/InstallPlugins.php:100
-msgid "Required plugins activation in progress"
+msgid "Plugins activation in progress"
 msgstr ""
 
 #: ../dist/easy-demo-importer/inc/App/Backend/Ajax/InstallPlugins.php:101, ../inc/App/Backend/Ajax/InstallPlugins.php:101
