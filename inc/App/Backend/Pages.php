@@ -82,20 +82,20 @@ class Pages extends Base {
 		return [
 			[
 				'parent_slug' => 'themes.php',
-				'page_title'  => __( 'Easy Demo Importer', 'easy-demo-importer' ),
-				'menu_title'  => __( 'Install Demo Content', 'easy-demo-importer' ),
+				'page_title'  => esc_html__( 'Easy Demo Importer', 'easy-demo-importer' ),
+				'menu_title'  => esc_html__( 'Easy Demo Importer', 'easy-demo-importer' ),
 				'capability'  => 'manage_options',
 				'menu_slug'   => $this->plugin->data()['demo_import_page'],
 				'callback'    => [ Callbacks::class, 'renderDemoImportPage' ],
 			],
-			[
-				'parent_slug' => 'themes.php',
-				'page_title'  => __( 'System Status Report', 'easy-demo-importer' ),
-				'menu_title'  => __( 'Easy System Status', 'easy-demo-importer' ),
-				'capability'  => 'manage_options',
-				'menu_slug'   => $this->plugin->data()['system_status_page'],
-				'callback'    => [ Callbacks::class, 'renderDemoImportPage' ],
-			],
+//			[
+//				'parent_slug' => 'themes.php',
+//				'page_title'  => esc_html__( 'System Status Report', 'easy-demo-importer' ),
+//				'menu_title'  => esc_html__( 'Easy System Status', 'easy-demo-importer' ),
+//				'capability'  => 'manage_options',
+//				'menu_slug'   => $this->plugin->data()['system_status_page'],
+//				'callback'    => [ Callbacks::class, 'renderDemoImportPage' ],
+//			],
 		];
 	}
 

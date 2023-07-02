@@ -166,6 +166,23 @@ class Helpers {
 	}
 
 	/**
+	 * Prints HTMl.
+	 *
+	 * @param string $html    HTML.
+	 * @param bool   $allHtml All HTML.
+	 *
+	 * @return void
+	 * @since  1.0.0
+	 */
+	public static function printHtml( $html, $allHtml = false ) {
+		if ( $allHtml ) {
+			echo stripslashes_deep( $html ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		} else {
+			echo wp_kses_post( stripslashes_deep( $html ) );
+		}
+	}
+
+	/**
 	 * Renders Admin View.
 	 *
 	 * @param string $viewName View name.

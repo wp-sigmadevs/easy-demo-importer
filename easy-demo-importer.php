@@ -6,10 +6,10 @@
  * Version: 1.0.0
  * Author: Sigma Devs
  * Author URI: https://github.com/wp-sigmadevs/
- * License: GPLv2 or later
+ * License: GPLv3 or later
  * Text Domain: easy-demo-importer
  * Domain Path: /languages
- * Requires PHP: 7.1
+ * Requires PHP: 7.4
  * Requires WP: 5.5
  * Namespace: SigmaDevs\EasyDemoImporter
  *
@@ -31,12 +31,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
- */
-/**
- * TODO: footer old link need to replace (fluent form contact)
- * TODO: Menu need to fix (header menu & footer menu)
- * TODO: Fluent form database error need to fix.
- * TODO: Snitization.
  */
 
 declare( strict_types=1 );
