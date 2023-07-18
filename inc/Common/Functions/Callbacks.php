@@ -30,14 +30,6 @@ class Callbacks {
 	 * @since 1.0.0
 	 */
 	public static function renderDemoImportPage() {
-		$themeConfig     = sd_edi()->getDemoConfig();
-		$activeTheme     = sd_edi()->activeTheme();
-		$supportedThemes = sd_edi()->supportedThemes();
-
-		if ( ! in_array( $activeTheme, $supportedThemes, true ) ) {
-			$themeConfig = [];
-		}
-
-		Helpers::renderView( 'demo-import', [ 'themeConfig' => $themeConfig ] );
+		Helpers::renderView( 'demo-import' );
 	}
 }

@@ -157,13 +157,13 @@ class Enqueue extends EnqueueBase {
 				'excludeImagesTitle'         => esc_html__( 'Exclude Demo Images', 'easy-demo-importer' ),
 				'excludeImagesHint'          => esc_html__( 'Select this option if demo import fails repeatedly. Excluding images will speed up the import process.', 'easy-demo-importer' ),
 				'resetDatabaseTitle'         => esc_html__( 'Reset Existing Database', 'easy-demo-importer' ),
-				'resetDatabaseWarning'       => esc_html__( 'Caution:', 'easy-demo-importer' ),
+				'resetDatabaseWarning'       => esc_html__( 'Caution: ', 'easy-demo-importer' ),
 				'resetDatabaseHint'          => esc_html__( 'Resetting the database will erase all of your content, including posts, pages, images, custom post types, taxonomies and settings. It is advised to reset the database for a full demo import.', 'easy-demo-importer' ),
 
 				// Confirmation Modal.
 				'confirmationModal'          => esc_html__( 'Are you sure you want to proceed?', 'easy-demo-importer' ),
 				'resetMessage'               => esc_html__( 'Resetting the database will delete all your contents.', 'easy-demo-importer' ),
-				'confirmationModalWithReset' => esc_html__( 'Are you sure you want to proceed? Resetting the database will delete all your contents.', 'easy-demo-importer' ),
+				'confirmationModalWithReset' => esc_html__( 'Are you sure you want to proceed? Resetting the database will delete all your contents, medias and settings.', 'easy-demo-importer' ),
 				'confirmYes'                 => esc_html__( 'Yes', 'easy-demo-importer' ),
 				'confirmNo'                  => esc_html__( 'No', 'easy-demo-importer' ),
 

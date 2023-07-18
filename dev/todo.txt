@@ -1,7 +1,8 @@
 /**
  * TODO: footer old link need to replace (fluent form contact)
- * TODO: Fluent form database error need to fix.
+ * TODO: Fluent form database error need to fix (Done).
+ * TODO: Fluent form import fix.
  * TODO: DB URL replace.
- * TODO: Elementor widgets category fix.
+ * TODO: Elementor widgets category fix. (Done)
  *
  */

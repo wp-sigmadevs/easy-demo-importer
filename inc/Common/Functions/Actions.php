@@ -72,6 +72,7 @@ class Actions {
 			->assignWooPages()
 			->setElementorActiveKit()
 			->setElementorSettings()
+			->elementorTaxonomyFix( $obj )
 			->updatePermalinks()
 			->rewriteFlag();
 	}
@@ -500,6 +501,102 @@ class Actions {
 		}
 
 		return new static();
+	}
+
+	/**
+	 * Category IDs' fix in Elementor data.
+	 *
+	 * @param object $obj Reference object.
+	 *
+	 * @return static
+	 * @since 1.0.0
+	 */
+	public static function elementorTaxonomyFix( $obj ) {
+		if ( empty( $obj->config['elementor_data_fix'] ) ) {
+			return new static();
+		}
+
+		global $wpdb;
+
+		// Search for the pages that contain '_elementor_data' in postmeta table.
+		$postmeta_rows = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT post_id, meta_value FROM $wpdb->postmeta WHERE meta_key = %s",
+				'_elementor_data'
+			)
+		);
+
+		// Iterate through each row and update the category ID.
+		foreach ( $postmeta_rows as $row ) {
+			$post_id    = $row->post_id;
+			$meta_value = $row->meta_value;
+
+			// Decode the JSON data.
+			$data = json_decode( $meta_value, true );
+
+			// Search and replace the IDs.
+			self::searchReplaceID( $data, $obj->config['elementor_data_fix'] );
+
+			// Update the meta_value in the database.
+			$wpdb->update(
+				$wpdb->postmeta,
+				[ 'meta_value' => wp_json_encode( $data ) ],
+				[
+					'post_id'  => $post_id,
+					'meta_key' => '_elementor_data',
+				],
+				[ '%s' ],
+				[ '%d', '%s' ]
+			);
+		}
+
+		return new static();
+	}
+
+	/**
+	 * Search and replace taxonomy IDs.
+	 *
+	 * @param array $data Postmeta data.
+	 * @param array $configData Configuration data.
+	 *
+	 * @return void
+	 * @since 1.0.0
+	 */
+	public static function searchReplaceID( &$data, $configData ) {
+		// Iterate through each element in the data.
+		foreach ( $data as &$element ) {
+			if ( is_array( $element ) ) {
+				self::searchReplaceID( $element, $configData );
+			}
+
+			// Perform search and replace within the array element.
+			self::performSearchReplace( $element, $configData );
+		}
+	}
+
+	public static function performSearchReplace( &$element, $data ) {
+		// Check if the element's widgetType exists in the data array.
+		if ( isset( $element['widgetType'] ) && isset( $data[ $element['widgetType'] ] ) ) {
+			$catKey = $data[ $element['widgetType'] ];
+
+			// Check if the catKey exists in the element's settings.
+			if ( isset( $element['settings'][ $catKey ] ) ) {
+				$oldIds = $element['settings'][ $catKey ];
+
+				if ( is_array( $oldIds ) ) {
+					$newIds                         = array_map(
+						function( $oldID ) {
+							return sd_edi()->getNewID( $oldID );
+						},
+						$oldIds
+					);
+					$element['settings'][ $catKey ] = $newIds;
+				} else {
+					$newId                          = sd_edi()->getNewID( $oldIds );
+					$element['settings'][ $catKey ] = $newId;
+				}
+			}
+		}
 	}
 
 	/**
