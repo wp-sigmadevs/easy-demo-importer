@@ -44,6 +44,11 @@
 					margin-right: 20px;
 					margin-top: 5px;
 				}
+
+				.anticon,
+				.ant-modal-confirm-title {
+					@extend .warn-text;
+				}
 			}
 		}
 	}

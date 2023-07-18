@@ -12,6 +12,7 @@ declare( strict_types=1 );
 
 namespace SigmaDevs\EasyDemoImporter\App\Backend\Ajax;
 
+use FluentForm\Database\DBMigrator;
 use FluentForm\Framework\Helpers\ArrayHelper;
 use SigmaDevs\EasyDemoImporter\Common\Abstracts\ImporterAjax;
 use SigmaDevs\EasyDemoImporter\Common\{
@@ -90,6 +91,10 @@ class ImportFluentForms extends ImporterAjax {
 	 * @since 1.0.0
 	 */
 	private function importFluentForms( $form ) {
+		if ( class_exists( DBMigrator::class ) ) {
+			DBMigrator::run();
+		}
+
 		$formFile   = $this->demoUploadDir( $this->demoDir() ) . '/' . $form . '.json';
 		$fileExists = file_exists( $formFile );
 
