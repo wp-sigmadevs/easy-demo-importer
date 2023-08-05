@@ -71,7 +71,7 @@ class Enqueue extends EnqueueBase {
 
 		$styles[] = [
 			'handle'    => 'sd-edi-admin-styles',
-			'asset_uri' => $this->plugin->assetsUri() . '/css/backend' . $this->plugin->suffix . '.css',
+			'asset_uri' => $this->plugin->assetsUri() . '/css/backend' . $this->suffix . '.css',
 			'version'   => $this->plugin->version(),
 		];
 
@@ -91,7 +91,7 @@ class Enqueue extends EnqueueBase {
 
 		$scripts[] = [
 			'handle'     => 'sd-edi-admin-script',
-			'asset_uri'  => $this->plugin->assetsUri() . '/js/backend' . $this->plugin->suffix . '.js',
+			'asset_uri'  => $this->plugin->assetsUri() . '/js/backend' . $this->suffix . '.js',
 			'dependency' => [ 'jquery' ],
 			'in_footer'  => true,
 			'version'    => $this->plugin->version(),

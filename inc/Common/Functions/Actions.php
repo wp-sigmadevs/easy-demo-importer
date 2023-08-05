@@ -12,6 +12,8 @@ declare( strict_types=1 );
 
 namespace SigmaDevs\EasyDemoImporter\Common\Functions;
 
+use SigmaDevs\EasyDemoImporter\Common\Models\DBSearchReplace;
+
 // Do not allow directly accessing this file.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit( 'This script cannot be accessed directly.' );
@@ -220,25 +222,31 @@ class Actions {
 			return new static();
 		}
 
+		$tables = apply_filters(
+			'sd/edi/db_search/tables',
+			[
+				$wpdb->prefix . 'commentmeta',
+				$wpdb->prefix . 'comments',
+				$wpdb->prefix . 'fluentform_forms',
+				$wpdb->prefix . 'options',
+				$wpdb->prefix . 'postmeta',
+				$wpdb->prefix . 'posts',
+			]
+		);
+
 		$urls = [
-			'slash'   => [
-				'old' => trailingslashit( 'https://radiustheme.com/demo/wordpress/themes/faktorie/' ),
-				'new' => home_url( '/' ),
-			],
 			'unslash' => [
-				'old' => untrailingslashit( 'https://radiustheme.com/demo/wordpress/themes/faktorie' ),
+				'old' => untrailingslashit( $obj->config['urlToReplace'] ),
 				'new' => home_url(),
+			],
+			'slash'   => [
+				'old' => trailingslashit( $obj->config['urlToReplace'] ),
+				'new' => home_url( '/' ),
 			],
 		];
 
-		// Table names and columns to update.
-		$tables = [
-			$wpdb->prefix . 'posts'       => [ 'post_content' ],
-			$wpdb->prefix . 'postmeta'    => [ 'meta_value' ],
-			$wpdb->prefix . 'options'     => [ 'option_value' ],
-			$wpdb->prefix . 'comments'    => [ 'comment_content' ],
-			$wpdb->prefix . 'commentmeta' => [ 'meta_value' ],
-		];
+		// Search and replace URLs in DB.
+		self::searchReplaceUrls( $urls, $tables );
 
 		foreach ( $urls as $url ) {
 			$oldUrl = esc_url_raw( $url['old'] );
@@ -246,12 +254,54 @@ class Actions {
 
 			// Search and replace URLs in Elementor data (postmeta).
 			self::searchReplaceElementorUrls( $oldUrl, $newUrl );
-
-			// Replace GUID.
 			self::replaceGUIDs( $oldUrl, $newUrl );
 		}
 
 		return new static();
+	}
+
+	/**
+	 * Search and replace URLs in DB.
+	 *
+	 * @param array $urls The URLs' to search & replace.
+	 * @param array $tables The tables to search & replace.
+	 *
+	 * @return void
+	 * @since 1.0.0
+	 */
+	public static function searchReplaceUrls( $urls, $tables ) {
+		$page       = 0;
+		$tableCount = count( $tables );
+
+		// Initialize the model.
+		$dbsr = new DBSearchReplace();
+		$args = [
+			'select_tables'   => array_map( 'trim', $tables ),
+			'completed_pages' => 0,
+			'dry_run'         => 'off',
+			'total_pages'     => $dbsr->get_total_pages( $tables ),
+		];
+
+		foreach ( $urls as $urlType => $url ) {
+			$oldUrl = esc_url_raw( $url['old'] );
+			$newUrl = esc_url_raw( $url['new'] );
+
+			$args['search_for']   = $oldUrl;
+			$args['replace_with'] = $newUrl;
+
+			for ( $i = 0; $i < $tableCount; $i++ ) {
+				$dbsr->srdb( $args['select_tables'][ $i ], $page, $args );
+			}
+
+			if ( 'slash' === $urlType ) {
+				$args['search_for']   = str_replace( '/', '\/', trailingslashit( $oldUrl ) );
+				$args['replace_with'] = str_replace( '/', '\/', $newUrl );
+
+				for ( $i = 0; $i < $tableCount; $i++ ) {
+					$dbsr->srdb( $args['select_tables'][ $i ], $page, $args );
+				}
+			}
+		}
 	}
 
 	/**
@@ -265,10 +315,6 @@ class Actions {
 	 */
 	public static function searchReplaceElementorUrls( $oldUrl, $newUrl ) {
 		global $wpdb;
-
-		// Sanitize the URLs for use in SQL query.
-		$oldUrl = str_replace( '/', '\/', $oldUrl );
-		$newUrl = str_replace( '/', '\/', $newUrl );
 
 		// Prepare and execute the SQL query.
 		$wpdb->query(

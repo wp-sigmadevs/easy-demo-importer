@@ -14,7 +14,7 @@ declare( strict_types=1 );
 namespace SigmaDevs\EasyDemoImporter;
 
 use Composer\Autoload\ClassLoader;
-use SigmaDevs\EasyDemoImporter\Common\{Abstracts\Base, Functions\Actions, Traits\Requester};
+use SigmaDevs\EasyDemoImporter\Common\{Abstracts\Base, Functions\Actions, Models\DBSearchReplace, Traits\Requester};
 use SigmaDevs\EasyDemoImporter\Config\
 {
 	I18n,
@@ -95,6 +95,61 @@ final class Bootstrap extends Base {
 
 		// Load services.
 		$this->loadServices( Classes::register() );
+
+//		$dbsr = new DBSearchReplace();
+//
+//		global $wpdb;
+//		$tables = [
+//			$wpdb->prefix . 'commentmeta',
+//			$wpdb->prefix . 'comments',
+//			$wpdb->prefix . 'fluentform_forms',
+//			$wpdb->prefix . 'options',
+//			$wpdb->prefix . 'postmeta',
+//			$wpdb->prefix . 'posts',
+//		];
+//
+//		$step     = 0;
+//		$page     = 0;
+//		$searches = [
+//			'slash'   => [
+//				'old' => trailingslashit( 'https://radiustheme.com/demo/wordpress/themes/faktorie/' ),
+//				'new' => home_url( '/' ),
+//			],
+//			'unslash' => [
+//				'old' => untrailingslashit( 'https://radiustheme.com/demo/wordpress/themes/faktorie/' ),
+//				'new' => home_url(),
+//			],
+//		];
+//
+//		$tableCount = count( $tables );
+//
+//		$args = [
+//			'select_tables'   => array_map( 'trim', $tables ),
+//			'completed_pages' => 0,
+//			'dry_run'         => 'off',
+//			'total_pages'     => $dbsr->get_total_pages( $tables ),
+//		];
+//
+//		foreach ( $searches as $urlType => $url ) {
+//			$oldUrl = esc_url_raw( $url['old'] );
+//			$newUrl = esc_url_raw( $url['new'] );
+//
+//			$args['search_for']   = $oldUrl;
+//			$args['replace_with'] = $newUrl;
+//
+//			for ( $i = 0; $i < $tableCount; $i++ ) {
+//				$dbsr->srdb( $args['select_tables'][ $i ], $page, $args );
+//			}
+//
+//			if ( 'slash' === $urlType ) {
+//				$args['search_for']   = str_replace( '/', '\/', trailingslashit( $oldUrl ) );
+//				$args['replace_with'] = str_replace( '/', '\/', $newUrl );
+//
+//				for ( $i = 0; $i < $tableCount; $i++ ) {
+//					$dbsr->srdb( $args['select_tables'][ $i ], $page, $args );
+//				}
+//			}
+//		}
 	}
 
 	/**
