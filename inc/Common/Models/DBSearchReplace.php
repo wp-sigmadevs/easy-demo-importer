@@ -75,7 +75,6 @@ class DBSearchReplace {
 		global $wpdb;
 
 		if ( function_exists( 'is_multisite' ) && is_multisite() ) {
-
 			if ( is_main_site() ) {
 				$tables = $wpdb->get_col( 'SHOW TABLES' );
 			} else {
@@ -90,29 +89,9 @@ class DBSearchReplace {
 	}
 
 	/**
-	 * Returns an array containing the size of each database table.
-	 *
-	 * @return array
-	 * @since 1.0.0
-	 */
-	public static function get_sizes() {
-		global $wpdb;
-
-		$sizes  = [];
-		$tables = $wpdb->get_results( 'SHOW TABLE STATUS', ARRAY_A );
-
-		if ( is_array( $tables ) && ! empty( $tables ) ) {
-			foreach ( $tables as $table ) {
-				$size                    = round( $table['Data_length'] / 1024 / 1024, 2 );
-				$sizes[ $table['Name'] ] = sprintf( __( '(%s MB)', 'easy-demo-importer' ), $size );
-			}
-		}
-
-		return $sizes;
-	}
-
-	/**
 	 * Returns the number of pages in a table.
+	 *
+	 * @param string $table The table to check.
 	 *
 	 * @return int
 	 * @since 1.0.0
@@ -131,6 +110,8 @@ class DBSearchReplace {
 
 	/**
 	 * Gets the total number of pages in the DB.
+	 *
+	 * @param array $tables The tables to check.
 	 *
 	 * @return int
 	 * @since 1.0.0
@@ -207,9 +188,6 @@ class DBSearchReplace {
 		$pages        = $this->get_pages_in_table( $table );
 		$done         = false;
 
-		$args['search_for']   = str_replace( '#EDI_BACKSLASH#', '\\', $args['search_for'] );
-		$args['replace_with'] = str_replace( '#EDI_BACKSLASH#', '\\', $args['replace_with'] );
-
 		$table_report = [
 			'change'  => 0,
 			'updates' => 0,
@@ -255,9 +233,9 @@ class DBSearchReplace {
 				}
 
 				// Skip GUIDs by default.
-				if ( 'on' !== $args['replace_guids'] && 'guid' === $column ) {
-					continue;
-				}
+//				if ( 'on' !== $args['replace_guids'] && 'guid' === $column ) {
+//					continue;
+//				}
 
 				if ( $this->wpdb->options === $table ) {
 					// Skip any BSR options as they may contain the search field.
@@ -269,12 +247,11 @@ class DBSearchReplace {
 					// If the Site URL needs to be updated, let's do that last.
 					if ( isset( $update_later ) && true === $update_later ) {
 						$update_later = false;
-						$edited_data  = $this->recursive_unserialize_replace( $args['search_for'], $args['replace_with'], $data_to_fix, false, $args['case_insensitive'] );
+						$edited_data  = $this->recursive_unserialize_replace( $args['search_for'], $args['replace_with'], $data_to_fix, false, false );
 
 						if ( $edited_data !== $data_to_fix ) {
 							$table_report['change'] ++;
 							$table_report['updates'] ++;
-							update_option( 'bsr_update_site_url', $edited_data );
 							continue;
 						}
 					}
@@ -289,7 +266,7 @@ class DBSearchReplace {
 				}
 
 				// Run a search replace on the data that'll respect the serialisation.
-				$edited_data = $this->recursive_unserialize_replace( $args['search_for'], $args['replace_with'], $data_to_fix, false, $args['case_insensitive'] );
+				$edited_data = $this->recursive_unserialize_replace( $args['search_for'], $args['replace_with'], $data_to_fix, false, false );
 
 				// Something was changed.
 				if ( $edited_data !== $data_to_fix ) {
@@ -300,14 +277,13 @@ class DBSearchReplace {
 			}
 
 			// Determine what to do with updates.
-			if ( 'on' === $args['dry_run'] ) {
-				// Don't do anything if a dry run.
-			} elseif ( $upd && ! empty( $where_sql ) ) {
+			if ( $upd && ! empty( $where_sql ) ) {
 				// If there are changes to make, run the query.
 				$sql    = 'UPDATE ' . $table . ' SET ' . implode( ', ', $update_sql ) . ' WHERE ' . implode( ' AND ', array_filter( $where_sql ) );
 				$result = $this->wpdb->query( $sql );
 
 				if ( ! $result ) {
+					// translators: the row number.
 					$table_report['errors'][] = sprintf( __( 'Error updating row: %d.', 'easy-demo-importer' ), $current_row );
 				} else {
 					$table_report['updates'] ++;
@@ -373,7 +349,7 @@ class DBSearchReplace {
 			} elseif ( is_serialized_string( $data ) ) {
 				$unserialized = $this->unserialize( $data );
 
-				if ( $unserialized !== false ) {
+				if ( false !== $unserialized ) {
 					$data = $this->recursive_unserialize_replace( $from, $to, $unserialized, true, $case_insensitive );
 				}
 			} else {
@@ -390,25 +366,6 @@ class DBSearchReplace {
 		}
 
 		return $data;
-	}
-
-	/**
-	 * Updates the Site URL if necessary.
-	 *
-	 * @return boolean
-	 * @since 1.0.0
-	 */
-	public function maybe_update_site_url() {
-		$option = get_option( 'bsr_update_site_url' );
-
-		if ( $option ) {
-			update_option( 'siteurl', $option );
-			delete_option( 'bsr_update_site_url' );
-
-			return true;
-		}
-
-		return false;
 	}
 
 	/**

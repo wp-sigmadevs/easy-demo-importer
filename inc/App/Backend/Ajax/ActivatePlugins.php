@@ -129,6 +129,10 @@ class ActivatePlugins extends ImporterAjax {
 	public function activatePlugin( $path ) {
 		if ( $path ) {
 			$activate = activate_plugin( $path, '', false, true );
+
+			if ( 'woocommerce/woocommerce.php' === $path ) {
+				\WC_Install::install();
+			}
 		}
 	}
 }

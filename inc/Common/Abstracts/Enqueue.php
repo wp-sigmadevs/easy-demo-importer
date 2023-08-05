@@ -24,7 +24,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 1.0.0
  */
 abstract class Enqueue extends Base {
-
 	/**
 	 * Holds script file name suffix.
 	 *
@@ -50,7 +49,7 @@ abstract class Enqueue extends Base {
 	public function __construct() {
 		parent::__construct();
 
-		$this->plugin->suffix = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
+		$this->suffix = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
 	}
 
 	/**
