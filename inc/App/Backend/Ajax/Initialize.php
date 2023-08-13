@@ -69,8 +69,6 @@ class Initialize extends ImporterAjax {
 			$this->databaseReset();
 		}
 
-		// sd_edi()->createTable();
-//		sd_edi()->dropTable();
 		// Start Importer Hook.
 		do_action( 'sd/edi/importer_init', $this );
 
