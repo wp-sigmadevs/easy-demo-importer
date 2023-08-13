@@ -116,9 +116,6 @@ class Actions {
 	 * @since 1.0.0
 	 */
 	private static function cleanups() {
-		// Truncate the import table.
-		sd_edi()->truncateImportTable();
-
 		// Delete widgets.
 		Helpers::deleteWidgets();
 
@@ -691,6 +688,7 @@ class Actions {
 	 */
 	public static function updatePermalinks() {
 		update_option( 'permalink_structure', '/%postname%/' );
+		delete_option( 'edi_plugin_deactivate_notice' );
 		flush_rewrite_rules();
 
 		return new static();

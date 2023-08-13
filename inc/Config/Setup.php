@@ -44,6 +44,8 @@ class Setup {
 			return;
 		}
 
+		update_option( 'edi_plugin_deactivate_notice', 'true' );
+
 		// If we made it till here nothing is running yet, lets set the transient now.
 		set_transient( 'sd_edi_installing', 'yes', MINUTE_IN_SECONDS * 10 );
 

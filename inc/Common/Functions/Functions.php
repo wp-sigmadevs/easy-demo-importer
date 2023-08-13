@@ -116,24 +116,6 @@ class Functions extends Base {
 	}
 
 	/**
-	 * Truncate the import table.
-	 *
-	 * @since 1.0.0
-	 */
-	public function truncateImportTable() {
-		global $wpdb;
-
-		$tableName = $this->getImportTable();
-
-		// Check if the table exists before truncation.
-		if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $tableName ) ) === $tableName ) {
-			$wpdb->query(
-				$wpdb->prepare( 'TRUNCATE TABLE %s;', $tableName )
-			);
-		}
-	}
-
-	/**
 	 * Get the original ID based on the new ID.
 	 *
 	 * @param int $newID The new ID.
