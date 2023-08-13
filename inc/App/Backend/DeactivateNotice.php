@@ -96,7 +96,8 @@ class DeactivateNotice extends Base {
 	private function noticeMarkup() {
 		ob_start();
 		?>
-		<p>
+		<h4 style="text-decoration: underline;">Easy Demo Importer - Notice</h4>
+		<p style="margin-bottom: 20px;">
 			<?php
 			echo sprintf( /* translators: %s: Plugin name */
 				__(

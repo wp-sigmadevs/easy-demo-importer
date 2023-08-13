@@ -124,6 +124,7 @@ class Helpers {
 			],
 			'h4'         => [
 				'class' => [],
+				'style' => [],
 			],
 			'h5'         => [
 				'class' => [],
@@ -149,6 +150,7 @@ class Helpers {
 			],
 			'p'          => [
 				'class' => [],
+				'style' => [],
 			],
 			'span'       => [
 				'class' => [],
