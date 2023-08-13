@@ -1,5 +1,5 @@
-import React from 'react';
-import { Button, Image, Space } from 'antd';
+import React, { useState } from 'react';
+import { Button, Space, Skeleton, Image, Spin } from 'antd';
 import { DownloadOutlined, FullscreenOutlined } from '@ant-design/icons';
 
 /* global sdEdiAdminParams */
@@ -7,34 +7,58 @@ import { DownloadOutlined, FullscreenOutlined } from '@ant-design/icons';
 /**
  * Component representing a demo card.
  *
- * @param {Object}   data      - The data object for the demo card.
- * @param {Function} showModal - Function to show the modal with the demo card details.
+ * @param            data.data
+ * @param {Object}   data           - The data object for the demo card.
+ * @param {Function} showModal      - Function to show the modal with the demo card details.
+ * @param            data.showModal
  */
 const DemoCard = ({ data, showModal }) => {
+	const [imageLoaded, setImageLoaded] = useState(false);
+
+	const handleImageLoad = () => {
+		setImageLoaded(true);
+	};
+
 	return (
 		<div className="demo-card">
 			<header>
-				<Image
-					src={data?.previewImage}
-					preview={{
-						maskClassName: 'custom-mask',
-						mask: (
-							<Space>
-								<FullscreenOutlined />
-								<span>{sdEdiAdminParams.clickEnlarge}</span>
-							</Space>
-						),
-					}}
-					alt="Preview"
-				/>
-				<a
-					className="details"
-					target="_blank"
-					href={data?.previewUrl}
-					rel="noreferrer"
-				>
-					{sdEdiAdminParams.btnLivePreview}
-				</a>
+				{imageLoaded ? (
+					<>
+						<Image
+							src={data?.previewImage}
+							preview={{
+								maskClassName: 'custom-mask',
+								mask: (
+									<Space>
+										<FullscreenOutlined />
+										<span>
+											{sdEdiAdminParams.clickEnlarge}
+										</span>
+									</Space>
+								),
+							}}
+							alt="Preview"
+						/>
+						<a
+							className="details"
+							target="_blank"
+							href={data?.previewUrl}
+							rel="noreferrer"
+						>
+							{sdEdiAdminParams.btnLivePreview}
+						</a>
+					</>
+				) : (
+					<>
+						<Skeleton.Node block={true} active={true} />
+						<img
+							src={data?.previewImage}
+							alt="Preview"
+							onLoad={handleImageLoad}
+							style={{ display: 'none' }}
+						/>
+					</>
+				)}
 			</header>
 			<div className="edi-demo-content">
 				<div className="demo-name">
@@ -53,7 +77,8 @@ const DemoCard = ({ data, showModal }) => {
 							})
 						}
 					>
-						<span>{sdEdiAdminParams.btnImport}</span> <DownloadOutlined />
+						<span>{sdEdiAdminParams.btnImport}</span>{' '}
+						<DownloadOutlined />
 					</Button>
 				</div>
 			</div>

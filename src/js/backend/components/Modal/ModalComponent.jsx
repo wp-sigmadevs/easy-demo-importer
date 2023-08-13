@@ -139,7 +139,6 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 				footer={null}
 				width={900}
 				centered
-				// bodyStyle={{ height: '600px' }}
 			>
 				{modalData && (
 					<Row>
@@ -167,7 +166,10 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 								}`}
 							>
 								{currentStep === 1 && (
-									<Begin handleReset={handleReset} />
+									<Begin
+										handleReset={handleReset}
+										modalData={modalData}
+									/>
 								)}
 							</div>
 							<div

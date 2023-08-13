@@ -1,8 +1,8 @@
 import React from 'react';
-import { Button } from 'antd';
+import {Button, Image} from 'antd';
 import ModalHeader from '../ModalHeader';
 import useSharedDataStore from '../../../utils/sharedDataStore';
-import { ArrowRightOutlined, CloseOutlined } from '@ant-design/icons';
+import {ArrowRightOutlined, CloseOutlined, FullscreenOutlined} from '@ant-design/icons';
 
 /* global sdEdiAdminParams */
 
@@ -11,7 +11,7 @@ import { ArrowRightOutlined, CloseOutlined } from '@ant-design/icons';
  *
  * @param {Function} handleReset - Handles resetting the modal.
  */
-const Begin = ({ handleReset }) => {
+const Begin = ({ handleReset, modalData }) => {
 	/**
 	 * Values from the shared data store.
 	 */
@@ -27,11 +27,20 @@ const Begin = ({ handleReset }) => {
 	return (
 		<>
 			<ModalHeader currentStep={currentStep} />
-			<div className="modal-content-inner">
-				<h3>{sdEdiAdminParams.beforeYouPreceed}</h3>
-				<div className="import-notice">
-					<p>{sdEdiAdminParams.stepOneIntro1}</p>
-					<p>{sdEdiAdminParams.stepOneIntro2}</p>
+			<div className="modal-content-inner modal-row">
+				<div className="modal-content-image modal-col-6">
+					<Image
+						src={modalData?.data?.previewImage}
+						preview={false}
+						alt="Preview"
+					/>
+				</div>
+				<div className="modal-content-text modal-col-6">
+					<h3>{sdEdiAdminParams.beforeYouPreceed}</h3>
+					<div className="import-notice">
+						<p>{sdEdiAdminParams.stepOneIntro1}</p>
+						<p>{sdEdiAdminParams.stepOneIntro2}</p>
+					</div>
 				</div>
 				<div className="step-actions">
 					<Button type="primary" onClick={handleReset}>
