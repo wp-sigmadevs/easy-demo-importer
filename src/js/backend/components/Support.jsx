@@ -57,6 +57,7 @@ const Support = () => {
 				open={modalVisible}
 				onCancel={handleModalClose}
 				footer={null}
+				centered={true}
 				className="support-modal"
 			>
 				<>

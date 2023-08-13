@@ -18,18 +18,16 @@
 		max-width: 100%;
 		height: auto;
 	}
+}
 
-	//.ant-col-xxl-6 {
-	//	@media only screen and (min-width: 1800px) {
-	//		display: block;
-	//		flex: 0 0 20%;
-	//		max-width: 20%;
-	//	}
-	//
-	//	@media only screen and (min-width: 2000px) {
-	//		display: block;
-	//		flex: 0 0 16.67%;
-	//		max-width: 16.67%;
-	//	}
-	//}
+.appearance_page_sd-easy-demo-importer {
+	.ant-modal-content {
+		* {
+			box-sizing: border-box;
+		}
+	}
+
+	.ant-image-preview-mask {
+		background-color: rgba(0, 0, 0, 0.7) !important;
+	}
 }

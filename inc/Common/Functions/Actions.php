@@ -43,6 +43,36 @@ class Actions {
 	}
 
 	/**
+	 * Activation Script after plugin activation.
+	 *
+	 * @param string $plugin_path The path of the activated plugin's main file.
+	 *
+	 * @return void
+	 * @since 1.0.0
+	 */
+	public static function pluginActivationActions( $plugin_path ) {
+		$plugins = apply_filters(
+			'sd/edi/activated_plugin_actions',
+			[
+				'woocommerce/woocommerce.php' => [
+					'class'  => '\WC_Install',
+					'action' => 'install',
+				],
+				'fluentform/fluentform.php'   => [
+					'class'  => '\FluentForm\Database\DBMigrator',
+					'action' => 'run',
+				],
+			]
+		);
+
+		foreach ( $plugins as $plugin => $actionInfo ) {
+			if ( $plugin === $plugin_path && class_exists( $actionInfo['class'] ) ) {
+				call_user_func( [ $actionInfo['class'], $actionInfo['action'] ] );
+			}
+		}
+	}
+
+	/**
 	 * Executes operations before import.
 	 *
 	 * @param object $obj Reference object.
@@ -245,17 +275,19 @@ class Actions {
 			],
 		];
 
-		// Search and replace URLs in DB.
-		self::searchReplaceUrls( $urls, $tables );
-
 		foreach ( $urls as $url ) {
 			$oldUrl = esc_url_raw( $url['old'] );
 			$newUrl = esc_url_raw( $url['new'] );
 
 			// Search and replace URLs in Elementor data (postmeta).
 			self::searchReplaceElementorUrls( $oldUrl, $newUrl );
+
+			// Replace GUID.
 			self::replaceGUIDs( $oldUrl, $newUrl );
 		}
+
+		// Search and replace URLs in DB.
+		self::searchReplaceUrls( $urls, $tables );
 
 		return new static();
 	}
@@ -315,6 +347,9 @@ class Actions {
 	 */
 	public static function searchReplaceElementorUrls( $oldUrl, $newUrl ) {
 		global $wpdb;
+
+		$oldUrl = str_replace( '/', '\/', $oldUrl );
+		$newUrl = str_replace( '/', '\/', $newUrl );
 
 		// Prepare and execute the SQL query.
 		$wpdb->query(
