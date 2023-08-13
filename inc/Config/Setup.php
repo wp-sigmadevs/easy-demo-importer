@@ -69,9 +69,6 @@ class Setup {
 
 		// Clear the permalinks.
 		\flush_rewrite_rules();
-
-		// Uncomment the following line to see the function in action
-		// exit( var_dump( $_GET ) );
 	}
 
 	/**
@@ -85,9 +82,6 @@ class Setup {
 		if ( ! current_user_can( 'activate_plugins' ) ) {
 			return;
 		}
-
-		// Uncomment the following line to see the function in action
-		// exit( var_dump( $_GET ) );
 	}
 
 	/**
@@ -114,14 +108,14 @@ class Setup {
 	private static function getTableSchema() {
 		global $wpdb;
 
-		$collate = '';
+		$tableName    = sanitize_key( $wpdb->prefix . 'sd_edi_taxonomy_import' );
+
+		$collate      = '';
+		$table_schema = [];
 
 		if ( $wpdb->has_cap( 'collation' ) ) {
 			$collate = $wpdb->get_charset_collate();
 		}
-
-		$tableName    = $wpdb->prefix . 'sd_edi_taxonomy_import';
-		$table_schema = [];
 
 		if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $tableName ) ) !== $tableName ) {
 			$table_schema[] = "CREATE TABLE $tableName (

@@ -116,6 +116,9 @@ class Actions {
 	 * @since 1.0.0
 	 */
 	private static function cleanups() {
+		// Truncate the import table.
+		sd_edi()->truncateImportTable();
+
 		// Delete widgets.
 		Helpers::deleteWidgets();
 
