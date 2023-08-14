@@ -97,8 +97,8 @@ class InstallPlugins extends ImporterAjax {
 		// Response.
 		$this->prepareResponse(
 			'sd_edi_activate_plugins',
-			esc_html__( 'Plugins activation in progress', 'easy-demo-importer' ),
-			$this->installCount > 0 ? esc_html__( 'All the required plugins installed.', 'easy-demo-importer' ) : esc_html__( 'All the required plugins already installed.', 'easy-demo-importer' )
+			esc_html__( 'Activating required plugins', 'easy-demo-importer' ),
+			$this->installCount > 0 ? esc_html__( 'Required plugins installation done.', 'easy-demo-importer' ) : esc_html__( 'Required plugins are already installed.', 'easy-demo-importer' )
 		);
 	}
 
