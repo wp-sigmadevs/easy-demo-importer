@@ -81,7 +81,7 @@ class Initialize extends ImporterAjax {
 		// Response.
 		$this->prepareResponse(
 			'sd_edi_install_plugins',
-			esc_html__( 'Plugins installation in progress.', 'easy-demo-importer' ),
+			esc_html__( 'Installing required plugins.', 'easy-demo-importer' ),
 			( $this->reset ) ? esc_html__( 'Database reset completed.', 'easy-demo-importer' ) : esc_html__( 'Minor cleanups done.', 'easy-demo-importer' )
 		);
 	}
