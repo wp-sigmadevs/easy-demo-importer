@@ -1,6 +1,6 @@
 <?php
 /**
- * Demo Import Page.
+ * Server Status Page.
  *
  * @package SigmaDevs\EasyDemoImporter
  */
@@ -10,4 +10,4 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit( 'This script cannot be accessed directly.' );
 }
 ?>
-<div id="sd-edi-demo-import-container"></div>
+<div id="sd-edi-server-status-container"></div>

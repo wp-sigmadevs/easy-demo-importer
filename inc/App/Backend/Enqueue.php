@@ -47,13 +47,17 @@ class Enqueue extends EnqueueBase {
 	 * @see Requester::isAdminBackend()
 	 */
 	public function register() {
-		$this->assets();
+		global $pagenow;
 
-		if ( empty( $this->assets() ) ) {
-			return;
+		if ( 'themes.php' === $pagenow && isset( $_GET['page'] ) && ( 'sd-easy-demo-importer' === $_GET['page'] || 'sd-edi-demo-importer-status' === $_GET['page'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$this->assets();
+
+			if ( empty( $this->assets() ) ) {
+				return;
+			}
+
+			add_action( 'admin_enqueue_scripts', [ $this, 'enqueue' ] );
 		}
-
-		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue' ] );
 	}
 
 	/**
@@ -167,6 +171,10 @@ class Enqueue extends EnqueueBase {
 				'confirmYes'                 => esc_html__( 'Yes', 'easy-demo-importer' ),
 				'confirmNo'                  => esc_html__( 'No', 'easy-demo-importer' ),
 
+				// Server Page Button.
+				'serverPageBtnText'          => esc_html__( 'Check System Status', 'easy-demo-importer' ),
+				'serverPageUrl'              => admin_url( 'themes.php?page=' ) . sd_edi()->getData()['system_status_page'],
+
 				// Button texts.
 				'btnLivePreview'             => esc_html__( 'Live Preview', 'easy-demo-importer' ),
 				'btnImport'                  => esc_html__( 'Import', 'easy-demo-importer' ),
@@ -189,7 +197,6 @@ class Enqueue extends EnqueueBase {
 				'docDesc'                    => esc_html__( 'Embark on your journey by immersing yourself in our FAQ-rich documentation. It provides an extensive guide, featuring step-by-step instructions, screenshots, and informative videos to address common issues and help you to import demo data successfully.', 'easy-demo-importer' ),
 				'docUrl'                     => '#',
 				'ticketUrl'                  => '#',
-
 
 				// Plugin Status.
 				'notInstalled'               => esc_html__( 'Not Installed', 'easy-demo-importer' ),

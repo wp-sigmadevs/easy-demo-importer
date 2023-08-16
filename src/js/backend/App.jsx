@@ -1,4 +1,4 @@
-import { Row, Col } from 'antd';
+import { Row, Col, Button } from 'antd';
 import Header from './Layouts/Header';
 import DemoCard from './components/DemoCard';
 import gridSkeleton from './components/skeleton';
@@ -70,6 +70,14 @@ const App = () => {
 		setModalData(data);
 	};
 
+	/**
+	 * Handle 'Server Page' button behavior.
+	 */
+	const handleServerPageBtn = () => {
+		const serverPageUrl = sdEdiAdminParams.serverPageUrl;
+		window.open(serverPageUrl, '_self');
+	};
+
 	let containerClassName = 'edi-container';
 
 	if (!importList.success) {
@@ -85,7 +93,10 @@ const App = () => {
 	return (
 		<>
 			<div className="wrap edi-demo-importer-wrapper">
-				<Header logo={sdEdiAdminParams.ediLogo} />
+				<Header
+					logo={sdEdiAdminParams.ediLogo}
+					heading="Demo Importer"
+				/>
 
 				<div className="edi-content">
 					<div className={containerClassName}>
@@ -143,6 +154,15 @@ const App = () => {
 					onCancel={handleModalCancel}
 					modalData={modalData}
 				/>
+			</div>
+			<div className="edi-server-status">
+				<Button
+					className="edi-server-status-btn"
+					type="primary"
+					onClick={handleServerPageBtn}
+				>
+					<span>{sdEdiAdminParams.serverPageBtnText}</span>
+				</Button>
 			</div>
 			{'yes' === sdEdiAdminParams.enableSupportButton && <Support />}
 		</>
