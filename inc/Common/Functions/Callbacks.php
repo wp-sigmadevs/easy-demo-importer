@@ -32,4 +32,14 @@ class Callbacks {
 	public static function renderDemoImportPage() {
 		Helpers::renderView( 'demo-import' );
 	}
+
+	/**
+	 * Callback: Server Section.
+	 *
+	 * @return void
+	 * @since 1.0.0
+	 */
+	public static function renderServerStatusPage() {
+		Helpers::renderView( 'server-status' );
+	}
 }

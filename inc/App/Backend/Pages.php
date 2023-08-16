@@ -79,24 +79,36 @@ class Pages extends Base {
 	 * @since 1.0.0
 	 */
 	public function setSubPages() {
-		return [
-			[
-				'parent_slug' => 'themes.php',
-				'page_title'  => esc_html__( 'Easy Demo Importer', 'easy-demo-importer' ),
-				'menu_title'  => esc_html__( 'Easy Demo Importer', 'easy-demo-importer' ),
-				'capability'  => 'manage_options',
-				'menu_slug'   => $this->plugin->data()['demo_import_page'],
-				'callback'    => [ Callbacks::class, 'renderDemoImportPage' ],
-			],
-//			[
-//				'parent_slug' => 'themes.php',
-//				'page_title'  => esc_html__( 'System Status Report', 'easy-demo-importer' ),
-//				'menu_title'  => esc_html__( 'Easy System Status', 'easy-demo-importer' ),
-//				'capability'  => 'manage_options',
-//				'menu_slug'   => $this->plugin->data()['system_status_page'],
-//				'callback'    => [ Callbacks::class, 'renderDemoImportPage' ],
-//			],
+		$subPages   = [];
+		$subPages[] = [
+			'parent_slug' => 'themes.php',
+			'page_title'  => esc_html__( 'Easy Demo Importer', 'easy-demo-importer' ),
+			'menu_title'  => esc_html__( 'Easy Demo Importer', 'easy-demo-importer' ),
+			'capability'  => 'manage_options',
+			'menu_slug'   => $this->plugin->data()['demo_import_page'],
+			'callback'    => [ Callbacks::class, 'renderDemoImportPage' ],
 		];
+
+		$themeConfig     = sd_edi()->getDemoConfig();
+		$activeTheme     = sd_edi()->activeTheme();
+		$supportedThemes = sd_edi()->supportedThemes();
+
+		if ( ! in_array( $activeTheme, $supportedThemes, true ) ) {
+			$themeConfig = [];
+		}
+
+		if ( ! empty( $themeConfig ) ) {
+			$subPages[] = [
+				'parent_slug' => 'themes.php',
+				'page_title'  => esc_html__( 'System Status Report', 'easy-demo-importer' ),
+				'menu_title'  => esc_html__( 'Easy System Status', 'easy-demo-importer' ),
+				'capability'  => 'manage_options',
+				'menu_slug'   => $this->plugin->data()['system_status_page'],
+				'callback'    => [ Callbacks::class, 'renderServerStatusPage' ],
+			];
+		}
+
+		return $subPages;
 	}
 
 	/**
@@ -106,7 +118,11 @@ class Pages extends Base {
 	 * @since 1.0.0
 	 */
 	public function removePageNotices() {
-		add_action( 'admin_init', [ $this, 'removeAllNotices' ] );
+		global $pagenow;
+
+		if ( 'themes.php' === $pagenow && isset( $_GET['page'] ) && ( 'sd-easy-demo-importer' === $_GET['page'] || 'sd-edi-demo-importer-status' === $_GET['page'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			add_action( 'admin_init', [ $this, 'removeAllNotices' ] );
+		}
 	}
 
 	/**
@@ -116,10 +132,6 @@ class Pages extends Base {
 	 * @since 1.0.0
 	 */
 	public function removeAllNotices() {
-		global $pagenow;
-
-		if ( 'themes.php' === $pagenow && isset( $_GET['page'] ) && ( 'sd-easy-demo-importer' === $_GET['page'] || 'sd-edi-demo-importer-status' === $_GET['page'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			remove_all_actions( 'admin_notices' );
-		}
+		remove_all_actions( 'admin_notices' );
 	}
 }

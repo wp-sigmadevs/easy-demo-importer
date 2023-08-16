@@ -1,8 +1,12 @@
 import React from 'react';
-import {Button, Image} from 'antd';
+import { Button, Image } from 'antd';
 import ModalHeader from '../ModalHeader';
 import useSharedDataStore from '../../../utils/sharedDataStore';
-import {ArrowRightOutlined, CloseOutlined, FullscreenOutlined} from '@ant-design/icons';
+import {
+	ArrowRightOutlined,
+	CloseOutlined,
+	AimOutlined,
+} from '@ant-design/icons';
 
 /* global sdEdiAdminParams */
 
@@ -10,6 +14,7 @@ import {ArrowRightOutlined, CloseOutlined, FullscreenOutlined} from '@ant-design
  * Component representing the "Begin" step in the modal.
  *
  * @param {Function} handleReset - Handles resetting the modal.
+ * @param {Object}   modalData   - Data for the Modal.
  */
 const Begin = ({ handleReset, modalData }) => {
 	/**
@@ -22,6 +27,14 @@ const Begin = ({ handleReset, modalData }) => {
 	 */
 	const onNext = () => {
 		setCurrentStep(currentStep + 1);
+	};
+
+	/**
+	 * Handle 'Server Page' button behavior.
+	 */
+	const handleServerPageBtn = () => {
+		const serverPageUrl = sdEdiAdminParams.serverPageUrl;
+		window.open(serverPageUrl, '_self');
 	};
 
 	return (
@@ -47,10 +60,16 @@ const Begin = ({ handleReset, modalData }) => {
 						<CloseOutlined />
 						<span>{sdEdiAdminParams.btnCancel}</span>
 					</Button>
-					<Button type="primary" onClick={onNext}>
-						<span>{sdEdiAdminParams.btnContinue}</span>
-						<ArrowRightOutlined />
-					</Button>
+					<div className="actions-right edi-d-flex edi-align-items-center">
+						<Button type="primary" onClick={handleServerPageBtn}>
+							<span>{sdEdiAdminParams.serverPageBtnText}</span>
+							<AimOutlined />
+						</Button>
+						<Button type="primary" onClick={onNext}>
+							<span>{sdEdiAdminParams.btnContinue}</span>
+							<ArrowRightOutlined />
+						</Button>
+					</div>
 				</div>
 			</div>
 		</>

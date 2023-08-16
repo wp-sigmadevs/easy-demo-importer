@@ -2,7 +2,7 @@
 /**
  * Demo Import Page.
  *
- * @package RT\DemoImport
+ * @package SigmaDevs\EasyDemoImporter
  */
 
 // Do not allow directly accessing this file.
