@@ -139,6 +139,7 @@ class RestEndpoint extends Base {
 	public function addPluginApiEndpoint() {
 		$this->addDemoDataEndpoint();
 		$this->addPluginStatusEndpoint();
+		$this->addServerStatusEndpoint();
 	}
 
 	/**
@@ -173,6 +174,24 @@ class RestEndpoint extends Base {
 				'methods'             => 'GET',
 				'callback'            => [ $this, 'pluginList' ],
 				'permission_callback' => [ $this, 'permission' ],
+			]
+		);
+	}
+
+	/**
+	 * Add Server Status Route.
+	 *
+	 * @return void
+	 * @since 1.0.0
+	 */
+	public function addServerStatusEndpoint() {
+		register_rest_route(
+			$this->getNamespace(),
+			'/server/status',
+			[
+				'methods'  => 'GET',
+				'callback' => [ $this, 'serverStatus' ],
+			// 'permission_callback' => [ $this, 'permission' ],
 			]
 		);
 	}
@@ -254,5 +273,234 @@ class RestEndpoint extends Base {
 		}
 
 		return $this->sendResponse( $requiredPlugins, esc_html__( 'Data is ready to fetch', 'easy-demo-importer' ) );
+	}
+
+	/**
+	 * Builds server status.
+	 *
+	 * @return WP_REST_Response
+	 * @since 1.0.0
+	 */
+	public function serverStatus() {
+		$info = $this->serverStatusTabs();
+
+		/**
+		 * System Info Fields.
+		 */
+		$info['system_info']['fields']['operating_system'] = [
+			'label' => esc_html__( 'Operating System', 'easy-demo-importer' ),
+			'value' => esc_html( PHP_OS ),
+		];
+
+		return $this->sendResponse( $info, esc_html__( 'Data is ready to fetch', 'easy-demo-importer' ) );
+	}
+
+	/**
+	 * System Status Tabs.
+	 *
+	 * @return array
+	 * @since 1.0.0
+	 */
+	private function serverStatusTabs() {
+		$tabs = [];
+
+		$tabs['system_info'] = [
+			'label'  => esc_html__( 'System Info', 'easy-demo-importer' ),
+			'fields' => $this->systemInfoFields(),
+		];
+
+		$tabs['wp_info'] = [
+			'label'  => esc_html__( 'WordPress Info', 'easy-demo-importer' ),
+			'fields' => $this->wpInfoFields(),
+		];
+
+		return $tabs;
+	}
+
+	/**
+	 * System Info Fields.
+	 *
+	 * @return array
+	 * @since 1.0.0
+	 */
+	private function systemInfoFields() {
+		global $wpdb;
+
+		$fields = [];
+
+		$fields['operating_system'] = [
+			'label' => esc_html__( 'Operating System', 'easy-demo-importer' ),
+			'value' => esc_html( PHP_OS ),
+		];
+
+		$fields['server'] = [
+			'label' => esc_html__( 'Server', 'easy-demo-importer' ),
+			'value' => ! empty( $_SERVER['SERVER_SOFTWARE'] ) ? sanitize_text_field( wp_unslash( $_SERVER['SERVER_SOFTWARE'] ) ) : esc_html__( 'Detection Error', 'easy-demo-importer' ),
+		];
+
+		$fields['mysql'] = [
+			'label' => esc_html__( 'MySQL Version', 'easy-demo-importer' ),
+			'value' => esc_html( $wpdb->get_var( 'SELECT VERSION()' ) ),
+		];
+
+		$fields['php'] = [
+			'label' => esc_html__( 'PHP Version', 'easy-demo-importer' ),
+			'value' => esc_html( PHP_VERSION ),
+		];
+
+		$fields['max_exec_time'] = [
+			'label' => esc_html__( 'PHP Max Execution Time', 'easy-demo-importer' ),
+			'value' => esc_html( ini_get( 'max_execution_time' ) ),
+		];
+
+		$fields['max_upload_size'] = [
+			'label' => esc_html__( 'PHP Max Upload Size', 'easy-demo-importer' ),
+			'value' => esc_html( ini_get( 'upload_max_filesize' ) ),
+		];
+
+		$fields['post_max_size'] = [
+			'label' => esc_html__( 'PHP Post Max Size', 'easy-demo-importer' ),
+			'value' => esc_html( ini_get( 'post_max_size' ) ),
+		];
+
+		$fields['max_input_vars'] = [
+			'label' => esc_html__( 'PHP Max Input Vars', 'easy-demo-importer' ),
+			'value' => esc_html( ini_get( 'max_input_vars' ) ),
+		];
+
+		$fields['memory_limit'] = [
+			'label' => esc_html__( 'PHP Memory Limit', 'easy-demo-importer' ),
+			'value' => esc_html( ini_get( 'memory_limit' ) ),
+		];
+
+		$fields['curl'] = [
+			'label' => esc_html__( 'cURL Installed', 'easy-demo-importer' ),
+			'value' => extension_loaded( 'curl' ) ? esc_html__( 'Yes', 'easy-demo-importer' ) : esc_html__( 'No', 'easy-demo-importer' ),
+		];
+
+		$curl_data = function_exists( 'curl_version' ) ? curl_version() : false;
+
+		if ( $curl_data ) {
+			$fields['curl_version'] = [
+				'label' => esc_html__( 'cURL version', 'easy-demo-importer' ),
+				'value' => esc_html( $curl_data['version'] ),
+			];
+		}
+
+		$fields['gd'] = [
+			'label' => esc_html__( 'GD Installed', 'easy-demo-importer' ),
+			'value' => extension_loaded( 'gd' ) ? esc_html__( 'Yes', 'easy-demo-importer' ) : esc_html__( 'No', 'easy-demo-importer' ),
+		];
+
+		$gd_data = function_exists( 'gd_info' ) ? gd_info() : false;
+
+		if ( $gd_data ) {
+			$fields['gd_version'] = [
+				'label' => esc_html__( 'GD version', 'easy-demo-importer' ),
+				'value' => esc_html( $gd_data['GD Version'] ),
+			];
+		}
+
+		$fields['write_permission'] = [
+			'label' => esc_html__( 'Write Permission', 'easy-demo-importer' ),
+			'value' => esc_html( $this->checkWritePermission() ),
+		];
+
+		$demo           = sd_edi()->getDemoConfig();
+		$downloadServer = ! empty( $demo['demoZip'] ) ? esc_url( $demo['demoZip'] ) : null;
+
+		$fields['demo_connection'] = [
+			'label' => esc_html__( 'Download Server Connection', 'easy-demo-importer' ),
+			'value' => ! empty( $downloadServer ) && wp_remote_get( $downloadServer, [ 'timeout' => 10 ] ) ? esc_html__( 'Connected', 'easy-demo-importer' ) : esc_html__( 'Connection failure', 'easy-demo-importer' ),
+		];
+
+		return $fields;
+	}
+
+	/**
+	 * WordPress Info Fields.
+	 *
+	 * @return array
+	 * @since 1.0.0
+	 */
+	private function wpInfoFields() {
+		global $wp_rewrite;
+
+		$fields = [];
+
+		$fields['wp_version'] = [
+			'label' => esc_html__( 'WordPress Version', 'easy-demo-importer' ),
+			'value' => esc_html( get_bloginfo( 'version' ) ),
+		];
+
+		$fields['site_url'] = [
+			'label' => esc_html__( 'Site URL', 'easy-demo-importer' ),
+			'value' => esc_html( get_site_url() ),
+		];
+
+		$fields['home_url'] = [
+			'label' => esc_html__( 'Home URL', 'easy-demo-importer' ),
+			'value' => esc_html( get_home_url() ),
+		];
+
+		$fields['multisite'] = [
+			'label' => esc_html__( 'Multisite', 'easy-demo-importer' ),
+			'value' => is_multisite() ? esc_html__( 'Yes', 'easy-demo-importer' ) : esc_html__( 'No', 'easy-demo-importer' ),
+		];
+
+		$fields['max_upload_size'] = [
+			'label' => esc_html__( 'Max Upload Size', 'easy-demo-importer' ),
+			'value' => esc_html( size_format( wp_max_upload_size() ) ),
+		];
+
+		$fields['memory_limit'] = [
+			'label' => esc_html__( 'Memory Limit', 'easy-demo-importer' ),
+			'value' => esc_html( WP_MEMORY_LIMIT ),
+		];
+
+		$fields['max_memory_limit'] = [
+			'label' => esc_html__( 'Max Memory Limit', 'easy-demo-importer' ),
+			'value' => esc_html( WP_MAX_MEMORY_LIMIT ),
+		];
+
+		$fields['permalink_structure'] = [
+			'label' => esc_html__( 'Permalink Structure', 'easy-demo-importer' ),
+			'value' => '' !== $wp_rewrite->permalink_structure ? esc_html( $wp_rewrite->permalink_structure ) : esc_html__( 'Plain', 'easy-demo-importer' ),
+		];
+
+		$fields['language'] = [
+			'label' => esc_html__( 'Language', 'easy-demo-importer' ),
+			'value' => esc_html( get_bloginfo( 'language' ) ),
+		];
+
+		$fields['wp_debug'] = [
+			'label' => esc_html__( 'Debug Mode Enabled', 'easy-demo-importer' ),
+			'value' => WP_DEBUG ? esc_html__( 'Yes', 'easy-demo-importer' ) : esc_html__( 'No', 'easy-demo-importer' ),
+		];
+
+		$fields['script_debug'] = [
+			'label' => esc_html__( 'Script Debug Mode Enabled', 'easy-demo-importer' ),
+			'value' => SCRIPT_DEBUG ? esc_html__( 'Yes', 'easy-demo-importer' ) : esc_html__( 'No', 'easy-demo-importer' ),
+		];
+
+		return $fields;
+	}
+
+	/**
+	 * Check write permission.
+	 *
+	 * @return string
+	 */
+	private function checkWritePermission() {
+		$output          = __( 'Write permission error', 'easy-demo-importer' );
+		$wpUploadDir     = wp_upload_dir( null, false );
+		$error           = $wpUploadDir['error'];
+		$ediDownloadPath = $wpUploadDir['basedir'] . '/easy-demo-importer/';
+
+		if ( ! $error && is_writable( $ediDownloadPath ) ) {
+			$output = __( 'Writable', 'easy-demo-importer' );
+		}
+
+		return $output;
 	}
 }

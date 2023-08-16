@@ -172,7 +172,7 @@ class Enqueue extends EnqueueBase {
 				'confirmNo'                  => esc_html__( 'No', 'easy-demo-importer' ),
 
 				// Server Page Button.
-				'serverPageBtnText'          => esc_html__( 'Check System Status', 'easy-demo-importer' ),
+				'serverPageBtnText'          => esc_html__( 'Server Requirements', 'easy-demo-importer' ),
 				'serverPageUrl'              => admin_url( 'themes.php?page=' ) . sd_edi()->getData()['system_status_page'],
 
 				// Button texts.
