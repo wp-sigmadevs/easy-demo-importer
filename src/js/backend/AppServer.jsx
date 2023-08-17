@@ -1,58 +1,67 @@
-import { Row, Col, Button } from 'antd';
+import { Row, Col } from 'antd';
 import Header from './Layouts/Header';
-import DemoCard from './components/DemoCard';
-import gridSkeleton from './components/skeleton';
+import Support from './components/Support';
 import React, { useState, useEffect } from 'react';
 import ErrorMessage from './components/ErrorMessage';
 import useSharedDataStore from './utils/sharedDataStore';
-import ModalComponent from './components/Modal/ModalComponent';
-import Support from './components/Support';
+import ServerInfoCollapse from './components/ServerInfoCollapse';
 
 /* global sdEdiAdminParams */
 
 /**
- * The main component representing the demo import application.
+ * The main component representing the server info application.
  */
 const AppServer = () => {
 	/**
+	 * State hooks.
+	 */
+	const [errorMessage, setErrorMessage] = useState('');
+
+	/**
 	 * Values from the shared data store.
 	 */
-	// const {
-	// 	importList,
-	// 	loading,
-	// 	fetchImportList,
-	// 	modalVisible,
-	// 	setModalVisible,
-	// 	handleModalCancel,
-	// } = useSharedDataStore();
+	const { serverData, loading, fetchServerData } = useSharedDataStore();
 
 	/**
-	 * Effect hook to fetch the import list when the component mounts.
+	 * Effect hook to fetch the server data when the component mounts.
 	 */
-	// useEffect(() => {
-	// 	(async () => {
-	// 		try {
-	// 			await fetchImportList('/sd/edi/v1/import/list');
-	// 		} catch (error) {
-	// 			console.error(error);
-	// 		}
-	// 	})();
-	// }, [fetchImportList]);
+	useEffect(() => {
+		(async () => {
+			try {
+				await fetchServerData('/sd/edi/v1/server/status');
+			} catch (error) {
+				console.error(error);
+			}
+		})();
+	}, [fetchServerData]);
 
 	/**
-	 * Effect hook to set the error message if the import list is not successful.
+	 * Effect hook to set the error message if the server data is not successful.
 	 */
-	// useEffect(() => {
-	// 	if (!importList.success) {
-	// 		setErrorMessage(importList.message);
-	// 	}
-	// }, [importList]);
+	useEffect(() => {
+		if (!serverData.success) {
+			setErrorMessage(serverData.message);
+		}
+	}, [serverData]);
 
 	/**
 	 * Extracting the demo data from the import list.
 	 */
-	// const demoData =
-	// 	importList.success && importList.data && importList.data.demoData;
+	const serverInfo = serverData.success && serverData.data;
+
+	let containerClassName = 'edi-container';
+
+	if (!serverData.success) {
+		if (loading && !serverInfo) {
+			containerClassName += ' loading';
+		} else {
+			containerClassName += ' no-server-config';
+		}
+	} else {
+		containerClassName += ' server-config-found';
+	}
+
+	console.log(serverInfo)
 
 	return (
 		<>
@@ -63,7 +72,33 @@ const AppServer = () => {
 				/>
 
 				<div className="edi-content">
-
+					<div className={containerClassName}>
+						<Row gutter={[30, 30]}>
+							{loading && !serverInfo ? (
+								<>
+									<Col className="gutter-row">
+										<div className="skeleton-wrapper">
+											{/*{listSkeleton(loading)}*/}
+										</div>
+									</Col>
+								</>
+							) : (
+								<>
+									{!serverData.success ? (
+										<ErrorMessage message={errorMessage} />
+									) : (
+										<>
+											<Col className="gutter-row edi-server-info edi-fade-in">
+												<ServerInfoCollapse
+													serverInfo={serverInfo}
+												/>
+											</Col>
+										</>
+									)}
+								</>
+							)}
+						</Row>
+					</div>
 				</div>
 			</div>
 			{'yes' === sdEdiAdminParams.enableSupportButton && <Support />}
