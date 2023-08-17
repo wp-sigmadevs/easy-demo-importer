@@ -284,14 +284,6 @@ class RestEndpoint extends Base {
 	public function serverStatus() {
 		$info = $this->serverStatusTabs();
 
-		/**
-		 * System Info Fields.
-		 */
-		$info['system_info']['fields']['operating_system'] = [
-			'label' => esc_html__( 'Operating System', 'easy-demo-importer' ),
-			'value' => esc_html( PHP_OS ),
-		];
-
 		return $this->sendResponse( $info, esc_html__( 'Data is ready to fetch', 'easy-demo-importer' ) );
 	}
 
@@ -351,16 +343,19 @@ class RestEndpoint extends Base {
 		$fields['max_exec_time'] = [
 			'label' => esc_html__( 'PHP Max Execution Time', 'easy-demo-importer' ),
 			'value' => esc_html( ini_get( 'max_execution_time' ) ),
+			'error' => ini_get( 'max_execution_time' ) < 300 ? esc_html__( 'Recommended PHP Max Execution Time is 300', 'easy-demo-importer' ) : '',
 		];
 
 		$fields['max_upload_size'] = [
 			'label' => esc_html__( 'PHP Max Upload Size', 'easy-demo-importer' ),
 			'value' => esc_html( ini_get( 'upload_max_filesize' ) ),
+			'error' => ini_get( 'upload_max_filesize' ) < 256 ? esc_html__( 'Recommended PHP Max Execution Time is 256M', 'easy-demo-importer' ) : '',
 		];
 
 		$fields['post_max_size'] = [
 			'label' => esc_html__( 'PHP Post Max Size', 'easy-demo-importer' ),
 			'value' => esc_html( ini_get( 'post_max_size' ) ),
+			'error' => ini_get( 'post_max_size' ) < 5000 ? esc_html__( 'Recommended PHP Post Max Size is 512M', 'easy-demo-importer' ) : '',
 		];
 
 		$fields['max_input_vars'] = [
@@ -371,6 +366,7 @@ class RestEndpoint extends Base {
 		$fields['memory_limit'] = [
 			'label' => esc_html__( 'PHP Memory Limit', 'easy-demo-importer' ),
 			'value' => esc_html( ini_get( 'memory_limit' ) ),
+			'error' => ini_get( 'memory_limit' ) < 256 ? esc_html__( 'Recommended PHP Memory Limit is 256M', 'easy-demo-importer' ) : '',
 		];
 
 		$fields['curl'] = [
