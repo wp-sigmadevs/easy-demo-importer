@@ -1,7 +1,8 @@
-import { Row, Col } from 'antd';
+import { Row, Col, Skeleton } from 'antd';
 import Header from './Layouts/Header';
 import Support from './components/Support';
 import React, { useState, useEffect } from 'react';
+import listSkeleton from './components/ListSkeleton';
 import ErrorMessage from './components/ErrorMessage';
 import useSharedDataStore from './utils/sharedDataStore';
 import ServerInfoCollapse from './components/ServerInfoCollapse';
@@ -49,7 +50,7 @@ const AppServer = () => {
 	 */
 	const serverInfo = serverData.success && serverData.data;
 
-	let containerClassName = 'edi-container';
+	let containerClassName = 'edi-container server-container';
 
 	if (!serverData.success) {
 		if (loading && !serverInfo) {
@@ -60,8 +61,6 @@ const AppServer = () => {
 	} else {
 		containerClassName += ' server-config-found';
 	}
-
-	console.log(serverInfo)
 
 	return (
 		<>
@@ -78,7 +77,19 @@ const AppServer = () => {
 								<>
 									<Col className="gutter-row">
 										<div className="skeleton-wrapper">
-											{/*{listSkeleton(loading)}*/}
+											{listSkeleton(true)}
+											{Array.from({ length: 5 }).map(
+												(_, buttonIndex) => (
+													<div
+														className="list-skeleton details"
+														key={buttonIndex}
+													>
+														<Skeleton.Button
+															active={true}
+														/>
+													</div>
+												)
+											)}
 										</div>
 									</Col>
 								</>

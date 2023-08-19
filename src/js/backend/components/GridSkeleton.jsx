@@ -5,7 +5,7 @@ import { Skeleton } from 'antd';
  *
  * @param {boolean} props - Indicates whether the skeleton is active.
  */
-const gridSkeleton = (props) => (
+const GridSkeleton = (props) => (
 	<>
 		<Skeleton.Node block={true} active={props} />
 		<div className="details edi-d-flex edi-align-items-center">
@@ -15,4 +15,4 @@ const gridSkeleton = (props) => (
 	</>
 );
 
-export default gridSkeleton;
+export default GridSkeleton;
