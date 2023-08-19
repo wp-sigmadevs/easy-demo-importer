@@ -191,7 +191,7 @@ class RestEndpoint extends Base {
 			[
 				'methods'  => 'GET',
 				'callback' => [ $this, 'serverStatus' ],
-			// 'permission_callback' => [ $this, 'permission' ],
+				// 'permission_callback' => [ $this, 'permission' ],
 			]
 		);
 	}

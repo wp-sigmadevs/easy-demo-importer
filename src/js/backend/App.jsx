@@ -1,7 +1,7 @@
 import { Row, Col, Button } from 'antd';
 import Header from './Layouts/Header';
 import DemoCard from './components/DemoCard';
-import gridSkeleton from './components/skeleton';
+import GridSkeleton from './components/GridSkeleton';
 import React, { useState, useEffect } from 'react';
 import ErrorMessage from './components/ErrorMessage';
 import useSharedDataStore from './utils/sharedDataStore';
@@ -108,7 +108,7 @@ const App = () => {
 									}).map((_, i) => (
 										<Col key={i} className="gutter-row">
 											<div className="skeleton-wrapper">
-												{gridSkeleton(loading)}
+												{GridSkeleton(loading)}
 											</div>
 										</Col>
 									))}
