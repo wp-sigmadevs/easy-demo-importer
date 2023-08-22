@@ -3,6 +3,35 @@
  */
 .edi-container {
 	&.server-container {
-		.ant-collapse {}
+		.ant-collapse {
+			.ant-collapse-item {
+				.ant-collapse-header {
+					@extend .edi-pos-r;
+
+					&::before {
+						content: "";
+						left: 17px;
+						top: 50%;
+						width: 25px;
+						height: 25px;
+						background-image: url(../images/server.svg);
+						background-repeat: no-repeat;
+						background-size: contain;
+						background-position: center center;
+						transform: translateY(-50%);
+
+						@extend .edi-pos-a;
+					}
+				}
+
+				&:nth-child(2) {
+					.ant-collapse-header {
+						&::before {
+							background-image: url(../images/logo-wordpress.svg);
+						}
+					}
+				}
+			}
+		}
 	}
 }

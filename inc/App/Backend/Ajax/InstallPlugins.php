@@ -148,7 +148,7 @@ class InstallPlugins extends ImporterAjax {
 			$upgrader = new Plugin_Upgrader( $skin );
 			$upgrader->install( $api->download_link );
 
-			$this->installCount ++;
+			++$this->installCount;
 		}
 	}
 
@@ -237,7 +237,7 @@ class InstallPlugins extends ImporterAjax {
 			// Delete zip.
 			$wp_filesystem->delete( $plugin );
 
-			$this->installCount ++;
+			++$this->installCount;
 		}
 	}
 }
