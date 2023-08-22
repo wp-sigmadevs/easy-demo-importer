@@ -1,0 +1,75 @@
+/**
+ * Component: Table.
+ */
+
+.appearance_page_sd-edi-demo-importer-status {
+	.ant-table {
+		.ant-table-thead {
+			tr,
+			td {
+				padding: 0;
+			}
+
+			td {
+				&::before {
+					content: none !important;
+				}
+			}
+		}
+
+		.ant-table-cell {
+			border: none !important;
+			padding: 10px 15px;
+			font-size: 14px;
+
+			.error-value {
+				@extend .edi-d-flex;
+				@extend .edi-align-items-center;
+
+				> span {
+					&:first-child {
+						min-width: 50px;
+						display: inline-block;
+						font-weight: 500;
+						color: #ff4d4f;
+					}
+				}
+
+				svg {
+					width: 20px;
+					height: 20px;
+					fill: #ff4d4f;
+				}
+			}
+		}
+
+		.ant-table-row {
+			> td {
+				&:first-child {
+					transition: all 0.3s;
+					border-left: 3px solid rgba(45, 116, 213, 0.2) !important;
+				}
+			}
+
+			&:hover {
+				> td {
+					&:first-child {
+						border-color: $color-primary !important;
+					}
+				}
+			}
+
+			&.error-row {
+				background: #FDF1E3 !important;
+
+				> .ant-table-cell {
+					background: transparent;
+
+					&:first-child {
+						border-color: #ff4d4f !important;
+					}
+				}
+			}
+		}
+	}
+}

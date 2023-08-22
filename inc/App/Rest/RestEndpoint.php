@@ -343,19 +343,19 @@ class RestEndpoint extends Base {
 		$fields['max_exec_time'] = [
 			'label' => esc_html__( 'PHP Max Execution Time', 'easy-demo-importer' ),
 			'value' => esc_html( ini_get( 'max_execution_time' ) ),
-			'error' => ini_get( 'max_execution_time' ) < 300 ? esc_html__( 'Recommended PHP Max Execution Time is 300', 'easy-demo-importer' ) : '',
+			'error' => $this->convertToBytes( ini_get( 'max_execution_time' ) ) < $this->convertedRequirements()['max_execution_time'] ? esc_html__( 'Recommended PHP Max Execution Time is ', 'easy-demo-importer' ) . esc_html( $this->systemRequirements()['max_execution_time'] ) : '',
 		];
 
 		$fields['max_upload_size'] = [
 			'label' => esc_html__( 'PHP Max Upload Size', 'easy-demo-importer' ),
 			'value' => esc_html( ini_get( 'upload_max_filesize' ) ),
-			'error' => ini_get( 'upload_max_filesize' ) < 256 ? esc_html__( 'Recommended PHP Max Execution Time is 256M', 'easy-demo-importer' ) : '',
+			'error' => $this->convertToBytes( ini_get( 'upload_max_filesize' ) ) < $this->convertedRequirements()['upload_max_filesize'] ? esc_html__( 'Recommended PHP Max Execution Time is ', 'easy-demo-importer' ) . esc_html( $this->systemRequirements()['upload_max_filesize'] ) : '',
 		];
 
 		$fields['post_max_size'] = [
 			'label' => esc_html__( 'PHP Post Max Size', 'easy-demo-importer' ),
 			'value' => esc_html( ini_get( 'post_max_size' ) ),
-			'error' => ini_get( 'post_max_size' ) < 5000 ? esc_html__( 'Recommended PHP Post Max Size is 512M', 'easy-demo-importer' ) : '',
+			'error' => $this->convertToBytes( ini_get( 'post_max_size' ) ) < $this->convertedRequirements()['post_max_size'] ? esc_html__( 'Recommended PHP Post Max Size is ', 'easy-demo-importer' ) . esc_html( $this->systemRequirements()['post_max_size'] ) : '',
 		];
 
 		$fields['max_input_vars'] = [
@@ -366,7 +366,7 @@ class RestEndpoint extends Base {
 		$fields['memory_limit'] = [
 			'label' => esc_html__( 'PHP Memory Limit', 'easy-demo-importer' ),
 			'value' => esc_html( ini_get( 'memory_limit' ) ),
-			'error' => ini_get( 'memory_limit' ) < 256 ? esc_html__( 'Recommended PHP Memory Limit is 256M', 'easy-demo-importer' ) : '',
+			'error' => $this->convertToBytes( ini_get( 'memory_limit' ) ) < $this->convertedRequirements()['memory_limit'] ? esc_html__( 'Recommended PHP Memory Limit is ', 'easy-demo-importer' ) . esc_html( $this->systemRequirements()['memory_limit'] ) : '',
 		];
 
 		$fields['curl'] = [
@@ -400,6 +400,7 @@ class RestEndpoint extends Base {
 		$fields['write_permission'] = [
 			'label' => esc_html__( 'Write Permission', 'easy-demo-importer' ),
 			'value' => esc_html( $this->checkWritePermission() ),
+			'error' => 'Writable' !== $this->checkWritePermission() ? esc_html__( 'Please fix the write permission error to import demo data successfully.', 'easy-demo-importer' ) : '',
 		];
 
 		$demo           = sd_edi()->getDemoConfig();
@@ -408,6 +409,7 @@ class RestEndpoint extends Base {
 		$fields['demo_connection'] = [
 			'label' => esc_html__( 'Download Server Connection', 'easy-demo-importer' ),
 			'value' => ! empty( $downloadServer ) && wp_remote_get( $downloadServer, [ 'timeout' => 10 ] ) ? esc_html__( 'Connected', 'easy-demo-importer' ) : esc_html__( 'Connection failure', 'easy-demo-importer' ),
+			'error' => empty( $downloadServer ) && ! wp_remote_get( $downloadServer, [ 'timeout' => 10 ] ) ? esc_html__( 'Please Check the demo data configuration or the internet connection.', 'easy-demo-importer' ) : '',
 		];
 
 		return $fields;
@@ -486,6 +488,7 @@ class RestEndpoint extends Base {
 	 * Check write permission.
 	 *
 	 * @return string
+	 * @since 1.0.0
 	 */
 	private function checkWritePermission() {
 		$output          = __( 'Write permission error', 'easy-demo-importer' );
@@ -498,5 +501,59 @@ class RestEndpoint extends Base {
 		}
 
 		return $output;
+	}
+
+	/**
+	 * Converts a PHP ini value.
+	 *
+	 * @param string|int $value The value to convert.
+	 *
+	 * @return int
+	 * @since 1.0.0
+	 */
+	private function convertToBytes( $value ) {
+		$value    = trim( $value );
+		$lastChar = strtolower( $value[ strlen( $value ) - 1 ] );
+
+		switch ( $lastChar ) {
+			case 'm':
+			case 'k':
+			case 'g':
+				$value *= 1024;
+				break;
+		}
+
+		return (int) $value;
+	}
+
+	/**
+	 * Server requirements in bytes.
+	 *
+	 * @return array
+	 * @since 1.0.0
+	 */
+	private function convertedRequirements() {
+		return array_map(
+			[ $this, 'convertToBytes' ],
+			$this->systemRequirements()
+		);
+	}
+
+	/**
+	 * Server requirements.
+	 *
+	 * @return array
+	 * @since 1.0.0
+	 */
+	private function systemRequirements() {
+		return apply_filters(
+			'sd/edi/server_requirements',
+			[
+				'max_execution_time'  => '300',
+				'upload_max_filesize' => '256M',
+				'post_max_size'       => '512M',
+				'memory_limit'        => '256M',
+			]
+		);
 	}
 }
