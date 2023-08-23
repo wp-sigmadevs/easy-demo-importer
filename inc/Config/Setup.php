@@ -53,6 +53,8 @@ class Setup {
 
 		delete_transient( 'sd_edi_installing' );
 
+		self::createDemoDir();
+
 		// Clear the permalinks.
 		flush_rewrite_rules();
 	}
@@ -129,5 +131,20 @@ class Setup {
 		}
 
 		return $table_schema;
+	}
+
+	/**
+	 * Create demo download directory.
+	 *
+	 * @return void
+	 * @since 1.0.0
+	 */
+	public static function createDemoDir() {
+		$uploadsDir = wp_get_upload_dir();
+		$demoDir    = 'easy-demo-importer';
+
+		if ( ! is_dir( $uploadsDir['basedir'] . '/' . $demoDir ) ) {
+			wp_mkdir_p( $uploadsDir['basedir'] . '/' . $demoDir );
+		}
 	}
 }

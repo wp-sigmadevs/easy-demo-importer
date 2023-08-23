@@ -80,58 +80,126 @@ const ServerInfoCollapse = ({ serverInfo }) => {
 						key={serverItem.id}
 						header={getPanelHeader(serverItem)}
 					>
-						<Table
-							dataSource={Object.keys(serverItem.fields).map(
-								(fieldKey) => ({
-									...serverItem.fields[fieldKey],
-									key: fieldKey,
-								})
-							)}
-							columns={[
-								{
-									dataIndex: 'label',
-									key: 'label',
-								},
-								{
-									dataIndex: 'value',
-									key: 'value',
-									render: (text, record) => {
-										if (record.error) {
-											return (
-												<span className="error-value">
-													<span>{text}</span>
-													<Popover
-														content={
-															<Alert
-																message="Error"
-																description={
-																	record.error
-																}
-																type="error"
-																showIcon
-															/>
+						{serverItem.id === 'copy_system_data' ? (
+							<div className="demo-importer-status-report">
+								<div id="system-status-report">
+									{Object.keys(serverItem.fields).map(
+										(fieldKey) => (
+											<div
+												className="report-inner"
+												key={fieldKey}
+											>
+												<p>
+													{
+														serverItem.fields[
+															fieldKey
+														].label
+													}
+												</p>
+												<textarea readOnly="readonly"></textarea>
+												<p className="submit">
+													<button className="button-primary">
+														{
+															serverItem.fields[
+																fieldKey
+															].value
 														}
-													>
-														<InfoCircleOutlined
-															style={{
-																marginLeft:
-																	'4px',
-															}}
-														/>
-													</Popover>
-												</span>
-											);
-										}
-
-										return text;
+													</button>
+												</p>
+											</div>
+										)
+									)}
+								</div>
+							</div>
+						) : (
+							<Table
+								dataSource={Object.keys(serverItem.fields).map(
+									(fieldKey) => ({
+										...serverItem.fields[fieldKey],
+										key: fieldKey,
+									})
+								)}
+								columns={[
+									{
+										dataIndex: 'label',
+										key: 'label',
 									},
-								},
-							]}
-							pagination={false}
-							rowClassName={(record) =>
-								record.error ? 'error-row' : 'row'
-							}
-						/>
+									{
+										dataIndex: 'value',
+										key: 'value',
+										render: (text, record) => {
+											if (record.error) {
+												return (
+													<span className="error-value">
+														<Popover
+															content={
+																<Alert
+																	message="Error"
+																	description={
+																		record.error
+																	}
+																	type="error"
+																	showIcon
+																/>
+															}
+														>
+															<InfoCircleOutlined
+																style={{
+																	marginLeft:
+																		'4px',
+																}}
+															/>
+														</Popover>
+														<span>{text}</span>
+													</span>
+												);
+											}
+
+											if (record.info) {
+												return (
+													<span className="info-value">
+														<Popover
+															content={
+																<Alert
+																	message="Error"
+																	description={
+																		record.info
+																	}
+																	type="info"
+																	showIcon
+																/>
+															}
+														>
+															<InfoCircleOutlined
+																style={{
+																	marginLeft:
+																		'4px',
+																}}
+															/>
+														</Popover>
+														<span>{text}</span>
+													</span>
+												);
+											}
+
+											return text;
+										},
+									},
+								]}
+								pagination={false}
+								rowClassName={(record) => {
+									if (record?.error) {
+										return 'error-row';
+									}
+
+									if (record?.info) {
+										return 'info-row';
+									}
+
+									return 'row';
+								}}
+							/>
+						)}
 					</Panel>
 				);
 			})}

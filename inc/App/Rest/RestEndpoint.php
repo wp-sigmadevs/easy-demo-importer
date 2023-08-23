@@ -306,6 +306,26 @@ class RestEndpoint extends Base {
 			'fields' => $this->wpInfoFields(),
 		];
 
+		$tabs['theme_info'] = [
+			'label'  => esc_html__( 'Theme Info', 'easy-demo-importer' ),
+			'fields' => $this->themeInfoFields(),
+		];
+
+		$tabs['active_plugins'] = [
+			'label'  => esc_html__( 'Active Plugins', 'easy-demo-importer' ),
+			'fields' => $this->activePluginsFields(),
+		];
+
+		$tabs['inactive_plugins'] = [
+			'label'  => esc_html__( 'Inactive Plugins', 'easy-demo-importer' ),
+			'fields' => $this->inactivePluginsFields(),
+		];
+
+		$tabs['copy_system_data'] = [
+			'label'  => esc_html__( 'Copy System Status Data', 'easy-demo-importer' ),
+			'fields' => $this->copyData(),
+		];
+
 		return $tabs;
 	}
 
@@ -400,7 +420,7 @@ class RestEndpoint extends Base {
 		$fields['write_permission'] = [
 			'label' => esc_html__( 'Write Permission', 'easy-demo-importer' ),
 			'value' => esc_html( $this->checkWritePermission() ),
-			'error' => 'Writable' !== $this->checkWritePermission() ? esc_html__( 'Please fix the write permission error to import demo data successfully.', 'easy-demo-importer' ) : '',
+			'error' => 'No issue' !== $this->checkWritePermission() ? esc_html__( 'Fix the write permission error in the wp-content directory for successful import.', 'easy-demo-importer' ) : '',
 		];
 
 		$demo           = sd_edi()->getDemoConfig();
@@ -409,8 +429,69 @@ class RestEndpoint extends Base {
 		$fields['demo_connection'] = [
 			'label' => esc_html__( 'Download Server Connection', 'easy-demo-importer' ),
 			'value' => ! empty( $downloadServer ) && wp_remote_get( $downloadServer, [ 'timeout' => 10 ] ) ? esc_html__( 'Connected', 'easy-demo-importer' ) : esc_html__( 'Connection failure', 'easy-demo-importer' ),
-			'error' => empty( $downloadServer ) && ! wp_remote_get( $downloadServer, [ 'timeout' => 10 ] ) ? esc_html__( 'Please Check the demo data configuration or the internet connection.', 'easy-demo-importer' ) : '',
+			'error' => empty( $downloadServer ) && ! wp_remote_get( $downloadServer, [ 'timeout' => 10 ] ) ? esc_html__( 'Check the demo data configuration or the internet connection.', 'easy-demo-importer' ) : '',
 		];
+
+		return $fields;
+	}
+
+	/**
+	 * Theme Info Fields.
+	 *
+	 * @return array
+	 * @since 1.0.0
+	 */
+	private function themeInfoFields() {
+		$theme  = wp_get_theme();
+		$fields = [];
+
+		$fields['name'] = [
+			'label' => esc_html__( 'Name', 'easy-demo-importer' ),
+			'value' => esc_html( $theme->get( 'Name' ) ),
+		];
+
+		$fields['version'] = [
+			'label' => esc_html__( 'Version', 'easy-demo-importer' ),
+			'value' => esc_html( $theme->get( 'Version' ) ),
+		];
+
+		$fields['author'] = [
+			'label' => esc_html__( 'Author', 'easy-demo-importer' ),
+			'value' => esc_html( $theme->get( 'Author' ) ),
+		];
+
+		$fields['author_url'] = [
+			'label' => esc_html__( 'Author URL', 'easy-demo-importer' ),
+			'value' => esc_html( $theme->get( 'AuthorURI' ) ),
+		];
+
+		$fields['child_theme'] = [
+			'label' => esc_html__( 'Child Theme', 'easy-demo-importer' ),
+			'value' => is_child_theme() ? esc_html__( 'Yes', 'easy-demo-importer' ) : esc_html__( 'No', 'easy-demo-importer' ),
+			'info'  => is_child_theme() ? '' : esc_html__( 'Child theme is recommended if you want to modify or extend the features of the theme', 'easy-demo-importer' ),
+		];
+
+		if ( is_child_theme() ) {
+			$fields['parent_theme_name'] = [
+				'label' => esc_html__( 'Parent Theme Name', 'easy-demo-importer' ),
+				'value' => esc_html( $theme->parent()->get( 'Name' ) ),
+			];
+
+			$fields['parent_theme_version'] = [
+				'label' => esc_html__( 'Parent Theme Version', 'easy-demo-importer' ),
+				'value' => esc_html( $theme->parent()->get( 'Version' ) ),
+			];
+
+			$fields['parent_theme_author'] = [
+				'label' => esc_html__( 'Parent Theme Author', 'easy-demo-importer' ),
+				'value' => esc_html( $theme->parent()->get( 'Author' ) ),
+			];
+
+			$fields['parent_theme_author_url'] = [
+				'label' => esc_html__( 'Parent Theme Author URL', 'easy-demo-importer' ),
+				'value' => esc_html( $theme->parent()->get( 'AuthorURI' ) ),
+			];
+		}
 
 		return $fields;
 	}
@@ -485,6 +566,81 @@ class RestEndpoint extends Base {
 	}
 
 	/**
+	 * Active Plugins Fields.
+	 *
+	 * @return array
+	 * @since 1.0.0
+	 */
+	private function activePluginsFields() {
+		$fields        = [];
+		$activePlugins = Helpers::getActivePlugins();
+
+		foreach ( $activePlugins as $activePlugin ) {
+			$pluginName = esc_html( $activePlugin['Name'] );
+
+			if ( $activePlugin['Version'] ) {
+				$pluginName .= ' - v' . $activePlugin['Version'];
+			}
+
+			$fields[ str_replace( ' ', '_', $activePlugin['Name'] ) ] = [
+				'label' => $pluginName,
+				'value' => $activePlugin['Author'] ? sprintf( /* translators: 1. Plugin author name. */
+					esc_html__( 'By %s', 'easy-demo-importer' ),
+					esc_html( $activePlugin['Author'] )
+				) : 'N/A',
+			];
+		}
+
+		return $fields;
+	}
+
+	/**
+	 * Inactive Plugins Fields.
+	 *
+	 * @return array
+	 * @since 1.0.0
+	 */
+	private function inactivePluginsFields() {
+		$fields          = [];
+		$inactivePlugins = Helpers::getInactivePlugins();
+
+		foreach ( $inactivePlugins as $inactivePlugin ) {
+			$pluginName = esc_html( $inactivePlugin['Name'] );
+
+			if ( $inactivePlugin['Version'] ) {
+				$pluginName .= ' - v' . $inactivePlugin['Version'];
+			}
+
+			$fields[ str_replace( ' ', '_', $inactivePlugin['Name'] ) ] = [
+				'label' => $pluginName,
+				'value' => $inactivePlugin['Author'] ? sprintf( /* translators: 1. Plugin author name. */
+					esc_html__( 'By %s', 'easy-demo-importer' ),
+					esc_html( $inactivePlugin['Author'] )
+				) : 'N/A',
+			];
+		}
+
+		return $fields;
+	}
+
+	/**
+	 * Copy Data.
+	 *
+	 * @return array
+	 * @since 1.0.0
+	 */
+	private function copyData() {
+		$fields = [];
+
+		$fields['status_report'] = [
+			'label' => esc_html__( 'When submitting a support request, kindly include the details generated below in your message. Providing this information will assist us in efficiently diagnosing and addressing the issue you are experiencing.', 'easy-demo-importer' ),
+			'value' => esc_html__( 'Copy System Status', 'easy-demo-importer' ),
+		];
+
+		return $fields;
+	}
+
+	/**
 	 * Check write permission.
 	 *
 	 * @return string
@@ -497,7 +653,7 @@ class RestEndpoint extends Base {
 		$ediDownloadPath = $wpUploadDir['basedir'] . '/easy-demo-importer/';
 
 		if ( ! $error && is_writable( $ediDownloadPath ) ) {
-			$output = __( 'Writable', 'easy-demo-importer' );
+			$output = __( 'No issue', 'easy-demo-importer' );
 		}
 
 		return $output;
@@ -549,7 +705,7 @@ class RestEndpoint extends Base {
 		return apply_filters(
 			'sd/edi/server_requirements',
 			[
-				'max_execution_time'  => '300',
+				'max_execution_time'  => '3000',
 				'upload_max_filesize' => '256M',
 				'post_max_size'       => '512M',
 				'memory_limit'        => '256M',

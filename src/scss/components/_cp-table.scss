@@ -22,23 +22,48 @@
 			padding: 10px 15px;
 			font-size: 14px;
 
+			&:last-child {
+				position: relative;
+				padding-left: 35px;
+				width: 310px;
+			}
+
+			.info-value,
 			.error-value {
 				@extend .edi-d-flex;
 				@extend .edi-align-items-center;
 
 				> span {
-					&:first-child {
-						min-width: 50px;
+					&:last-child {
 						display: inline-block;
 						font-weight: 500;
 						color: #ff4d4f;
 					}
 				}
 
+				.anticon-info-circle {
+					left: 0;
+					top: 10px;
+
+					@extend .edi-pos-a;
+				}
+
 				svg {
 					width: 20px;
 					height: 20px;
 					fill: #ff4d4f;
+				}
+			}
+
+			.info-value {
+				svg {
+					fill: #17a2b8;
+				}
+
+				> span {
+					&:last-child {
+						color: #17a2b8;
+					}
 				}
 			}
 		}
@@ -55,6 +80,18 @@
 				> td {
 					&:first-child {
 						border-color: $color-primary !important;
+					}
+				}
+			}
+
+			&.info-row {
+				background: #e6f4ff !important;
+
+				> .ant-table-cell {
+					background: transparent;
+
+					&:first-child {
+						border-color: #91caff !important;
 					}
 				}
 			}

@@ -367,11 +367,40 @@ class Helpers {
 	 * @param string $demo Demo slug.
 	 * @param array  $config Theme config.
 	 * @param bool   $multiple Is multiple?.
+	 *
 	 * @return mixed
+	 * @since 1.0.0
 	 */
 	public static function getPluginsList( $demo, $config, $multiple ) {
 		$demoData = ! empty( $config['demoData'][ $demo ] ) ? $config['demoData'][ $demo ] : [];
 
 		return $multiple ? $demoData['plugins'] : $config['plugins'];
+	}
+
+	/**
+	 * Get lists of active plugins.
+	 *
+	 * @return array
+	 * @since 1.0.0
+	 */
+	public static function getActivePlugins() {
+		// Ensure get_plugins function is loaded.
+		if ( ! function_exists( 'get_plugins' ) ) {
+			include ABSPATH . '/wp-admin/includes/plugin.php';
+		}
+
+		$activePlugins = get_option( 'active_plugins' );
+
+		return array_intersect_key( get_plugins(), array_flip( $activePlugins ) );
+	}
+
+	/**
+	 * Get lists of inactive plugins.
+	 *
+	 * @return array
+	 * @since 1.0.0
+	 */
+	public static function getInactivePlugins() {
+		return array_diff_key( get_plugins(), self::getActivePlugins() );
 	}
 }
