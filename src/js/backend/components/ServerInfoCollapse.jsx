@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { Collapse, Table, Popover, Alert } from 'antd';
-import { InfoCircleOutlined } from '@ant-design/icons';
+import React, { useState, useRef } from 'react';
+import { Collapse, Table, Popover, Alert, message, Button } from 'antd';
+import { InfoCircleOutlined, CopyOutlined } from '@ant-design/icons';
 
 const ServerInfoCollapse = ({ serverInfo }) => {
 	const { Panel } = Collapse;
@@ -29,6 +29,104 @@ const ServerInfoCollapse = ({ serverInfo }) => {
 				behavior: 'smooth',
 			});
 		}
+	};
+
+	const generateReport = (info) => {
+		const sections = Object.keys(info);
+
+		let report = '';
+
+		sections.forEach((sectionKey) => {
+			if (sectionKey !== 'copy_system_data') {
+				const section = info[sectionKey];
+
+				if (section && section.fields) {
+					report += `== ${section.label} ==\n`;
+
+					Object.keys(section.fields).forEach((fieldKey) => {
+						const field = section.fields[fieldKey];
+						report += `\t${field.label}: ${field.value}\n`;
+					});
+
+					report += '\n';
+				}
+			}
+		});
+
+		return report;
+	};
+
+	const report = generateReport(serverInfo);
+	const textareaRef = useRef(null);
+
+	const handleCopyToClipboard = () => {
+		if (textareaRef.current) {
+			const textToCopy = textareaRef.current.value;
+
+			if (window.isSecureContext && navigator.clipboard) {
+				navigator.clipboard
+					.writeText(textToCopy)
+					.then(() => {
+						showCopyMessage(
+							'System status data copied to clipboard'
+						);
+					})
+					.catch((error) => {
+						console.error(
+							'Unable to copy to clipboard using Clipboard API:',
+							error
+						);
+
+						fallbackCopyToClipboard(textToCopy);
+					});
+			} else {
+				fallbackCopyToClipboard(textToCopy);
+			}
+		}
+	};
+
+	const fallbackCopyToClipboard = (text) => {
+		const textArea = document.createElement('textarea');
+		textArea.value = text;
+		document.body.appendChild(textArea);
+		textArea.select();
+
+		try {
+			document.execCommand('copy');
+			showCopyMessage('System status data copied to clipboard');
+		} catch (error) {
+			console.error('Unable to copy to clipboard', error);
+			showCopyMessage('Unable to copy to clipboard. Try again');
+		} finally {
+			document.body.removeChild(textArea);
+		}
+	};
+
+	const showCopyMessage = (content) => {
+		const key = 'copyMessage';
+
+		message.open({
+			key,
+			type: 'loading',
+			content: 'Loading...',
+			style: {
+				marginTop: '40vh',
+			},
+		});
+
+		setTimeout(() => {
+			textareaRef.current.focus();
+			textareaRef.current.select();
+
+			message.success({
+				key,
+				content,
+				duration: 3,
+				style: {
+					marginTop: '40vh',
+				},
+			});
+		}, 1000);
 	};
 
 	const getPanelHeader = (serverItem) => {
@@ -96,15 +194,29 @@ const ServerInfoCollapse = ({ serverInfo }) => {
 														].label
 													}
 												</p>
-												<textarea readOnly="readonly"></textarea>
+												<textarea
+													ref={textareaRef}
+													readOnly
+													rows={20}
+													value={report}
+												/>
 												<p className="submit">
-													<button className="button-primary">
-														{
-															serverItem.fields[
-																fieldKey
-															].value
+													<Button
+														className="edi-copy-button"
+														type="primary"
+														onClick={
+															handleCopyToClipboard
 														}
-													</button>
+													>
+														<span>
+															{
+																serverItem.fields[
+																	fieldKey
+																].value
+															}
+														</span>
+														<CopyOutlined />
+													</Button>
 												</p>
 											</div>
 										)
