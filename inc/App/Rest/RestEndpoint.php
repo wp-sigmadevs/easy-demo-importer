@@ -634,7 +634,7 @@ class RestEndpoint extends Base {
 
 		$fields['status_report'] = [
 			'label' => esc_html__( 'When submitting a support request, kindly include the details generated below in your message. Providing this information will assist us in efficiently diagnosing and addressing the issue you are experiencing.', 'easy-demo-importer' ),
-			'value' => esc_html__( 'Copy System Status', 'easy-demo-importer' ),
+			'value' => esc_html__( 'Copy System Data', 'easy-demo-importer' ),
 		];
 
 		return $fields;
