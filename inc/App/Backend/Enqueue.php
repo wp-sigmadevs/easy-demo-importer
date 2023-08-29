@@ -197,6 +197,13 @@ class Enqueue extends EnqueueBase {
 				'docDesc'                    => esc_html__( 'Embark on your journey by immersing yourself in our FAQ-rich documentation. It provides an extensive guide, featuring step-by-step instructions, screenshots, and informative videos to address common issues and help you to import demo data successfully.', 'easy-demo-importer' ),
 				'docUrl'                     => '#',
 				'ticketUrl'                  => '#',
+				'copySuccess'                => esc_html__( 'System status data copied to clipboard', 'easy-demo-importer' ),
+				'copyFailure'                => esc_html__( 'Unable to copy to clipboard. Try again.', 'easy-demo-importer' ),
+
+				// Server Requirements.
+				'reqHeader'                  => esc_html__( 'Server Requirements Error', 'easy-demo-importer' ),
+				'reqDescription'             => esc_html__( 'Server Requirements for demo import have not been met. Kindly head to the server status page to review the details. Please note that if the minimum server requirements have not met, the demo import may be stuck or unsuccessful.', 'easy-demo-importer' ),
+				'reqProceed'                 => esc_html__( 'Continue Anyway', 'easy-demo-importer' ),
 
 				// Plugin Status.
 				'notInstalled'               => esc_html__( 'Not Installed', 'easy-demo-importer' ),

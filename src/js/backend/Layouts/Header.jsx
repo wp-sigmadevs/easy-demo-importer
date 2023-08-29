@@ -1,10 +1,11 @@
 import React from 'react';
 
 /**
- * The header layout of the demo importer.
+ * Component representing the header layout of the demo importer.
  *
- * @param {string} logo    - The URL of the EDI logo.
- * @param {string} heading - The Heading.
+ * @param {Object} props         - Component properties.
+ * @param {string} props.logo    - The URL of the EDI logo.
+ * @param {string} props.heading - The heading to display.
  */
 const Header = ({ logo, heading }) => {
 	return (

@@ -3,8 +3,8 @@
  */
 
 import App from './backend/App';
-import AppServer from './backend/AppServer';
 import ReactDOM from 'react-dom/client';
+import AppServer from './backend/AppServer';
 
 /**
  * The container element where the pages will be rendered.

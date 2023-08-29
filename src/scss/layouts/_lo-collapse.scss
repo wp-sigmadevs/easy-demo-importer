@@ -12,9 +12,9 @@
 						content: "";
 						left: 17px;
 						top: 50%;
-						width: 25px;
-						height: 25px;
-						background-image: url(../images/server.svg);
+						width: 30px;
+						height: 30px;
+						background-image: url(../images/server-icon.svg);
 						background-repeat: no-repeat;
 						background-size: contain;
 						background-position: center center;
@@ -27,7 +27,39 @@
 				&:nth-child(2) {
 					.ant-collapse-header {
 						&::before {
-							background-image: url(../images/logo-wordpress.svg);
+							background-image: url(../images/wordpress-icon.svg);
+						}
+					}
+				}
+
+				&:nth-child(3) {
+					.ant-collapse-header {
+						&::before {
+							background-image: url(../images/theme-icon.svg);
+						}
+					}
+				}
+
+				&:nth-child(4) {
+					.ant-collapse-header {
+						&::before {
+							background-image: url(../images/plugin-icon.svg);
+						}
+					}
+				}
+
+				&:nth-child(5) {
+					.ant-collapse-header {
+						&::before {
+							background-image: url(../images/lock-icon.svg);
+						}
+					}
+				}
+
+				&:nth-child(6) {
+					.ant-collapse-header {
+						&::before {
+							background-image: url(../images/copy-icon.svg);
 						}
 					}
 				}

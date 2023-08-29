@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Space, Skeleton, Image, Spin } from 'antd';
+import { Button, Space, Skeleton, Image } from 'antd';
 import { DownloadOutlined, FullscreenOutlined } from '@ant-design/icons';
 
 /* global sdEdiAdminParams */
@@ -7,10 +7,9 @@ import { DownloadOutlined, FullscreenOutlined } from '@ant-design/icons';
 /**
  * Component representing a demo card.
  *
- * @param            data.data
- * @param {Object}   data           - The data object for the demo card.
- * @param {Function} showModal      - Function to show the modal with the demo card details.
- * @param            data.showModal
+ * @param {Object}   props           - Component properties.
+ * @param {Object}   props.data      - The data object for the demo card.
+ * @param {Function} props.showModal - Function to show the modal with the demo card details.
  */
 const DemoCard = ({ data, showModal }) => {
 	const [imageLoaded, setImageLoaded] = useState(false);

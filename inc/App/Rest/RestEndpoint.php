@@ -189,9 +189,9 @@ class RestEndpoint extends Base {
 			$this->getNamespace(),
 			'/server/status',
 			[
-				'methods'  => 'GET',
-				'callback' => [ $this, 'serverStatus' ],
-				// 'permission_callback' => [ $this, 'permission' ],
+				'methods'             => 'GET',
+				'callback'            => [ $this, 'serverStatus' ],
+				'permission_callback' => [ $this, 'permission' ],
 			]
 		);
 	}
@@ -322,7 +322,7 @@ class RestEndpoint extends Base {
 		];
 
 		$tabs['copy_system_data'] = [
-			'label'  => esc_html__( 'Copy System Status Data', 'easy-demo-importer' ),
+			'label'  => esc_html__( 'Copy System Data', 'easy-demo-importer' ),
 			'fields' => $this->copyData(),
 		];
 
@@ -510,6 +510,7 @@ class RestEndpoint extends Base {
 		$fields['wp_version'] = [
 			'label' => esc_html__( 'WordPress Version', 'easy-demo-importer' ),
 			'value' => esc_html( get_bloginfo( 'version' ) ),
+			'error' => $this->coreUpdateNeeded() ? esc_html__( 'WordPress core is outdated. Please update to the latest version.', 'easy-demo-importer' ) : '',
 		];
 
 		$fields['site_url'] = [
@@ -660,6 +661,28 @@ class RestEndpoint extends Base {
 	}
 
 	/**
+	 * Check if core update needed.
+	 *
+	 * @return bool
+	 * @since 1.0.0
+	 */
+	private function coreUpdateNeeded() {
+		require_once ABSPATH . 'wp-admin/includes/update.php';
+
+		$core_updates = get_core_updates();
+
+		if ( ! empty( $core_updates ) && is_array( $core_updates ) ) {
+			foreach ( $core_updates as $update ) {
+				if ( 'upgrade' === $update->response ) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Converts a PHP ini value.
 	 *
 	 * @param string|int $value The value to convert.
@@ -705,7 +728,7 @@ class RestEndpoint extends Base {
 		return apply_filters(
 			'sd/edi/server_requirements',
 			[
-				'max_execution_time'  => '3000',
+				'max_execution_time'  => '300',
 				'upload_max_filesize' => '256M',
 				'post_max_size'       => '512M',
 				'memory_limit'        => '256M',
