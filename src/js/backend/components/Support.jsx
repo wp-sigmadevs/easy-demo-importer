@@ -10,20 +10,39 @@ import { Button, FloatButton, Modal } from 'antd';
 
 /* global sdEdiAdminParams */
 
+/**
+ * Component for displaying support options.
+ */
 const Support = () => {
+	/**
+	 * State hooks
+	 */
 	const [modalVisible, setModalVisible] = useState(false);
 	const [activeButton, setActiveButton] = useState('');
 
+	/**
+	 * Handler function for button clicks.
+	 *
+	 * @param {string} buttonName - The name of the button that was clicked.
+	 */
 	const handleButtonClick = (buttonName) => {
 		setModalVisible(true);
 		setActiveButton(buttonName);
 	};
 
+	/**
+	 * Handler function for closing the modal.
+	 */
 	const handleModalClose = () => {
 		setModalVisible(false);
 		setActiveButton('');
 	};
 
+	/**
+	 * Handler function for opening a URL in a new browser tab.
+	 *
+	 * @param {string} url - The URL to be opened.
+	 */
 	const handleClick = (url) => {
 		window.open(url, '_blank');
 	};

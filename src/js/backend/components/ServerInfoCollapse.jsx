@@ -2,6 +2,8 @@ import React, { useState, useRef } from 'react';
 import { Collapse, Table, Popover, Alert, message, Button } from 'antd';
 import { InfoCircleOutlined, CopyOutlined } from '@ant-design/icons';
 
+/* global sdEdiAdminParams */
+
 const ServerInfoCollapse = ({ serverInfo }) => {
 	const { Panel } = Collapse;
 	const [activePanel, setActivePanel] = useState('');
@@ -67,15 +69,10 @@ const ServerInfoCollapse = ({ serverInfo }) => {
 				navigator.clipboard
 					.writeText(textToCopy)
 					.then(() => {
-						showCopyMessage(
-							'System status data copied to clipboard'
-						);
+						showCopyMessage(sdEdiAdminParams.copySuccess);
 					})
 					.catch((error) => {
-						console.error(
-							'Unable to copy to clipboard using Clipboard API:',
-							error
-						);
+						console.error(sdEdiAdminParams.copyFailure, error);
 
 						fallbackCopyToClipboard(textToCopy);
 					});
@@ -93,10 +90,10 @@ const ServerInfoCollapse = ({ serverInfo }) => {
 
 		try {
 			document.execCommand('copy');
-			showCopyMessage('System status data copied to clipboard');
+			showCopyMessage(sdEdiAdminParams.copySuccess);
 		} catch (error) {
-			console.error('Unable to copy to clipboard', error);
-			showCopyMessage('Unable to copy to clipboard. Try again');
+			console.error(sdEdiAdminParams.copyFailure, error);
+			showCopyMessage(sdEdiAdminParams.copyFailure);
 		} finally {
 			document.body.removeChild(textArea);
 		}
@@ -104,6 +101,9 @@ const ServerInfoCollapse = ({ serverInfo }) => {
 
 	const showCopyMessage = (content) => {
 		const key = 'copyMessage';
+
+		textareaRef.current.focus();
+		textareaRef.current.select();
 
 		message.open({
 			key,
@@ -115,9 +115,6 @@ const ServerInfoCollapse = ({ serverInfo }) => {
 		});
 
 		setTimeout(() => {
-			textareaRef.current.focus();
-			textareaRef.current.select();
-
 			message.success({
 				key,
 				content,
@@ -134,8 +131,6 @@ const ServerInfoCollapse = ({ serverInfo }) => {
 			(fieldKey) => serverItem.fields[fieldKey].error
 		).length;
 
-		let errorText = 'Issue detected';
-
 		if (errorCount === 0) {
 			return (
 				<div data-panel-key={serverItem.id}>
@@ -144,11 +139,7 @@ const ServerInfoCollapse = ({ serverInfo }) => {
 			);
 		}
 
-		if (errorCount > 1) {
-			errorText = 'Issues detected';
-		}
-
-		const headerText = `${errorCount} ${errorText}`;
+		const headerText = `${errorCount}`;
 
 		return (
 			<div data-panel-key={serverItem.id}>
@@ -210,7 +201,8 @@ const ServerInfoCollapse = ({ serverInfo }) => {
 													>
 														<span>
 															{
-																serverItem.fields[
+																serverItem
+																	.fields[
 																	fieldKey
 																].value
 															}

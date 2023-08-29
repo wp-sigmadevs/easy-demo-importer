@@ -1,8 +1,7 @@
-import { Row, Col, Skeleton } from 'antd';
 import Header from './Layouts/Header';
+import { Row, Col, Skeleton } from 'antd';
 import Support from './components/Support';
 import React, { useState, useEffect } from 'react';
-import listSkeleton from './components/ListSkeleton';
 import ErrorMessage from './components/ErrorMessage';
 import useSharedDataStore from './utils/sharedDataStore';
 import ServerInfoCollapse from './components/ServerInfoCollapse';
@@ -46,7 +45,7 @@ const AppServer = () => {
 	}, [serverData]);
 
 	/**
-	 * Extracting the demo data from the import list.
+	 * Extracting the server data.
 	 */
 	const serverInfo = serverData.success && serverData.data;
 
@@ -77,14 +76,17 @@ const AppServer = () => {
 								<>
 									<Col className="gutter-row">
 										<div className="skeleton-wrapper">
-											{listSkeleton(true)}
-											{Array.from({ length: 5 }).map(
+											{Array.from({ length: 6 }).map(
 												(_, buttonIndex) => (
 													<div
 														className="list-skeleton details"
 														key={buttonIndex}
 													>
-														<Skeleton.Button
+														<Skeleton
+															avatar
+															paragraph={{
+																rows: 0,
+															}}
 															active={true}
 														/>
 													</div>
@@ -112,6 +114,7 @@ const AppServer = () => {
 					</div>
 				</div>
 			</div>
+
 			{'yes' === sdEdiAdminParams.enableSupportButton && <Support />}
 		</>
 	);
