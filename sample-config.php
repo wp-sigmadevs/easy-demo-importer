@@ -1,9 +1,8 @@
 <?php
 /**
- * Sample theme Config file.
- *
- * @package SigmaDevs\EasyDemoImporter
- * @since   1.0.0
+ * @author  RadiusTheme
+ * @since   1.0
+ * @version 1.0
  */
 
 namespace radiustheme\Faktorie_Core;
@@ -15,14 +14,29 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Demo_Importer {
 
 	public function __construct() {
-		add_filter( 'sd/edi/importer/config', [ $this, 'edi_sample_config' ] );
+		$pro = false;
+
+		if ( $pro ) {
+			add_filter( 'sd/edi/importer/config', [ $this, 'edi_sample_config' ] );
+		} else {
+			add_filter(
+				'edi/sd/config/no_demo',
+				function () {
+					return [
+						'text'    => 'It seems you have not activated the theme. Please head to the license page and provide license key to activate demo import functionality. Thanks for your understanding.',
+						'btnUrl'  => admin_url() . 'themes.php',
+						'btnText' => 'Activate Theme',
+					];
+				}
+			);
+		}
 	}
 
 	public function edi_sample_config() {
 		return [
 			'themeName'          => 'Faktorie',
 			'themeSlug'          => 'faktorie',
-			'demoZip'            => 'http://demo-import.local/faktorie.zip',
+			'demoZip'            => 'http://demo-import.test/faktorie.zip',
 			'settingsJson'       => [
 				'bcn_settings',
 				'rtsb_settings',
@@ -43,7 +57,7 @@ class Demo_Importer {
 			'demoData'           => [
 				'home-01' => [
 					'name'         => __( 'Main Home', 'easy-demo-importer' ),
-					'previewImage' => 'http://demo-import.local/faktorie-home-1.png',
+					'previewImage' => 'http://demo-import.test/faktorie-home-1.jpg',
 					'previewUrl'   => 'https://demo.hashthemes.com/viral-mag/news',
 				],
 				'home-02' => [
@@ -98,11 +112,6 @@ class Demo_Importer {
 					'name'     => 'WP Fluent Forms',
 					'source'   => 'wordpress',
 					'filePath' => 'fluentform/fluentform.php',
-				],
-				'shopbuilder'      => [
-					'name'     => 'ShopBuilder - WooCommerce Page Builder',
-					'source'   => 'wordpress',
-					'filePath' => 'shopbuilder/shopbuilder.php',
 				],
 				'woocommerce'      => [
 					'name'     => 'WooCommerce',

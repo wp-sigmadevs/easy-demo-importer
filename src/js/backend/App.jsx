@@ -19,7 +19,7 @@ const App = () => {
 	 * State hooks.
 	 */
 	const [modalData, setModalData] = useState(null);
-	const [errorMessage, setErrorMessage] = useState('');
+	const [errorMessage, setErrorMessage] = useState(null);
 	const [isModalVisible, setIsModalVisible] = useState(false);
 
 	/**
@@ -169,7 +169,7 @@ const App = () => {
 					heading="Demo Importer"
 				/>
 
-				{hasErrors(serverInfo) && (
+				{importList.success && hasErrors(serverInfo) && (
 					<ModalRequirements
 						isVisible={isModalVisible}
 						onClose={handleCloseModal}
