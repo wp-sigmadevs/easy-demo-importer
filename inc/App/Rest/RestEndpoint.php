@@ -231,8 +231,17 @@ class RestEndpoint extends Base {
 			$themeConfig = [];
 		}
 
+		$errorData = apply_filters(
+			'edi/sd/config/no_demo',
+			[
+				'text'    => esc_html__( 'We apologize for any inconvenience, but it appears that the configuration file for the demo importer is either missing or you are using an unsupported theme. As a result, the installation of the demo content cannot proceed any further at this time. Thank you for your understanding.', 'easy-demo-importer' ),
+				'btnUrl'  => '',
+				'btnText' => '',
+			]
+		);
+
 		if ( empty( $themeConfig ) ) {
-			return $this->sendError( esc_html__( 'We apologize for any inconvenience, but it appears that the configuration file for the demo importer is either missing or you are using an unsupported theme. As a result, the installation of the demo content cannot proceed any further at this time. Thank you for your understanding.', 'easy-demo-importer' ) );
+			return $this->sendError( $errorData );
 		}
 
 		return $this->sendResponse( $themeConfig, esc_html__( 'Data is ready to fetch', 'easy-demo-importer' ) );
@@ -297,7 +306,7 @@ class RestEndpoint extends Base {
 		$tabs = [];
 
 		$tabs['system_info'] = [
-			'label'  => esc_html__( 'System Info', 'easy-demo-importer' ),
+			'label'  => esc_html__( 'Server Info', 'easy-demo-importer' ),
 			'fields' => $this->systemInfoFields(),
 		];
 
@@ -524,8 +533,13 @@ class RestEndpoint extends Base {
 		];
 
 		$fields['multisite'] = [
-			'label' => esc_html__( 'Multisite', 'easy-demo-importer' ),
+			'label' => esc_html__( 'Is this Multisite?', 'easy-demo-importer' ),
 			'value' => is_multisite() ? esc_html__( 'Yes', 'easy-demo-importer' ) : esc_html__( 'No', 'easy-demo-importer' ),
+		];
+
+		$fields['ssl'] = [
+			'label' => esc_html__( 'Has SSL Enabled?', 'easy-demo-importer' ),
+			'value' => is_ssl() ? esc_html__( 'Yes', 'easy-demo-importer' ) : esc_html__( 'No', 'easy-demo-importer' ),
 		];
 
 		$fields['max_upload_size'] = [
@@ -651,9 +665,9 @@ class RestEndpoint extends Base {
 		$output          = __( 'Write permission error', 'easy-demo-importer' );
 		$wpUploadDir     = wp_upload_dir( null, false );
 		$error           = $wpUploadDir['error'];
-		$ediDownloadPath = $wpUploadDir['basedir'] . '/easy-demo-importer/';
+		$ediDownloadPath = $wpUploadDir['basedir'];
 
-		if ( ! $error && is_writable( $ediDownloadPath ) ) {
+		if ( ! $error && wp_is_writable( $ediDownloadPath ) ) {
 			$output = __( 'No issue', 'easy-demo-importer' );
 		}
 
