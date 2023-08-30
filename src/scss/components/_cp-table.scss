@@ -43,7 +43,8 @@
 
 				.anticon-info-circle {
 					left: 0;
-					top: 10px;
+					top: 50%;
+					transform: translateY(-50%);
 
 					@extend .edi-pos-a;
 				}
