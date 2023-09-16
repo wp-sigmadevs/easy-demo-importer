@@ -112,7 +112,7 @@ class Setup {
 	private static function getTableSchema() {
 		global $wpdb;
 
-		$tableName    = sanitize_key( $wpdb->prefix . 'sd_edi_taxonomy_import' );
+		$tableName = sanitize_key( $wpdb->prefix . 'sd_edi_taxonomy_import' );
 
 		$collate      = '';
 		$table_schema = [];
