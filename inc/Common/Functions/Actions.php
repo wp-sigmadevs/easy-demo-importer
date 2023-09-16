@@ -666,7 +666,7 @@ class Actions {
 
 				if ( is_array( $oldIds ) ) {
 					$newIds                         = array_map(
-						function( $oldID ) {
+						function ( $oldID ) {
 							return sd_edi()->getNewID( $oldID );
 						},
 						$oldIds

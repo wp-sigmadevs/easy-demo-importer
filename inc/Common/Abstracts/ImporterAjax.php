@@ -114,7 +114,7 @@ abstract class ImporterAjax {
 		$this->excludeImages = ! empty( $_POST['excludeImages'] ) ? sanitize_text_field( wp_unslash( $_POST['excludeImages'] ) ) : '';
 
 		// Check if database reset needed.
-		$this->reset = isset( $_POST['reset'] ) && 'true' === $_POST['reset'];
+		$this->reset = isset( $_POST['reset'] ) && 'true' === sanitize_text_field( wp_unslash( $_POST['reset'] ) );
 	}
 
 	/**
@@ -204,14 +204,11 @@ abstract class ImporterAjax {
 	/**
 	 * Before import action.
 	 *
-	 * @param string $xml Demo XML file.
-	 * @param string $excludeImages $exclude images.
-	 *
 	 * @return void
 	 * @since 1.0.0
 	 */
-	public function beforeImportActions( $xml, $excludeImages ) {
-		do_action( 'sd/edi/before/import', $xml, $excludeImages );
+	public function beforeImportActions() {
+		do_action( 'sd/edi/before_import', $this );
 	}
 
 	/**
@@ -221,7 +218,7 @@ abstract class ImporterAjax {
 	 * @since 1.0.0
 	 */
 	public function afterImportActions() {
-		do_action( 'sd/edi/after/import' );
+		do_action( 'sd/edi/after_import', $this );
 	}
 
 	/**

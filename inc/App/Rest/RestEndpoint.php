@@ -662,13 +662,13 @@ class RestEndpoint extends Base {
 	 * @since 1.0.0
 	 */
 	private function checkWritePermission() {
-		$output          = __( 'Write permission error', 'easy-demo-importer' );
+		$output          = esc_html__( 'Write permission error', 'easy-demo-importer' );
 		$wpUploadDir     = wp_upload_dir( null, false );
 		$error           = $wpUploadDir['error'];
 		$ediDownloadPath = $wpUploadDir['basedir'];
 
 		if ( ! $error && wp_is_writable( $ediDownloadPath ) ) {
-			$output = __( 'No issue', 'easy-demo-importer' );
+			$output = esc_html__( 'No issue', 'easy-demo-importer' );
 		}
 
 		return $output;
@@ -705,18 +705,23 @@ class RestEndpoint extends Base {
 	 * @since 1.0.0
 	 */
 	private function convertToBytes( $value ) {
-		$value    = trim( $value );
-		$lastChar = strtolower( $value[ strlen( $value ) - 1 ] );
+		$value = trim( $value );
 
-		switch ( $lastChar ) {
-			case 'm':
-			case 'k':
-			case 'g':
-				$value *= 1024;
-				break;
+		if ( is_numeric( $value ) ) {
+			$lastChar = strtolower( $value[ strlen( $value ) - 1 ] );
+
+			switch ( $lastChar ) {
+				case 'm':
+				case 'k':
+				case 'g':
+					$value *= 1024;
+					break;
+			}
+
+			return (int) $value;
+		} else {
+			return 0;
 		}
-
-		return (int) $value;
 	}
 
 	/**

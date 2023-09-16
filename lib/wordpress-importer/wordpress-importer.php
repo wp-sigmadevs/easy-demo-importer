@@ -28,19 +28,19 @@ if ( ! class_exists( 'WP_Importer' ) ) {
 }
 
 /** Functions missing in older WordPress versions. */
-require_once dirname( __FILE__ ) . '/compat.php';
+require_once __DIR__ . '/compat.php';
 
 /** SD_EDI_WXR_Parser class */
-require_once dirname( __FILE__ ) . '/parsers/class-wxr-parser.php';
+require_once __DIR__ . '/parsers/class-wxr-parser.php';
 
 /** SD_EDI_WXR_Parser_SimpleXML class */
-require_once dirname( __FILE__ ) . '/parsers/class-wxr-parser-simplexml.php';
+require_once __DIR__ . '/parsers/class-wxr-parser-simplexml.php';
 
 /** SD_EDI_WXR_Parser_XML class */
-require_once dirname( __FILE__ ) . '/parsers/class-wxr-parser-xml.php';
+require_once __DIR__ . '/parsers/class-wxr-parser-xml.php';
 
 /** SD_EDI_WXR_Parser_Regex class */
-require_once dirname( __FILE__ ) . '/parsers/class-wxr-parser-regex.php';
+require_once __DIR__ . '/parsers/class-wxr-parser-regex.php';
 
 /** SD_EDI_WP_Import class */
-require_once dirname( __FILE__ ) . '/class-wp-import.php';
+require_once __DIR__ . '/class-wp-import.php';

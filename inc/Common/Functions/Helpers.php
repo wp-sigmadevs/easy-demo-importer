@@ -204,7 +204,7 @@ class Helpers {
 			return new WP_Error(
 				'brock',
 				/* translators: View file name. */
-				sprintf( __( '%s file not found', 'easy-demo-importer' ), $viewFile )
+				sprintf( esc_html__( '%s file not found', 'easy-demo-importer' ), $viewFile )
 			);
 		}
 

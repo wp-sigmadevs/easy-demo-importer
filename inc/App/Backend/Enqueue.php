@@ -12,7 +12,11 @@ declare( strict_types=1 );
 
 namespace SigmaDevs\EasyDemoImporter\App\Backend;
 
-use SigmaDevs\EasyDemoImporter\Common\{Functions\Helpers, Traits\Singleton, Abstracts\Enqueue as EnqueueBase};
+use SigmaDevs\EasyDemoImporter\Common\{
+	Functions\Helpers,
+	Traits\Singleton,
+	Abstracts\Enqueue as EnqueueBase
+};
 
 // Do not allow directly accessing this file.
 if ( ! defined( 'ABSPATH' ) ) {

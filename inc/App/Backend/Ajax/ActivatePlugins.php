@@ -113,7 +113,7 @@ class ActivatePlugins extends ImporterAjax {
 
 			if ( 'inactive' === $pluginStatus ) {
 				$this->activatePlugin( $filePath );
-				$this->activeCount ++;
+				++$this->activeCount;
 			}
 		}
 	}

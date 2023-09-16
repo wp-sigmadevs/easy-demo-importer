@@ -219,7 +219,7 @@ class DBSearchReplace {
 
 		// Loop through the data.
 		foreach ( $data as $row ) {
-			$current_row ++;
+			++$current_row;
 			$update_sql = [];
 			$where_sql  = [];
 			$upd        = false;
@@ -231,11 +231,6 @@ class DBSearchReplace {
 					$where_sql[] = $column . ' = "' . $this->mysql_escape_mimic( $data_to_fix ) . '"';
 					continue;
 				}
-
-				// Skip GUIDs by default.
-//				if ( 'on' !== $args['replace_guids'] && 'guid' === $column ) {
-//					continue;
-//				}
 
 				if ( $this->wpdb->options === $table ) {
 					// Skip any BSR options as they may contain the search field.
@@ -250,8 +245,8 @@ class DBSearchReplace {
 						$edited_data  = $this->recursive_unserialize_replace( $args['search_for'], $args['replace_with'], $data_to_fix, false, false );
 
 						if ( $edited_data !== $data_to_fix ) {
-							$table_report['change'] ++;
-							$table_report['updates'] ++;
+							++$table_report['change'];
+							++$table_report['updates'];
 							continue;
 						}
 					}
@@ -272,7 +267,7 @@ class DBSearchReplace {
 				if ( $edited_data !== $data_to_fix ) {
 					$update_sql[] = $column . ' = "' . $this->mysql_escape_mimic( $edited_data ) . '"';
 					$upd          = true;
-					$table_report['change'] ++;
+					++$table_report['change'];
 				}
 			}
 
@@ -284,9 +279,9 @@ class DBSearchReplace {
 
 				if ( ! $result ) {
 					// translators: the row number.
-					$table_report['errors'][] = sprintf( __( 'Error updating row: %d.', 'easy-demo-importer' ), $current_row );
+					$table_report['errors'][] = sprintf( esc_html__( 'Error updating row: %d.', 'easy-demo-importer' ), $current_row );
 				} else {
-					$table_report['updates'] ++;
+					++$table_report['updates'];
 				}
 			}
 		}
@@ -352,10 +347,8 @@ class DBSearchReplace {
 				if ( false !== $unserialized ) {
 					$data = $this->recursive_unserialize_replace( $from, $to, $unserialized, true, $case_insensitive );
 				}
-			} else {
-				if ( is_string( $data ) ) {
+			} elseif ( is_string( $data ) ) {
 					$data = $this->str_replace( $from, $to, $data, $case_insensitive );
-				}
 			}
 
 			if ( $serialised ) {

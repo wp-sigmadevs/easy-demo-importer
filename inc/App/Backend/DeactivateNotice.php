@@ -99,7 +99,7 @@ class DeactivateNotice extends Base {
 		<h4 style="text-decoration: underline;">Easy Demo Importer - Notice</h4>
 		<p style="margin-bottom: 20px;">
 			<?php
-			echo sprintf( /* translators: %s: Plugin name */
+			printf( /* translators: %s: Plugin name */
 				__(
 					'It seems you\'ve imported the theme demo data successfully. So, the purpose of <b>%s</b> plugin is fulfilled and it has no more use. <br />If you\'re satisfied with the imported theme demo data, you can safely deactivate it by clicking below <b>Deactivate</b> button.',
 					'easy-demo-importer'
@@ -111,11 +111,11 @@ class DeactivateNotice extends Base {
 
 		<p class="links">
 			<a href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'deactivate-easy-demo-importer', 'true' ), 'deactivate_sd_edi_plugin', '_deactivate_sd_edi_plugin_nonce' ) ); ?>"
-			   class="btn button-primary">
+				class="btn button-primary">
 				<span><?php esc_html_e( 'Deactivate Plugin', 'easy-demo-importer' ); ?></span>
 			</a>
 			<a class="btn button-secondary"
-			   href="?nag_sd_edi_plugin_deactivate_notice=0"><?php esc_html_e( 'Dismiss This Notice', 'easy-demo-importer' ); ?></a>
+				href="?nag_sd_edi_plugin_deactivate_notice=0"><?php esc_html_e( 'Dismiss This Notice', 'easy-demo-importer' ); ?></a>
 		</p>
 
 		<?php

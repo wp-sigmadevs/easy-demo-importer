@@ -66,10 +66,10 @@ class Errors {
 		if ( $message ) {
 			$plugin   = self::getPluginData();
 			$title    = $title ? esc_html( $title ) : $plugin['name'] . ' ' . $plugin['version'] . ' ' . esc_html__( '&rsaquo; Fatal Error', 'easy-demo-importer' );
-			$subtitle = $subtitle ? esc_html( $subtitle ) : $plugin['name'] . ' ' . $plugin['version'] . ' ' . __( '&#10230; Plugin Disabled', 'easy-demo-importer' );
+			$subtitle = $subtitle ? esc_html( $subtitle ) : $plugin['name'] . ' ' . $plugin['version'] . ' ' . esc_html__( '&#10230; Plugin Disabled', 'easy-demo-importer' );
 			$footer   = $source ? '<small>' .
 								sprintf( /* translators: %s: file path */
-									__( 'Error source: %s', 'easy-demo-importer' ),
+									esc_html__( 'Error source: %s', 'easy-demo-importer' ),
 									esc_html( $source )
 								) . '</small>' : '';
 			$error    = "<h3>$title</h3><strong>$subtitle</strong><p>$message</p><hr><p>$footer</p>";

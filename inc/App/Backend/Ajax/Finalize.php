@@ -64,8 +64,8 @@ class Finalize extends ImporterAjax {
 	public function response() {
 		Helpers::verifyAjaxCall();
 
-		// After Import Hook.
-		do_action( 'sd/edi/after_import', $this );
+		// After Import Actions.
+		$this->afterImportActions();
 
 		// Response.
 		$this->prepareResponse(

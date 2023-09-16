@@ -56,37 +56,37 @@ class Demo_Importer {
 			'blogSlug'           => 'news-media',
 			'demoData'           => [
 				'home-01' => [
-					'name'         => __( 'Main Home', 'easy-demo-importer' ),
+					'name'         => esc_html__( 'Main Home', 'easy-demo-importer' ),
 					'previewImage' => 'http://demo-import.test/faktorie-home-1.jpg',
 					'previewUrl'   => 'https://demo.hashthemes.com/viral-mag/news',
 				],
 				'home-02' => [
-					'name'         => __( 'Factory', 'easy-demo-importer' ),
+					'name'         => esc_html__( 'Factory', 'easy-demo-importer' ),
 					'previewImage' => 'https://demo.radiustheme.com/wordpress/demo-content/faktorie/edi/screens/screenshot2.jpg',
 					'previewUrl'   => 'https://radiustheme.com/demo/wordpress/themes/faktorie/home-02/',
 				],
 				'home-03' => [
-					'name'         => __( 'Industry', 'easy-demo-importer' ),
+					'name'         => esc_html__( 'Industry', 'easy-demo-importer' ),
 					'previewImage' => 'https://demo.radiustheme.com/wordpress/demo-content/faktorie/edi/screens/screenshot3.jpg',
 					'previewUrl'   => 'https://radiustheme.com/demo/wordpress/themes/faktorie/home-03/',
 				],
 				'home-04' => [
-					'name'         => __( 'Construction', 'easy-demo-importer' ),
+					'name'         => esc_html__( 'Construction', 'easy-demo-importer' ),
 					'previewImage' => 'https://demo.radiustheme.com/wordpress/demo-content/faktorie/edi/screens/screenshot4.jpg',
 					'previewUrl'   => 'https://radiustheme.com/demo/wordpress/themes/faktorie/home-04/',
 				],
 				'home-05' => [
-					'name'         => __( 'Manufacture', 'easy-demo-importer' ),
+					'name'         => esc_html__( 'Manufacture', 'easy-demo-importer' ),
 					'previewImage' => 'https://demo.radiustheme.com/wordpress/demo-content/faktorie/edi/screens/screenshot5.jpg',
 					'previewUrl'   => 'https://radiustheme.com/demo/wordpress/themes/faktorie/home-05/',
 				],
 				'home-06' => [
-					'name'         => __( 'Industry 02', 'easy-demo-importer' ),
+					'name'         => esc_html__( 'Industry 02', 'easy-demo-importer' ),
 					'previewImage' => 'https://demo.radiustheme.com/wordpress/demo-content/faktorie/edi/screens/screenshot6.jpg',
 					'previewUrl'   => 'https://radiustheme.com/demo/wordpress/themes/faktorie/home-06/',
 				],
 				'home-07' => [
-					'name'         => __( 'Factory Black', 'easy-demo-importer' ),
+					'name'         => esc_html__( 'Factory Black', 'easy-demo-importer' ),
 					'previewImage' => 'https://demo.radiustheme.com/wordpress/demo-content/faktorie/edi/screens/screenshot7.jpg',
 					'previewUrl'   => 'https://radiustheme.com/demo/wordpress/themes/faktorie/home-07/',
 				],

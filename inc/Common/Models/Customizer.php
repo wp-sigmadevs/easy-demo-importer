@@ -47,15 +47,15 @@ class Customizer {
 
 		// Data checks.
 		if ( 'array' != gettype( $data ) ) {
-			return new WP_Error( 'sd_edi_customizer_import_data_error', __( 'The customizer import file is not in a correct format. Please make sure to use the correct customizer import file.', 'easy-demo-importer' ) );
+			return new WP_Error( 'sd_edi_customizer_import_data_error', esc_html__( 'The customizer import file is not in a correct format. Please make sure to use the correct customizer import file.', 'easy-demo-importer' ) );
 		}
 
 		if ( ! isset( $data['template'] ) || ! isset( $data['mods'] ) ) {
-			return new WP_Error( 'sd_edi_customizer_import_no_data', __( 'Error importing settings! Please check that you uploaded a customizer export file.', 'easy-demo-importer' ) );
+			return new WP_Error( 'sd_edi_customizer_import_no_data', esc_html__( 'Error importing settings! Please check that you uploaded a customizer export file.', 'easy-demo-importer' ) );
 		}
 
 		if ( $data['template'] !== $template ) {
-			return new WP_Error( 'sd_edi_customizer_import_wrong_theme', __( 'The customizer import file is not suitable for current theme. You can only import customizer settings for the same theme or a child theme.', 'easy-demo-importer' ) );
+			return new WP_Error( 'sd_edi_customizer_import_wrong_theme', esc_html__( 'The customizer import file is not suitable for current theme. You can only import customizer settings for the same theme or a child theme.', 'easy-demo-importer' ) );
 		}
 
 		// Import Images.
@@ -125,27 +125,27 @@ class Customizer {
 			}
 
 			// For repeater fields.
-//			if ( $this->isJSON( $value ) ) {
-//				$dataArray = json_decode( $value );
-//
-//				foreach ( $dataArray as $dataKey => $dataObject ) {
-//					foreach ( $dataObject as $subDataKey => $subDataValue ) {
-//						if ( $this->isImageUrl( $subDataValue ) ) {
-//							$subData = $this->mediaHandleSideload( $subDataValue );
-//
-//							if ( ! is_wp_error( $subData ) ) {
-//								$dataObject->$subDataKey = $subData->url;
-//							}
-//						} else {
-//							$dataObject->$subDataKey = $subDataValue;
-//						}
-//					}
-//
-//					$dataArray[ $dataKey ] = $dataObject;
-//				}
-//
-//				$mods[ $key ] = json_encode( $dataArray );
-//			}
+			if ( $this->isJSON( $value ) ) {
+				$dataArray = json_decode( $value );
+
+				foreach ( $dataArray as $dataKey => $dataObject ) {
+					foreach ( $dataObject as $subDataKey => $subDataValue ) {
+						if ( $this->isImageUrl( $subDataValue ) ) {
+							$subData = $this->mediaHandleSideload( $subDataValue );
+
+							if ( ! is_wp_error( $subData ) ) {
+								$dataObject->$subDataKey = $subData->url;
+							}
+						} else {
+							$dataObject->$subDataKey = $subDataValue;
+						}
+					}
+
+					$dataArray[ $dataKey ] = $dataObject;
+				}
+
+				$mods[ $key ] = wp_json_encode( $dataArray );
+			}
 		}
 
 		return $mods;
