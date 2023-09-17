@@ -14,6 +14,7 @@ namespace SigmaDevs\EasyDemoImporter\Common\Functions;
 
 use WP_Post;
 use WP_Error;
+use WP_Query;
 
 // Do not allow directly accessing this file.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -74,8 +75,8 @@ class Helpers {
 		if ( ! current_user_can( 'import' ) ) {
 			wp_die(
 				sprintf(
-				/* translators: %1$s - opening div and paragraph HTML tags, %2$s - closing div and paragraph HTML tags. */
-					__( '%1$sYour user role isn\'t high enough. You don\'t have permission to import demo data.%2$s', 'easy-demo-importer' ),
+					/* translators: %1$s - opening div and paragraph HTML tags, %2$s - closing div and paragraph HTML tags. */
+					esc_html__( '%1$sYour user role isn\'t high enough. You don\'t have permission to import demo data.%2$s', 'easy-demo-importer' ),
 					'<div class="notice notice-error"><p>',
 					'</p></div>'
 				)
@@ -165,23 +166,6 @@ class Helpers {
 				'class' => [],
 			],
 		];
-	}
-
-	/**
-	 * Prints HTMl.
-	 *
-	 * @param string $html    HTML.
-	 * @param bool   $allHtml All HTML.
-	 *
-	 * @return void
-	 * @since  1.0.0
-	 */
-	public static function printHtml( $html, $allHtml = false ) {
-		if ( $allHtml ) {
-			echo stripslashes_deep( $html ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		} else {
-			echo wp_kses_post( stripslashes_deep( $html ) );
-		}
 	}
 
 	/**
@@ -322,7 +306,7 @@ class Helpers {
 	 * @since  1.0.0
 	 */
 	public static function getPageByTitle( $title, $post_type = 'page' ) {
-		$query = new \WP_Query(
+		$query = new WP_Query(
 			[
 				'post_type'              => esc_html( $post_type ),
 				'title'                  => esc_html( $title ),

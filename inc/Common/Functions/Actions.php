@@ -655,6 +655,15 @@ class Actions {
 		}
 	}
 
+	/**
+	 * Perform Search and Replace on Element Data.
+	 *
+	 * @param array $element The element data to be modified by reference.
+	 * @param array $data The data array containing category keys and their corresponding replacement values.
+	 *
+	 * @return void
+	 * @since 1.0.0
+	 */
 	public static function performSearchReplace( &$element, $data ) {
 		// Check if the element's widgetType exists in the data array.
 		if ( isset( $element['widgetType'] ) && isset( $data[ $element['widgetType'] ] ) ) {

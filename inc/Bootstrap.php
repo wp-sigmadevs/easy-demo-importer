@@ -14,9 +14,11 @@ declare( strict_types=1 );
 namespace SigmaDevs\EasyDemoImporter;
 
 use Composer\Autoload\ClassLoader;
-use SigmaDevs\EasyDemoImporter\Common\{Abstracts\Base, Functions\Actions, Models\DBSearchReplace, Traits\Requester};
-use SigmaDevs\EasyDemoImporter\Config\
-{
+use SigmaDevs\EasyDemoImporter\Common\{
+	Abstracts\Base,
+	Traits\Requester
+};
+use SigmaDevs\EasyDemoImporter\Config\{
 	I18n,
 	Classes,
 	Requirements
@@ -166,8 +168,7 @@ final class Bootstrap extends Base {
 	 * using the Composer autoload.
 	 *
 	 * This method checks for optimized class autoload to reduce
-	 * server load time. If the newly added class is not found,
-	 * run 'composer dump-autoload -o' command.
+	 * server load time.
 	 *
 	 * @param string $service Class name to find.
 	 *

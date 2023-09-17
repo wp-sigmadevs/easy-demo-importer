@@ -79,7 +79,7 @@ final class Plugin {
 				'domain-path'  => 'Domain Path',
 				'namespace'    => 'Namespace',
 				'required_php' => 'Requires PHP',
-				'required_wp'  => 'Requires WP',
+				'required_wp'  => 'Requires at least',
 			],
 			'plugin'
 		);

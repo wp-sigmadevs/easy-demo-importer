@@ -354,7 +354,7 @@ class DBSearchReplace {
 			if ( $serialised ) {
 				return serialize( $data );
 			}
-		} catch ( Exception $error ) {
+		} catch ( \Exception $error ) {
 
 		}
 

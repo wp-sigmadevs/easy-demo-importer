@@ -102,12 +102,12 @@ class ImportFluentForms extends ImporterAjax {
 
 			if ( $forms && is_array( $forms ) ) {
 				foreach ( $forms as $formItem ) {
-					$formFields = json_encode( [] );
+					$formFields = wp_json_encode( [] );
 
 					if ( $fields = Arr::get( $formItem, 'form', '' ) ) {
-						$formFields = json_encode( $fields );
+						$formFields = wp_json_encode( $fields );
 					} elseif ( $fields = Arr::get( $formItem, 'form_fields', '' ) ) {
-						$formFields = json_encode( $fields );
+						$formFields = wp_json_encode( $fields );
 					}
 
 					$form = [
@@ -153,7 +153,7 @@ class ImportFluentForms extends ImporterAjax {
 
 						foreach ( $oldKeys as $key ) {
 							if ( isset( $formItem[ $key ] ) ) {
-								FormMeta::persist( $formId, $key, json_encode( Arr::get( $formItem, $key ) ) );
+								FormMeta::persist( $formId, $key, wp_json_encode( Arr::get( $formItem, $key ) ) );
 							}
 						}
 					}
