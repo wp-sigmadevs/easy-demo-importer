@@ -9,21 +9,93 @@
 /**
  * WXR Parser that uses regular expressions. Fallback for installs without an XML parser.
  */
-class RT_EDI_Parser_Regex {
-	public $authors       = [];
-	public $posts         = [];
-	public $categories    = [];
-	public $tags          = [];
-	public $terms         = [];
-	public $base_url      = '';
+class SD_EDI_WXR_Parser_Regex {
+	/**
+	 * Authors
+	 *
+	 * @var array
+	 * @since 1.0.0
+	 */
+	public $authors = [];
+
+	/**
+	 * Posts
+	 *
+	 * @var array
+	 * @since 1.0.0
+	 */
+	public $posts = [];
+
+	/**
+	 * Categories
+	 *
+	 * @var array
+	 * @since 1.0.0
+	 */
+	public $categories = [];
+
+	/**
+	 * Tags
+	 *
+	 * @var array
+	 * @since 1.0.0
+	 */
+	public $tags = [];
+
+	/**
+	 * Terms
+	 *
+	 * @var array
+	 * @since 1.0.0
+	 */
+	public $terms = [];
+
+	/**
+	 * Base URL
+	 *
+	 * @var array
+	 * @since 1.0.0
+	 */
+	public $base_url = '';
+
+	/**
+	 * Base Blog URL
+	 *
+	 * @var array
+	 * @since 1.0.0
+	 */
 	public $base_blog_url = '';
+
+	/**
+	 * Indicates whether GZIP compression is enabled or not.
+	 *
+	 * @var bool|null
+	 */
 	public $has_gzip;
 
-	function __construct() {
+	/**
+	 * Class Constructor.
+	 *
+	 * @return void
+	 * @since 1.0.0
+	 */
+	public function __construct() {
 		$this->has_gzip = is_callable( 'gzopen' );
 	}
 
-	function parse( $file ) {
+	/**
+	 * Parses a WordPress XML-RPC (WXR) file and extracts data.
+	 *
+	 * This method reads a WordPress XML-RPC (WXR) file and extracts data such as authors, posts,
+	 * categories, tags, terms, base URLs, and the WXR version.
+	 *
+	 * @param string $file The path to the WordPress XML-RPC (WXR) file to parse.
+	 *
+	 * @return array|WP_Error An array containing the extracted data or a WP_Error object if parsing fails.
+	 *
+	 * @since 1.0.0
+	 */
+	public function parse( $file ) {
 		$wxr_version  = false;
 		$in_multiline = false;
 
@@ -68,14 +140,14 @@ class RT_EDI_Parser_Regex {
 				}
 
 				foreach ( $multiline_tags as $tag => $handler ) {
-					// Handle multi-line tags on a singular line
+					// Handle multi-line tags on a singular line.
 					$pos         = strpos( $importline, "<$tag>" );
 					$pos_closing = strpos( $importline, "</$tag>" );
 					if ( preg_match( '|<' . $tag . '>(.*?)</' . $tag . '>|is', $importline, $matches ) ) {
 						$this->{$handler[0]}[] = call_user_func( $handler[1], $matches[1] );
 
 					} elseif ( false !== $pos ) {
-						// Take note of any content after the opening tag
+						// Take note of any content after the opening tag.
 						$multiline_content = trim( substr( $importline, $pos + strlen( $tag ) + 2 ) );
 
 						// We don't want to have this line added to `$is_multiline` below.
@@ -99,7 +171,7 @@ class RT_EDI_Parser_Regex {
 		}
 
 		if ( ! $wxr_version ) {
-			return new WP_Error( 'WXR_parse_error', __( 'This does not appear to be a WXR file, missing/invalid WXR version number', 'easy-demo-importer' ) );
+			return new WP_Error( 'WXR_parse_error', esc_html__( 'This does not appear to be a WXR file, missing/invalid WXR version number', 'easy-demo-importer' ) );
 		}
 
 		return [
@@ -114,13 +186,28 @@ class RT_EDI_Parser_Regex {
 		];
 	}
 
-	function get_tag( $string, $tag ) {
+	/**
+	 * Extracts and returns the content of a specified XML tag from a given string.
+	 *
+	 * This method searches for the opening and closing XML tag specified by the $tag parameter within
+	 * the provided $string and returns the content enclosed by those tags. If the content is wrapped
+	 * in CDATA sections, they are properly processed and the content is extracted.
+	 *
+	 * @param string $string The input string containing XML content.
+	 * @param string $tag    The XML tag to search for and extract.
+	 *
+	 * @return string The content of the specified XML tag, or an empty string if the tag is not found.
+	 *
+	 * @since 1.0.0
+	 */
+	public function get_tag( $string, $tag ) {
 		preg_match( "|<$tag.*?>(.*?)</$tag>|is", $string, $return );
 		if ( isset( $return[1] ) ) {
 			if ( substr( $return[1], 0, 9 ) == '<![CDATA[' ) {
 				if ( strpos( $return[1], ']]]]><![CDATA[>' ) !== false ) {
 					preg_match_all( '|<!\[CDATA\[(.*?)\]\]>|s', $return[1], $matches );
 					$return = '';
+
 					foreach ( $matches[1] as $match ) {
 						$return .= $match;
 					}
@@ -137,7 +224,21 @@ class RT_EDI_Parser_Regex {
 		return $return;
 	}
 
-	function process_category( $c ) {
+	/**
+	 * Process and extract category information from a given XML element.
+	 *
+	 * This function takes an XML element representing a category and extracts relevant information,
+	 * such as term ID, category name, category nicename, parent category, and category description.
+	 * Additionally, it processes any term metadata associated with the category and includes it in the result
+	 * if available.
+	 *
+	 * @param string $c The XML element containing category data.
+	 *
+	 * @return array An array containing the extracted category information.
+	 *
+	 * @since 1.0.0
+	 */
+	public function process_category( $c ) {
 		$term = [
 			'term_id'              => $this->get_tag( $c, 'wp:term_id' ),
 			'cat_name'             => $this->get_tag( $c, 'wp:cat_name' ),
@@ -147,6 +248,7 @@ class RT_EDI_Parser_Regex {
 		];
 
 		$term_meta = $this->process_meta( $c, 'wp:termmeta' );
+
 		if ( ! empty( $term_meta ) ) {
 			$term['termmeta'] = $term_meta;
 		}
@@ -154,7 +256,20 @@ class RT_EDI_Parser_Regex {
 		return $term;
 	}
 
-	function process_tag( $t ) {
+	/**
+	 * Process and extract tag information from a given XML element.
+	 *
+	 * This function takes an XML element representing a tag and extracts relevant information,
+	 * such as term ID, tag name, tag slug, and tag description. It also processes any term metadata
+	 * associated with the tag and includes it in the result if available.
+	 *
+	 * @param string $t The XML element containing tag data.
+	 *
+	 * @return array An array containing the extracted tag information.
+	 *
+	 * @since 1.0.0
+	 */
+	public function process_tag( $t ) {
 		$term = [
 			'term_id'         => $this->get_tag( $t, 'wp:term_id' ),
 			'tag_name'        => $this->get_tag( $t, 'wp:tag_name' ),
@@ -163,6 +278,7 @@ class RT_EDI_Parser_Regex {
 		];
 
 		$term_meta = $this->process_meta( $t, 'wp:termmeta' );
+
 		if ( ! empty( $term_meta ) ) {
 			$term['termmeta'] = $term_meta;
 		}
@@ -170,7 +286,21 @@ class RT_EDI_Parser_Regex {
 		return $term;
 	}
 
-	function process_term( $t ) {
+	/**
+	 * Process and extract term information from a given XML element.
+	 *
+	 * This function takes an XML element representing a term and extracts relevant information,
+	 * such as term ID, term taxonomy, slug, term parent, term name, and term description.
+	 * Additionally, it processes any term metadata associated with the term and includes it in the result
+	 * if available.
+	 *
+	 * @param string $t The XML element containing term data.
+	 *
+	 * @return array An array containing the extracted term information.
+	 *
+	 * @since 1.0.0
+	 */
+	public function process_term( $t ) {
 		$term = [
 			'term_id'          => $this->get_tag( $t, 'wp:term_id' ),
 			'term_taxonomy'    => $this->get_tag( $t, 'wp:term_taxonomy' ),
@@ -181,6 +311,7 @@ class RT_EDI_Parser_Regex {
 		];
 
 		$term_meta = $this->process_meta( $t, 'wp:termmeta' );
+
 		if ( ! empty( $term_meta ) ) {
 			$term['termmeta'] = $term_meta;
 		}
@@ -188,7 +319,20 @@ class RT_EDI_Parser_Regex {
 		return $term;
 	}
 
-	function process_meta( $string, $tag ) {
+	/**
+	 * Process and extract metadata from a given XML element.
+	 *
+	 * This function takes an XML element representing metadata and extracts key-value pairs
+	 * of metadata. It expects the metadata to be enclosed within the specified XML tag.
+	 *
+	 * @param string $string The XML element containing metadata.
+	 * @param string $tag    The XML tag that encloses the metadata.
+	 *
+	 * @return array An array containing the extracted metadata in the form of key-value pairs.
+	 *
+	 * @since 1.0.0
+	 */
+	public function process_meta( $string, $tag ) {
 		$parsed_meta = [];
 
 		preg_match_all( "|<$tag>(.+?)</$tag>|is", $string, $meta );
@@ -207,7 +351,19 @@ class RT_EDI_Parser_Regex {
 		return $parsed_meta;
 	}
 
-	function process_author( $a ) {
+	/**
+	 * Process and extract author information from a given XML element.
+	 *
+	 * This function takes an XML element representing an author and extracts relevant information,
+	 * such as author ID, author login, author email, author display name, first name, and last name.
+	 *
+	 * @param string $a The XML element containing author data.
+	 *
+	 * @return array An array containing the extracted author information.
+	 *
+	 * @since 1.0.0
+	 */
+	public function process_author( $a ) {
 		return [
 			'author_id'           => $this->get_tag( $a, 'wp:author_id' ),
 			'author_login'        => $this->get_tag( $a, 'wp:author_login' ),
@@ -218,7 +374,21 @@ class RT_EDI_Parser_Regex {
 		];
 	}
 
-	function process_post( $post ) {
+	/**
+	 * Process and extract post information from a given XML element.
+	 *
+	 * This function takes an XML element representing a post and extracts relevant information,
+	 * such as post ID, post title, post dates, comment status, ping status, post status, post name,
+	 * post parent, menu order, post type, post password, sticky status, GUID, post author, post excerpt,
+	 * post content, attachment URL, terms, comments, and post metadata.
+	 *
+	 * @param string $post The XML element containing post data.
+	 *
+	 * @return array An array containing the extracted post information.
+	 *
+	 * @since 1.0.0
+	 */
+	public function process_post( $post ) {
 		$post_id        = $this->get_tag( $post, 'wp:post_id' );
 		$post_title     = $this->get_tag( $post, 'title' );
 		$post_date      = $this->get_tag( $post, 'wp:post_date' );
@@ -266,11 +436,13 @@ class RT_EDI_Parser_Regex {
 		);
 
 		$attachment_url = $this->get_tag( $post, 'wp:attachment_url' );
+
 		if ( $attachment_url ) {
 			$postdata['attachment_url'] = $attachment_url;
 		}
 
 		preg_match_all( '|<category domain="([^"]+?)" nicename="([^"]+?)">(.+?)</category>|is', $post, $terms, PREG_SET_ORDER );
+
 		foreach ( $terms as $t ) {
 			$post_terms[] = [
 				'slug'   => $t[2],
@@ -278,12 +450,14 @@ class RT_EDI_Parser_Regex {
 				'name'   => str_replace( [ '<![CDATA[', ']]>' ], '', $t[3] ),
 			];
 		}
+
 		if ( ! empty( $post_terms ) ) {
 			$postdata['terms'] = $post_terms;
 		}
 
 		preg_match_all( '|<wp:comment>(.+?)</wp:comment>|is', $post, $comments );
 		$comments = $comments[1];
+
 		if ( $comments ) {
 			foreach ( $comments as $comment ) {
 				$post_comments[] = [
@@ -303,11 +477,13 @@ class RT_EDI_Parser_Regex {
 				];
 			}
 		}
+
 		if ( ! empty( $post_comments ) ) {
 			$postdata['comments'] = $post_comments;
 		}
 
 		$post_meta = $this->process_meta( $post, 'wp:postmeta' );
+
 		if ( ! empty( $post_meta ) ) {
 			$postdata['postmeta'] = $post_meta;
 		}
@@ -315,11 +491,35 @@ class RT_EDI_Parser_Regex {
 		return $postdata;
 	}
 
-	function _normalize_tag( $matches ) {
+	/**
+	 * Normalize and convert the tag to lowercase in a callback.
+	 *
+	 * This function is used as a callback to normalize and convert an XML tag to lowercase.
+	 *
+	 * @param array $matches An array of matches from a regular expression.
+	 *
+	 * @return string The normalized XML tag in lowercase.
+	 *
+	 * @since 1.0.0
+	 */
+	public function _normalize_tag( $matches ) {
 		return '<' . strtolower( $matches[1] );
 	}
 
-	function fopen( $filename, $mode = 'r' ) {
+	/**
+	 * Opens a file for reading or writing, considering GZIP compression if enabled.
+	 *
+	 * This method opens a file for reading or writing, taking into account the GZIP compression status
+	 * of the instance. If GZIP compression is enabled, it uses `gzopen`, otherwise, it uses `fopen`.
+	 *
+	 * @param string $filename The name of the file to open.
+	 * @param string $mode     The mode in which to open the file (e.g., 'r' for reading, 'w' for writing).
+	 *
+	 * @return resource|false A file pointer resource if successful, or false on failure.
+	 *
+	 * @since 1.0.0
+	 */
+	public function fopen( $filename, $mode = 'r' ) {
 		if ( $this->has_gzip ) {
 			return gzopen( $filename, $mode );
 		}
@@ -327,7 +527,20 @@ class RT_EDI_Parser_Regex {
 		return fopen( $filename, $mode );
 	}
 
-	function feof( $fp ) {
+	/**
+	 * Tests for end-of-file on a file pointer, considering GZIP compression if enabled.
+	 *
+	 * This method checks if the end of the file has been reached on a given file pointer resource,
+	 * taking into account the GZIP compression status of the instance. If GZIP compression is enabled,
+	 * it uses `gzeof`, otherwise, it uses `feof`.
+	 *
+	 * @param resource $fp A file pointer resource to test for end-of-file.
+	 *
+	 * @return bool Returns true if the end of the file has been reached, or false otherwise.
+	 *
+	 * @since 1.0.0
+	 */
+	public function feof( $fp ) {
 		if ( $this->has_gzip ) {
 			return gzeof( $fp );
 		}
@@ -335,7 +548,20 @@ class RT_EDI_Parser_Regex {
 		return feof( $fp );
 	}
 
-	function fgets( $fp, $len = 8192 ) {
+	/**
+	 * Reads a line from a file pointer, considering GZIP compression if enabled.
+	 *
+	 * This method reads a line from a given file pointer resource, taking into account the GZIP compression
+	 * status of the instance. If GZIP compression is enabled, it uses `gzgets`, otherwise, it uses `fgets`.
+	 *
+	 * @param resource $fp  A file pointer resource to read from.
+	 * @param int      $len The maximum length of the line to read.
+	 *
+	 * @return string|false Returns a string containing the line read from the file, or false on failure or EOF.
+	 *
+	 * @since 1.0.0
+	 */
+	public function fgets( $fp, $len = 8192 ) {
 		if ( $this->has_gzip ) {
 			return gzgets( $fp, $len );
 		}
@@ -343,7 +569,19 @@ class RT_EDI_Parser_Regex {
 		return fgets( $fp, $len );
 	}
 
-	function fclose( $fp ) {
+	/**
+	 * Closes a file pointer, considering GZIP compression if enabled.
+	 *
+	 * This method closes a given file pointer resource, taking into account the GZIP compression
+	 * status of the instance. If GZIP compression is enabled, it uses `gzclose`, otherwise, it uses `fclose`.
+	 *
+	 * @param resource $fp A file pointer resource to close.
+	 *
+	 * @return bool Returns true on success or false on failure.
+	 *
+	 * @since 1.0.0
+	 */
+	public function fclose( $fp ) {
 		if ( $this->has_gzip ) {
 			return gzclose( $fp );
 		}

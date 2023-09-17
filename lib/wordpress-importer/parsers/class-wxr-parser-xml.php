@@ -10,7 +10,13 @@
  * WXR Parser that makes use of the XML Parser PHP extension.
  */
 class SD_EDI_WXR_Parser_XML {
-	public $wp_tags     = [
+	/**
+	 * An array containing WordPress main tags for parsing.
+	 *
+	 * @var string[]
+	 * @since 1.0.0
+	 */
+	public $wp_tags = [
 		'wp:post_id',
 		'wp:post_date',
 		'wp:post_date_gmt',
@@ -43,6 +49,13 @@ class SD_EDI_WXR_Parser_XML {
 		'wp:author_first_name',
 		'wp:author_last_name',
 	];
+
+	/**
+	 * An array containing WordPress sub-tags for parsing.
+	 *
+	 * @var string[]
+	 * @since 1.0.0
+	 */
 	public $wp_sub_tags = [
 		'wp:comment_id',
 		'wp:comment_author',
@@ -58,22 +71,127 @@ class SD_EDI_WXR_Parser_XML {
 		'wp:comment_user_id',
 	];
 
+	/**
+	 * The version of the WordPress WXR file being parsed.
+	 *
+	 * @var string|null
+	 * @since 1.0.0
+	 */
 	public $wxr_version;
+
+	/**
+	 * Flag indicating whether the parser is inside a post element.
+	 *
+	 * @var bool
+	 * @since 1.0.0
+	 */
 	public $in_post;
+
+	/**
+	 * The CDATA content being parsed.
+	 *
+	 * @var string
+	 * @since 1.0.0
+	 */
 	public $cdata;
+
+	/**
+	 * The primary data being parsed.
+	 *
+	 * @var string
+	 * @since 1.0.0
+	 */
 	public $data;
+
+	/**
+	 * The sub-data being parsed.
+	 *
+	 * @var string
+	 * @since 1.0.0
+	 */
 	public $sub_data;
+
+	/**
+	 * Flag indicating whether the parser is inside a tag element.
+	 *
+	 * @var bool
+	 * @since 1.0.0
+	 */
 	public $in_tag;
+
+	/**
+	 * Flag indicating whether the parser is inside a sub-tag element.
+	 *
+	 * @var bool
+	 * @since 1.0.0
+	 */
 	public $in_sub_tag;
+
+	/**
+	 * An array containing parsed author data.
+	 *
+	 * @var array
+	 * @since 1.0.0
+	 */
 	public $authors;
+
+	/**
+	 * An array containing parsed post data.
+	 *
+	 * @var array
+	 * @since 1.0.0
+	 */
 	public $posts;
+
+	/**
+	 * An array containing parsed term data.
+	 *
+	 * @var array
+	 * @since 1.0.0
+	 */
 	public $term;
+
+	/**
+	 * An array containing parsed category data.
+	 *
+	 * @var array
+	 * @since 1.0.0
+	 */
 	public $category;
+
+	/**
+	 * An array containing parsed tag data.
+	 *
+	 * @var array
+	 * @since 1.0.0
+	 */
 	public $tag;
+
+	/**
+	 * The base URL for the WordPress site.
+	 *
+	 * @var string
+	 * @since 1.0.0
+	 */
 	public $base_url;
+
+	/**
+	 * The base URL for the WordPress blog.
+	 *
+	 * @var string
+	 * @since 1.0.0
+	 */
 	public $base_blog_url;
 
-	function parse( $file ) {
+	/**
+	 * Parses a WordPress WXR (WordPress eXtended RSS) file.
+	 *
+	 * @param string $file The path to the WXR file to parse.
+	 *
+	 * @return array|WP_Error An array containing parsed data if successful, or a WP_Error object on failure.
+	 * @since 1.0.0
+	 */
+	public function parse( $file ) {
 		$this->wxr_version = false;
 		$this->in_post     = false;
 		$this->cdata       = false;
@@ -113,7 +231,7 @@ class SD_EDI_WXR_Parser_XML {
 		xml_parser_free( $xml );
 
 		if ( ! preg_match( '/^\d+\.\d+$/', $this->wxr_version ) ) {
-			return new WP_Error( 'WXR_parse_error', __( 'This does not appear to be a WXR file, missing/invalid WXR version number', 'easy-demo-importer' ) );
+			return new WP_Error( 'WXR_parse_error', esc_html__( 'This does not appear to be a WXR file, missing/invalid WXR version number', 'easy-demo-importer' ) );
 		}
 
 		return [
@@ -128,7 +246,21 @@ class SD_EDI_WXR_Parser_XML {
 		];
 	}
 
-	function tag_open( $parse, $tag, $attr ) {
+	/**
+	 * Handles the opening of XML tags during parsing.
+	 *
+	 * This function is called when an opening XML tag is encountered during parsing.
+	 * It checks if the current tag is one of the WordPress tags or sub-tags defined in the $wp_tags and $wp_sub_tags arrays.
+	 * If the tag matches, it sets the corresponding property ($in_tag or $in_sub_tag) to indicate that data parsing for that tag has started.
+	 *
+	 * @param resource $parse The XML parser resource.
+	 * @param string   $tag   The name of the opening XML tag.
+	 * @param array    $attr  An array of attributes for the tag.
+	 *
+	 * @return void
+	 * @since 1.0.0
+	 */
+	public function tag_open( $parse, $tag, $attr ) {
 		if ( in_array( $tag, $this->wp_tags, true ) ) {
 			$this->in_tag = substr( $tag, 3 );
 
@@ -185,7 +317,20 @@ class SD_EDI_WXR_Parser_XML {
 		}
 	}
 
-	function cdata( $parser, $cdata ) {
+	/**
+	 * Handles character data (CDATA) within XML elements during parsing.
+	 *
+	 * This function is called when character data (text) within an XML element is encountered.
+	 * It appends the character data to the $cdata property, which is used to accumulate text data until the corresponding closing tag is encountered.
+	 * It skips leading and trailing whitespace when appending data.
+	 *
+	 * @param resource $parser The XML parser resource.
+	 * @param string   $cdata  The character data (text) within the XML element.
+	 *
+	 * @return void
+	 * @since 1.0.0
+	 */
+	public function cdata( $parser, $cdata ) {
 		if ( ! trim( $cdata ) ) {
 			return;
 		}
@@ -197,10 +342,23 @@ class SD_EDI_WXR_Parser_XML {
 		}
 	}
 
-	function tag_close( $parser, $tag ) {
+	/**
+	 * Handles the closing of XML tags during parsing.
+	 *
+	 * This function is called when a closing XML tag is encountered.
+	 * It performs specific actions based on the closing tag, such as processing comment data, post data, term data, and more.
+	 * It accumulates data into the corresponding arrays and clears relevant properties after processing.
+	 *
+	 * @param resource $parser The XML parser resource.
+	 * @param string   $tag    The name of the closing XML tag.
+	 *
+	 * @return void
+	 * @since 1.0.0
+	 */
+	public function tag_close( $parser, $tag ) {
 		switch ( $tag ) {
 			case 'wp:comment':
-				unset( $this->sub_data['key'], $this->sub_data['value'] ); // remove meta sub_data
+				unset( $this->sub_data['key'], $this->sub_data['value'] ); // remove meta sub_data.
 				if ( ! empty( $this->sub_data ) ) {
 					$this->data['comments'][] = $this->sub_data;
 				}

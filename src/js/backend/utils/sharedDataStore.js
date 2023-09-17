@@ -4,7 +4,7 @@ import { Api } from './Api';
 /**
  * Shared data store for managing shared state and actions.
  *
- * @typedef  {Object}    SharedDataStore
+ * @typedef  {Object}   SharedDataStore
  * @property {Object}   importList        - The import list data.
  * @property {Object}   pluginList        - The plugin list data.
  * @property {boolean}  loading           - The loading state.
@@ -34,6 +34,7 @@ import { Api } from './Api';
 const useSharedDataStore = create((set) => ({
 	importList: {},
 	pluginList: {},
+	serverData: {},
 	loading: true,
 	currentStep: 1,
 	modalVisible: false,
@@ -53,6 +54,14 @@ const useSharedDataStore = create((set) => ({
 		try {
 			const response = await Api.get(endpoint, {});
 			set({ pluginList: response.data, loading: false });
+		} catch (error) {
+			console.error(error);
+		}
+	},
+	fetchServerData: async (endpoint) => {
+		try {
+			const response = await Api.get(endpoint, {});
+			set({ serverData: response.data, loading: false });
 		} catch (error) {
 			console.error(error);
 		}

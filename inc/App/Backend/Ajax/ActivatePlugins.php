@@ -94,8 +94,8 @@ class ActivatePlugins extends ImporterAjax {
 		// Response.
 		$this->prepareResponse(
 			'sd_edi_download_demo_files',
-			esc_html__( 'Demo files download in progress.', 'easy-demo-importer' ),
-			$this->activeCount > 0 ? esc_html__( 'All the required plugins activated.', 'easy-demo-importer' ) : esc_html__( 'All the required plugins already activated.', 'easy-demo-importer' )
+			esc_html__( 'Downloading demo files from server.', 'easy-demo-importer' ),
+			$this->activeCount > 0 ? esc_html__( 'Required plugins activation done.', 'easy-demo-importer' ) : esc_html__( 'Required plugins are already activated.', 'easy-demo-importer' )
 		);
 	}
 
@@ -113,7 +113,7 @@ class ActivatePlugins extends ImporterAjax {
 
 			if ( 'inactive' === $pluginStatus ) {
 				$this->activatePlugin( $filePath );
-				$this->activeCount ++;
+				++$this->activeCount;
 			}
 		}
 	}
@@ -129,6 +129,8 @@ class ActivatePlugins extends ImporterAjax {
 	public function activatePlugin( $path ) {
 		if ( $path ) {
 			$activate = activate_plugin( $path, '', false, true );
+
+			do_action( 'sd/edi/after_plugin_activation', $path );
 		}
 	}
 }

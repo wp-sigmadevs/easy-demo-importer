@@ -40,7 +40,7 @@ class Widgets {
 		// If no data or could not decode.
 		if ( empty( $data ) || ! is_object( $data ) ) {
 			wp_die(
-				_e( 'Widget data is not available', 'easy-demo-importer' ),
+				esc_html__( 'Widget data is not available', 'easy-demo-importer' ),
 				'',
 				[ 'back_link' => true ]
 			);
@@ -81,7 +81,7 @@ class Widgets {
 				$sidebarAvailable   = false;
 				$useSidebarId       = 'wp_inactive_widgets'; // Add to inactive if sidebar does not exist in theme.
 				$sidebarMessageType = 'error';
-				$sidebarMessage     = __( 'Sidebar does not exist in theme (moving widget to Inactive)', 'easy-demo-importer' );
+				$sidebarMessage     = esc_html__( 'Sidebar does not exist in theme (moving widget to Inactive)', 'easy-demo-importer' );
 			}
 
 			// Result for sidebar.
@@ -107,7 +107,7 @@ class Widgets {
 				if ( ! $fail && ! isset( $availableWidgets[ $idBase ] ) ) {
 					$fail              = true;
 					$widgetMessageType = 'error';
-					$widgetMessage     = __( 'Site does not support widget', 'easy-demo-importer' ); // Explain why widget not imported.
+					$widgetMessage     = esc_html__( 'Site does not support widget', 'easy-demo-importer' ); // Explain why widget not imported.
 				}
 
 				// Filter to modify settings object before conversion to array and import
@@ -140,7 +140,7 @@ class Widgets {
 						if ( in_array( "$idBase-$checkId", $sidebarWidgets ) && (array) $widget == $check_widget ) {
 							$fail              = true;
 							$widgetMessageType = 'warning';
-							$widgetMessage     = __( 'Widget already exists', 'easy-demo-importer' ); // Explain why widget not imported.
+							$widgetMessage     = esc_html__( 'Widget already exists', 'easy-demo-importer' );
 
 							break;
 						}
@@ -212,8 +212,8 @@ class Widgets {
 				}
 
 				// Result for widget instance.
-				$results[ $sidebarId ]['widgets'][ $widgetInstanceId ]['name']         = ! empty( $availableWidgets[ $idBase ]['name'] ) ? $availableWidgets[ $idBase ]['name'] : $idBase; // Widget name or ID if name not available (not supported by site).
-				$results[ $sidebarId ]['widgets'][ $widgetInstanceId ]['title']        = ! empty( $widget['title'] ) ? $widget['title'] : __( 'No Title', 'easy-demo-importer' ); // Show "No Title" if widget instance is untitled.
+				$results[ $sidebarId ]['widgets'][ $widgetInstanceId ]['name']         = ! empty( $availableWidgets[ $idBase ]['name'] ) ? $availableWidgets[ $idBase ]['name'] : $idBase;
+				$results[ $sidebarId ]['widgets'][ $widgetInstanceId ]['title']        = ! empty( $widget['title'] ) ? $widget['title'] : esc_html__( 'No Title', 'easy-demo-importer' );
 				$results[ $sidebarId ]['widgets'][ $widgetInstanceId ]['message_type'] = $widgetMessageType;
 				$results[ $sidebarId ]['widgets'][ $widgetInstanceId ]['message']      = $widgetMessage;
 			}

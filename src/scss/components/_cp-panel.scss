@@ -1,0 +1,61 @@
+/**
+ * Component: Panel.
+ */
+
+.appearance_page_sd-edi-demo-importer-status {
+	.ant-collapse {
+		border: 0;
+		background: #fff;
+		box-shadow: 1px 1px 2px 2px rgba(0, 0, 0, 0.05);
+
+		.ant-collapse-item {
+			border: 0;
+
+			.ant-collapse-header {
+				min-height: 55px;
+				align-items: center;
+				font-size: 16px;
+				padding-left: 65px;
+				color: #666;
+				font-weight: 500;
+
+				.ant-collapse-header-text {
+					> div {
+						@extend .edi-d-flex;
+						@extend .edi-align-items-center;
+					}
+
+					.error-count {
+						background: #ff4d4f;
+						color: #fff;
+						display: inline-flex;
+						font-size: 13px;
+						font-weight: 500;
+						margin-left: 10px;
+						width: 25px;
+						height: 25px;
+						border-radius: 50%;
+						justify-content: center;
+						align-items: center;
+					}
+				}
+			}
+
+			.ant-collapse-expand-icon {
+				svg {
+					transform: rotate(90deg);
+				}
+			}
+
+			&.ant-collapse-item-active {
+				border-bottom: 1px solid #d9d9d9;
+
+				.ant-collapse-expand-icon {
+					svg {
+						transform: rotate(270deg) !important;
+					}
+				}
+			}
+		}
+	}
+}

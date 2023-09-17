@@ -30,14 +30,16 @@ class Callbacks {
 	 * @since 1.0.0
 	 */
 	public static function renderDemoImportPage() {
-		$themeConfig     = sd_edi()->getDemoConfig();
-		$activeTheme     = sd_edi()->activeTheme();
-		$supportedThemes = sd_edi()->supportedThemes();
+		Helpers::renderView( 'demo-import' );
+	}
 
-		if ( ! in_array( $activeTheme, $supportedThemes, true ) ) {
-			$themeConfig = [];
-		}
-
-		Helpers::renderView( 'demo-import', [ 'themeConfig' => $themeConfig ] );
+	/**
+	 * Callback: Server Section.
+	 *
+	 * @return void
+	 * @since 1.0.0
+	 */
+	public static function renderServerStatusPage() {
+		Helpers::renderView( 'server-status' );
 	}
 }

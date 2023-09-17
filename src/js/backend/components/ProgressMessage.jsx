@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 
 /**
- * Component to display a progress message.
+ * Component for displaying a progress message.
  *
- * @param {string} message - The message to display.
+ * @param {Object} props         - Component properties.
+ * @param {string} props.message - The message to display.
  */
 export const ProgressMessage = ({ message }) => {
 	/**

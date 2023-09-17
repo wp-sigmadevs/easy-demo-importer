@@ -72,6 +72,9 @@ class InstallDemo extends ImporterAjax {
 		// Init import actions.
 		$this->beforeImportActions( $xmlFile, $this->excludeImages );
 
+		// Try to update PHP memory limit before import.
+		ini_set( 'memory_limit', apply_filters( 'sd/edi/import_memory_limit', '350M' ) );
+
 		if ( $fileExists ) {
 			$this->importDemoContent( $xmlFile, $this->excludeImages );
 		}
@@ -79,8 +82,8 @@ class InstallDemo extends ImporterAjax {
 		// Response.
 		$this->prepareResponse(
 			$fileExists ? 'sd_edi_import_customizer' : '',
-			$fileExists ? esc_html__( 'Customizer settings import in progress.', 'easy-demo-importer' ) : '',
-			$fileExists ? esc_html__( 'All content successfully imported', 'easy-demo-importer' ) : '',
+			$fileExists ? esc_html__( 'Importing Customizer settings.', 'easy-demo-importer' ) : '',
+			$fileExists ? esc_html__( 'All contents are imported.', 'easy-demo-importer' ) : '',
 			! $fileExists,
 			! $fileExists ? esc_html__( 'Demo import process failed. No content file found.', 'easy-demo-importer' ) : '',
 		);

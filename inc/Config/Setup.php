@@ -44,12 +44,16 @@ class Setup {
 			return;
 		}
 
+		update_option( 'edi_plugin_deactivate_notice', 'true' );
+
 		// If we made it till here nothing is running yet, lets set the transient now.
 		set_transient( 'sd_edi_installing', 'yes', MINUTE_IN_SECONDS * 10 );
 
 		self::createTable();
 
 		delete_transient( 'sd_edi_installing' );
+
+		self::createDemoDir();
 
 		// Clear the permalinks.
 		flush_rewrite_rules();
@@ -68,10 +72,7 @@ class Setup {
 		}
 
 		// Clear the permalinks.
-		\flush_rewrite_rules();
-
-		// Uncomment the following line to see the function in action
-		// exit( var_dump( $_GET ) );
+		flush_rewrite_rules();
 	}
 
 	/**
@@ -85,9 +86,6 @@ class Setup {
 		if ( ! current_user_can( 'activate_plugins' ) ) {
 			return;
 		}
-
-		// Uncomment the following line to see the function in action
-		// exit( var_dump( $_GET ) );
 	}
 
 	/**
@@ -114,14 +112,14 @@ class Setup {
 	private static function getTableSchema() {
 		global $wpdb;
 
-		$collate = '';
+		$tableName = sanitize_key( $wpdb->prefix . 'sd_edi_taxonomy_import' );
+
+		$collate      = '';
+		$table_schema = [];
 
 		if ( $wpdb->has_cap( 'collation' ) ) {
 			$collate = $wpdb->get_charset_collate();
 		}
-
-		$tableName    = $wpdb->prefix . 'sd_edi_taxonomy_import';
-		$table_schema = [];
 
 		if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $tableName ) ) !== $tableName ) {
 			$table_schema[] = "CREATE TABLE $tableName (
@@ -133,5 +131,20 @@ class Setup {
 		}
 
 		return $table_schema;
+	}
+
+	/**
+	 * Create demo download directory.
+	 *
+	 * @return void
+	 * @since 1.0.0
+	 */
+	public static function createDemoDir() {
+		$uploadsDir = wp_get_upload_dir();
+		$demoDir    = 'easy-demo-importer';
+
+		if ( ! is_dir( $uploadsDir['basedir'] . '/' . $demoDir ) ) {
+			wp_mkdir_p( $uploadsDir['basedir'] . '/' . $demoDir );
+		}
 	}
 }

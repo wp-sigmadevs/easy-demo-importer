@@ -51,6 +51,10 @@
         <exclude name="Squiz.Commenting.FileComment.MissingPackageTag"/>
     </rule>
 
+    <rule ref="WordPress">
+        <exclude name="Universal.Arrays.DisallowShortArraySyntax.Found"/>
+    </rule>
+
     <!-- Allows hook names in dot/slash notation. -->
     <rule ref="WordPress.NamingConventions.ValidHookName">
         <properties>

@@ -1,0 +1,32 @@
+/**
+ * Component: Popover.
+ */
+
+.appearance_page_sd-edi-demo-importer-status {
+	.ant-popover {
+		.ant-popover-arrow {
+			&::before {
+				background: #fff2f0;
+			}
+		}
+
+		.ant-popover-inner {
+			padding: 0;
+
+			.ant-alert {
+				border: none !important;
+			}
+
+			.ant-alert-message {
+				display: none;
+			}
+
+			.ant-alert-description {
+				font-size: 15px;
+				font-weight: 500;
+				color: #555;
+				max-width: 350px;
+			}
+		}
+	}
+}

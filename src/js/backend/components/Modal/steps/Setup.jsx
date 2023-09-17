@@ -127,7 +127,7 @@ const Setup = ({ modalData, handleImport, handleReset }) => {
 						</div>
 					</Col>
 					<Col
-						className="gutter-row"
+						className="gutter-row configure-col"
 						xs={24}
 						sm={24}
 						md={12}
@@ -153,7 +153,7 @@ const Setup = ({ modalData, handleImport, handleReset }) => {
 								</div>
 							</div>
 							<div>
-								<div className="import-option">
+								<div className="import-option last">
 									<div className="choose reset-db edi-d-flex edi-align-items-center">
 										<Switch
 											checked={reset}

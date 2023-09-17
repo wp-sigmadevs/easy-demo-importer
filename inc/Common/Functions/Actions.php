@@ -12,6 +12,8 @@ declare( strict_types=1 );
 
 namespace SigmaDevs\EasyDemoImporter\Common\Functions;
 
+use SigmaDevs\EasyDemoImporter\Common\Models\DBSearchReplace;
+
 // Do not allow directly accessing this file.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit( 'This script cannot be accessed directly.' );
@@ -37,6 +39,36 @@ class Actions {
 		if ( 'true' === get_option( $option ) ) {
 			flush_rewrite_rules();
 			delete_option( $option );
+		}
+	}
+
+	/**
+	 * Activation Script after plugin activation.
+	 *
+	 * @param string $plugin_path The path of the activated plugin's main file.
+	 *
+	 * @return void
+	 * @since 1.0.0
+	 */
+	public static function pluginActivationActions( $plugin_path ) {
+		$plugins = apply_filters(
+			'sd/edi/activated_plugin_actions',
+			[
+				'woocommerce/woocommerce.php' => [
+					'class'  => '\WC_Install',
+					'action' => 'install',
+				],
+				'fluentform/fluentform.php'   => [
+					'class'  => '\FluentForm\Database\DBMigrator',
+					'action' => 'run',
+				],
+			]
+		);
+
+		foreach ( $plugins as $plugin => $actionInfo ) {
+			if ( $plugin === $plugin_path && class_exists( $actionInfo['class'] ) ) {
+				call_user_func( [ $actionInfo['class'], $actionInfo['action'] ] );
+			}
 		}
 	}
 
@@ -72,6 +104,7 @@ class Actions {
 			->assignWooPages()
 			->setElementorActiveKit()
 			->setElementorSettings()
+			->elementorTaxonomyFix( $obj )
 			->updatePermalinks()
 			->rewriteFlag();
 	}
@@ -219,24 +252,27 @@ class Actions {
 			return new static();
 		}
 
+		$tables = apply_filters(
+			'sd/edi/db_search/tables',
+			[
+				$wpdb->prefix . 'commentmeta',
+				$wpdb->prefix . 'comments',
+				$wpdb->prefix . 'fluentform_forms',
+				$wpdb->prefix . 'options',
+				$wpdb->prefix . 'postmeta',
+				$wpdb->prefix . 'posts',
+			]
+		);
+
 		$urls = [
-			'slash'   => [
-				'old' => trailingslashit( 'https://radiustheme.com/demo/wordpress/themes/faktorie/' ),
-				'new' => home_url( '/' ),
-			],
 			'unslash' => [
-				'old' => untrailingslashit( 'https://radiustheme.com/demo/wordpress/themes/faktorie' ),
+				'old' => untrailingslashit( $obj->config['urlToReplace'] ),
 				'new' => home_url(),
 			],
-		];
-
-		// Table names and columns to update.
-		$tables = [
-			$wpdb->prefix . 'posts'       => [ 'post_content' ],
-			$wpdb->prefix . 'postmeta'    => [ 'meta_value' ],
-			$wpdb->prefix . 'options'     => [ 'option_value' ],
-			$wpdb->prefix . 'comments'    => [ 'comment_content' ],
-			$wpdb->prefix . 'commentmeta' => [ 'meta_value' ],
+			'slash'   => [
+				'old' => trailingslashit( $obj->config['urlToReplace'] ),
+				'new' => home_url( '/' ),
+			],
 		];
 
 		foreach ( $urls as $url ) {
@@ -250,7 +286,54 @@ class Actions {
 			self::replaceGUIDs( $oldUrl, $newUrl );
 		}
 
+		// Search and replace URLs in DB.
+		self::searchReplaceUrls( $urls, $tables );
+
 		return new static();
+	}
+
+	/**
+	 * Search and replace URLs in DB.
+	 *
+	 * @param array $urls The URLs' to search & replace.
+	 * @param array $tables The tables to search & replace.
+	 *
+	 * @return void
+	 * @since 1.0.0
+	 */
+	public static function searchReplaceUrls( $urls, $tables ) {
+		$page       = 0;
+		$tableCount = count( $tables );
+
+		// Initialize the model.
+		$dbsr = new DBSearchReplace();
+		$args = [
+			'select_tables'   => array_map( 'trim', $tables ),
+			'completed_pages' => 0,
+			'dry_run'         => 'off',
+			'total_pages'     => $dbsr->get_total_pages( $tables ),
+		];
+
+		foreach ( $urls as $urlType => $url ) {
+			$oldUrl = esc_url_raw( $url['old'] );
+			$newUrl = esc_url_raw( $url['new'] );
+
+			$args['search_for']   = $oldUrl;
+			$args['replace_with'] = $newUrl;
+
+			for ( $i = 0; $i < $tableCount; $i++ ) {
+				$dbsr->srdb( $args['select_tables'][ $i ], $page, $args );
+			}
+
+			if ( 'slash' === $urlType ) {
+				$args['search_for']   = str_replace( '/', '\/', trailingslashit( $oldUrl ) );
+				$args['replace_with'] = str_replace( '/', '\/', $newUrl );
+
+				for ( $i = 0; $i < $tableCount; $i++ ) {
+					$dbsr->srdb( $args['select_tables'][ $i ], $page, $args );
+				}
+			}
+		}
 	}
 
 	/**
@@ -265,7 +348,6 @@ class Actions {
 	public static function searchReplaceElementorUrls( $oldUrl, $newUrl ) {
 		global $wpdb;
 
-		// Sanitize the URLs for use in SQL query.
 		$oldUrl = str_replace( '/', '\/', $oldUrl );
 		$newUrl = str_replace( '/', '\/', $newUrl );
 
@@ -503,6 +585,111 @@ class Actions {
 	}
 
 	/**
+	 * Category IDs' fix in Elementor data.
+	 *
+	 * @param object $obj Reference object.
+	 *
+	 * @return static
+	 * @since 1.0.0
+	 */
+	public static function elementorTaxonomyFix( $obj ) {
+		if ( empty( $obj->config['elementor_data_fix'] ) ) {
+			return new static();
+		}
+
+		global $wpdb;
+
+		// Search for the pages that contain '_elementor_data' in postmeta table.
+		$postmeta_rows = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT post_id, meta_value FROM $wpdb->postmeta WHERE meta_key = %s",
+				'_elementor_data'
+			)
+		);
+
+		// Iterate through each row and update the category ID.
+		foreach ( $postmeta_rows as $row ) {
+			$post_id    = $row->post_id;
+			$meta_value = $row->meta_value;
+
+			// Decode the JSON data.
+			$data = json_decode( $meta_value, true );
+
+			// Search and replace the IDs.
+			self::searchReplaceID( $data, $obj->config['elementor_data_fix'] );
+
+			// Update the meta_value in the database.
+			$wpdb->update(
+				$wpdb->postmeta,
+				[ 'meta_value' => wp_json_encode( $data ) ],
+				[
+					'post_id'  => $post_id,
+					'meta_key' => '_elementor_data',
+				],
+				[ '%s' ],
+				[ '%d', '%s' ]
+			);
+		}
+
+		return new static();
+	}
+
+	/**
+	 * Search and replace taxonomy IDs.
+	 *
+	 * @param array $data Postmeta data.
+	 * @param array $configData Configuration data.
+	 *
+	 * @return void
+	 * @since 1.0.0
+	 */
+	public static function searchReplaceID( &$data, $configData ) {
+		// Iterate through each element in the data.
+		foreach ( $data as &$element ) {
+			if ( is_array( $element ) ) {
+				self::searchReplaceID( $element, $configData );
+			}
+
+			// Perform search and replace within the array element.
+			self::performSearchReplace( $element, $configData );
+		}
+	}
+
+	/**
+	 * Perform Search and Replace on Element Data.
+	 *
+	 * @param array $element The element data to be modified by reference.
+	 * @param array $data The data array containing category keys and their corresponding replacement values.
+	 *
+	 * @return void
+	 * @since 1.0.0
+	 */
+	public static function performSearchReplace( &$element, $data ) {
+		// Check if the element's widgetType exists in the data array.
+		if ( isset( $element['widgetType'] ) && isset( $data[ $element['widgetType'] ] ) ) {
+			$catKey = $data[ $element['widgetType'] ];
+
+			// Check if the catKey exists in the element's settings.
+			if ( isset( $element['settings'][ $catKey ] ) ) {
+				$oldIds = $element['settings'][ $catKey ];
+
+				if ( is_array( $oldIds ) ) {
+					$newIds                         = array_map(
+						function ( $oldID ) {
+							return sd_edi()->getNewID( $oldID );
+						},
+						$oldIds
+					);
+					$element['settings'][ $catKey ] = $newIds;
+				} else {
+					$newId                          = sd_edi()->getNewID( $oldIds );
+					$element['settings'][ $catKey ] = $newId;
+				}
+			}
+		}
+	}
+
+	/**
 	 * Updates the permalink structure to "/%postname%/".
 	 *
 	 * @return static
@@ -510,6 +697,7 @@ class Actions {
 	 */
 	public static function updatePermalinks() {
 		update_option( 'permalink_structure', '/%postname%/' );
+		delete_option( 'edi_plugin_deactivate_notice' );
 		flush_rewrite_rules();
 
 		return new static();

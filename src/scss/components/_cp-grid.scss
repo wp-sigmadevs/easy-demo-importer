@@ -36,3 +36,10 @@
 		}
 	}
 }
+
+.appearance_page_sd-edi-demo-importer-status {
+	.ant-row {
+		display: grid;
+		grid-template-columns: repeat(1, 1fr);
+	}
+}

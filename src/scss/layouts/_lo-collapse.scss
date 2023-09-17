@@ -1,0 +1,110 @@
+/**
+ * Layout: Collapse.
+ */
+.edi-container {
+	&.server-container {
+		.ant-collapse {
+			.ant-collapse-item {
+				.ant-collapse-header {
+					@extend .edi-pos-r;
+
+					&::before {
+						content: "";
+						left: 17px;
+						top: 50%;
+						width: 30px;
+						height: 30px;
+						background-image: url(../images/server-icon.svg);
+						background-repeat: no-repeat;
+						background-size: contain;
+						background-position: center center;
+						transform: translateY(-50%);
+
+						@extend .edi-pos-a;
+					}
+				}
+
+				&:nth-child(2) {
+					.ant-collapse-header {
+						&::before {
+							background-image: url(../images/wordpress-icon.svg);
+						}
+					}
+				}
+
+				&:nth-child(3) {
+					.ant-collapse-header {
+						&::before {
+							background-image: url(../images/theme-icon.svg);
+						}
+					}
+				}
+
+				&:nth-child(4) {
+					.ant-collapse-header {
+						&::before {
+							background-image: url(../images/plugin-icon.svg);
+						}
+					}
+				}
+
+				&:nth-child(5) {
+					.ant-collapse-header {
+						&::before {
+							background-image: url(../images/lock-icon.svg);
+						}
+					}
+				}
+
+				&:nth-child(6) {
+					.ant-collapse-header {
+						&::before {
+							background-image: url(../images/copy-icon.svg);
+						}
+					}
+				}
+
+				.demo-importer-status-report {
+					.report-inner {
+						> p {
+							&:first-child {
+								font-size: 16px;
+								color: #555;
+								padding: 20px;
+								background: var(--edi-color-grey);
+								border-left: 4px solid var(--edi-color-primary);
+								margin-bottom: 30px;
+							}
+						}
+					}
+					textarea {
+						width: 100%;
+						border-radius: 8px;
+						padding: 20px;
+						background: #f6f7f8;
+						border: 1px solid #d9d9d9;
+						color: #555;
+						font-family: monospace;
+						letter-spacing: -0.05em;
+						font-size: 14px;
+					}
+
+					.ant-btn-primary {
+						background-image: linear-gradient(109.6deg, rgb(45, 116, 213) 11.2%, rgb(121, 137, 212) 91.2%);
+						background-size: 200% auto;
+						min-width: 130px;
+						font-weight: 500;
+						height: 40px;
+						font-size: 15px;
+						-webkit-transition: all 0.3s;
+						transition: all 0.3s;
+
+						&:hover {
+							background-position: right center;
+						}
+					}
+				}
+			}
+		}
+	}
+}
