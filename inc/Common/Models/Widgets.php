@@ -40,7 +40,7 @@ class Widgets {
 		// If no data or could not decode.
 		if ( empty( $data ) || ! is_object( $data ) ) {
 			wp_die(
-				_e( 'Widget data is not available', 'easy-demo-importer' ),
+				esc_html__( 'Widget data is not available', 'easy-demo-importer' ),
 				'',
 				[ 'back_link' => true ]
 			);

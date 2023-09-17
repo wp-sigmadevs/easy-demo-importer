@@ -35,7 +35,7 @@ if (process.env.npm_config_package) {
 			"vendor",
 			"views",
 			"index.php",
-			"README.txt",
+			"readme.txt",
 			`${package_slug}.php`,
 		];
 

@@ -8,6 +8,8 @@
  * @since   1.0.0
  */
 
+declare( strict_types=1 );
+
 namespace SigmaDevs\EasyDemoImporter\App\Rest;
 
 use WP_Error;
@@ -707,21 +709,24 @@ class RestEndpoint extends Base {
 	private function convertToBytes( $value ) {
 		$value = trim( $value );
 
-		if ( is_numeric( $value ) ) {
-			$lastChar = strtolower( $value[ strlen( $value ) - 1 ] );
+		// Check if the input is a valid numeric value with a valid suffix.
+		if ( preg_match( '/^(\d+)\s*([KMG]?)$/i', $value, $matches ) ) {
+			$numericValue = (int) $matches[1];
+			$suffix       = strtoupper( $matches[2] );
 
-			switch ( $lastChar ) {
-				case 'm':
-				case 'k':
-				case 'g':
-					$value *= 1024;
-					break;
+			switch ( $suffix ) {
+				case 'K':
+					return $numericValue * 1024;
+				case 'M':
+					return $numericValue * 1024 * 1024;
+				case 'G':
+					return $numericValue * 1024 * 1024 * 1024;
+				default:
+					return $numericValue;
 			}
-
-			return (int) $value;
-		} else {
-			return 0;
 		}
+
+		return 0;
 	}
 
 	/**

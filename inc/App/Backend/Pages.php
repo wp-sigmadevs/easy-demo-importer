@@ -120,7 +120,9 @@ class Pages extends Base {
 	public function removePageNotices() {
 		global $pagenow;
 
-		if ( 'themes.php' === $pagenow && isset( $_GET['page'] ) && ( 'sd-easy-demo-importer' === $_GET['page'] || 'sd-edi-demo-importer-status' === $_GET['page'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : '';
+
+		if ( 'themes.php' === $pagenow && ( 'sd-easy-demo-importer' === $page || 'sd-edi-demo-importer-status' === $page ) ) {
 			add_action( 'admin_init', [ $this, 'removeAllNotices' ] );
 		}
 	}

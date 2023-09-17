@@ -88,7 +88,9 @@ class Errors {
 		require_once ABSPATH . 'wp-admin/includes/plugin.php';
 		deactivate_plugins( plugin_basename( SD_EDI_ROOT_FILE ) );
 
-		unset( $_GET['activate'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( isset( $_GET['activate'] ) ) {
+			unset( $_GET['activate'] );
+		}
 	}
 
 	/**
