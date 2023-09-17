@@ -10,7 +10,20 @@
  * WXR Parser that makes use of the SimpleXML PHP extension.
  */
 class SD_EDI_WXR_Parser_SimpleXML {
-	function parse( $file ) {
+	/**
+	 * Parses a WordPress WXR (WordPress eXtended RSS) file.
+	 *
+	 * This method reads and processes a WordPress WXR file, extracting information about authors,
+	 * posts, categories, tags, and terms. It returns an array containing the parsed data.
+	 *
+	 * @param string $file The path to the WXR file to parse.
+	 *
+	 * @return array|WP_Error An array containing parsed data including authors, posts, categories, tags, and terms,
+	 *                        or a WP_Error object if there was an error during parsing.
+	 *
+	 * @since 1.0.0
+	 */
+	public function parse( $file ) {
 		$authors    = [];
 		$posts      = [];
 		$categories = [];
@@ -21,41 +34,47 @@ class SD_EDI_WXR_Parser_SimpleXML {
 
 		$dom       = new DOMDocument();
 		$old_value = null;
+
 		if ( function_exists( 'libxml_disable_entity_loader' ) && PHP_VERSION_ID < 80000 ) {
 			$old_value = libxml_disable_entity_loader( true );
 		}
+
 		$success = $dom->loadXML( file_get_contents( $file ) );
+
 		if ( ! is_null( $old_value ) ) {
 			libxml_disable_entity_loader( $old_value );
 		}
 
 		if ( ! $success || isset( $dom->doctype ) ) {
-			return new WP_Error( 'SimpleXML_parse_error', __( 'There was an error when reading this WXR file', 'easy-demo-importer' ), libxml_get_errors() );
+			return new WP_Error( 'SimpleXML_parse_error', esc_html__( 'There was an error when reading this WXR file', 'easy-demo-importer' ), libxml_get_errors() );
 		}
 
 		$xml = simplexml_import_dom( $dom );
 		unset( $dom );
 
-		// halt if loading produces an error
+		// halt if loading produces an error.
 		if ( ! $xml ) {
-			return new WP_Error( 'SimpleXML_parse_error', __( 'There was an error when reading this WXR file', 'easy-demo-importer' ), libxml_get_errors() );
+			return new WP_Error( 'SimpleXML_parse_error', esc_html__( 'There was an error when reading this WXR file', 'easy-demo-importer' ), libxml_get_errors() );
 		}
 
 		$wxr_version = $xml->xpath( '/rss/channel/wp:wxr_version' );
+
 		if ( ! $wxr_version ) {
-			return new WP_Error( 'WXR_parse_error', __( 'This does not appear to be a WXR file, missing/invalid WXR version number', 'easy-demo-importer' ) );
+			return new WP_Error( 'WXR_parse_error', esc_html__( 'This does not appear to be a WXR file, missing/invalid WXR version number', 'easy-demo-importer' ) );
 		}
 
 		$wxr_version = (string) trim( $wxr_version[0] );
-		// confirm that we are dealing with the correct file format
+
+		// confirm that we are dealing with the correct file format.
 		if ( ! preg_match( '/^\d+\.\d+$/', $wxr_version ) ) {
-			return new WP_Error( 'WXR_parse_error', __( 'This does not appear to be a WXR file, missing/invalid WXR version number', 'easy-demo-importer' ) );
+			return new WP_Error( 'WXR_parse_error', esc_html__( 'This does not appear to be a WXR file, missing/invalid WXR version number', 'easy-demo-importer' ) );
 		}
 
 		$base_url = $xml->xpath( '/rss/channel/wp:base_site_url' );
 		$base_url = (string) trim( isset( $base_url[0] ) ? $base_url[0] : '' );
 
 		$base_blog_url = $xml->xpath( '/rss/channel/wp:base_blog_url' );
+
 		if ( $base_blog_url ) {
 			$base_blog_url = (string) trim( $base_blog_url[0] );
 		} else {
@@ -63,14 +82,16 @@ class SD_EDI_WXR_Parser_SimpleXML {
 		}
 
 		$namespaces = $xml->getDocNamespaces();
+
 		if ( ! isset( $namespaces['wp'] ) ) {
 			$namespaces['wp'] = 'http://wordpress.org/export/1.1/';
 		}
+
 		if ( ! isset( $namespaces['excerpt'] ) ) {
 			$namespaces['excerpt'] = 'http://wordpress.org/export/1.1/excerpt/';
 		}
 
-		// grab authors
+		// grab authors.
 		foreach ( $xml->xpath( '/rss/channel/wp:author' ) as $author_arr ) {
 			$a                 = $author_arr->children( $namespaces['wp'] );
 			$login             = (string) $a->author_login;
@@ -84,7 +105,7 @@ class SD_EDI_WXR_Parser_SimpleXML {
 			];
 		}
 
-		// grab cats, tags and terms
+		// grab cats, tags and terms.
 		foreach ( $xml->xpath( '/rss/channel/wp:category' ) as $term_arr ) {
 			$t        = $term_arr->children( $namespaces['wp'] );
 			$category = [
@@ -145,7 +166,7 @@ class SD_EDI_WXR_Parser_SimpleXML {
 			$terms[] = $term;
 		}
 
-		// grab posts
+		// grab posts.
 		foreach ( $xml->channel->item as $item ) {
 			$post = [
 				'post_title' => (string) $item->title,

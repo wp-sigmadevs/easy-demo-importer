@@ -12,7 +12,9 @@ declare( strict_types=1 );
 
 namespace SigmaDevs\EasyDemoImporter\App\Backend\Ajax;
 
-use FluentForm\Framework\Helpers\ArrayHelper;
+use FluentForm\App\Models\Form;
+use FluentForm\App\Models\FormMeta;
+use FluentForm\Framework\Support\Arr;
 use SigmaDevs\EasyDemoImporter\Common\Abstracts\ImporterAjax;
 use SigmaDevs\EasyDemoImporter\Common\{
 	Traits\Singleton,
@@ -76,8 +78,8 @@ class ImportFluentForms extends ImporterAjax {
 		// Response.
 		$this->prepareResponse(
 			'sd_edi_import_widgets',
-			esc_html__( 'Widgets import in progress.', 'easy-demo-importer' ),
-			$formsExists ? esc_html__( 'Fluent forms imported.', 'easy-demo-importer' ) : esc_html__( 'Fluent forms not needed.', 'easy-demo-importer' )
+			esc_html__( 'Importing widgets.', 'easy-demo-importer' ),
+			$formsExists ? esc_html__( 'Fluent forms imported.', 'easy-demo-importer' ) : esc_html__( 'No Fluent forms found.', 'easy-demo-importer' )
 		);
 	}
 
@@ -100,37 +102,32 @@ class ImportFluentForms extends ImporterAjax {
 
 			if ( $forms && is_array( $forms ) ) {
 				foreach ( $forms as $formItem ) {
-					// First of all make the form object.
 					$formFields = wp_json_encode( [] );
 
-					if ( $fields = ArrayHelper::get( $formItem, 'form', '' ) ) {
+					if ( $fields = Arr::get( $formItem, 'form', '' ) ) {
 						$formFields = wp_json_encode( $fields );
-					} elseif ( $fields = ArrayHelper::get( $formItem, 'form_fields', '' ) ) {
+					} elseif ( $fields = Arr::get( $formItem, 'form_fields', '' ) ) {
 						$formFields = wp_json_encode( $fields );
-					} else {
 					}
 
 					$form = [
-						'title'       => ArrayHelper::get( $formItem, 'title' ),
-						'id'          => ArrayHelper::get( $formItem, 'id' ),
+						'title'       => Arr::get( $formItem, 'title' ),
 						'form_fields' => $formFields,
-						'status'      => ArrayHelper::get( $formItem, 'status', 'published' ),
-						'has_payment' => ArrayHelper::get( $formItem, 'has_payment', 0 ),
-						'type'        => ArrayHelper::get( $formItem, 'type', 'form' ),
+						'status'      => Arr::get( $formItem, 'status', 'published' ),
+						'has_payment' => Arr::get( $formItem, 'has_payment', 0 ),
+						'type'        => Arr::get( $formItem, 'type', 'form' ),
 						'created_by'  => get_current_user_id(),
 					];
 
-					if ( ArrayHelper::get( $formItem, 'conditions' ) ) {
-						$form['conditions'] = ArrayHelper::get( $formItem, 'conditions' );
+					if ( Arr::get( $formItem, 'conditions' ) ) {
+						$form['conditions'] = Arr::get( $formItem, 'conditions' );
 					}
 
 					if ( isset( $formItem['appearance_settings'] ) ) {
-						$form['appearance_settings'] = $formItem['appearance_settings'];
+						$form['appearance_settings'] = Arr::get( $formItem, 'appearance_settings' );
 					}
 
-					// Insert the form to the DB.
-					$formId = wpFluent()->table( 'fluentform_forms' )->insert( $form );
-
+					$formId                   = Form::insertGetId( $form );
 					$insertedForms[ $formId ] = [
 						'title'    => $form['title'],
 						'edit_url' => admin_url( 'admin.php?page=fluent_forms&route=editor&form_id=' . $formId ),
@@ -140,11 +137,11 @@ class ImportFluentForms extends ImporterAjax {
 						foreach ( $formItem['metas'] as $metaData ) {
 							$settings = [
 								'form_id'  => $formId,
-								'meta_key' => $metaData['meta_key'],
-								'value'    => $metaData['value'],
+								'meta_key' => Arr::get( $metaData, 'meta_key' ),
+								'value'    => Arr::get( $metaData, 'value' ),
 							];
 
-							wpFluent()->table( 'fluentform_form_meta' )->insert( $settings );
+							FormMeta::insert( $settings );
 						}
 					} else {
 						$oldKeys = [
@@ -156,13 +153,7 @@ class ImportFluentForms extends ImporterAjax {
 
 						foreach ( $oldKeys as $key ) {
 							if ( isset( $formItem[ $key ] ) ) {
-								$settings = [
-									'form_id'  => $formId,
-									'meta_key' => $key,
-									'value'    => json_encode( $formItem[ $key ] ),
-								];
-
-								wpFluent()->table( 'fluentform_form_meta' )->insert( $settings );
+								FormMeta::persist( $formId, $key, wp_json_encode( Arr::get( $formItem, $key ) ) );
 							}
 						}
 					}

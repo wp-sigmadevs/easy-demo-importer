@@ -11,11 +11,12 @@ import { getCurrentStatus, progressSteps } from '../../utils/helpers';
 /* global sdEdiAdminParams */
 
 /**
- * Component representing the Modal.
+ * Component representing a modal dialog.
  *
- * @param {boolean}  visible   - Specifies whether the Modal is visible.
- * @param {Function} onCancel  - Callback function invoked when the Modal is canceled.
- * @param {Object}   modalData - Data for the Modal.
+ * @param {Object}   props           - Component properties.
+ * @param {boolean}  props.visible   - Specifies whether the modal is visible.
+ * @param {Function} props.onCancel  - Callback function invoked when the modal is canceled.
+ * @param {Object}   props.modalData - Data to be displayed in the modal.
  */
 const ModalComponent = ({ visible, onCancel, modalData }) => {
 	/**
@@ -139,7 +140,6 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 				footer={null}
 				width={900}
 				centered
-				// bodyStyle={{ height: '600px' }}
 			>
 				{modalData && (
 					<Row>
@@ -167,7 +167,10 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 								}`}
 							>
 								{currentStep === 1 && (
-									<Begin handleReset={handleReset} />
+									<Begin
+										handleReset={handleReset}
+										modalData={modalData}
+									/>
 								)}
 							</div>
 							<div

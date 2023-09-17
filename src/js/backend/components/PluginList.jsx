@@ -3,9 +3,10 @@ import { List } from 'antd';
 import { getPluginText, getStatusIcon } from '../utils/helpers';
 
 /**
- * Component to display a list of plugins.
+ * Component for displaying a list of plugins.
  *
- * @param {Array} plugins - The array of plugins to display.
+ * @param {Object} props         - Component properties.
+ * @param {Array}  props.plugins - The array of plugins to display.
  */
 const PluginList = ({ plugins }) => {
 	if (plugins.length === 0) {

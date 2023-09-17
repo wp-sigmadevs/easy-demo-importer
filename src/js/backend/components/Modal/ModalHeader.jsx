@@ -3,7 +3,8 @@ import React from 'react';
 /**
  * Component representing the header of a modal.
  *
- * @param {number} currentStep - The current step of the modal.
+ * @param {Object} props             - Component properties.
+ * @param {number} props.currentStep - The current step of the modal.
  */
 const ModalHeader = ({ currentStep }) => {
 	return (

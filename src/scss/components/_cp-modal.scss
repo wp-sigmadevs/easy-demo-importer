@@ -2,6 +2,7 @@
  * Component: Support Modal.
  */
 
+.appearance_page_sd-edi-demo-importer-status,
 .appearance_page_sd-easy-demo-importer {
 	.support-modal {
 		.ant-modal-content {
@@ -82,6 +83,56 @@
 			&:hover {
 				background-position: right center;
 				transform: scale(1.1);
+			}
+		}
+	}
+
+	.ant-modal-root {
+		.ant-modal-mask {
+			background-color: rgba(0, 0, 0, 0.70) !important;
+		}
+	}
+}
+
+.appearance_page_sd-easy-demo-importer {
+	.requirement-modal {
+		.ant-modal-content {
+			height: 300px;
+
+			h2 {
+				column-gap: 10px;
+
+				@extend .edi-d-flex;
+				@extend .edi-justify-content-center;
+				@extend .edi-align-items-center;
+
+				> span {
+					margin: 0;
+
+					@extend .warn-text;
+				}
+
+				.anticon {
+					svg {
+						width: 30px;
+						height: 30px;
+					}
+				}
+			}
+		}
+
+		.modal-content-inner {
+			padding: 0 5px;
+			font-size: 18px;
+		}
+
+		.step-actions {
+			button {
+				min-width: 180px !important;
+
+				&:last-child {
+					background-image: linear-gradient(109.6deg, #ff4d4f 11.2%, #a44f51 91.2%);
+				}
 			}
 		}
 	}

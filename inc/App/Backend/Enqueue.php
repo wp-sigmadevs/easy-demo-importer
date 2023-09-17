@@ -12,7 +12,11 @@ declare( strict_types=1 );
 
 namespace SigmaDevs\EasyDemoImporter\App\Backend;
 
-use SigmaDevs\EasyDemoImporter\Common\{Functions\Helpers, Traits\Singleton, Abstracts\Enqueue as EnqueueBase};
+use SigmaDevs\EasyDemoImporter\Common\{
+	Functions\Helpers,
+	Traits\Singleton,
+	Abstracts\Enqueue as EnqueueBase
+};
 
 // Do not allow directly accessing this file.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -47,13 +51,19 @@ class Enqueue extends EnqueueBase {
 	 * @see Requester::isAdminBackend()
 	 */
 	public function register() {
-		$this->assets();
+		global $pagenow;
 
-		if ( empty( $this->assets() ) ) {
-			return;
+		$page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : '';
+
+		if ( 'themes.php' === $pagenow && ( 'sd-easy-demo-importer' === $page || 'sd-edi-demo-importer-status' === $page ) ) {
+			$this->assets();
+
+			if ( empty( $this->assets() ) ) {
+				return;
+			}
+
+			add_action( 'admin_enqueue_scripts', [ $this, 'enqueue' ] );
 		}
-
-		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue' ] );
 	}
 
 	/**
@@ -71,7 +81,7 @@ class Enqueue extends EnqueueBase {
 
 		$styles[] = [
 			'handle'    => 'sd-edi-admin-styles',
-			'asset_uri' => $this->plugin->assetsUri() . '/css/backend' . $this->plugin->suffix . '.css',
+			'asset_uri' => $this->plugin->assetsUri() . '/css/backend' . $this->suffix . '.css',
 			'version'   => $this->plugin->version(),
 		];
 
@@ -91,7 +101,7 @@ class Enqueue extends EnqueueBase {
 
 		$scripts[] = [
 			'handle'     => 'sd-edi-admin-script',
-			'asset_uri'  => $this->plugin->assetsUri() . '/js/backend' . $this->plugin->suffix . '.js',
+			'asset_uri'  => $this->plugin->assetsUri() . '/js/backend' . $this->suffix . '.js',
 			'dependency' => [ 'jquery' ],
 			'in_footer'  => true,
 			'version'    => $this->plugin->version(),
@@ -157,15 +167,19 @@ class Enqueue extends EnqueueBase {
 				'excludeImagesTitle'         => esc_html__( 'Exclude Demo Images', 'easy-demo-importer' ),
 				'excludeImagesHint'          => esc_html__( 'Select this option if demo import fails repeatedly. Excluding images will speed up the import process.', 'easy-demo-importer' ),
 				'resetDatabaseTitle'         => esc_html__( 'Reset Existing Database', 'easy-demo-importer' ),
-				'resetDatabaseWarning'       => esc_html__( 'Caution:', 'easy-demo-importer' ),
+				'resetDatabaseWarning'       => esc_html__( 'Caution: ', 'easy-demo-importer' ),
 				'resetDatabaseHint'          => esc_html__( 'Resetting the database will erase all of your content, including posts, pages, images, custom post types, taxonomies and settings. It is advised to reset the database for a full demo import.', 'easy-demo-importer' ),
 
 				// Confirmation Modal.
 				'confirmationModal'          => esc_html__( 'Are you sure you want to proceed?', 'easy-demo-importer' ),
 				'resetMessage'               => esc_html__( 'Resetting the database will delete all your contents.', 'easy-demo-importer' ),
-				'confirmationModalWithReset' => esc_html__( 'Are you sure you want to proceed? Resetting the database will delete all your contents.', 'easy-demo-importer' ),
+				'confirmationModalWithReset' => esc_html__( 'Are you sure you want to proceed? Resetting the database will delete all your contents, medias and settings.', 'easy-demo-importer' ),
 				'confirmYes'                 => esc_html__( 'Yes', 'easy-demo-importer' ),
 				'confirmNo'                  => esc_html__( 'No', 'easy-demo-importer' ),
+
+				// Server Page Button.
+				'serverPageBtnText'          => esc_html__( 'System Status', 'easy-demo-importer' ),
+				'serverPageUrl'              => admin_url( 'themes.php?page=' ) . sd_edi()->getData()['system_status_page'],
 
 				// Button texts.
 				'btnLivePreview'             => esc_html__( 'Live Preview', 'easy-demo-importer' ),
@@ -189,7 +203,13 @@ class Enqueue extends EnqueueBase {
 				'docDesc'                    => esc_html__( 'Embark on your journey by immersing yourself in our FAQ-rich documentation. It provides an extensive guide, featuring step-by-step instructions, screenshots, and informative videos to address common issues and help you to import demo data successfully.', 'easy-demo-importer' ),
 				'docUrl'                     => '#',
 				'ticketUrl'                  => '#',
+				'copySuccess'                => esc_html__( 'System status data copied to clipboard', 'easy-demo-importer' ),
+				'copyFailure'                => esc_html__( 'Unable to copy to clipboard. Try again.', 'easy-demo-importer' ),
 
+				// Server Requirements.
+				'reqHeader'                  => esc_html__( 'Server Requirements Error', 'easy-demo-importer' ),
+				'reqDescription'             => esc_html__( 'Server Requirements for demo import have not been met. Kindly head to the server status page to review the details. Please note that if the minimum server requirements have not met, the demo import may be stuck or unsuccessful.', 'easy-demo-importer' ),
+				'reqProceed'                 => esc_html__( 'Continue Anyway', 'easy-demo-importer' ),
 
 				// Plugin Status.
 				'notInstalled'               => esc_html__( 'Not Installed', 'easy-demo-importer' ),

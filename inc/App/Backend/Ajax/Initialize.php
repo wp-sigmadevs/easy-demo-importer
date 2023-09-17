@@ -69,17 +69,37 @@ class Initialize extends ImporterAjax {
 			$this->databaseReset();
 		}
 
-		// sd_edi()->createTable();
-//		sd_edi()->dropTable();
+		// Truncate the import table.
+		$this->truncateImportTable();
+
+		// Update option.
+		update_option( 'edi_plugin_deactivate_notice', 'true' );
+
 		// Start Importer Hook.
 		do_action( 'sd/edi/importer_init', $this );
 
 		// Response.
 		$this->prepareResponse(
 			'sd_edi_install_plugins',
-			esc_html__( 'Plugins installation in progress.', 'easy-demo-importer' ),
+			esc_html__( 'Installing required plugins.', 'easy-demo-importer' ),
 			( $this->reset ) ? esc_html__( 'Database reset completed.', 'easy-demo-importer' ) : esc_html__( 'Minor cleanups done.', 'easy-demo-importer' )
 		);
+	}
+
+	/**
+	 * Truncate the import table.
+	 *
+	 * @since 1.0.0
+	 */
+	public function truncateImportTable() {
+		global $wpdb;
+
+		$tableName = sanitize_key( $wpdb->prefix . 'sd_edi_taxonomy_import' );
+
+		// Check if the table exists before truncation.
+		if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $tableName ) ) === $tableName ) {
+			$wpdb->query( "TRUNCATE TABLE $tableName;" );
+		}
 	}
 
 	/**

@@ -65,7 +65,7 @@ class AdminPage {
 	 *
 	 * @param array $pages Admin pages.
 	 *
-	 * @return Settings
+	 * @return AdminPage
 	 * @since 1.0.0
 	 */
 	protected function addPages( array $pages ) {
@@ -79,7 +79,7 @@ class AdminPage {
 	 *
 	 * @param array $subPages Admin Sub-Pages.
 	 *
-	 * @return Settings
+	 * @return AdminPage
 	 * @since 1.0.0
 	 */
 	protected function addSubPages( array $subPages ) {

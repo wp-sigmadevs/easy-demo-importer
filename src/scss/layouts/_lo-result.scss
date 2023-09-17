@@ -5,11 +5,15 @@
 .appearance_page_sd-easy-demo-importer {
 	.ant-result-success {
 		text-align: center;
-		height: 254px;
+		//height: 254px;
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
-		padding: 48px 32px;
+		padding: 55px 32px 50px;
+
+		@media only screen and (min-height: 765px) {
+			padding-top: 75px;
+		}
 
 		.check-container {
 			width: 6.25rem;
@@ -63,6 +67,7 @@
 			h3 {
 				font-size: 30px;
 				font-weight: 500;
+				margin-bottom: 50px;
 			}
 		}
 
@@ -79,6 +84,14 @@
 			margin-top: 40px;
 			margin-bottom: 30px;
 			line-height: 1.57;
+		}
+
+		.ant-result-extra {
+			margin-top: 30px !important;
+		}
+
+		.ant-btn {
+			min-width: 160px !important;
 		}
 	}
 

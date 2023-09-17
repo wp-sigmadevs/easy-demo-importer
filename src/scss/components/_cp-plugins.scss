@@ -5,6 +5,15 @@
 .required-plugins {
 	.skeleton-list {
 		margin-top: 30px;
+		height: 145px;
+
+		@media only screen and (min-height: 680px) {
+			height: 195px;
+		}
+
+		@media only screen and (min-height: 765px) {
+			height: 220px;
+		}
 	}
 
 	.ant-skeleton {

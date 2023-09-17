@@ -47,15 +47,15 @@ class Customizer {
 
 		// Data checks.
 		if ( 'array' != gettype( $data ) ) {
-			return new WP_Error( 'sd_edi_customizer_import_data_error', __( 'The customizer import file is not in a correct format. Please make sure to use the correct customizer import file.', 'easy-demo-importer' ) );
+			return new WP_Error( 'sd_edi_customizer_import_data_error', esc_html__( 'The customizer import file is not in a correct format. Please make sure to use the correct customizer import file.', 'easy-demo-importer' ) );
 		}
 
 		if ( ! isset( $data['template'] ) || ! isset( $data['mods'] ) ) {
-			return new WP_Error( 'sd_edi_customizer_import_no_data', __( 'Error importing settings! Please check that you uploaded a customizer export file.', 'easy-demo-importer' ) );
+			return new WP_Error( 'sd_edi_customizer_import_no_data', esc_html__( 'Error importing settings! Please check that you uploaded a customizer export file.', 'easy-demo-importer' ) );
 		}
 
 		if ( $data['template'] !== $template ) {
-			return new WP_Error( 'sd_edi_customizer_import_wrong_theme', __( 'The customizer import file is not suitable for current theme. You can only import customizer settings for the same theme or a child theme.', 'easy-demo-importer' ) );
+			return new WP_Error( 'sd_edi_customizer_import_wrong_theme', esc_html__( 'The customizer import file is not suitable for current theme. You can only import customizer settings for the same theme or a child theme.', 'easy-demo-importer' ) );
 		}
 
 		// Import Images.
@@ -141,10 +141,10 @@ class Customizer {
 //						}
 //					}
 //
-//					$dataArray[ $dataKey ] = $dataObject;
+//					$dataArray->$dataKey = $dataObject;
 //				}
 //
-//				$mods[ $key ] = json_encode( $dataArray );
+//				$mods[ $key ] = wp_json_encode( $dataArray );
 //			}
 		}
 
@@ -207,7 +207,7 @@ class Customizer {
 	}
 
 	/**
-	 * Checks to see whether a url is an image url or not.
+	 * Checks to see whether an url is an image url or not.
 	 *
 	 * @param string $url The url to check.
 	 *
@@ -225,12 +225,12 @@ class Customizer {
 	/**
 	 * Check if the input is JSON.
 	 *
-	 * @param string $string String to check.
+	 * @param string $str String to check.
 	 *
 	 * @return bool
 	 * @since 1.0.0
 	 */
-	private function isJSON( $string ) {
-		return is_string( $string ) && is_array( json_decode( $string, true ) );
+	private function isJSON( $str ) {
+		return is_string( $str ) && is_array( json_decode( $str, true ) );
 	}
 }

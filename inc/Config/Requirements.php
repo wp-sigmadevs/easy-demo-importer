@@ -76,7 +76,7 @@ final class Requirements extends Base {
 				// Through error & kill plugin.
 				$this->throughError( $error );
 			}
-		};
+		}
 	}
 
 	/**
@@ -91,10 +91,10 @@ final class Requirements extends Base {
 			[
 				'current' => phpversion(),
 				'compare' => $this->plugin->requiredPhp(),
-				'title'   => __( 'Invalid PHP version', 'easy-demo-importer' ),
+				'title'   => esc_html__( 'Invalid PHP version', 'easy-demo-importer' ),
 				'message' => sprintf(
-				/* translators: %1$1s: required php version, %2$2s: current php version */
-					__( 'You must be using PHP %1$1s or greater. You are currently using PHP %2$2s.', 'easy-demo-importer' ),
+					/* translators: 1. Required php version, 2. Current php version */
+					esc_html__( 'You must be using PHP %1$1s or greater. You are currently using PHP %2$2s.', 'easy-demo-importer' ),
 					$this->plugin->requiredPhp(),
 					phpversion()
 				),
@@ -103,10 +103,10 @@ final class Requirements extends Base {
 			[
 				'current' => get_bloginfo( 'version' ),
 				'compare' => $this->plugin->requiredWp(),
-				'title'   => __( 'Invalid WordPress version', 'easy-demo-importer' ),
+				'title'   => esc_html__( 'Invalid WordPress version', 'easy-demo-importer' ),
 				'message' => sprintf(
-				/* translators: %1$s: required wordpress version, %2$s: current wordpress version */
-					__( 'You must be using WordPress %1$s or greater. You are currently using WordPress %2$s.', 'easy-demo-importer' ),
+					/* translators: 2. Required WordPress version, 2. Current WordPress version */
+					esc_html__( 'You must be using WordPress %1$s or greater. You are currently using WordPress %2$s.', 'easy-demo-importer' ),
 					$this->plugin->requiredWp(),
 					get_bloginfo( 'version' )
 				),

@@ -44,6 +44,11 @@
 					margin-right: 20px;
 					margin-top: 5px;
 				}
+
+				.anticon,
+				.ant-modal-confirm-title {
+					@extend .warn-text;
+				}
 			}
 		}
 	}
@@ -51,6 +56,18 @@
 	.ant-modal-body {
 		.ant-col {
 			@extend .edi-pos-s;
+		}
+
+		.configure-col {
+			justify-content: flex-start;
+			align-self: flex-start;
+
+			@extend .edi-d-flex;
+
+			@media only screen and (min-height: 765px) {
+				justify-content: center;
+				align-self: center;
+			}
 		}
 
 		.modal-content {
@@ -64,6 +81,64 @@
 			}
 
 			.modal-content-inner {
+				&.modal-row {
+					flex-wrap: wrap;
+					margin-left: -15px;
+					margin-right: -15px;
+
+					@extend .edi-d-flex;
+
+					.modal-col-6 {
+						flex: 0 0 50%;
+						max-width: 50%;
+						padding-left: 15px;
+						padding-right: 15px;
+					}
+
+					.ant-image {
+						overflow-y: auto;
+						max-height: 375px;
+						border-radius: 6px;
+						box-shadow: 0 4px 50px rgba(0, 0, 0, 0.1);
+						cursor: ns-resize;
+
+						@extend .no-scrollbar;
+
+						@media only screen and (min-height: 765px) {
+							max-height: 410px;
+						}
+					}
+				}
+
+				.modal-content-text {
+					@extend .edi-pos-r;
+
+					&::before {
+						content: "";
+						display: block;
+						background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0, rgba(255, 255, 255, 0.7) 50%, #fff 100%);
+						bottom: 0;
+						left: 0;
+						height: 60px;
+						width: 100%;
+						z-index: 1;
+
+						@extend .edi-pos-a;
+					}
+
+					.import-notice {
+						height: 330px;
+						overflow-y: auto;
+						padding-bottom: 20px;
+
+						@extend .no-scrollbar;
+
+						@media only screen and (min-height: 765px) {
+							height: 370px;
+						}
+					}
+				}
+
 				h3 {
 					padding: 6px 15px;
 					//border-left: 5px solid #2d74d5;
@@ -137,10 +212,14 @@
 				padding: 30px;
 				//border: 2px solid #2d74d5;
 				border: 2px solid $color-primary;
-				height: 300px;
+				//height: 300px;
+				flex-direction: column;
+
+				@extend .edi-d-flex;
+				@extend .edi-justify-content-center;
 
 				@media only screen and (min-height: 765px) {
-					height: 310px;
+					//height: 310px;
 				}
 
 				h3 {
@@ -186,6 +265,16 @@
 						border-bottom: 1px solid rgba(5, 5, 5, 0.06);
 						margin-bottom: 20px;
 					}
+
+					&.last {
+						.option-details {
+							p {
+								&:last-child {
+									margin-bottom: 0;
+								}
+							}
+						}
+					}
 				}
 			}
 		}
@@ -193,15 +282,14 @@
 		.step-actions {
 			left: 0;
 			bottom: 0;
-			width: calc(100% - 60px);
+			width: 100%;
 			padding: 20px 30px;
 			display: flex;
 			justify-content: space-between;
-			//box-shadow: 0 -5px 30px -5px rgba(0, 0, 0, 0.05);
-			//border-top: 1px solid rgba(0, 0, 0, 0.05);
 			border-top: 1px solid #eee;
 			border-bottom-left-radius: 8px;
 			border-bottom-right-radius: 8px;
+			z-index: 1;
 
 			@extend .edi-pos-a;
 			@extend .edi-white-color-bg;
