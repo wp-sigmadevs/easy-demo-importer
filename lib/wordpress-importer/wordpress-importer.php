@@ -9,12 +9,14 @@
  * @since   1.0.0
  */
 
-if ( ! defined( 'WP_LOAD_IMPORTERS' ) ) {
-	return;
+// Do not allow directly accessing this file.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit( 'This script cannot be accessed directly.' );
 }
 
-/** Display verbose errors */
-define( 'IMPORT_DEBUG', false );
+if ( ! defined( 'SD_EDI_LOAD_IMPORTERS' ) ) {
+	return;
+}
 
 /** WordPress Import Administration API */
 require_once ABSPATH . 'wp-admin/includes/import.php';
@@ -26,9 +28,6 @@ if ( ! class_exists( 'WP_Importer' ) ) {
 		require $class_wp_importer;
 	}
 }
-
-/** Functions missing in older WordPress versions. */
-require_once __DIR__ . '/compat.php';
 
 /** SD_EDI_WXR_Parser class */
 require_once __DIR__ . '/parsers/class-wxr-parser.php';

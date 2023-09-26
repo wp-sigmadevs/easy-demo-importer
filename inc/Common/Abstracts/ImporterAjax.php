@@ -204,11 +204,13 @@ abstract class ImporterAjax {
 	/**
 	 * Before import action.
 	 *
+	 * @param string $xml XML File.
+	 *
 	 * @return void
 	 * @since 1.0.0
 	 */
-	public function beforeImportActions() {
-		do_action( 'sd/edi/before_import', $this );
+	public function beforeImportActions( $xml ) {
+		do_action( 'sd/edi/before_import', $xml, $this );
 	}
 
 	/**

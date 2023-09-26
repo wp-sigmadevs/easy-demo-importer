@@ -7,6 +7,11 @@
  * @since   1.0.0
  */
 
+// Do not allow directly accessing this file.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit( 'This script cannot be accessed directly.' );
+}
+
 /**
  * WordPress importer class.
  */
@@ -346,10 +351,6 @@ class SD_EDI_WP_Import extends WP_Importer {
 				/* translators: Category Name */
 				printf( esc_html__( 'Failed to import category %s', 'easy-demo-importer' ), esc_html( $cat['category_nicename'] ) );
 
-				if ( defined( 'IMPORT_DEBUG' ) && IMPORT_DEBUG ) {
-					echo ': ' . esc_html( $id->get_error_message() );
-				}
-
 				echo '<br />';
 				continue;
 			}
@@ -405,10 +406,6 @@ class SD_EDI_WP_Import extends WP_Importer {
 			} else {
 				/* translators: Tag Name */
 				printf( esc_html__( 'Failed to import post tag %s', 'easy-demo-importer' ), esc_html( $tag['tag_name'] ) );
-
-				if ( defined( 'IMPORT_DEBUG' ) && IMPORT_DEBUG ) {
-					echo ': ' . esc_html( $id->get_error_message() );
-				}
 
 				echo '<br />';
 				continue;
@@ -477,10 +474,6 @@ class SD_EDI_WP_Import extends WP_Importer {
 			} else {
 				/* translators: 1. Term Taxonomy, 2. Term Name */
 				printf( esc_html__( 'Failed to import %1$s %2$s', 'easy-demo-importer' ), esc_html( $term['term_taxonomy'] ), esc_html( $term['term_name'] ) );
-
-				if ( defined( 'IMPORT_DEBUG' ) && IMPORT_DEBUG ) {
-					echo ': ' . esc_html( $id->get_error_message() );
-				}
 
 				echo '<br />';
 				continue;
@@ -699,9 +692,6 @@ class SD_EDI_WP_Import extends WP_Importer {
 						esc_html( $post_type_object->labels->singular_name ),
 						esc_html( $post['post_title'] )
 					);
-					if ( defined( 'IMPORT_DEBUG' ) && IMPORT_DEBUG ) {
-						echo ': ' . esc_html( $post_id->get_error_message() );
-					}
 					echo '<br />';
 					continue;
 				}
@@ -737,10 +727,6 @@ class SD_EDI_WP_Import extends WP_Importer {
 						} else {
 							/* translators: 1. Taxonomy, 2. Name */
 							printf( esc_html__( 'Failed to import %1$s %2$s', 'easy-demo-importer' ), esc_html( $taxonomy ), esc_html( $term['name'] ) );
-
-							if ( defined( 'IMPORT_DEBUG' ) && IMPORT_DEBUG ) {
-								echo ': ' . esc_html( $t->get_error_message() );
-							}
 
 							echo '<br />';
 							do_action( 'wp_import_insert_term_failed', $t, $term, $post_id, $post );

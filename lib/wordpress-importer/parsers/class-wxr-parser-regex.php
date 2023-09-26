@@ -6,6 +6,11 @@
  * @since   1.0.0
  */
 
+// Do not allow directly accessing this file.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit( 'This script cannot be accessed directly.' );
+}
+
 /**
  * WXR Parser that uses regular expressions. Fallback for installs without an XML parser.
  */

@@ -129,7 +129,8 @@ class Functions extends Base {
 		$tableName = $this->getImportTable();
 		$newID     = $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT new_id FROM {$tableName} WHERE original_id = %d",
+				'SELECT new_id FROM %s WHERE original_id = %d',
+				$tableName,
 				intval( $originalID )
 			)
 		);
@@ -160,7 +161,8 @@ class Functions extends Base {
 		// Check if the entry already exists.
 		$existingEntry = $wpdb->get_row(
 			$wpdb->prepare(
-				"SELECT * FROM {$tableName} WHERE original_id = %d",
+				'SELECT * FROM %s WHERE original_id = %d',
+				$tableName,
 				$originalID
 			)
 		);
