@@ -79,7 +79,8 @@ class DBSearchReplace {
 				$tables = $wpdb->get_col( 'SHOW TABLES' );
 			} else {
 				$blog_id = get_current_blog_id();
-				$tables  = $wpdb->get_col( "SHOW TABLES LIKE '" . $wpdb->base_prefix . absint( $blog_id ) . "\_%'" );
+				$query   = $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->esc_like( $wpdb->base_prefix . absint( $blog_id ) ) . '\_%' );
+				$tables  = $wpdb->get_col( $query );
 			}
 		} else {
 			$tables = $wpdb->get_col( 'SHOW TABLES' );
@@ -102,7 +103,11 @@ class DBSearchReplace {
 		}
 
 		$table = esc_sql( $table );
-		$rows  = $this->wpdb->get_var( "SELECT COUNT(*) FROM `$table`" );
+		$query = $this->wpdb->prepare(
+			'SELECT COUNT(*) FROM %s',
+			$table
+		);
+		$rows  = $this->wpdb->get_var( $query );
 		$pages = ceil( $rows / $this->page_size );
 
 		return absint( $pages );
@@ -151,12 +156,13 @@ class DBSearchReplace {
 			return [ $primary_key, $columns ];
 		}
 
-		$fields = $this->wpdb->get_results( 'DESCRIBE ' . $table );
+		$query  = $this->wpdb->prepare( 'DESCRIBE %s', $table );
+		$fields = $this->wpdb->get_results( $query );
 
 		if ( is_array( $fields ) ) {
 			foreach ( $fields as $column ) {
 				$columns[] = $column->Field;
-				if ( $column->Key == 'PRI' ) {
+				if ( 'PRI' == $column->Key ) {
 					$primary_key = $column->Field;
 				}
 			}
@@ -215,7 +221,8 @@ class DBSearchReplace {
 		$end         = $this->page_size;
 
 		// Grab the content of the table.
-		$data = $this->wpdb->get_results( "SELECT * FROM `$table` LIMIT $start, $end", ARRAY_A );
+		$query = $this->wpdb->prepare( 'SELECT * FROM `%s` LIMIT %d, %d', $table, $start, $end );
+		$data  = $this->wpdb->get_results( $query, ARRAY_A );
 
 		// Loop through the data.
 		foreach ( $data as $row ) {
@@ -255,7 +262,7 @@ class DBSearchReplace {
 						$should_skip = true;
 					}
 
-					if ( 'siteurl' === $data_to_fix && $args['dry_run'] !== 'on' ) {
+					if ( 'siteurl' === $data_to_fix && 'on' !== $args['dry_run'] ) {
 						$update_later = true;
 					}
 				}
@@ -274,7 +281,16 @@ class DBSearchReplace {
 			// Determine what to do with updates.
 			if ( $upd && ! empty( $where_sql ) ) {
 				// If there are changes to make, run the query.
-				$sql    = 'UPDATE ' . $table . ' SET ' . implode( ', ', $update_sql ) . ' WHERE ' . implode( ' AND ', array_filter( $where_sql ) );
+				$update_fields    = implode( ', ', $update_sql );
+				$where_conditions = implode( ' AND ', array_filter( $where_sql ) );
+
+				$sql = $this->wpdb->prepare(
+					'UPDATE %s SET %s WHERE %s',
+					$table,
+					$update_fields,
+					$where_conditions
+				);
+
 				$result = $this->wpdb->query( $sql );
 
 				if ( ! $result ) {
@@ -370,13 +386,14 @@ class DBSearchReplace {
 	 *
 	 * @param string $input The string to escape.
 	 *
-	 * @return string
+	 * @return string|array
 	 * @since 1.0.0
 	 */
 	public function mysql_escape_mimic( $input ) {
 		if ( is_array( $input ) ) {
 			return array_map( __METHOD__, $input );
 		}
+
 		if ( ! empty( $input ) && is_string( $input ) ) {
 			return str_replace(
 				[ '\\', "\0", "\n", "\r", "'", '"', "\x1a" ],

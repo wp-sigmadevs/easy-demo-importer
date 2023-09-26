@@ -8,6 +8,7 @@ Stable tag: 1.0.0
 Requires PHP: 7.4
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
+GitHub Repository: https://github.com/wp-sigmadevs/easy-demo-importer
 
 A one-click, user-friendly WordPress plugin for effortlessly importing theme demos and customizing your website in no time.
 

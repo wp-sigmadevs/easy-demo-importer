@@ -70,7 +70,7 @@ class InstallDemo extends ImporterAjax {
 		$fileExists = file_exists( $xmlFile );
 
 		// Init import actions.
-		$this->beforeImportActions( $xmlFile, $this->excludeImages );
+		$this->beforeImportActions( $xmlFile );
 
 		// Try to update PHP memory limit before import.
 		ini_set( 'memory_limit', apply_filters( 'sd/edi/import_memory_limit', '350M' ) );
@@ -99,8 +99,8 @@ class InstallDemo extends ImporterAjax {
 	 * @since 1.0.0
 	 */
 	private function importDemoContent( $xmlFilePath, $excludeImages ) {
-		if ( ! defined( 'WP_LOAD_IMPORTERS' ) ) {
-			define( 'WP_LOAD_IMPORTERS', true );
+		if ( ! defined( 'SD_EDI_LOAD_IMPORTERS' ) ) {
+			define( 'SD_EDI_LOAD_IMPORTERS', true );
 		}
 
 		if ( ! class_exists( 'SD_EDI_WP_Import' ) ) {
