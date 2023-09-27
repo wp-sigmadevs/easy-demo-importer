@@ -532,7 +532,7 @@ class SD_EDI_WP_Import extends WP_Importer {
 			// Export gets meta straight from the DB so could have a serialized string.
 			$value = maybe_unserialize( $meta['value'] );
 
-			add_term_meta( $term_id, wp_slash( $key ), wp_slash_strings_only( $value ) );
+			add_term_meta( $term_id, wp_slash( $key ), sd_edi()->slash_strings_only( $value ) );
 
 			/**
 			 * Fires after term meta is imported.
@@ -791,7 +791,7 @@ class SD_EDI_WP_Import extends WP_Importer {
 						foreach ( $comment['commentmeta'] as $meta ) {
 							$value = maybe_unserialize( $meta['value'] );
 
-							add_comment_meta( $inserted_comments[ $key ], wp_slash( $meta['key'] ), wp_slash_strings_only( $value ) );
+							add_comment_meta( $inserted_comments[ $key ], wp_slash( $meta['key'] ), sd_edi()->slash_strings_only( $value ) );
 						}
 
 						++$num_comments;
@@ -826,7 +826,7 @@ class SD_EDI_WP_Import extends WP_Importer {
 							$value = maybe_unserialize( $meta['value'] );
 						}
 
-						add_post_meta( $post_id, wp_slash( $key ), wp_slash_strings_only( $value ) );
+						add_post_meta( $post_id, wp_slash( $key ), sd_edi()->slash_strings_only( $value ) );
 
 						do_action( 'import_post_meta', $post_id, $key, $value );
 

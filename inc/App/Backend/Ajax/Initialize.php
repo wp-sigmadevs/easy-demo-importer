@@ -98,7 +98,7 @@ class Initialize extends ImporterAjax {
 
 		// Check if the table exists before truncation.
 		if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $tableName ) ) === $tableName ) {
-			$wpdb->query( $wpdb->prepare( 'TRUNCATE TABLE %s;', $tableName ) );
+			$wpdb->query( $wpdb->prepare( 'TRUNCATE TABLE %1$s;', $tableName ) );
 		}
 	}
 
@@ -165,7 +165,7 @@ class Initialize extends ImporterAjax {
 
 		foreach ( $customTables as $tbl ) {
 			$wpdb->query( 'SET foreign_key_checks = 0' );
-			$wpdb->query( $wpdb->prepare( 'TRUNCATE TABLE %s', $tbl ) );
+			$wpdb->query( $wpdb->prepare( 'TRUNCATE TABLE %1$s', $tbl ) );
 		}
 
 		// Delete Widgets.
@@ -193,8 +193,6 @@ class Initialize extends ImporterAjax {
 			( is_dir( "$dir/$file" ) ) ? $this->clearUploads( "$dir/$file" ) : wp_delete_file( "$dir/$file" );
 		}
 
-		global $wp_filesystem;
-
-		return ! ( $dir !== $this->uploadsDir['basedir'] ) || $wp_filesystem->rmdir( $dir, true );
+		return ! ( $dir !== $this->uploadsDir['basedir'] ) || rmdir( $dir );
 	}
 }
