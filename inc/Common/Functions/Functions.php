@@ -129,8 +129,7 @@ class Functions extends Base {
 		$tableName = $this->getImportTable();
 		$newID     = $wpdb->get_var(
 			$wpdb->prepare(
-				'SELECT new_id FROM %s WHERE original_id = %d',
-				$tableName,
+				"SELECT new_id FROM $tableName WHERE original_id = %d",
 				intval( $originalID )
 			)
 		);
@@ -161,8 +160,7 @@ class Functions extends Base {
 		// Check if the entry already exists.
 		$existingEntry = $wpdb->get_row(
 			$wpdb->prepare(
-				'SELECT * FROM %s WHERE original_id = %d',
-				$tableName,
+				"SELECT * FROM $tableName WHERE original_id = %d",
 				$originalID
 			)
 		);
@@ -191,5 +189,29 @@ class Functions extends Base {
 				[ '%d', '%d', '%s' ]
 			);
 		}
+	}
+
+	/**
+	 * Adds slashes to only string values in an array of values.
+	 *
+	 * @param mixed $value Scalar or array of scalars.
+	 *
+	 * @return mixed Slashes $value
+	 * @since 1.0.0
+	 */
+	public function slash_strings_only( $value ) {
+		return map_deep( $value, [ $this, 'add_slashes_strings_only' ] );
+	}
+
+	/**
+	 * Adds slashes only if the provided value is a string.
+	 *
+	 * @param mixed $value Value.
+	 *
+	 * @return mixed
+	 * @since 1.0.0
+	 */
+	public function add_slashes_strings_only( $value ) {
+		return is_string( $value ) ? addslashes( $value ) : $value;
 	}
 }

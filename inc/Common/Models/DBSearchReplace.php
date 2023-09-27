@@ -79,7 +79,7 @@ class DBSearchReplace {
 				$tables = $wpdb->get_col( 'SHOW TABLES' );
 			} else {
 				$blog_id = get_current_blog_id();
-				$query   = $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->esc_like( $wpdb->base_prefix . absint( $blog_id ) ) . '\_%' );
+				$query   = $wpdb->prepare( 'SHOW TABLES LIKE %1$s', $wpdb->esc_like( $wpdb->base_prefix . absint( $blog_id ) ) . '\_%' );
 				$tables  = $wpdb->get_col( $query );
 			}
 		} else {
@@ -104,7 +104,7 @@ class DBSearchReplace {
 
 		$table = esc_sql( $table );
 		$query = $this->wpdb->prepare(
-			'SELECT COUNT(*) FROM %s',
+			'SELECT COUNT(*) FROM %1$s',
 			$table
 		);
 		$rows  = $this->wpdb->get_var( $query );
@@ -156,7 +156,7 @@ class DBSearchReplace {
 			return [ $primary_key, $columns ];
 		}
 
-		$query  = $this->wpdb->prepare( 'DESCRIBE %s', $table );
+		$query  = $this->wpdb->prepare( 'DESCRIBE %1$s', $table );
 		$fields = $this->wpdb->get_results( $query );
 
 		if ( is_array( $fields ) ) {
@@ -221,7 +221,7 @@ class DBSearchReplace {
 		$end         = $this->page_size;
 
 		// Grab the content of the table.
-		$query = $this->wpdb->prepare( 'SELECT * FROM `%s` LIMIT %d, %d', $table, $start, $end );
+		$query = $this->wpdb->prepare( "SELECT * FROM $table LIMIT %d, %d", absint( $start ), absint( $end ) );
 		$data  = $this->wpdb->get_results( $query, ARRAY_A );
 
 		// Loop through the data.
@@ -284,11 +284,12 @@ class DBSearchReplace {
 				$update_fields    = implode( ', ', $update_sql );
 				$where_conditions = implode( ' AND ', array_filter( $where_sql ) );
 
-				$sql = $this->wpdb->prepare(
-					'UPDATE %s SET %s WHERE %s',
-					$table,
-					$update_fields,
-					$where_conditions
+				$sql = stripslashes(
+						$this->wpdb->prepare(
+						'UPDATE ' . $table . ' SET %1$s WHERE %2$s',
+						$update_fields,
+						$where_conditions
+					)
 				);
 
 				$result = $this->wpdb->query( $sql );
