@@ -17,10 +17,10 @@ class Demo_Importer {
 		$pro = false;
 
 		if ( $pro ) {
-			add_filter( 'sd/edi/importer/config', [ $this, 'edi_sample_config' ] );
+			add_filter( 'sd/edi/importer/config', [ $this, 'sd_edi_sample_config' ] );
 		} else {
 			add_filter(
-				'edi/sd/config/no_demo',
+				'sd/edi/config/no_demo',
 				function () {
 					return [
 						'text'    => 'It seems you have not activated the theme. Please head to the license page and provide license key to activate demo import functionality. Thanks for your understanding.',
@@ -32,7 +32,7 @@ class Demo_Importer {
 		}
 	}
 
-	public function edi_sample_config() {
+	public function sd_edi_sample_config() {
 		return [
 			'themeName'          => 'Faktorie',
 			'themeSlug'          => 'faktorie',

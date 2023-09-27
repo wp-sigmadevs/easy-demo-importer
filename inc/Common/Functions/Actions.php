@@ -697,7 +697,7 @@ class Actions {
 	 */
 	public static function updatePermalinks() {
 		update_option( 'permalink_structure', '/%postname%/' );
-		delete_option( 'edi_plugin_deactivate_notice' );
+		delete_option( 'sd_edi_plugin_deactivate_notice' );
 		flush_rewrite_rules();
 
 		return new static();
@@ -714,7 +714,7 @@ class Actions {
 		$option = $theme . '_edi_rewrite_flash';
 
 		update_option( $option, 'true' );
-		update_option( 'edi_import_success', 'true' );
+		update_option( 'sd_edi_import_success', 'true' );
 
 		return new static();
 	}
