@@ -73,7 +73,7 @@ class Initialize extends ImporterAjax {
 		$this->truncateImportTable();
 
 		// Update option.
-		update_option( 'edi_plugin_deactivate_notice', 'true' );
+		update_option( 'sd_edi_plugin_deactivate_notice', 'true' );
 
 		// Start Importer Hook.
 		do_action( 'sd/edi/importer_init', $this );
@@ -98,7 +98,7 @@ class Initialize extends ImporterAjax {
 
 		// Check if the table exists before truncation.
 		if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $tableName ) ) === $tableName ) {
-			$wpdb->query( $wpdb->prepare( 'TRUNCATE TABLE %1$s;', $tableName ) );
+			$wpdb->query( $wpdb->prepare( 'TRUNCATE TABLE %s', $tableName ) );
 		}
 	}
 

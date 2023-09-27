@@ -49,7 +49,7 @@ final class Plugin {
 	 */
 	public function getOwnPluginData() {
 		return [
-			'settings'            => get_option( 'sd-edi-settings' ),
+			'settings'            => get_option( 'sd_edi_settings' ),
 			'plugin_path'         => untrailingslashit( plugin_dir_path( SD_EDI_ROOT_FILE ) ),
 			'plugin_uri'          => untrailingslashit( plugin_dir_url( SD_EDI_ROOT_FILE ) ),
 			'plugin_active_file'  => plugin_basename( SD_EDI_ROOT_FILE ),
