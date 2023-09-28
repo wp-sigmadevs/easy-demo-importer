@@ -285,7 +285,7 @@ class DBSearchReplace {
 				$where_conditions = implode( ' AND ', array_filter( $where_sql ) );
 
 				$sql = stripslashes(
-						$this->wpdb->prepare(
+					$this->wpdb->prepare(
 						'UPDATE ' . $table . ' SET %1$s WHERE %2$s',
 						$update_fields,
 						$where_conditions
