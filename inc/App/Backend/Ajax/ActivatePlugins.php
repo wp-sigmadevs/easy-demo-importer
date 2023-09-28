@@ -12,10 +12,10 @@ declare( strict_types=1 );
 
 namespace SigmaDevs\EasyDemoImporter\App\Backend\Ajax;
 
-use SigmaDevs\EasyDemoImporter\Common\Abstracts\ImporterAjax;
 use SigmaDevs\EasyDemoImporter\Common\{
+	Traits\Singleton,
 	Functions\Helpers,
-	Traits\Singleton
+	Abstracts\ImporterAjax
 };
 
 // Do not allow directly accessing this file.
@@ -106,8 +106,7 @@ class ActivatePlugins extends ImporterAjax {
 	 * @since 1.0.0
 	 */
 	private function activatePlugins() {
-		foreach ( $this->plugins as $pluginSlug => $plugin ) {
-			$name         = ! empty( $plugin['name'] ) ? $plugin['name'] : '';
+		foreach ( $this->plugins as $plugin ) {
 			$filePath     = ! empty( $plugin['filePath'] ) ? $plugin['filePath'] : '';
 			$pluginStatus = $this->pluginStatus( $filePath );
 
@@ -128,8 +127,15 @@ class ActivatePlugins extends ImporterAjax {
 	 */
 	public function activatePlugin( $path ) {
 		if ( $path ) {
-			$activate = activate_plugin( $path, '', false, true );
+			activate_plugin( $path, '', false, true );
 
+			/**
+			 * Action Hook: 'sd/edi/after_plugin_activation'
+			 *
+			 * Performs special actions after plugins activation if needed.
+			 *
+			 * @since 1.0.0
+			 */
 			do_action( 'sd/edi/after_plugin_activation', $path );
 		}
 	}

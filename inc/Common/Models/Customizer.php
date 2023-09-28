@@ -125,27 +125,27 @@ class Customizer {
 			}
 
 			// For repeater fields.
-//			if ( $this->isJSON( $value ) ) {
-//				$dataArray = json_decode( $value );
-//
-//				foreach ( $dataArray as $dataKey => $dataObject ) {
-//					foreach ( $dataObject as $subDataKey => $subDataValue ) {
-//						if ( $this->isImageUrl( $subDataValue ) ) {
-//							$subData = $this->mediaHandleSideload( $subDataValue );
-//
-//							if ( ! is_wp_error( $subData ) ) {
-//								$dataObject->$subDataKey = $subData->url;
-//							}
-//						} else {
-//							$dataObject->$subDataKey = $subDataValue;
-//						}
-//					}
-//
-//					$dataArray->$dataKey = $dataObject;
-//				}
-//
-//				$mods[ $key ] = wp_json_encode( $dataArray );
-//			}
+			// if ( $this->isJSON( $value ) ) {
+			// $dataArray = json_decode( $value );
+			//
+			// foreach ( $dataArray as $dataKey => $dataObject ) {
+			// foreach ( $dataObject as $subDataKey => $subDataValue ) {
+			// if ( $this->isImageUrl( $subDataValue ) ) {
+			// $subData = $this->mediaHandleSideload( $subDataValue );
+			//
+			// if ( ! is_wp_error( $subData ) ) {
+			// $dataObject->$subDataKey = $subData->url;
+			// }
+			// } else {
+			// $dataObject->$subDataKey = $subDataValue;
+			// }
+			// }
+			//
+			// $dataArray->$dataKey = $dataObject;
+			// }
+			//
+			// $mods[ $key ] = wp_json_encode( $dataArray );
+			// }
 		}
 
 		return $mods;

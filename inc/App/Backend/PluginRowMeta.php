@@ -67,12 +67,22 @@ class PluginRowMeta extends Base {
 		$demoImportPage   = 'themes.php?page=' . $this->plugin->data()['demo_import_page'];
 		$systemStatusPage = 'themes.php?page=' . $this->plugin->data()['system_status_page'];
 
-		return array_merge(
-			[
-				'<a href="' . esc_url( admin_url( $demoImportPage ) ) . '">' . esc_html__( 'Install Demo Data', 'easy-demo-importer' ) . '</a>',
-				'<a href="' . esc_url( admin_url( $systemStatusPage ) ) . '">' . esc_html__( 'System Status', 'easy-demo-importer' ) . '</a>',
-			],
-			$links
-		);
+		$customRowMeta = [
+			'<a href="' . esc_url( admin_url( $demoImportPage ) ) . '">' . esc_html__( 'Install Demo Data', 'easy-demo-importer' ) . '</a>',
+		];
+
+		$themeConfig     = sd_edi()->getDemoConfig();
+		$activeTheme     = sd_edi()->activeTheme();
+		$supportedThemes = sd_edi()->supportedThemes();
+
+		if ( ! in_array( $activeTheme, $supportedThemes, true ) ) {
+			$themeConfig = [];
+		}
+
+		if ( ! empty( $themeConfig ) ) {
+			$customRowMeta[] = '<a href="' . esc_url( admin_url( $systemStatusPage ) ) . '">' . esc_html__( 'System Status', 'easy-demo-importer' ) . '</a>';
+		}
+
+		return array_merge( $customRowMeta, $links );
 	}
 }

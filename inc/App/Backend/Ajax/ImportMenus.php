@@ -12,10 +12,10 @@ declare( strict_types=1 );
 
 namespace SigmaDevs\EasyDemoImporter\App\Backend\Ajax;
 
-use SigmaDevs\EasyDemoImporter\Common\Abstracts\ImporterAjax;
 use SigmaDevs\EasyDemoImporter\Common\{
 	Traits\Singleton,
-	Functions\Helpers
+	Functions\Helpers,
+	Abstracts\ImporterAjax
 };
 
 // Do not allow directly accessing this file.
@@ -74,12 +74,12 @@ class ImportMenus extends ImporterAjax {
 		$this->prepareResponse(
 			'sd_edi_import_settings',
 			esc_html__( 'Importing theme settings.', 'easy-demo-importer' ),
-			$menus ? esc_html__( 'Menus saved successfully.', 'easy-demo-importer' ) : esc_html__( 'No menus found.', 'easy-demo-importer' )
+			$menus ? esc_html__( 'Nav Menus saved successfully.', 'easy-demo-importer' ) : esc_html__( 'No nav menus found.', 'easy-demo-importer' )
 		);
 	}
 
 	/**
-	 * Set menus.
+	 * Setting nav menus.
 	 *
 	 * @param array $menus Menu array.
 	 *

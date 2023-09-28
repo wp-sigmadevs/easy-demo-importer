@@ -21,7 +21,7 @@
     }
   },
   "scripts": {
-    "cs": "phpcs --standard=phpcs.xml .",
+    "cs": "phpcs --standard=phpcs.xml --report-full=error-report.txt --report-summary=error-summary.txt .",
     "cbf": "phpcbf --standard=phpcs.xml .",
     "phpcs": "phpcs --standard=phpcs.xml"
   },
