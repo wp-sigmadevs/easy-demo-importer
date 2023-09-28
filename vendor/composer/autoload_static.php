@@ -38,7 +38,7 @@ class ComposerStaticInita3a0f0cbb9b6e205034676f5e8e4d4d6
         'SigmaDevs\\EasyDemoImporter\\App\\Backend\\Pages' => __DIR__ . '/../..' . '/inc/App/Backend/Pages.php',
         'SigmaDevs\\EasyDemoImporter\\App\\Backend\\PluginRowMeta' => __DIR__ . '/../..' . '/inc/App/Backend/PluginRowMeta.php',
         'SigmaDevs\\EasyDemoImporter\\App\\General\\Hooks' => __DIR__ . '/../..' . '/inc/App/General/Hooks.php',
-        'SigmaDevs\\EasyDemoImporter\\App\\Rest\\RestEndpoint' => __DIR__ . '/../..' . '/inc/App/Rest/RestEndpoint.php',
+        'SigmaDevs\\EasyDemoImporter\\App\\Rest\\RestEndpoints' => __DIR__ . '/../..' . '/inc/App/Rest/RestEndpoints.php',
         'SigmaDevs\\EasyDemoImporter\\Bootstrap' => __DIR__ . '/../..' . '/inc/Bootstrap.php',
         'SigmaDevs\\EasyDemoImporter\\Common\\Abstracts\\Base' => __DIR__ . '/../..' . '/inc/Common/Abstracts/Base.php',
         'SigmaDevs\\EasyDemoImporter\\Common\\Abstracts\\Enqueue' => __DIR__ . '/../..' . '/inc/Common/Abstracts/Enqueue.php',

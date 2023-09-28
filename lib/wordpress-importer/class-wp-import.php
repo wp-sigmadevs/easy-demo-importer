@@ -1207,6 +1207,7 @@ class SD_EDI_WP_Import extends WP_Importer {
 			}
 
 			if ( $local_child_id && $local_parent_id ) {
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 				$wpdb->update( $wpdb->posts, [ 'post_parent' => $local_parent_id ], [ 'ID' => $local_child_id ], '%d', '%d' );
 				clean_post_cache( $local_child_id );
 			}
@@ -1251,8 +1252,11 @@ class SD_EDI_WP_Import extends WP_Importer {
 
 		foreach ( $this->url_remap as $from_url => $to_url ) {
 			// remap urls in post_content.
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->posts} SET post_content = REPLACE(post_content, %s, %s)", $from_url, $to_url ) );
+
 			// remap enclosure urls.
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$result = $wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->postmeta} SET meta_value = REPLACE(meta_value, %s, %s) WHERE meta_key='enclosure'", $from_url, $to_url ) );
 		}
 	}

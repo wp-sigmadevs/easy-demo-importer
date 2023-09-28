@@ -2,7 +2,7 @@
 /**
  * Functions Class: Functions.
  *
- * Main function class for external uses
+ * Main function class for external uses.
  *
  * @package SigmaDevs\EasyDemoImporter
  * @since   1.0.0
@@ -127,9 +127,13 @@ class Functions extends Base {
 		global $wpdb;
 
 		$tableName = $this->getImportTable();
-		$newID     = $wpdb->get_var(
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$newID = $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT new_id FROM $tableName WHERE original_id = %d",
+				// phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnquotedComplexPlaceholder
+				'SELECT new_id FROM %1$s WHERE original_id = %2$d',
+				$tableName,
 				intval( $originalID )
 			)
 		);
@@ -157,16 +161,19 @@ class Functions extends Base {
 		$newID      = intval( $newID );
 		$slug       = sanitize_text_field( $slug );
 
-		// Check if the entry already exists.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$existingEntry = $wpdb->get_row(
 			$wpdb->prepare(
-				"SELECT * FROM $tableName WHERE original_id = %d",
+				// phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnquotedComplexPlaceholder
+				'SELECT * FROM %1$s WHERE original_id = %2$d',
+				$tableName,
 				$originalID
 			)
 		);
 
 		if ( $existingEntry ) {
 			// Entry already exists, update the values.
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$wpdb->update(
 				$tableName,
 				[
@@ -179,6 +186,7 @@ class Functions extends Base {
 			);
 		} else {
 			// Entry doesn't exist, insert a new row.
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$wpdb->insert(
 				$tableName,
 				[

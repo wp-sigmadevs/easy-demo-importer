@@ -238,6 +238,7 @@ class Actions {
 			$commenter_new_email = esc_sql( get_bloginfo( 'admin_email' ) );
 			$commenter_new_url   = esc_sql( home_url() );
 
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$wpdb->query(
 				$wpdb->prepare(
 					"UPDATE $wpdb->comments SET comment_author_email = %s, comment_author_url = %s WHERE comment_author_email = %s",
@@ -352,10 +353,13 @@ class Actions {
 		$newUrl = str_replace( '/', '\/', $newUrl );
 
 		// Prepare and execute the SQL query.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->query(
+			// phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.LikeWildcardsInQuery
 			$wpdb->prepare(
 				"UPDATE {$wpdb->postmeta} " .
 				'SET `meta_value` = REPLACE(`meta_value`, %s, %s) ' .
+				// phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.LikeWildcardsInQuery
 				"WHERE `meta_key` = '_elementor_data' AND `meta_value` LIKE '[%%' ;",
 				$oldUrl,
 				$newUrl
@@ -379,6 +383,7 @@ class Actions {
 		$oldUrlLike = $wpdb->esc_like( $oldUrl ) . '%';
 
 		// Prepare and execute the SQL query.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->query(
 			$wpdb->prepare(
 				"UPDATE $wpdb->posts " .
@@ -427,6 +432,7 @@ class Actions {
 		foreach ( $wcPages as $key => $wcPage ) {
 
 			// Get the ID of every page with matching name or title.
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$pageIds = $wpdb->get_results(
 				$wpdb->prepare(
 					"SELECT ID FROM $wpdb->posts WHERE (post_name = %s OR post_title = %s) AND post_type = 'page' AND post_status = 'publish'",
@@ -504,6 +510,7 @@ class Actions {
 	public static function setElementorActiveKit() {
 		global $wpdb;
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$pageIds = $wpdb->get_results(
 			$wpdb->prepare(
 				"SELECT ID FROM $wpdb->posts WHERE (post_name = %s OR post_title = %s) AND post_type = 'elementor_library' AND post_status = 'publish'",
@@ -600,6 +607,7 @@ class Actions {
 		global $wpdb;
 
 		// Search for the pages that contain '_elementor_data' in postmeta table.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$postmeta_rows = $wpdb->get_results(
 			$wpdb->prepare(
 				"SELECT post_id, meta_value FROM $wpdb->postmeta WHERE meta_key = %s",
@@ -619,11 +627,14 @@ class Actions {
 			self::searchReplaceID( $data, $obj->config['elementor_data_fix'] );
 
 			// Update the meta_value in the database.
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$wpdb->update(
 				$wpdb->postmeta,
+				// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
 				[ 'meta_value' => wp_json_encode( $data ) ],
 				[
 					'post_id'  => $post_id,
+					// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
 					'meta_key' => '_elementor_data',
 				],
 				[ '%s' ],

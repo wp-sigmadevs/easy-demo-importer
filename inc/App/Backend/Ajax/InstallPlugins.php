@@ -15,10 +15,10 @@ namespace SigmaDevs\EasyDemoImporter\App\Backend\Ajax;
 use WP_Error;
 use Plugin_Upgrader;
 use WP_Ajax_Upgrader_Skin;
-use SigmaDevs\EasyDemoImporter\Common\Abstracts\ImporterAjax;
 use SigmaDevs\EasyDemoImporter\Common\{
+	Traits\Singleton,
 	Functions\Helpers,
-	Traits\Singleton
+	Abstracts\ImporterAjax
 };
 
 // Do not allow directly accessing this file.
@@ -110,7 +110,6 @@ class InstallPlugins extends ImporterAjax {
 	 */
 	private function installPlugins() {
 		foreach ( $this->plugins as $pluginSlug => $plugin ) {
-			$name     = ! empty( $plugin['name'] ) ? $plugin['name'] : '';
 			$source   = ! empty( $plugin['source'] ) ? $plugin['source'] : '';
 			$filePath = ! empty( $plugin['filePath'] ) ? $plugin['filePath'] : '';
 			$location = ! empty( $plugin['location'] ) ? $plugin['location'] : '';
@@ -232,7 +231,7 @@ class InstallPlugins extends ImporterAjax {
 			// Unzip file.
 			unzip_file( $plugin, WP_PLUGIN_DIR );
 
-			$plugin_file = WP_PLUGIN_DIR . '/' . esc_html( $path );
+			WP_PLUGIN_DIR . '/' . esc_html( $path );
 
 			// Delete zip.
 			$wp_filesystem->delete( $plugin );

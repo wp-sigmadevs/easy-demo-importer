@@ -34,6 +34,7 @@ class Widgets {
 	public function import( $widgetFile ) {
 		global $wp_registered_sidebars, $wp_registered_widget_controls;
 
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
 		$data = json_decode( file_get_contents( $widgetFile ) );
 
 		// Have valid data?

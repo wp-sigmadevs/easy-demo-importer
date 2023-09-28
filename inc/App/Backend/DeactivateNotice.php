@@ -60,7 +60,7 @@ class DeactivateNotice extends Base {
 	/**
 	 * Deactivation notice,
 	 *
-	 * @return $this
+	 * @return DeactivateNotice
 	 * @since 1.0.0
 	 */
 	public function deactivateNotice() {
@@ -68,11 +68,13 @@ class DeactivateNotice extends Base {
 		$ignoreDeactivateNotice = get_option( 'sd_edi_plugin_deactivate_notice' );
 
 		if ( ! $importSuccess || ! current_user_can( 'deactivate_plugin' ) || ( 'true' === $ignoreDeactivateNotice && current_user_can( 'deactivate_plugin' ) ) ) {
+            // phpcs:ignore Universal.CodeAnalysis.ConstructorDestructorReturn.ReturnValueFound
 			return $this;
 		}
 
 		Notice::trigger( $this->noticeMarkup(), 'success', true );
 
+		// phpcs:ignore Universal.CodeAnalysis.ConstructorDestructorReturn.ReturnValueFound
 		return $this;
 	}
 
@@ -157,8 +159,8 @@ class DeactivateNotice extends Base {
 	 * @since 1.0.0
 	 */
 	public function ignoreNotice() {
-		if ( isset( $_GET['nag_sd_edi_plugin_deactivate_notice'] )
-			&& '0' === sanitize_text_field( wp_unslash( $_GET['nag_sd_edi_plugin_deactivate_notice'] ) ) ) {
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( isset( $_GET['nag_sd_edi_plugin_deactivate_notice'] ) && '0' === sanitize_text_field( wp_unslash( $_GET['nag_sd_edi_plugin_deactivate_notice'] ) ) ) {
 			update_option( 'sd_edi_plugin_deactivate_notice', 'true' );
 			wp_safe_redirect( admin_url( 'plugins.php' ) );
 		}

@@ -120,15 +120,17 @@ class Pages extends Base {
 	public function removePageNotices() {
 		global $pagenow;
 
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : '';
 
+		// Conditionally removing all notices.
 		if ( 'themes.php' === $pagenow && ( 'sd-easy-demo-importer' === $page || 'sd-edi-demo-importer-status' === $page ) ) {
 			add_action( 'admin_init', [ $this, 'removeAllNotices' ] );
 		}
 	}
 
 	/**
-	 * Conditionally Remove All Notices.
+	 * Removes All Notices.
 	 *
 	 * @return void
 	 * @since 1.0.0

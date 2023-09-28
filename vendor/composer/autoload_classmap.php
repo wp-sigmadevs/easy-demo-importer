@@ -23,7 +23,7 @@ return array(
     'SigmaDevs\\EasyDemoImporter\\App\\Backend\\Pages' => $baseDir . '/inc/App/Backend/Pages.php',
     'SigmaDevs\\EasyDemoImporter\\App\\Backend\\PluginRowMeta' => $baseDir . '/inc/App/Backend/PluginRowMeta.php',
     'SigmaDevs\\EasyDemoImporter\\App\\General\\Hooks' => $baseDir . '/inc/App/General/Hooks.php',
-    'SigmaDevs\\EasyDemoImporter\\App\\Rest\\RestEndpoint' => $baseDir . '/inc/App/Rest/RestEndpoint.php',
+    'SigmaDevs\\EasyDemoImporter\\App\\Rest\\RestEndpoints' => $baseDir . '/inc/App/Rest/RestEndpoints.php',
     'SigmaDevs\\EasyDemoImporter\\Bootstrap' => $baseDir . '/inc/Bootstrap.php',
     'SigmaDevs\\EasyDemoImporter\\Common\\Abstracts\\Base' => $baseDir . '/inc/Common/Abstracts/Base.php',
     'SigmaDevs\\EasyDemoImporter\\Common\\Abstracts\\Enqueue' => $baseDir . '/inc/Common/Abstracts/Enqueue.php',

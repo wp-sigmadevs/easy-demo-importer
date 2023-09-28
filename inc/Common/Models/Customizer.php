@@ -41,7 +41,9 @@ class Customizer {
 	public function import( $customizerFile, $excludeImages ) {
 		global $wp_customize;
 
-		$template      = get_template();
+		$template = get_template();
+
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
 		$data          = maybe_unserialize( file_get_contents( $customizerFile ) );
 		$excludeImages = 'true' === $excludeImages;
 
@@ -123,29 +125,6 @@ class Customizer {
 					}
 				}
 			}
-
-			// For repeater fields.
-			// if ( $this->isJSON( $value ) ) {
-			// $dataArray = json_decode( $value );
-			//
-			// foreach ( $dataArray as $dataKey => $dataObject ) {
-			// foreach ( $dataObject as $subDataKey => $subDataValue ) {
-			// if ( $this->isImageUrl( $subDataValue ) ) {
-			// $subData = $this->mediaHandleSideload( $subDataValue );
-			//
-			// if ( ! is_wp_error( $subData ) ) {
-			// $dataObject->$subDataKey = $subData->url;
-			// }
-			// } else {
-			// $dataObject->$subDataKey = $subDataValue;
-			// }
-			// }
-			//
-			// $dataArray->$dataKey = $dataObject;
-			// }
-			//
-			// $mods[ $key ] = wp_json_encode( $dataArray );
-			// }
 		}
 
 		return $mods;
@@ -189,6 +168,7 @@ class Customizer {
 
 			// If error storing permanently, unlink.
 			if ( is_wp_error( $id ) ) {
+				// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.unlink_unlink
 				@unlink( $fileArray['tmp_name'] );
 
 				return $id;
@@ -220,17 +200,5 @@ class Customizer {
 		}
 
 		return false;
-	}
-
-	/**
-	 * Check if the input is JSON.
-	 *
-	 * @param string $str String to check.
-	 *
-	 * @return bool
-	 * @since 1.0.0
-	 */
-	private function isJSON( $str ) {
-		return is_string( $str ) && is_array( json_decode( $str, true ) );
 	}
 }
