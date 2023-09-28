@@ -12,11 +12,11 @@ declare( strict_types=1 );
 
 namespace SigmaDevs\EasyDemoImporter\App\Backend\Ajax;
 
-use SigmaDevs\EasyDemoImporter\Common\Abstracts\ImporterAjax;
 use SigmaDevs\EasyDemoImporter\Common\{
+	Traits\Singleton,
 	Functions\Helpers,
 	Models\Customizer,
-	Traits\Singleton
+	Abstracts\ImporterAjax
 };
 
 // Do not allow directly accessing this file.

@@ -202,28 +202,6 @@ abstract class ImporterAjax {
 	}
 
 	/**
-	 * Before import action.
-	 *
-	 * @param string $xml XML File.
-	 *
-	 * @return void
-	 * @since 1.0.0
-	 */
-	public function beforeImportActions( $xml ) {
-		do_action( 'sd/edi/before_import', $xml, $this );
-	}
-
-	/**
-	 * After import action.
-	 *
-	 * @return void
-	 * @since 1.0.0
-	 */
-	public function afterImportActions() {
-		do_action( 'sd/edi/after_import', $this );
-	}
-
-	/**
 	 * Check if plugin is active or not.
 	 *
 	 * @param string $path Plugin path.

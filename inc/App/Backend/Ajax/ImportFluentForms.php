@@ -15,10 +15,10 @@ namespace SigmaDevs\EasyDemoImporter\App\Backend\Ajax;
 use FluentForm\App\Models\Form;
 use FluentForm\App\Models\FormMeta;
 use FluentForm\Framework\Support\Arr;
-use SigmaDevs\EasyDemoImporter\Common\Abstracts\ImporterAjax;
 use SigmaDevs\EasyDemoImporter\Common\{
 	Traits\Singleton,
-	Functions\Helpers
+	Functions\Helpers,
+	Abstracts\ImporterAjax
 };
 
 // Do not allow directly accessing this file.
@@ -78,8 +78,8 @@ class ImportFluentForms extends ImporterAjax {
 		// Response.
 		$this->prepareResponse(
 			'sd_edi_import_widgets',
-			esc_html__( 'Importing widgets.', 'easy-demo-importer' ),
-			$formsExists ? esc_html__( 'Fluent forms imported.', 'easy-demo-importer' ) : esc_html__( 'No Fluent forms found.', 'easy-demo-importer' )
+			esc_html__( 'Importing all widgets.', 'easy-demo-importer' ),
+			$formsExists ? esc_html__( 'Fluent forms successfully imported.', 'easy-demo-importer' ) : esc_html__( 'No Fluent forms found.', 'easy-demo-importer' )
 		);
 	}
 
@@ -96,6 +96,7 @@ class ImportFluentForms extends ImporterAjax {
 		$fileExists = file_exists( $formFile );
 
 		if ( $fileExists ) {
+			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
 			$data          = file_get_contents( $formFile );
 			$forms         = json_decode( $data, true );
 			$insertedForms = [];
@@ -104,8 +105,10 @@ class ImportFluentForms extends ImporterAjax {
 				foreach ( $forms as $formItem ) {
 					$formFields = wp_json_encode( [] );
 
+					// phpcs:ignore Generic.CodeAnalysis.AssignmentInCondition.Found, Squiz.PHP.DisallowMultipleAssignments.FoundInControlStructure
 					if ( $fields = Arr::get( $formItem, 'form', '' ) ) {
 						$formFields = wp_json_encode( $fields );
+					// phpcs:ignore Generic.CodeAnalysis.AssignmentInCondition.Found, Squiz.PHP.DisallowMultipleAssignments.FoundInControlStructure
 					} elseif ( $fields = Arr::get( $formItem, 'form_fields', '' ) ) {
 						$formFields = wp_json_encode( $fields );
 					}
@@ -137,6 +140,7 @@ class ImportFluentForms extends ImporterAjax {
 						foreach ( $formItem['metas'] as $metaData ) {
 							$settings = [
 								'form_id'  => $formId,
+								// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
 								'meta_key' => Arr::get( $metaData, 'meta_key' ),
 								'value'    => Arr::get( $metaData, 'value' ),
 							];

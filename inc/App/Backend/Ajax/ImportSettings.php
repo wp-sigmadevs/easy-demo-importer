@@ -12,10 +12,10 @@ declare( strict_types=1 );
 
 namespace SigmaDevs\EasyDemoImporter\App\Backend\Ajax;
 
-use SigmaDevs\EasyDemoImporter\Common\Abstracts\ImporterAjax;
 use SigmaDevs\EasyDemoImporter\Common\{
 	Traits\Singleton,
-	Functions\Helpers
+	Functions\Helpers,
+	Abstracts\ImporterAjax
 };
 
 // Do not allow directly accessing this file.
@@ -74,6 +74,7 @@ class ImportSettings extends ImporterAjax {
 				$fileExists = file_exists( $optionFile );
 
 				if ( $fileExists ) {
+					// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
 					$data = file_get_contents( $optionFile );
 
 					if ( $data ) {
@@ -97,8 +98,8 @@ class ImportSettings extends ImporterAjax {
 		// Response.
 		$this->prepareResponse(
 			$formsFileExists ? 'sd_edi_import_fluent_forms' : 'sd_edi_import_widgets',
-			$formsFileExists ? esc_html__( 'Importing Fluent forms.', 'easy-demo-importer' ) : esc_html__( 'Importing widgets', 'easy-demo-importer' ),
-			$settingsExists ? esc_html__( 'Theme settings imported.', 'easy-demo-importer' ) : esc_html__( 'Theme settings import not required.', 'easy-demo-importer' )
+			$formsFileExists ? esc_html__( 'Importing Fluent forms.', 'easy-demo-importer' ) : esc_html__( 'Importing all widgets', 'easy-demo-importer' ),
+			$settingsExists ? esc_html__( 'Theme settings successfully imported.', 'easy-demo-importer' ) : esc_html__( 'Theme settings import not required.', 'easy-demo-importer' )
 		);
 	}
 }

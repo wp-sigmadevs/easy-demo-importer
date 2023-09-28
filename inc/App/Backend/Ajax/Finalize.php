@@ -12,10 +12,10 @@ declare( strict_types=1 );
 
 namespace SigmaDevs\EasyDemoImporter\App\Backend\Ajax;
 
-use SigmaDevs\EasyDemoImporter\Common\Abstracts\ImporterAjax;
 use SigmaDevs\EasyDemoImporter\Common\{
 	Traits\Singleton,
-	Functions\Helpers
+	Functions\Helpers,
+	Abstracts\ImporterAjax
 };
 
 // Do not allow directly accessing this file.
@@ -64,8 +64,14 @@ class Finalize extends ImporterAjax {
 	public function response() {
 		Helpers::verifyAjaxCall();
 
-		// After Import Actions.
-		$this->afterImportActions();
+		/**
+		 * Action Hook: 'sd/edi/after_import'
+		 *
+		 * Performs special actions after demo import.
+		 *
+		 * @since 1.0.0
+		 */
+		do_action( 'sd/edi/after_import', $this );
 
 		// Response.
 		$this->prepareResponse(

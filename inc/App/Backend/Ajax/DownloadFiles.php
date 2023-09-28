@@ -12,10 +12,10 @@ declare( strict_types=1 );
 
 namespace SigmaDevs\EasyDemoImporter\App\Backend\Ajax;
 
-use SigmaDevs\EasyDemoImporter\Common\Abstracts\ImporterAjax;
 use SigmaDevs\EasyDemoImporter\Common\{
+	Traits\Singleton,
 	Functions\Helpers,
-	Traits\Singleton
+	Abstracts\ImporterAjax
 };
 
 // Do not allow directly accessing this file.
@@ -74,7 +74,7 @@ class DownloadFiles extends ImporterAjax {
 		$this->prepareResponse(
 			$downloads ? 'sd_edi_import_xml' : '',
 			$downloads ? esc_html__( 'Importing all sorts of contents. This will take some time.', 'easy-demo-importer' ) : '',
-			$downloads ? esc_html__( 'Successfully downloaded.', 'easy-demo-importer' ) : '',
+			$downloads ? esc_html__( 'Demo files Successfully downloaded.', 'easy-demo-importer' ) : '',
 			! $downloads,
 			! $downloads ? esc_html__( 'Import failed. Demo files can not be downloaded.', 'easy-demo-importer' ) : '',
 		);

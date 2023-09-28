@@ -12,11 +12,11 @@ declare( strict_types=1 );
 
 namespace SigmaDevs\EasyDemoImporter\App\Backend\Ajax;
 
-use SigmaDevs\EasyDemoImporter\Common\Abstracts\ImporterAjax;
 use SigmaDevs\EasyDemoImporter\Common\{
 	Models\Widgets,
 	Traits\Singleton,
-	Functions\Helpers
+	Functions\Helpers,
+	Abstracts\ImporterAjax
 };
 
 // Do not allow directly accessing this file.
@@ -75,6 +75,7 @@ class ImportWidgets extends ImporterAjax {
 			ob_end_clean();
 		}
 
+		// TODO: Need to integrate revolution slider import.
 		$sliderFileExists = file_exists( $this->demoUploadDir( $this->demoSlug ) . '/revslider.zip' );
 
 		// Response.

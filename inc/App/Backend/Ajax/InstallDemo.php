@@ -69,8 +69,14 @@ class InstallDemo extends ImporterAjax {
 
 		$fileExists = file_exists( $xmlFile );
 
-		// Init import actions.
-		$this->beforeImportActions( $xmlFile );
+		/**
+		 * Action Hook: 'sd/edi/before_import'
+		 *
+		 * Performs special actions before demo import.
+		 *
+		 * @since 1.0.0
+		 */
+		do_action( 'sd/edi/before_import', $xmlFile, $this );
 
 		// Try to update PHP memory limit before import.
 		ini_set( 'memory_limit', apply_filters( 'sd/edi/import_memory_limit', '350M' ) );

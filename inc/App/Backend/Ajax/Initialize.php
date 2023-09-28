@@ -12,10 +12,11 @@ declare( strict_types=1 );
 
 namespace SigmaDevs\EasyDemoImporter\App\Backend\Ajax;
 
-use SigmaDevs\EasyDemoImporter\Common\Abstracts\ImporterAjax;
+use WP_Filesystem_Direct;
 use SigmaDevs\EasyDemoImporter\Common\{
+	Traits\Singleton,
 	Functions\Helpers,
-	Traits\Singleton
+	Abstracts\ImporterAjax
 };
 
 // Do not allow directly accessing this file.
@@ -75,7 +76,13 @@ class Initialize extends ImporterAjax {
 		// Update option.
 		update_option( 'sd_edi_plugin_deactivate_notice', 'true' );
 
-		// Start Importer Hook.
+		/**
+		 * Action Hook: 'sd/edi/importer_init'
+		 *
+		 * Performs special actions when importer initializes.
+		 *
+		 * @since 1.0.0
+		 */
 		do_action( 'sd/edi/importer_init', $this );
 
 		// Response.
@@ -98,7 +105,10 @@ class Initialize extends ImporterAjax {
 
 		// Check if the table exists before truncation.
 		if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $tableName ) ) === $tableName ) {
-			$wpdb->query( $wpdb->prepare( 'TRUNCATE TABLE %s', $tableName ) );
+			$wpdb->query(
+				// phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnquotedComplexPlaceholder
+				$wpdb->prepare( 'TRUNCATE TABLE %1$s', $tableName )
+			);
 		}
 	}
 
@@ -143,10 +153,12 @@ class Initialize extends ImporterAjax {
 		);
 
 		$customTables = [];
-		$tableStatus  = $wpdb->get_results( 'SHOW TABLE STATUS' );
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$tableStatus = $wpdb->get_results( 'SHOW TABLE STATUS' );
 
 		if ( is_array( $tableStatus ) ) {
-			foreach ( $tableStatus as $index => $table ) {
+			foreach ( $tableStatus as $table ) {
 				if ( 0 !== stripos( $table->Name, $wpdb->prefix ) ) {
 					continue;
 				}
@@ -155,7 +167,7 @@ class Initialize extends ImporterAjax {
 					continue;
 				}
 
-				if ( false === in_array( $table->Name, $coreTables ) && false === in_array( $table->Name, $excludeTables ) ) {
+				if ( false === in_array( $table->Name, $coreTables, true ) && false === in_array( $table->Name, $excludeTables, true ) ) {
 					$customTables[] = $table->Name;
 				}
 			}
@@ -164,8 +176,12 @@ class Initialize extends ImporterAjax {
 		$customTables = array_merge( $coreTables, $customTables );
 
 		foreach ( $customTables as $tbl ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$wpdb->query( 'SET foreign_key_checks = 0' );
-			$wpdb->query( $wpdb->prepare( 'TRUNCATE TABLE %1$s', $tbl ) );
+			$wpdb->query(
+			// phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnquotedComplexPlaceholder
+				$wpdb->prepare( 'TRUNCATE TABLE %1$s', $tbl )
+			);
 		}
 
 		// Delete Widgets.
@@ -175,15 +191,17 @@ class Initialize extends ImporterAjax {
 		Helpers::deleteThemeMods();
 
 		// Clear "uploads" folder.
-		$this->clearUploads( $this->uploadsDir['basedir'] );
+		if ( is_array( $this->uploadsDir ) && isset( $this->uploadsDir['basedir'] ) ) {
+			$this->clearUploads( $this->uploadsDir['basedir'] );
+		}
 	}
 
 	/**
-	 * Clear folder
+	 * Clear 'uploads' folder
 	 *
 	 * @param string $dir Directory to clean.
 	 *
-	 * @return bool
+	 * @return bool|void
 	 * @since 1.0.0
 	 */
 	private function clearUploads( $dir ) {
@@ -193,6 +211,13 @@ class Initialize extends ImporterAjax {
 			( is_dir( "$dir/$file" ) ) ? $this->clearUploads( "$dir/$file" ) : wp_delete_file( "$dir/$file" );
 		}
 
-		return ! ( $dir !== $this->uploadsDir['basedir'] ) || rmdir( $dir );
+		require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-base.php';
+		require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-direct.php';
+
+		$fileSystemDirect = new WP_Filesystem_Direct( false );
+
+		if ( is_array( $this->uploadsDir ) && isset( $this->uploadsDir['basedir'] ) ) {
+			return ! ( $dir !== $this->uploadsDir['basedir'] ) || $fileSystemDirect->rmdir( $dir, true );
+		}
 	}
 }
