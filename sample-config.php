@@ -34,27 +34,27 @@ class Demo_Importer {
 
 	public function sd_edi_sample_config() {
 		return [
-			'themeName'          => 'Faktorie',
-			'themeSlug'          => 'faktorie',
-			'demoZip'            => 'http://demo-import.test/faktorie.zip',
-			'settingsJson'       => [
+			'themeName'             => 'Faktorie',
+			'themeSlug'             => 'faktorie',
+			'demoZip'               => 'http://demo-import.test/faktorie.zip',
+			'settingsJson'          => [
 				'bcn_settings',
 				'rtsb_settings',
 			],
-			'fluentFormsJson'    => 'fluentforms',
-			'multipleZip'        => false,
-			'urlToReplace'       => 'https://radiustheme.com/demo/wordpress/themes/faktorie/',
-			'replaceEmail'       => 'techlabpro24@gmail.com',
-			'menus'              => [
+			'fluentFormsJson'       => 'fluentforms',
+			'multipleZip'           => false,
+			'urlToReplace'          => 'https://radiustheme.com/demo/wordpress/themes/faktorie/',
+			'replaceCommenterEmail' => 'techlabpro24@gmail.com',
+			'menus'                 => [
 				'primary' => 'Main Menu',
 			],
-			'elementor_data_fix' => [
+			'elementor_data_fix'    => [
 				'rt-portfolio' => 'cat',
 				'rt-post-grid' => 'catid',
 				'rt-team'      => 'cat',
 			],
-			'blogSlug'           => 'news-media',
-			'demoData'           => [
+			'blogSlug'              => 'news-media',
+			'demoData'              => [
 				'home-01' => [
 					'name'         => esc_html__( 'Main Home', 'easy-demo-importer' ),
 					'previewImage' => 'http://demo-import.test/faktorie-home-1.jpg',
@@ -91,7 +91,7 @@ class Demo_Importer {
 					'previewUrl'   => 'https://radiustheme.com/demo/wordpress/themes/faktorie/home-07/',
 				],
 			],
-			'plugins'            => [
+			'plugins'               => [
 				'rt-framework'     => [
 					'name'     => 'RT Framework',
 					'source'   => 'bundled',

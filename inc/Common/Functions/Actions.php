@@ -34,7 +34,7 @@ class Actions {
 	 */
 	public static function rewriteFlushCheck() {
 		$theme  = str_replace( '-', '_', sd_edi()->activeTheme() );
-		$option = $theme . '_edi_rewrite_flash';
+		$option = $theme . '_sd_edi_rewrite_flash';
 
 		if ( 'true' === get_option( $option ) ) {
 			flush_rewrite_rules();
@@ -232,9 +232,9 @@ class Actions {
 	public static function replaceUrls( $obj ) {
 		global $wpdb;
 
-		if ( ! empty( $obj->config['replaceEmail'] ) ) {
+		if ( ! empty( $obj->config['replaceCommenterEmail'] ) ) {
 			// Commenter email.
-			$commenter_email     = esc_sql( $obj->config['replaceEmail'] );
+			$commenter_email     = esc_sql( $obj->config['replaceCommenterEmail'] );
 			$commenter_new_email = esc_sql( get_bloginfo( 'admin_email' ) );
 			$commenter_new_url   = esc_sql( home_url() );
 
@@ -711,7 +711,7 @@ class Actions {
 	 */
 	public static function rewriteFlag() {
 		$theme  = str_replace( '-', '_', sd_edi()->activeTheme() );
-		$option = $theme . '_edi_rewrite_flash';
+		$option = $theme . '_sd_edi_rewrite_flash';
 
 		update_option( $option, 'true' );
 		update_option( 'sd_edi_import_success', 'true' );
