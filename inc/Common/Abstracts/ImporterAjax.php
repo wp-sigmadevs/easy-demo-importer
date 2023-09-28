@@ -111,9 +111,11 @@ abstract class ImporterAjax {
 		$this->demoSlug = $this->getDemoSlug();
 
 		// Check if images import is needed.
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing
 		$this->excludeImages = ! empty( $_POST['excludeImages'] ) ? sanitize_text_field( wp_unslash( $_POST['excludeImages'] ) ) : '';
 
 		// Check if database reset needed.
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing
 		$this->reset = isset( $_POST['reset'] ) && 'true' === sanitize_text_field( wp_unslash( $_POST['reset'] ) );
 	}
 
@@ -127,10 +129,12 @@ abstract class ImporterAjax {
 	private function getDemoSlug() {
 		$firstDemoSlug = array_key_first( $this->config['demoData'] );
 
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing
 		if ( empty( $_POST['demo'] ) ) {
 			return $firstDemoSlug;
 		}
 
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing
 		$demoSlug = sanitize_text_field( wp_unslash( $_POST['demo'] ) );
 
 		return $this->multiple ? $this->config['demoData'][ $demoSlug ] : $demoSlug;
@@ -178,11 +182,13 @@ abstract class ImporterAjax {
 	 *
 	 * @param string $path Path.
 	 *
-	 * @return string
+	 * @return string|void
 	 * @since 1.0.0
 	 */
 	public function demoUploadDir( $path = '' ) {
-		return $this->uploadsDir['basedir'] . '/easy-demo-importer/' . $path;
+		if ( is_array( $this->uploadsDir ) && isset( $this->uploadsDir['basedir'] ) ) {
+			return $this->uploadsDir['basedir'] . '/easy-demo-importer/' . $path;
+		}
 	}
 
 	/**

@@ -49,7 +49,7 @@ abstract class Enqueue extends Base {
 	public function __construct() {
 		parent::__construct();
 
-		$this->suffix = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
+		$this->suffix = '.min';
 	}
 
 	/**
@@ -59,6 +59,7 @@ abstract class Enqueue extends Base {
 	 * @since 1.0.0
 	 */
 	protected function registerScripts() {
+		// Bail if no scripts.
 		if ( empty( $this->enqueues ) ) {
 			return;
 		}

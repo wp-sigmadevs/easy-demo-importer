@@ -121,7 +121,9 @@ class Setup {
 			$collate = $wpdb->get_charset_collate();
 		}
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $tableName ) ) !== $tableName ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange
 			$table_schema[] = "CREATE TABLE $tableName (
                       original_id BIGINT UNSIGNED NOT NULL,
                       new_id BIGINT UNSIGNED NOT NULL,

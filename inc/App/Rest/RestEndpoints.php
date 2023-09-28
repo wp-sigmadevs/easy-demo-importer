@@ -2,7 +2,7 @@
 /**
  * Rest Class: RestAPI Custom Endpoint.
  *
- * This class initializes REST API and creates a custom endpoint.
+ * This class initializes REST API and creates custom endpoints.
  *
  * @package SigmaDevs\EasyDemoImporter
  * @since   1.0.0
@@ -30,7 +30,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 1.0.0
  */
-class RestEndpoint extends Base {
+class RestEndpoints extends Base {
 	/**
 	 * Singleton trait.
 	 *
@@ -363,6 +363,7 @@ class RestEndpoint extends Base {
 
 		$fields['mysql'] = [
 			'label' => esc_html__( 'MySQL Version', 'easy-demo-importer' ),
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			'value' => esc_html( $wpdb->get_var( 'SELECT VERSION()' ) ),
 		];
 

@@ -13,8 +13,8 @@ declare( strict_types=1 );
 namespace SigmaDevs\EasyDemoImporter\App\Backend;
 
 use SigmaDevs\EasyDemoImporter\Common\{
-	Functions\Helpers,
 	Traits\Singleton,
+	Functions\Helpers,
 	Abstracts\Enqueue as EnqueueBase
 };
 
@@ -53,11 +53,13 @@ class Enqueue extends EnqueueBase {
 	public function register() {
 		global $pagenow;
 
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : '';
 
 		if ( 'themes.php' === $pagenow && ( 'sd-easy-demo-importer' === $page || 'sd-edi-demo-importer-status' === $page ) ) {
 			$this->assets();
 
+			// Bail if no assets.
 			if ( empty( $this->assets() ) ) {
 				return;
 			}
@@ -81,7 +83,7 @@ class Enqueue extends EnqueueBase {
 
 		$styles[] = [
 			'handle'    => 'sd-edi-admin-styles',
-			'asset_uri' => $this->plugin->assetsUri() . '/css/backend' . $this->suffix . '.css',
+			'asset_uri' => esc_url( $this->plugin->assetsUri() . '/css/backend' . $this->suffix . '.css' ),
 			'version'   => $this->plugin->version(),
 		];
 
@@ -101,7 +103,7 @@ class Enqueue extends EnqueueBase {
 
 		$scripts[] = [
 			'handle'     => 'sd-edi-admin-script',
-			'asset_uri'  => $this->plugin->assetsUri() . '/js/backend' . $this->suffix . '.js',
+			'asset_uri'  => esc_url( $this->plugin->assetsUri() . '/js/backend' . $this->suffix . '.js' ),
 			'dependency' => [ 'jquery' ],
 			'in_footer'  => true,
 			'version'    => $this->plugin->version(),

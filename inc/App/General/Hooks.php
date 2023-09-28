@@ -15,12 +15,9 @@ namespace SigmaDevs\EasyDemoImporter\App\General;
 use SigmaDevs\EasyDemoImporter\Common\
 {
 	Abstracts\Base,
-	Traits\Singleton
-};
-use SigmaDevs\EasyDemoImporter\Common\Functions\
-{
-	Actions,
-	Filters
+	Traits\Singleton,
+	Functions\Actions,
+	Functions\Filters
 };
 
 // Do not allow directly accessing this file.
@@ -66,9 +63,16 @@ class Hooks extends Base {
 	 * @return Hooks
 	 */
 	public function actions() {
+		// Check the rewrite flush.
 		add_action( 'init', [ Actions::class, 'rewriteFlushCheck' ] );
+
+		// Actions during importer initialization.
 		add_action( 'sd/edi/importer_init', [ Actions::class, 'beforeImportActions' ] );
+
+		// Actions during plugins activation.
 		add_action( 'sd/edi/after_plugin_activation', [ Actions::class, 'pluginActivationActions' ] );
+
+		// Actions after import.
 		add_action( 'sd/edi/after_import', [ Actions::class, 'afterImportActions' ] );
 
 		return $this;
@@ -77,11 +81,10 @@ class Hooks extends Base {
 	/**
 	 * List of filter hooks
 	 *
-	 * @return Hooks
+	 * @return void
 	 */
 	public function filters() {
+		// Add SVG file support.
 		add_filter( 'upload_mimes', [ Filters::class, 'supportedFileTypes' ] );
-
-		return $this;
 	}
 }

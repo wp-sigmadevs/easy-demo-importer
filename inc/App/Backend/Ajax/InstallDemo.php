@@ -13,10 +13,10 @@ declare( strict_types=1 );
 namespace SigmaDevs\EasyDemoImporter\App\Backend\Ajax;
 
 use SD_EDI_WP_Import;
-use SigmaDevs\EasyDemoImporter\Common\Abstracts\ImporterAjax;
 use SigmaDevs\EasyDemoImporter\Common\{
+	Traits\Singleton,
 	Functions\Helpers,
-	Traits\Singleton
+	Abstracts\ImporterAjax
 };
 
 // Do not allow directly accessing this file.
@@ -79,6 +79,7 @@ class InstallDemo extends ImporterAjax {
 		do_action( 'sd/edi/before_import', $xmlFile, $this );
 
 		// Try to update PHP memory limit before import.
+		// phpcs:ignore WordPress.PHP.IniSet.memory_limit_Disallowed
 		ini_set( 'memory_limit', apply_filters( 'sd/edi/import_memory_limit', '350M' ) );
 
 		if ( $fileExists ) {
@@ -89,7 +90,7 @@ class InstallDemo extends ImporterAjax {
 		$this->prepareResponse(
 			$fileExists ? 'sd_edi_import_customizer' : '',
 			$fileExists ? esc_html__( 'Importing Customizer settings.', 'easy-demo-importer' ) : '',
-			$fileExists ? esc_html__( 'All contents are imported.', 'easy-demo-importer' ) : '',
+			$fileExists ? esc_html__( 'All contents are imported successfully.', 'easy-demo-importer' ) : '',
 			! $fileExists,
 			! $fileExists ? esc_html__( 'Demo import process failed. No content file found.', 'easy-demo-importer' ) : '',
 		);
@@ -146,6 +147,7 @@ class InstallDemo extends ImporterAjax {
 	private function unsetThumbnails() {
 		global $wpdb;
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->query(
 			$wpdb->prepare( "DELETE FROM $wpdb->postmeta WHERE meta_key = %s", '_thumbnail_id' )
 		);

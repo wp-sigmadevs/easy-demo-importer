@@ -76,13 +76,19 @@ class DBSearchReplace {
 
 		if ( function_exists( 'is_multisite' ) && is_multisite() ) {
 			if ( is_main_site() ) {
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 				$tables = $wpdb->get_col( 'SHOW TABLES' );
 			} else {
 				$blog_id = get_current_blog_id();
-				$query   = $wpdb->prepare( 'SHOW TABLES LIKE %1$s', $wpdb->esc_like( $wpdb->base_prefix . absint( $blog_id ) ) . '\_%' );
-				$tables  = $wpdb->get_col( $query );
+
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+				$tables = $wpdb->get_col(
+					// phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnquotedComplexPlaceholder
+					$wpdb->prepare( 'SHOW TABLES LIKE %1$s', $wpdb->esc_like( $wpdb->base_prefix . absint( $blog_id ) ) . '\_%' )
+				);
 			}
 		} else {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$tables = $wpdb->get_col( 'SHOW TABLES' );
 		}
 
@@ -104,9 +110,13 @@ class DBSearchReplace {
 
 		$table = esc_sql( $table );
 		$query = $this->wpdb->prepare(
+			// phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnquotedComplexPlaceholder
 			'SELECT COUNT(*) FROM %1$s',
 			$table
 		);
+
+		// SQL already prepared.
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 		$rows  = $this->wpdb->get_var( $query );
 		$pages = ceil( $rows / $this->page_size );
 
@@ -156,7 +166,11 @@ class DBSearchReplace {
 			return [ $primary_key, $columns ];
 		}
 
-		$query  = $this->wpdb->prepare( 'DESCRIBE %1$s', $table );
+		// phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnquotedComplexPlaceholder
+		$query = $this->wpdb->prepare( 'DESCRIBE %1$s', $table );
+
+		// SQL already prepared.
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 		$fields = $this->wpdb->get_results( $query );
 
 		if ( is_array( $fields ) ) {
@@ -221,8 +235,12 @@ class DBSearchReplace {
 		$end         = $this->page_size;
 
 		// Grab the content of the table.
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$query = $this->wpdb->prepare( "SELECT * FROM $table LIMIT %d, %d", absint( $start ), absint( $end ) );
-		$data  = $this->wpdb->get_results( $query, ARRAY_A );
+
+		// SQL already prepared.
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		$data = $this->wpdb->get_results( $query, ARRAY_A );
 
 		// Loop through the data.
 		foreach ( $data as $row ) {
@@ -286,12 +304,16 @@ class DBSearchReplace {
 
 				$sql = stripslashes(
 					$this->wpdb->prepare(
-						'UPDATE ' . $table . ' SET %1$s WHERE %2$s',
+						// phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnquotedComplexPlaceholder
+						'UPDATE %1$s SET %2$s WHERE %3$s',
+						$table,
 						$update_fields,
 						$where_conditions
 					)
 				);
 
+				// SQL already prepared.
+				// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 				$result = $this->wpdb->query( $sql );
 
 				if ( ! $result ) {
@@ -337,6 +359,7 @@ class DBSearchReplace {
 	 */
 	public function recursive_unserialize_replace( $from = '', $to = '', $data = '', $serialised = false, $case_insensitive = false ) {
 		try {
+			// phpcs:ignore Generic.CodeAnalysis.AssignmentInCondition.Found, Squiz.PHP.DisallowMultipleAssignments.FoundInControlStructure
 			if ( is_string( $data ) && ! is_serialized_string( $data ) && ( $unserialized = $this->unserialize( $data ) ) !== false ) {
 				$data = $this->recursive_unserialize_replace( $from, $to, $unserialized, true, $case_insensitive );
 			} elseif ( is_array( $data ) ) {
@@ -369,10 +392,11 @@ class DBSearchReplace {
 			}
 
 			if ( $serialised ) {
+				// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.serialize_serialize
 				return serialize( $data );
 			}
+		// phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch, Squiz.Commenting.EmptyCatchComment.Missing
 		} catch ( \Exception $error ) {
-
 		}
 
 		return $data;
@@ -427,10 +451,10 @@ class DBSearchReplace {
 			return false;
 		}
 
-		$serialized_string   = trim( $serialized_string );
-		$unserialized_string = @unserialize( $serialized_string );
+		$serialized_string = trim( $serialized_string );
 
-		return $unserialized_string;
+		// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.serialize_unserialize, WordPress.PHP.NoSilencedErrors.Discouraged
+		return @unserialize( $serialized_string );
 	}
 
 	/**
