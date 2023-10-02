@@ -62,6 +62,7 @@ class ImportSettings extends ImporterAjax {
 	 * @since 1.0.0
 	 */
 	public function response() {
+		// Verifying AJAX call and user role.
 		Helpers::verifyAjaxCall();
 
 		$settings = $this->multiple ? Helpers::keyExists( $this->config['demoData'][ $this->demoSlug ]['settingsJson'] ) : Helpers::keyExists( $this->config['settingsJson'] );

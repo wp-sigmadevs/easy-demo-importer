@@ -3,7 +3,7 @@
         'name' => 'sigmadevs/easy-demo-importer',
         'pretty_version' => 'dev-master',
         'version' => 'dev-master',
-        'reference' => 'a2e9f0ce61b62925eae940e134561163fb801a70',
+        'reference' => '99af81c7257300275c781ef4bfd49708fb8d9501',
         'type' => 'wordpress-plugin',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -13,7 +13,7 @@
         'sigmadevs/easy-demo-importer' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
-            'reference' => 'a2e9f0ce61b62925eae940e134561163fb801a70',
+            'reference' => '99af81c7257300275c781ef4bfd49708fb8d9501',
             'type' => 'wordpress-plugin',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

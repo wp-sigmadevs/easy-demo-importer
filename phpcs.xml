@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <ruleset name="WordPress Coding Standards">
-    <description>WordPress dev PHP_CodeSniffer ruleset.</description>
+    <description>A custom set of rules to check for WP projects</description>
 
     <config name="minimum_supported_wp_version" value="5.0.0" />
 
@@ -38,6 +38,9 @@
         <severity>0</severity>
     </rule>
     <rule ref="Generic.Arrays.DisallowLongArraySyntax.Found"/>
+    <rule ref="Universal">
+        <exclude name="Universal"/>
+    </rule>
 
     <!-- Adds exceptions in files and variables naming conventions. -->
     <rule ref="WordPress">
@@ -49,10 +52,6 @@
         <exclude name="Squiz.Commenting.FileComment.Missing"/>
         <exclude name="Squiz.Commenting.FileComment.Missing"/>
         <exclude name="Squiz.Commenting.FileComment.MissingPackageTag"/>
-    </rule>
-
-    <rule ref="WordPress">
-        <exclude name="Universal.Arrays.DisallowShortArraySyntax.Found"/>
     </rule>
 
     <!-- Allows hook names in dot/slash notation. -->

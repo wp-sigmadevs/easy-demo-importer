@@ -65,6 +65,7 @@ class ImportFluentForms extends ImporterAjax {
 	 * @since 1.0.0
 	 */
 	public function response() {
+		// Verifying AJAX call and user role.
 		Helpers::verifyAjaxCall();
 
 		$forms = $this->multiple ? Helpers::keyExists( $this->config['demoData'][ $this->demoSlug ]['fluentFormsJson'] ) : Helpers::keyExists( $this->config['fluentFormsJson'] );

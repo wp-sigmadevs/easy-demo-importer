@@ -143,10 +143,10 @@ class Enqueue extends EnqueueBase {
 				'homeUrl'                    => esc_url( home_url( '/' ) ),
 				'restApiUrl'                 => esc_url_raw( rest_url() ),
 				'restNonce'                  => wp_create_nonce( 'wp_rest' ),
-				'ediLogo'                    => $this->plugin->assetsUri() . '/images/sd-edi-logo.svg',
+				'ediLogo'                    => esc_url( $this->plugin->assetsUri() . '/images/sd-edi-logo.svg' ),
 				'numberOfDemos'              => ! empty( sd_edi()->getDemoConfig()['demoData'] ) ? count( sd_edi()->getDemoConfig()['demoData'] ) : 0,
 				Helpers::nonceId()           => wp_create_nonce( Helpers::nonceText() ),
-				'enableSupportButton'        => apply_filters( 'sd/edi/support_button', 'yes' ),
+				'enableSupportButton'        => esc_html( apply_filters( 'sd/edi/support_button', 'yes' ) ),
 
 				// Imports messages.
 				'prepareImporting'           => esc_html__( 'Preparing to install demo data. Doing some cleanups first.', 'easy-demo-importer' ),
