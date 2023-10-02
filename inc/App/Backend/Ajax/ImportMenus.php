@@ -62,6 +62,7 @@ class ImportMenus extends ImporterAjax {
 	 * @since 1.0.0
 	 */
 	public function response() {
+		// Verifying AJAX call and user role.
 		Helpers::verifyAjaxCall();
 
 		$menus = $this->multiple ? Helpers::keyExists( $this->config['demoData'][ $this->demoSlug ]['menus'], 'array' ) : Helpers::keyExists( $this->config['menus'], 'array' );

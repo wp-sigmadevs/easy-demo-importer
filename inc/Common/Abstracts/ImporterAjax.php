@@ -94,6 +94,24 @@ abstract class ImporterAjax {
 	 * @see Requester::isAdminBackend()
 	 */
 	public function register() {
+		// Verify if the Post submission is a correct one.
+		if ( ! $this->verifyPostSubmission() ) {
+			return;
+		}
+
+		// Verify if the user has the correct role.
+		Helpers::verifyUserRole();
+
+		// Handle the Post submission.
+		$this->handlePostSubmission();
+	}
+
+	/**
+	 * Handles post submission.
+	 *
+	 * @return void
+	 */
+	protected function handlePostSubmission() {
 		// Theme config.
 		$this->config = sd_edi()->getDemoConfig();
 
@@ -110,13 +128,27 @@ abstract class ImporterAjax {
 		// Demo slug.
 		$this->demoSlug = $this->getDemoSlug();
 
-		// Check if images import is needed.
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$this->excludeImages = ! empty( $_POST['excludeImages'] ) ? sanitize_text_field( wp_unslash( $_POST['excludeImages'] ) ) : '';
+		if ( check_ajax_referer( Helpers::nonceText(), Helpers::nonceId() ) ) {
+			// Check if images import is needed.
+			$this->excludeImages = ! empty( $_POST['excludeImages'] ) ? sanitize_text_field( wp_unslash( $_POST['excludeImages'] ) ) : '';
 
-		// Check if database reset needed.
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$this->reset = isset( $_POST['reset'] ) && 'true' === sanitize_text_field( wp_unslash( $_POST['reset'] ) );
+			// Check if database reset needed.
+			$this->reset = isset( $_POST['reset'] ) && 'true' === sanitize_text_field( wp_unslash( $_POST['reset'] ) );
+		}
+	}
+
+	/**
+	 * Verifies the current request.
+	 *
+	 * @return bool True if it's a verified post submission, false otherwise.
+	 */
+	protected function verifyPostSubmission() {
+		return (
+			isset( $_POST['action'] ) &&
+			isset( $_POST['demo'] ) &&
+			isset( $_POST[ Helpers::nonceId() ] ) &&
+			check_admin_referer( Helpers::nonceText(), Helpers::nonceId() )
+		);
 	}
 
 	/**
@@ -127,14 +159,16 @@ abstract class ImporterAjax {
 	 * @since 1.0.0
 	 */
 	private function getDemoSlug() {
+		if ( ! check_ajax_referer( Helpers::nonceText(), Helpers::nonceId() ) ) {
+			return '';
+		}
+
 		$firstDemoSlug = array_key_first( $this->config['demoData'] );
 
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing
 		if ( empty( $_POST['demo'] ) ) {
 			return $firstDemoSlug;
 		}
 
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing
 		$demoSlug = sanitize_text_field( wp_unslash( $_POST['demo'] ) );
 
 		return $this->multiple ? $this->config['demoData'][ $demoSlug ] : $demoSlug;

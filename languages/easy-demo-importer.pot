@@ -6,7 +6,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2023-09-28 19:48+0000\n"
+"POT-Creation-Date: 2023-10-02 20:07+0000\n"
 "Report-Msgid-Bugs-To: https://github.com/wp-sigmadevs/easy-demo-importer/issues\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -614,13 +614,16 @@ msgstr ""
 msgid "No issue"
 msgstr ""
 
-#. translators: %1$s - opening div and paragraph HTML tags, %2$s - closing div and paragraph HTML tags.
 #: ../dist/easy-demo-importer/inc/Common/Functions/Helpers.php:79, ../inc/Common/Functions/Helpers.php:79
-msgid "%1$sYour user role isn't high enough. You don't have permission to import demo data.%2$s"
+msgid "Security Check Failed. Access Denied!"
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/Common/Functions/Helpers.php:99, ../inc/Common/Functions/Helpers.php:99
+msgid "You do not have the necessary permissions to import. Access Denied!"
 msgstr ""
 
 #. translators: View file name.
-#: ../dist/easy-demo-importer/inc/Common/Functions/Helpers.php:191, ../inc/Common/Functions/Helpers.php:191
+#: ../dist/easy-demo-importer/inc/Common/Functions/Helpers.php:209, ../inc/Common/Functions/Helpers.php:209
 msgid "%s file not found"
 msgstr ""
 
@@ -637,7 +640,7 @@ msgid "The customizer import file is not suitable for current theme. You can onl
 msgstr ""
 
 #. translators: the row number.
-#: ../dist/easy-demo-importer/inc/Common/Models/DBSearchReplace.php:317, ../inc/Common/Models/DBSearchReplace.php:317
+#: ../dist/easy-demo-importer/inc/Common/Models/DBSearchReplace.php:321, ../inc/Common/Models/DBSearchReplace.php:321
 msgid "Error updating row: %d."
 msgstr ""
 
@@ -691,7 +694,7 @@ msgstr ""
 msgid "Error source: %s"
 msgstr ""
 
-#: ../dist/easy-demo-importer/lib/wordpress-importer/parsers/class-wxr-parser-regex.php:179, ../dist/easy-demo-importer/lib/wordpress-importer/parsers/class-wxr-parser-simplexml.php:68, ../dist/easy-demo-importer/lib/wordpress-importer/parsers/class-wxr-parser-simplexml.php:75, ../dist/easy-demo-importer/lib/wordpress-importer/parsers/class-wxr-parser-xml.php:239, ../lib/wordpress-importer/parsers/class-wxr-parser-regex.php:179, ../lib/wordpress-importer/parsers/class-wxr-parser-simplexml.php:68, ../lib/wordpress-importer/parsers/class-wxr-parser-simplexml.php:75, ../lib/wordpress-importer/parsers/class-wxr-parser-xml.php:239
+#: ../dist/easy-demo-importer/lib/wordpress-importer/parsers/class-wxr-parser-regex.php:179, ../dist/easy-demo-importer/lib/wordpress-importer/parsers/class-wxr-parser-simplexml.php:68, ../dist/easy-demo-importer/lib/wordpress-importer/parsers/class-wxr-parser-simplexml.php:75, ../dist/easy-demo-importer/lib/wordpress-importer/parsers/class-wxr-parser-xml.php:240, ../lib/wordpress-importer/parsers/class-wxr-parser-regex.php:179, ../lib/wordpress-importer/parsers/class-wxr-parser-simplexml.php:68, ../lib/wordpress-importer/parsers/class-wxr-parser-simplexml.php:75, ../lib/wordpress-importer/parsers/class-wxr-parser-xml.php:240
 msgid "This does not appear to be a WXR file, missing/invalid WXR version number"
 msgstr ""
 
@@ -699,135 +702,135 @@ msgstr ""
 msgid "There was an error when reading this WXR file"
 msgstr ""
 
-#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/ActivatePlugins.php:97, ../inc/App/Backend/Ajax/ActivatePlugins.php:97
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/ActivatePlugins.php:98, ../inc/App/Backend/Ajax/ActivatePlugins.php:98
 msgid "Downloading demo files from server."
 msgstr ""
 
-#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/ActivatePlugins.php:98, ../inc/App/Backend/Ajax/ActivatePlugins.php:98
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/ActivatePlugins.php:99, ../inc/App/Backend/Ajax/ActivatePlugins.php:99
 msgid "Required plugins activation done."
 msgstr ""
 
-#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/ActivatePlugins.php:98, ../inc/App/Backend/Ajax/ActivatePlugins.php:98
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/ActivatePlugins.php:99, ../inc/App/Backend/Ajax/ActivatePlugins.php:99
 msgid "Required plugins are already activated."
 msgstr ""
 
-#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/CustomizerImport.php:81, ../inc/App/Backend/Ajax/CustomizerImport.php:81
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/CustomizerImport.php:82, ../inc/App/Backend/Ajax/CustomizerImport.php:82
 msgid "Setting navigation menus."
 msgstr ""
 
-#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/CustomizerImport.php:82, ../inc/App/Backend/Ajax/CustomizerImport.php:82
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/CustomizerImport.php:83, ../inc/App/Backend/Ajax/CustomizerImport.php:83
 msgid "Customizer settings imported."
 msgstr ""
 
-#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/CustomizerImport.php:82, ../inc/App/Backend/Ajax/CustomizerImport.php:82
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/CustomizerImport.php:83, ../inc/App/Backend/Ajax/CustomizerImport.php:83
 msgid "Customizer settings import not required."
 msgstr ""
 
-#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/DownloadFiles.php:76, ../inc/App/Backend/Ajax/DownloadFiles.php:76
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/DownloadFiles.php:77, ../inc/App/Backend/Ajax/DownloadFiles.php:77
 msgid "Importing all sorts of contents. This will take some time."
 msgstr ""
 
-#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/DownloadFiles.php:77, ../inc/App/Backend/Ajax/DownloadFiles.php:77
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/DownloadFiles.php:78, ../inc/App/Backend/Ajax/DownloadFiles.php:78
 msgid "Demo files Successfully downloaded."
 msgstr ""
 
-#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/DownloadFiles.php:79, ../inc/App/Backend/Ajax/DownloadFiles.php:79
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/DownloadFiles.php:80, ../inc/App/Backend/Ajax/DownloadFiles.php:80
 msgid "Import failed. Demo files can not be downloaded."
 msgstr ""
 
-#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/Finalize.php:80, ../inc/App/Backend/Ajax/Finalize.php:80
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/Finalize.php:81, ../inc/App/Backend/Ajax/Finalize.php:81
 msgid "Congratulations! All done. Have fun!"
 msgstr ""
 
-#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/ImportFluentForms.php:81, ../inc/App/Backend/Ajax/ImportFluentForms.php:81
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/ImportFluentForms.php:82, ../inc/App/Backend/Ajax/ImportFluentForms.php:82
 msgid "Importing all widgets."
 msgstr ""
 
-#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/ImportFluentForms.php:82, ../inc/App/Backend/Ajax/ImportFluentForms.php:82
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/ImportFluentForms.php:83, ../inc/App/Backend/Ajax/ImportFluentForms.php:83
 msgid "Fluent forms successfully imported."
 msgstr ""
 
-#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/ImportFluentForms.php:82, ../inc/App/Backend/Ajax/ImportFluentForms.php:82
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/ImportFluentForms.php:83, ../inc/App/Backend/Ajax/ImportFluentForms.php:83
 msgid "No Fluent forms found."
 msgstr ""
 
-#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/ImportMenus.php:76, ../inc/App/Backend/Ajax/ImportMenus.php:76
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/ImportMenus.php:77, ../inc/App/Backend/Ajax/ImportMenus.php:77
 msgid "Importing theme settings."
 msgstr ""
 
-#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/ImportMenus.php:77, ../inc/App/Backend/Ajax/ImportMenus.php:77
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/ImportMenus.php:78, ../inc/App/Backend/Ajax/ImportMenus.php:78
 msgid "Nav Menus saved successfully."
 msgstr ""
 
-#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/ImportMenus.php:77, ../inc/App/Backend/Ajax/ImportMenus.php:77
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/ImportMenus.php:78, ../inc/App/Backend/Ajax/ImportMenus.php:78
 msgid "No nav menus found."
 msgstr ""
 
-#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/ImportSettings.php:101, ../inc/App/Backend/Ajax/ImportSettings.php:101
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/ImportSettings.php:102, ../inc/App/Backend/Ajax/ImportSettings.php:102
 msgid "Importing Fluent forms."
 msgstr ""
 
-#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/ImportSettings.php:101, ../inc/App/Backend/Ajax/ImportSettings.php:101
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/ImportSettings.php:102, ../inc/App/Backend/Ajax/ImportSettings.php:102
 msgid "Importing all widgets"
 msgstr ""
 
-#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/ImportSettings.php:102, ../inc/App/Backend/Ajax/ImportSettings.php:102
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/ImportSettings.php:103, ../inc/App/Backend/Ajax/ImportSettings.php:103
 msgid "Theme settings successfully imported."
 msgstr ""
 
-#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/ImportSettings.php:102, ../inc/App/Backend/Ajax/ImportSettings.php:102
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/ImportSettings.php:103, ../inc/App/Backend/Ajax/ImportSettings.php:103
 msgid "Theme settings import not required."
 msgstr ""
 
-#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/ImportWidgets.php:84, ../inc/App/Backend/Ajax/ImportWidgets.php:84
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/ImportWidgets.php:85, ../inc/App/Backend/Ajax/ImportWidgets.php:85
 msgid "Importing Revolution Slider."
 msgstr ""
 
-#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/ImportWidgets.php:84, ../inc/App/Backend/Ajax/ImportWidgets.php:84
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/ImportWidgets.php:85, ../inc/App/Backend/Ajax/ImportWidgets.php:85
 msgid "Finalizing demo data import."
 msgstr ""
 
-#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/ImportWidgets.php:85, ../inc/App/Backend/Ajax/ImportWidgets.php:85
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/ImportWidgets.php:86, ../inc/App/Backend/Ajax/ImportWidgets.php:86
 msgid "Widgets successfully imported."
 msgstr ""
 
-#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/ImportWidgets.php:85, ../inc/App/Backend/Ajax/ImportWidgets.php:85
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/ImportWidgets.php:86, ../inc/App/Backend/Ajax/ImportWidgets.php:86
 msgid "No widgets found."
 msgstr ""
 
-#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/Initialize.php:91, ../inc/App/Backend/Ajax/Initialize.php:91
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/Initialize.php:92, ../inc/App/Backend/Ajax/Initialize.php:92
 msgid "Installing required plugins."
 msgstr ""
 
-#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/Initialize.php:92, ../inc/App/Backend/Ajax/Initialize.php:92
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/Initialize.php:93, ../inc/App/Backend/Ajax/Initialize.php:93
 msgid "Database reset completed."
 msgstr ""
 
-#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/Initialize.php:92, ../inc/App/Backend/Ajax/Initialize.php:92
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/Initialize.php:93, ../inc/App/Backend/Ajax/Initialize.php:93
 msgid "Minor cleanups done."
 msgstr ""
 
-#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/InstallDemo.php:92, ../inc/App/Backend/Ajax/InstallDemo.php:92
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/InstallDemo.php:93, ../inc/App/Backend/Ajax/InstallDemo.php:93
 msgid "Importing Customizer settings."
 msgstr ""
 
-#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/InstallDemo.php:93, ../inc/App/Backend/Ajax/InstallDemo.php:93
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/InstallDemo.php:94, ../inc/App/Backend/Ajax/InstallDemo.php:94
 msgid "All contents are imported successfully."
 msgstr ""
 
-#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/InstallDemo.php:95, ../inc/App/Backend/Ajax/InstallDemo.php:95
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/InstallDemo.php:96, ../inc/App/Backend/Ajax/InstallDemo.php:96
 msgid "Demo import process failed. No content file found."
 msgstr ""
 
-#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/InstallPlugins.php:100, ../inc/App/Backend/Ajax/InstallPlugins.php:100
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/InstallPlugins.php:101, ../inc/App/Backend/Ajax/InstallPlugins.php:101
 msgid "Activating required plugins"
 msgstr ""
 
-#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/InstallPlugins.php:101, ../inc/App/Backend/Ajax/InstallPlugins.php:101
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/InstallPlugins.php:102, ../inc/App/Backend/Ajax/InstallPlugins.php:102
 msgid "Required plugins installation done."
 msgstr ""
 
-#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/InstallPlugins.php:101, ../inc/App/Backend/Ajax/InstallPlugins.php:101
+#: ../dist/easy-demo-importer/inc/App/Backend/Ajax/InstallPlugins.php:102, ../inc/App/Backend/Ajax/InstallPlugins.php:102
 msgid "Required plugins are already installed."
 msgstr ""
 

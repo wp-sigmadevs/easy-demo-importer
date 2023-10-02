@@ -62,6 +62,7 @@ class DownloadFiles extends ImporterAjax {
 	 * @since 1.0.0
 	 */
 	public function response() {
+		// Verifying AJAX call and user role.
 		Helpers::verifyAjaxCall();
 
 		if ( $this->multiple ) {

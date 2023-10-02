@@ -64,22 +64,40 @@ class Helpers {
 	}
 
 	/**
-	 * Check if the AJAX call is valid.
+	 * Check if the AJAX call is valid and
+	 * the user has sufficient permission.
 	 *
 	 * @return void
 	 * @since  1.0.0
 	 */
 	public static function verifyAjaxCall() {
-		check_ajax_referer( self::nonceText(), self::nonceId() );
+		// Verifies the Ajax request.
+		if ( ! check_ajax_referer( self::nonceText(), self::nonceId(), false ) ) {
+			wp_send_json(
+				[
+					'error'        => true,
+					'errorMessage' => esc_html__( 'Security Check Failed. Access Denied!', 'easy-demo-importer' ),
+				]
+			);
+		}
 
+		// Verifies the user role.
+		self::verifyUserRole();
+	}
+
+	/**
+	 * Verify if the current user has the 'import' capability.
+	 *
+	 * @return void
+	 * @since 1.0.0
+	 */
+	public static function verifyUserRole() {
 		if ( ! current_user_can( 'import' ) ) {
-			wp_die(
-				sprintf(
-					/* translators: %1$s - opening div and paragraph HTML tags, %2$s - closing div and paragraph HTML tags. */
-					esc_html__( '%1$sYour user role isn\'t high enough. You don\'t have permission to import demo data.%2$s', 'easy-demo-importer' ),
-					'<div class="notice notice-error"><p>',
-					'</p></div>'
-				)
+			wp_send_json(
+				[
+					'error'        => true,
+					'errorMessage' => esc_html__( 'You do not have the necessary permissions to import. Access Denied!', 'easy-demo-importer' ),
+				]
 			);
 		}
 	}
