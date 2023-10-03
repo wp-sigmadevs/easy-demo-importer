@@ -1,8 +1,8 @@
 <?php
 /**
- * Backend Ajax Class: CustomizerImport
+ * Backend Ajax Class: ImportWidgets
  *
- * Initializes the Customizer import Process.
+ * Initializes the widgets import Process.
  *
  * @package SigmaDevs\EasyDemoImporter
  * @since   1.0.0
@@ -10,12 +10,12 @@
 
 declare( strict_types=1 );
 
-namespace SigmaDevs\EasyDemoImporter\App\Backend\Ajax;
+namespace SigmaDevs\EasyDemoImporter\App\Ajax\Backend;
 
 use SigmaDevs\EasyDemoImporter\Common\{
+	Models\Widgets,
 	Traits\Singleton,
 	Functions\Helpers,
-	Models\Customizer,
 	Abstracts\ImporterAjax
 };
 
@@ -25,11 +25,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Backend Ajax Class: CustomizerImport
+ * Backend Ajax Class: ImportWidgets
  *
  * @since 1.0.0
  */
-class CustomizerImport extends ImporterAjax {
+class ImportWidgets extends ImporterAjax {
 	/**
 	 * Singleton trait.
 	 *
@@ -53,7 +53,7 @@ class CustomizerImport extends ImporterAjax {
 	public function register() {
 		parent::register();
 
-		add_action( 'wp_ajax_sd_edi_import_customizer', [ $this, 'response' ] );
+		add_action( 'wp_ajax_sd_edi_import_widgets', [ $this, 'response' ] );
 	}
 
 	/**
@@ -66,21 +66,24 @@ class CustomizerImport extends ImporterAjax {
 		// Verifying AJAX call and user role.
 		Helpers::verifyAjaxCall();
 
-		$customizerFilePath = $this->demoUploadDir( $this->demoDir() ) . '/customizer.dat';
-		$fileExists         = file_exists( $customizerFilePath );
+		$widgetsFilePath = $this->demoUploadDir( $this->demoDir() ) . '/widget.wie';
+		$fileExists      = file_exists( $widgetsFilePath );
 
 		if ( $fileExists ) {
-			// Import customizer data.
+			// Import widgets data.
 			ob_start();
-			( new Customizer() )->import( $customizerFilePath, $this->excludeImages );
+			( new Widgets() )->import( $widgetsFilePath );
 			ob_end_clean();
 		}
 
+		// TODO: Need to integrate revolution slider import.
+		$sliderFileExists = file_exists( $this->demoUploadDir( $this->demoSlug ) . '/revslider.zip' );
+
 		// Response.
 		$this->prepareResponse(
-			'sd_edi_import_menus',
-			$fileExists ? esc_html__( 'Setting navigation menus.', 'easy-demo-importer' ) : '',
-			$fileExists ? esc_html__( 'Customizer settings imported.', 'easy-demo-importer' ) : esc_html__( 'Customizer settings import not required.', 'easy-demo-importer' )
+			$sliderFileExists ? 'sd_edi_import_revslider' : 'sd_edi_finalize_demo',
+			$sliderFileExists ? esc_html__( 'Importing Revolution Slider.', 'easy-demo-importer' ) : esc_html__( 'Finalizing demo data import.', 'easy-demo-importer' ),
+			$fileExists ? esc_html__( 'Widgets successfully imported.', 'easy-demo-importer' ) : esc_html__( 'No widgets found.', 'easy-demo-importer' )
 		);
 	}
 }

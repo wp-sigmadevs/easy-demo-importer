@@ -37,6 +37,7 @@ final class Classes {
 			[ 'register' => 'App\\General' ],
 			[ 'register' => 'App\\Rest' ],
 			[ 'register' => 'App\\Backend', 'onRequest' => 'backend' ],
+			[ 'register' => 'App\\Ajax\\Backend', 'onRequest' => 'import' ],
 		];
 		// phpcs:enable
 	}
