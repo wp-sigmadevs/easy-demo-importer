@@ -11,15 +11,3 @@ $color-grey: var(--edi-color-grey);
 $color-border: var(--edi-color-border);
 
 $default-gutter: 30px;
-
-// Breakpoints
-$breakpoints: (
-	"xs": (max-width: 575px,
-	),
-	"sm": (max-width: 767px,
-	),
-	"md": (max-width: 991px,
-	),
-	"lg": (max-width: 1199px,
-	),
-) !default;

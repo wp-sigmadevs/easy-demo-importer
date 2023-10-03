@@ -13,6 +13,8 @@ declare( strict_types=1 );
 
 namespace SigmaDevs\EasyDemoImporter\Common\Traits;
 
+use SigmaDevs\EasyDemoImporter\Common\Functions\Helpers;
+
 // Do not allow directly accessing this file.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit( 'This script cannot be accessed directly.' );
@@ -36,6 +38,8 @@ trait Requester {
 		switch ( $type ) {
 			case 'frontend':
 				return $this->isFrontend();
+			case 'import':
+				return $this->isImportProcess();
 			case 'backend':
 				return $this->isAdminBackend();
 			case 'cron':
@@ -61,6 +65,31 @@ trait Requester {
 	 */
 	public function isFrontend() {
 		return ! $this->isAdminBackend() && ! $this->isCron();
+	}
+
+	/**
+	 * Is it the import process?
+	 *
+	 * @return bool
+	 * @since 1.0.0
+	 */
+	public function isImportProcess() {
+		return $this->isAdminBackend() && $this->verifyPostSubmission();
+	}
+
+	/**
+	 * Verifies the current post request.
+	 *
+	 * @return bool
+	 * @since 1.0.0
+	 */
+	public function verifyPostSubmission() {
+		return (
+			isset( $_POST['action'] ) &&
+			isset( $_POST['demo'] ) &&
+			isset( $_POST[ Helpers::nonceId() ] ) &&
+			check_admin_referer( Helpers::nonceText(), Helpers::nonceId() )
+		);
 	}
 
 	/**

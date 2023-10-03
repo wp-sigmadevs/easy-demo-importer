@@ -10,7 +10,7 @@
 
 declare( strict_types=1 );
 
-namespace SigmaDevs\EasyDemoImporter\App\Backend\Ajax;
+namespace SigmaDevs\EasyDemoImporter\App\Ajax\Backend;
 
 use SigmaDevs\EasyDemoImporter\Common\{
 	Traits\Singleton,

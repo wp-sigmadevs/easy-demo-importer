@@ -94,11 +94,6 @@ abstract class ImporterAjax {
 	 * @see Requester::isAdminBackend()
 	 */
 	public function register() {
-		// Verify if the Post submission is a correct one.
-		if ( ! $this->verifyPostSubmission() ) {
-			return;
-		}
-
 		// Verify if the user has the correct role.
 		Helpers::verifyUserRole();
 
@@ -135,20 +130,6 @@ abstract class ImporterAjax {
 			// Check if database reset needed.
 			$this->reset = isset( $_POST['reset'] ) && 'true' === sanitize_text_field( wp_unslash( $_POST['reset'] ) );
 		}
-	}
-
-	/**
-	 * Verifies the current request.
-	 *
-	 * @return bool True if it's a verified post submission, false otherwise.
-	 */
-	protected function verifyPostSubmission() {
-		return (
-			isset( $_POST['action'] ) &&
-			isset( $_POST['demo'] ) &&
-			isset( $_POST[ Helpers::nonceId() ] ) &&
-			check_admin_referer( Helpers::nonceText(), Helpers::nonceId() )
-		);
 	}
 
 	/**
