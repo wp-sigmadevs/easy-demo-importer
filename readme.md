@@ -79,10 +79,3 @@ Empowering developers with precise control, our plugin offers advanced Elementor
 The Easy Demo Importer provides an extensive array of hooks that empower developers to execute advanced custom actions. These hooks give you complete control over the import process, allowing for fine-tuned adjustments and customizations.
 
 The Easy Demo Importer empowers you to create beautiful, feature-rich websites with minimal effort. Whether a beginner or a seasoned developer, this plugin is your gateway to hassle-free demo imports and a highly customizable WordPress experience.
-
-For any bugs or suggestions, please email us: service.sigmadevs@gmail.com
-
-#### REQUIREMENTS
-
--   **WordPress version:**  >= 5.5
--   **PHP version:**  >= 7.4
