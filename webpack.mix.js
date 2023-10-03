@@ -40,6 +40,7 @@ if (process.env.npm_config_package) {
 			"lib",
 			"vendor",
 			"views",
+			"src",
 			"index.php",
 			"readme.txt",
 			`${package_slug}.php`,

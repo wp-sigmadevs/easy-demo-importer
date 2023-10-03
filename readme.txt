@@ -16,20 +16,25 @@ A one-click, user-friendly WordPress plugin for effortlessly importing theme dem
 
 The Easy Demo Importer is your go-to solution for effortlessly bringing your WordPress site to life. With its user-friendly interface and robust feature set, it streamlines the process of importing demo content, offering an unparalleled level of convenience for both users and developers.
 
+Check out our [Official GitHub repository here](https://github.com/wp-sigmadevs/easy-demo-importer).
+
 == Main Features ==
 
-* One-Click Demo Imports
-* Based on WordPress Importer
+* One-Click Demo Import System
+* Based on WordPress XML Importer
 * Comprehensive Content Replication
 * User-Friendly Interface
 * Universal Theme Compatibility
 * Developer-Friendly Customization
-* High Customization for Single and Multipurpose Demo Imports
+* Option to Reset Database
+* Imports Fluent Forms
+* Imports any Plugin Settings and Theme Options
+* Full Site or Multipurpose Site Imports
 * Modern React-Powered Pages
-* Built-in Plugin Installer
+* Built-in Required plugins Installer
 * Built-in System Status Checker
-* Automatic URL and Email Replacement
-* Advanced Elementor Configuration
+* Automatic URL and Commenter Email Replacement
+* Taxonomy Data Fix for Elementor Data Import
 * Developer Hooks for Custom Actions
 
 == Simplified Demo Imports ==
@@ -82,7 +87,7 @@ Before you dive into the import process, ensure that your website meets the mini
 
 == Automatic URL and Email Replacement ==
 
-Our plugin includes an in-built versatile URL and email replacement tool, designed with developers in mind. This feature enables you to effortlessly update URLs and email addresses throughout your imported content, aligning your imported content with your website's domain, saving time and reducing errors.
+Our plugin includes an in-built versatile URL and email replacement tool, designed with developers in mind. This feature enables you to effortlessly update URLs and commenter email addresses throughout your imported content, aligning your imported content with your website's domain, saving time and reducing errors.
 
 == Advanced Elementor Configuration ==
 
