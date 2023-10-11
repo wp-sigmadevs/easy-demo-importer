@@ -150,9 +150,9 @@ abstract class ImporterAjax {
 			return $firstDemoSlug;
 		}
 
-		$demoSlug = sanitize_text_field( wp_unslash( $_POST['demo'] ) );
+		return sanitize_text_field( wp_unslash( $_POST['demo'] ) );
 
-		return $this->multiple ? $this->config['demoData'][ $demoSlug ] : $demoSlug;
+		//return $this->multiple ? $this->config['demoData'][ $demoSlug ] : $demoSlug;
 	}
 
 	/**
