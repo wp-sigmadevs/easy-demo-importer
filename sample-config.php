@@ -33,22 +33,28 @@ class Demo_Importer {
 			'themeName'             => 'Twenty Twenty-One',
 			'themeSlug'             => 'twentytwentyone',
 			'multipleZip'           => true,
-			'urlToReplace'          => 'sample.sigmadevs.com',
+			'urlToReplace'          => 'https://demoimport.sigmadevs.com/',
 			'replaceCommenterEmail' => 'email@example.com',
 			'demoData'              => [
-				'default-home' => [
-					'name'            => esc_html__( 'Default', 'easy-demo-importer' ),
-					'previewImage'    => 'https://sample.sigmadevs.com/demos/twentytwentyone/default/preview.jpg',
-					'previewUrl'      => 'https://sample.sigmadevs.com/',
-					'demoZip'         => 'https://sample.sigmadevs.com/demos/twentytwentyone/default/default.zip',
+				'marketing-agency' => [
+					'name'            => esc_html__( 'Marketing Agency', 'easy-demo-importer' ),
+					'previewImage'    => 'https://sample.sigmadevs.com/demos/twentytwentyone/marketing-agency/preview.jpg',
+					'previewUrl'      => 'https://demoimport.sigmadevs.com/',
+					'demoZip'         => 'https://sample.sigmadevs.com/demos/twentytwentyone/marketing-agency/marketing-agency.zip',
 					'blogSlug'        => 'blog',
 					'settingsJson'    => [
+						'__fluentform_global_form_settings',
 						'rtsb_settings',
+						'rtsb_tb_template_default_archive',
+						'rtsb_tb_template_default_cart',
+						'rtsb_tb_template_default_checkout',
+						'rtsb_tb_template_default_product',
+						'rtsb_tb_template_default_shop',
 					],
 					'fluentFormsJson' => 'fluentforms',
 					'menus'           => [
-						'primary' => 'Primary Menu',
-						'footer'  => 'Secondary Menu',
+						'primary' => 'Main Menu',
+						'footer'  => 'Secondary',
 					],
 					'plugins'         => [
 						'elementor'   => [
