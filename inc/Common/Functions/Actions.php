@@ -232,9 +232,17 @@ class Actions {
 	public static function replaceUrls( $obj ) {
 		global $wpdb;
 
-		if ( ! empty( $obj->config['replaceCommenterEmail'] ) ) {
+		$emailToReplace = ! empty( $obj->config['replaceCommenterEmail'] ) ? $obj->config['replaceCommenterEmail'] : '';
+		$urlToReplace   = ! empty( $obj->config['urlToReplace'] ) ? $obj->config['urlToReplace'] : '';
+
+		if ( $obj->config['multipleZip'] ) {
+			$emailToReplace = ! empty( $obj->config['demoData'][ $obj->demoSlug ]['replaceCommenterEmail'] ) ? $obj->config['demoData'][ $obj->demoSlug ]['replaceCommenterEmail'] : $emailToReplace;
+			$urlToReplace   = ! empty( $obj->config['demoData'][ $obj->demoSlug ]['urlToReplace'] ) ? $obj->config['demoData'][ $obj->demoSlug ]['urlToReplace'] : $urlToReplace;
+		}
+
+		if ( ! empty( $emailToReplace ) ) {
 			// Commenter email.
-			$commenter_email     = esc_sql( $obj->config['replaceCommenterEmail'] );
+			$commenter_email     = esc_sql( $emailToReplace );
 			$commenter_new_email = esc_sql( get_bloginfo( 'admin_email' ) );
 			$commenter_new_url   = esc_sql( home_url() );
 
@@ -249,7 +257,7 @@ class Actions {
 			);
 		}
 
-		if ( empty( $obj->config['urlToReplace'] ) ) {
+		if ( empty( $urlToReplace ) ) {
 			return new static();
 		}
 
@@ -267,11 +275,11 @@ class Actions {
 
 		$urls = [
 			'unslash' => [
-				'old' => untrailingslashit( $obj->config['urlToReplace'] ),
+				'old' => untrailingslashit( $urlToReplace ),
 				'new' => home_url(),
 			],
 			'slash'   => [
-				'old' => trailingslashit( $obj->config['urlToReplace'] ),
+				'old' => trailingslashit( $urlToReplace ),
 				'new' => home_url( '/' ),
 			],
 		];
