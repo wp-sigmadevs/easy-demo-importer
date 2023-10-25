@@ -30,19 +30,19 @@ class Demo_Importer {
 	 */
 	public function sd_edi_single_site_config() {
 		return [
-			'themeName'             => 'Twenty Twenty-One',
-			'themeSlug'             => 'twentytwentyone',
-			'multipleZip'           => true,
-			'urlToReplace'          => 'https://demoimport.sigmadevs.com/',
-			'replaceCommenterEmail' => 'email@example.com',
-			'demoData'              => [
+			'themeName'   => 'Twenty Twenty-One',
+			'themeSlug'   => 'twentytwentyone',
+			'multipleZip' => true,
+			'demoData'    => [
 				'marketing-agency' => [
-					'name'            => esc_html__( 'Marketing Agency', 'easy-demo-importer' ),
-					'previewImage'    => 'https://sample.sigmadevs.com/demos/twentytwentyone/marketing-agency/preview.jpg',
-					'previewUrl'      => 'https://demoimport.sigmadevs.com/',
-					'demoZip'         => 'https://sample.sigmadevs.com/demos/twentytwentyone/marketing-agency/marketing-agency.zip',
-					'blogSlug'        => 'blog',
-					'settingsJson'    => [
+					'name'                  => esc_html__( 'Marketing Agency', 'easy-demo-importer' ),
+					'previewImage'          => 'https://sample.sigmadevs.com/demos/twentytwentyone/marketing-agency/preview.jpg',
+					'previewUrl'            => 'https://demoimport.sigmadevs.com/',
+					'demoZip'               => 'https://sample.sigmadevs.com/demos/twentytwentyone/marketing-agency/marketing-agency.zip',
+					'blogSlug'              => 'blog',
+					'urlToReplace'          => 'https://demoimport.sigmadevs.com/',
+					'replaceCommenterEmail' => 'email@example.com',
+					'settingsJson'          => [
 						'__fluentform_global_form_settings',
 						'rtsb_settings',
 						'rtsb_tb_template_default_archive',
@@ -51,12 +51,12 @@ class Demo_Importer {
 						'rtsb_tb_template_default_product',
 						'rtsb_tb_template_default_shop',
 					],
-					'fluentFormsJson' => 'fluentforms',
-					'menus'           => [
+					'fluentFormsJson'       => 'fluentforms',
+					'menus'                 => [
 						'primary' => 'Main Menu',
 						'footer'  => 'Secondary',
 					],
-					'plugins'         => [
+					'plugins'               => [
 						'elementor'   => [
 							'name'     => 'Elementor Page Builder',
 							'source'   => 'wordpress',
@@ -71,6 +71,69 @@ class Demo_Importer {
 							'name'     => 'WP Fluent Forms',
 							'source'   => 'wordpress',
 							'filePath' => 'fluentform/fluentform.php',
+						],
+						'woocommerce' => [
+							'name'     => 'WooCommerce',
+							'source'   => 'wordpress',
+							'filePath' => 'woocommerce/woocommerce.php',
+						],
+						'shopbuilder' => [
+							'name'     => 'ShopBuilder',
+							'source'   => 'wordpress',
+							'filePath' => 'shopbuilder/shopbuilder.php',
+						],
+					],
+				],
+				'sigma-restaurant' => [
+					'name'                  => esc_html__( 'Sigma Restaurant', 'easy-demo-importer' ),
+					'previewImage'          => 'https://sample.sigmadevs.com/demos/twentytwentyone/sigma-restaurant/preview.jpg',
+					'previewUrl'            => 'https://demoimport2.sigmadevs.com/',
+					'demoZip'               => 'https://sample.sigmadevs.com/demos/twentytwentyone/sigma-restaurant/sigma-restaurant.zip',
+					'blogSlug'              => 'blog',
+					'urlToReplace'          => 'https://demoimport2.sigmadevs.com/',
+					'replaceCommenterEmail' => 'email@example.com',
+					'menus'                 => [
+						'primary' => 'Header Menu',
+						'footer'  => 'Social Menu',
+					],
+					'plugins'               => [
+						'twentig' => [
+							'name'     => 'Twentig',
+							'source'   => 'wordpress',
+							'filePath' => 'twentig/twentig.php',
+						],
+					],
+				],
+				'copywriter'       => [
+					'name'                  => esc_html__( 'Copywriter', 'easy-demo-importer' ),
+					'previewImage'          => 'https://sample.sigmadevs.com/demos/twentytwentyone/copywriter/preview.jpg',
+					'previewUrl'            => 'https://demoimport3.sigmadevs.com/',
+					'demoZip'               => 'https://sample.sigmadevs.com/demos/twentytwentyone/copywriter/copywriter.zip',
+					'blogSlug'              => 'news',
+					'urlToReplace'          => 'https://demoimport3.sigmadevs.com/',
+					'replaceCommenterEmail' => 'email@example.com',
+					'settingsJson'          => [
+						'rtsb_settings',
+						'rtsb_tb_template_default_archive',
+						'rtsb_tb_template_default_cart',
+						'rtsb_tb_template_default_checkout',
+						'rtsb_tb_template_default_product',
+						'rtsb_tb_template_default_shop',
+					],
+					'menus'                 => [
+						'primary' => 'Primary Nav',
+						'footer'  => 'Footer Socials',
+					],
+					'plugins'               => [
+						'elementor'   => [
+							'name'     => 'Elementor Page Builder',
+							'source'   => 'wordpress',
+							'filePath' => 'elementor/elementor.php',
+						],
+						'twentig'     => [
+							'name'     => 'Twentig',
+							'source'   => 'wordpress',
+							'filePath' => 'twentig/twentig.php',
 						],
 						'woocommerce' => [
 							'name'     => 'WooCommerce',
