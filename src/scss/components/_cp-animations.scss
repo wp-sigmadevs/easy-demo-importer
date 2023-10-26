@@ -111,3 +111,24 @@
 		opacity: 0.25;
 	}
 }
+
+@keyframes ediPulseRing {
+	0% {
+		transform: scale(.33);
+	}
+	80%, 100% {
+		opacity: 0;
+	}
+}
+
+@keyframes ediPulseDot {
+	0% {
+		transform: scale(.5);
+	}
+	50% {
+		transform: scale(1);
+	}
+	100% {
+		transform: scale(.5);
+	}
+}
