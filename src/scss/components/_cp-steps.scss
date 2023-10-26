@@ -63,6 +63,40 @@
 				}
 			}
 
+			.ant-steps-item-active {
+				.ant-steps-icon-dot {
+					@extend .edi-pos-r;
+
+					&::before {
+						content: '';
+						position: relative;
+						display: block;
+						width: 250%;
+						height: 250%;
+						box-sizing: border-box;
+						margin-left: -75%;
+						margin-top: -75%;
+						border-radius: 45px;
+						background-image: linear-gradient(109.6deg, rgb(45, 116, 213) 11.2%, rgb(121, 137, 212) 91.2%);
+						animation: ediPulseRing 1.125s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+					}
+
+					&::after {
+						content: '';
+						position: absolute;
+						left: 0;
+						top: 0;
+						display: block;
+						width: 100%;
+						height: 100%;
+						background-image: linear-gradient(109.6deg, rgb(45, 116, 213) 11.2%, rgb(121, 137, 212) 91.2%);
+						border-radius: 15px;
+						box-shadow: 0 0 8px rgba(0, 0, 0, .3);
+						animation: ediPulseDot 1.125s cubic-bezier(0.455, 0.03, 0.515, 0.955) -.4s infinite;
+					}
+				}
+			}
+
 			.ant-steps-item-finish {
 				.ant-steps-item-tail {
 					&::after {
