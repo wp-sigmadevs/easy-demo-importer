@@ -74,10 +74,10 @@ class DownloadFiles extends ImporterAjax {
 		// Response.
 		$this->prepareResponse(
 			$downloads ? 'sd_edi_import_xml' : '',
-			$downloads ? esc_html__( 'Importing all sorts of contents. This will take some time.', 'easy-demo-importer' ) : '',
-			$downloads ? esc_html__( 'Demo files Successfully downloaded.', 'easy-demo-importer' ) : '',
+			$downloads ? esc_html__( 'Importing content, sit back, relax! This might take a while.', 'easy-demo-importer' ) : '',
+			$downloads ? esc_html__( 'Demo files have landed, we are good to go!', 'easy-demo-importer' ) : '',
 			! $downloads,
-			! $downloads ? esc_html__( 'Import failed. Demo files can not be downloaded.', 'easy-demo-importer' ) : '',
+			! $downloads ? esc_html__( 'Import attempt failed. Demo files can not be downloaded.', 'easy-demo-importer' ) : '',
 		);
 	}
 

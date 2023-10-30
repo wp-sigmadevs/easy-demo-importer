@@ -91,7 +91,7 @@ class InstallDemo extends ImporterAjax {
 		$this->prepareResponse(
 			$fileExists ? 'sd_edi_import_customizer' : '',
 			$fileExists ? esc_html__( 'Importing Customizer settings.', 'easy-demo-importer' ) : '',
-			$fileExists ? esc_html__( 'All contents are imported successfully.', 'easy-demo-importer' ) : '',
+			$fileExists ? esc_html__( 'Everything has been imported smoothly.', 'easy-demo-importer' ) : '',
 			! $fileExists,
 			! $fileExists ? esc_html__( 'Demo import process failed. No content file found.', 'easy-demo-importer' ) : '',
 		);
