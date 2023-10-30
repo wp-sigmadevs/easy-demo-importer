@@ -95,8 +95,8 @@ class ActivatePlugins extends ImporterAjax {
 		// Response.
 		$this->prepareResponse(
 			'sd_edi_download_demo_files',
-			esc_html__( 'Downloading demo files from server.', 'easy-demo-importer' ),
-			$this->activeCount > 0 ? esc_html__( 'Required plugins activation done.', 'easy-demo-importer' ) : esc_html__( 'Required plugins are already activated.', 'easy-demo-importer' )
+			esc_html__( 'Fetching demo files from the server.', 'easy-demo-importer' ),
+			$this->activeCount > 0 ? esc_html__( 'Required plugins are activated. Awesome!', 'easy-demo-importer' ) : esc_html__( 'Plugins are active, ready to rock!', 'easy-demo-importer' )
 		);
 	}
 

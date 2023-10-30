@@ -78,7 +78,7 @@ class Finalize extends ImporterAjax {
 		$this->prepareResponse(
 			'',
 			'',
-			esc_html__( 'Congratulations! All done. Have fun!', 'easy-demo-importer' )
+			esc_html__( 'Hooray! You are all set! Now go out and have a blast!', 'easy-demo-importer' )
 		);
 	}
 }

@@ -75,7 +75,7 @@ class ImportMenus extends ImporterAjax {
 		$this->prepareResponse(
 			'sd_edi_import_settings',
 			esc_html__( 'Importing theme settings.', 'easy-demo-importer' ),
-			$menus ? esc_html__( 'Nav Menus saved successfully.', 'easy-demo-importer' ) : esc_html__( 'No nav menus found.', 'easy-demo-importer' )
+			$menus ? esc_html__( 'Nav Menus are locked and loaded.', 'easy-demo-importer' ) : esc_html__( 'Skipping the nav menus import!.', 'easy-demo-importer' )
 		);
 	}
 

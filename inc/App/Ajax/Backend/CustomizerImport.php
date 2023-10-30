@@ -79,8 +79,8 @@ class CustomizerImport extends ImporterAjax {
 		// Response.
 		$this->prepareResponse(
 			'sd_edi_import_menus',
-			$fileExists ? esc_html__( 'Setting navigation menus.', 'easy-demo-importer' ) : '',
-			$fileExists ? esc_html__( 'Customizer settings imported.', 'easy-demo-importer' ) : esc_html__( 'Customizer settings import not required.', 'easy-demo-importer' )
+			$fileExists ? esc_html__( 'Working on the menus, just a sec!', 'easy-demo-importer' ) : '',
+			$fileExists ? esc_html__( 'Customizer settings in place – all set!', 'easy-demo-importer' ) : esc_html__( 'Skipping the fancy customizer settings import!.', 'easy-demo-importer' )
 		);
 	}
 }
