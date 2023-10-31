@@ -14,90 +14,32 @@ A one-click, user-friendly WordPress plugin for effortlessly importing theme dem
 
 == Description ==
 
-The Easy Demo Importer is your go-to solution for effortlessly bringing your WordPress site to life. With its user-friendly interface and robust feature set, It makes importing demo content easy and convenient for both users and developers.
+Are you tired of the complex and time-consuming process of setting up your WordPress website? Look no further. The Easy Demo Importer plugin is your solution to effortlessly import demo data and have your website up and running in no time.
 
-[Official GitHub repository](https://github.com/wp-sigmadevs/easy-demo-importer) | Plugin Documentation (Coming Soon).
+👉 [Official GitHub repository](https://github.com/wp-sigmadevs/easy-demo-importer) | Plugin Documentation (Coming Soon). 👈
 
-== Main Features ==
+== Key Features ==
 
-* One-Click Demo Import System
-* Based on WordPress XML Importer
-* Comprehensive Content Replication
-* User-Friendly Interface
-* Full Site Import or Single Site Import
-* Universal Theme Compatibility
-* Developer-Friendly Customization
-* Option to Reset Database during import
-* Imports Fluent Forms
-* Imports any Plugin Settings and Theme Options
-* Modern React-Powered Pages
-* Built-in Required plugins Installer
-* Built-in System Status Checker
-* Automatic URL and Commenter Email Replacement
-* Taxonomy Data Fix for Elementor Data Import
-* Developer Hooks for Custom Actions
+* **One-Click Demo Import:** With just one click, you can import beautifully designed demo content to kickstart your website.
+* **Based on WordPress XML Importer:** Built on the reliable WordPress XML Importer, our plugin ensures a robust import process.
+* **Full Site or Single Site Import:** Demo import can be configured to import a whole demo or individual demos from a multipurpose theme.
+* **Complete Content Import:** Import Customizer settings, widgets, menus, options data, and more, ensuring your website looks and functions just like the demo.
+* **User-Friendly Interface:** Our intuitive interface makes it easy for users of all skill levels to import demo data.
+* **Universal Theme Compatibility:** Can be configured to work seamlessly with a wide range of WordPress themes, ensuring broad compatibility.
+* **Developer Hooks:** offers a wide range of hooks that give theme developers full control to perform advanced custom actions. These hooks allow for precise adjustments and customizations in the import process.
+* **Database Reset Option Included:** Theme users can decide whether to reset the database during import. It provides a clean slate for a fresh start.
+* **Media Import Control for Speed:** Our plugin offers flexibility by letting users choose whether to include media during demo imports. Disabling media import can speed up the setup for those who don't need media files.
+* **Plugin Settings and Theme Options:** Can be configured to import any plugin settings and theme options, ensuring a cohesive website setup.
+* **Fluent Forms Import:** Automatically imports Fluent Forms, retaining your forms' integrity.
+* **Modern React-Powered Pages:** Enjoy modern, React-powered pages for a seamless user experience.
+* **Built-in Required Plugins Installer:** Simplify the installation process of necessary plugins right from the start.
+* **System Status Checker:** Our built-in system status checker acts as a helpful pre-import checklist, alerting you to any potential issues that need addressing.
+* **Automatic URL and Commenter Email Replacement:** Designed for developers, our plugin has a versatile built-in tool for updating URLs and email addresses in your imported content.
+* **Elementor Taxonomy Data Fix:** Resolve Elementor data import issues with our automatic taxonomy data fix.
 
-== Simplified Demo Imports ==
+Experience the ultimate convenience of importing demo data with the Theme Demo Importer plugin. Make your website setup a breeze and unleash the full potential of your WordPress theme. Whether you're a user or developer, our feature-rich and user-friendly plugin is designed to simplify your website creation journey.
 
-Easy Demo Importer simplifies the complex task of importing website demos. In just a few clicks, users of all levels can effortlessly transform their websites into an exact replica of the demo site, saving time and effort during setup and configuration.
-
-== WordPress Importer Foundation ==
-
-Easy Demo Importer relies on the strong foundation of the WordPress Importer tool. It ensures a flawless import of content XML, including posts, pages, and media files, preserving your website's content integrity thanks to this robust integration.
-
-== Complete Content Import ==
-
-We do more than just basic content import. Easy Demo Importer brings in content, Customizer settings, Widgets data, Fluent Forms data, Menus, Plugin settings, and theme options. This ensures your site faithfully mirrors the demo's functionality and design.
-
-== Database Reset Control ==
-
-With Easy Demo Importer, users can decide whether to reset the database during import. It offers a clean start by removing existing content and grants full control over the import.
-
-== Media Import Control for Speed ==
-
-Our plugin offers flexibility by letting users choose whether to include media during demo imports. Disabling media import can speed up the setup for those who don't need media files.
-
-== Enhanced User Experience ==
-
-Our plugin is designed for a seamless user experience. Whether you're new to WordPress or an experienced user, our user-centric design makes demo imports straightforward and frustration-free.
-
-== Theme Compatibility ==
-
-Easy Demo Importer is compatible with all WordPress themes, providing developers with seamless integration. It ensures smooth demo imports, no matter the complexity or sophistication of your chosen theme.
-
-== Developer-Friendly Configuration ==
-
-Developers will appreciate the flexibility of our plugin. It offers an easy-to-use configuration that can be fine-tuned to meet specific project requirements, making it a valuable tool for professionals.
-
-== Full Site / Single Site Configuration ==
-
-Our plugin allows you to import a whole demo using a single ZIP file for a quick and complete solution. If you want to import individual demos from a multipurpose theme, our multi-ZIP option offers flexibility and efficiency for managing different project needs.
-
-== React-Powered ==
-
-The Easy Demo Importer comes with modern pages and functionalities built using React. This choice of technology provides users with an intuitive and highly responsive interface, simplifying navigation and interactions within the plugin.
-
-== Built-in Plugin Installer ==
-
-Say goodbye to the tedious manual installation of required plugins. Our plugin comes with a built-in required plugin installer that takes care of the essentials, making your import process smoother.
-
-== Built-in System Status Checker ==
-
-Before you dive into the import process, ensure that your website meets the minimum requirements for demo import with our system status page. It acts as a helpful pre-import checklist, alerting you to any potential issues that need addressing.
-
-== Automatic URL and Email Replacement ==
-
-Our plugin has a versatile built-in tool for updating URLs and email addresses in your imported content, designed for developers. It helps align your content with your website's domain, saving time and reducing errors.
-
-== Advanced Elementor Data Fix ==
-
-Our plugin provides advanced Elementor customization options, ideal for developers needing detailed Elementor settings and widget adjustments, including the Elementor Taxonomy Data Fix feature.
-
-== Developer Hooks ==
-
-Our Easy Demo Importer offers a wide range of hooks that give developers full control to perform advanced custom actions. These hooks allow for precise adjustments and customizations in the import process.
-
-The Easy Demo Importer gives you the ability to create beautiful, feature-rich websites with minimal effort. Whether a beginner or a seasoned developer, this plugin is your gateway to hassle-free demo imports and a highly customizable WordPress experience.
+> **Important Note:** Please be aware that this plugin does not provide a feature to import authors from the demo import file to existing users in your WordPress site. When you import demo content, all content will be attributed to the current user account.
 
 For any bugs or suggestions, please email us: service.sigmadevs@gmail.com
 
@@ -131,13 +73,37 @@ For any bugs or suggestions, please email us: service.sigmadevs@gmail.com
 
 == Frequently Asked Questions ==
 
+= How to configure demo import? =
+
+Theme authors can configure the demo imports by hooking into the `sd/edi/importer/config` filter. A sample configuration can be found in the *plugin directory -> samples* folder along with a sample zip file.
+
+= How can I see the demo importer in action? =
+
+A sample configuration is provided in the *plugin directory -> samples* folder along with a sample zip file. It is configured to work with the default **Twenty Twenty-One** theme. You need to require the `sample-config.php` file in the theme to see the importer in action (it will even work in localhost).
+
+= Where is the demo import page? =
+
+If your theme is correctly configured, you can find the demo import page with all the demos in *Dashboard -> Appearance -> Easy Demo Importer*.
+
+= How can I export plugin settings to configure with the demo import? =
+
+Theme developers can use the [WP Options Importer](https://wordpress.org/plugins/options-importer) plugin to downloading the data from the options table. Then, use some preferable tools to decode and convert this data into a JSON format and include them in the demo zip file.
+
+= I can't import demo. It is saying there are errors. What can I do? =
+
+Commonly, errors encountered during the demo import process are often associated with the relatively smaller `max_execution_time` or server timeout settings. A practical first step is to inspect the built-in **Easy System Status** page, which can provide insights into any problematic server parameters. Once these issues are fixed, your demo import should work smoothly.
+
 = Does this plugin support multi-language? =
 
-* Yes, Easy Demo Importer supports multi-language.
+Yes, Easy Demo Importer fully supports multi-language.
+
+= Where can I report bugs or contribute to the project? =
+
+Bugs can be reported either in our support forum or preferably on the [GitHub repository](https://github.com/wp-sigmadevs/easy-demo-importer/issues).
 
 = Need Any Help? =
 
-* For any bug, support or suggestion please email us [here](mailto:service.sigmadevs@gmail.com).
+For any bug, support or suggestion please email us [here](mailto:service.sigmadevs@gmail.com).
 
 == Screenshots ==
 

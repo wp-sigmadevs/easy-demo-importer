@@ -1,4 +1,11 @@
-## Easy Demo Importer 
+## Easy Demo Importer
+
+![Requires PHP_>_7.4](https://img.shields.io/badge/Requires-PHP_>_7.4-2d74d5)
+![Tested up to WordPress 6.3](https://img.shields.io/badge/Tested-Up_to_WordPress_6.3-2d74d5)
+![Stable_Tag 2.27.10](https://img.shields.io/badge/Stable_Tag-1.0.0-2d74d5)
+![License GPLv3 or later](https://img.shields.io/badge/License-GPLv3_or_later-2d74d5)
+
+<hr />
 
 The Easy Demo Importer is your go-to solution for effortlessly bringing your WordPress site to life. With its user-friendly interface and robust feature set, it streamlines the process of importing demo content, offering an unparalleled level of convenience for both users and developers.
 

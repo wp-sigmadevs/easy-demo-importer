@@ -59,7 +59,8 @@ class SD_EDI_Demo_Importer {
 			// JSON data file name for Fluent Forms.
 			'fluentFormsJson'       => 'fluentforms',
 
-			// Array of settings JSON data. The file names are representing
+			// Array of settings JSON data. You need to include these JSON files
+			// in the demo zip file. The file names are representing
 			// the option names.
 			'settingsJson'          => [
 				'__fluentform_global_form_settings',
@@ -81,7 +82,7 @@ class SD_EDI_Demo_Importer {
 			// Array of demo data consisting of demo name, demo preview image
 			// and demo preview URL.
 			'demoData'              => [
-				// The array key needs to be the same as the page slug.
+				// The array key needs to be the same as the home page slug to automatically setting it up as the home page.
 				'home-1' => [
 					'name'         => esc_html__( 'Right Place', 'easy-demo-importer' ),
 					'previewImage' => 'https://sample.sigmadevs.com/demos/twentytwentyone/right-place/preview-1.jpg',
@@ -142,6 +143,9 @@ class SD_EDI_Demo_Importer {
 					'source'   => 'bundled',
 					'filePath' => 'theme-core/theme-core.php',
 					'location' => 'https://abcd.com/theme-core.zip',
+
+					// If you want to include the plugin from the theme directory, use as below.
+					'location' => trailingslashit( get_template_directory() ) . 'inc/plugins/theme-core.zip',
 				],
 				*/
 
