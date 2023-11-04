@@ -107,7 +107,14 @@ For any bug, support or suggestion please email us [here](mailto:service.sigmade
 
 == Screenshots ==
 
+1. Example of multiple demos that a user can choose from.
+2. Example of how import step introduction popup looks.
+3. Example of how required plugins and configure import popup looks.
+4. Example of how the demo import step popup looks.
+5. Example of the completed demo import popup.
+6. Example of how the system status page looks.
+
 == Changelog ==
 
 = 1.0.0 =
-* Stable version release
+* Initial release
