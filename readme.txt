@@ -75,7 +75,7 @@ For any bugs or suggestions, please email us: service.sigmadevs@gmail.com
 
 = How to configure demo import? =
 
-Theme authors can configure the demo imports by hooking into the `sd/edi/importer/config` filter. A sample configuration can be found in the *plugin directory -> samples* folder along with a sample zip file.
+Theme authors can configure the demo imports by hooking into the `sd/edi/importer/config` filter. A sample configuration can be found in the *plugin directory -> samples* folder along with a sample zip file. Please note that the XML file needs to be renamed as `content.xml`, customizer file as `customizer.dat` and widget file as `widget.wie`.
 
 = How can I see the demo importer in action? =
 

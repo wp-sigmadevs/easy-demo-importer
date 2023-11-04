@@ -56,6 +56,12 @@ class SD_EDI_Demo_Importer {
 			// Commenter email to replace.
 			'replaceCommenterEmail' => 'email@example.com',
 
+			// Fix elementor taxonomy data.
+			// 'elementor_data_fix'    => [
+			// Need to pass the Elementor widget name and control name pair.
+			// 'elementor-widget-name' => 'control_widget_name',
+			// ],
+
 			// JSON data file name for Fluent Forms.
 			'fluentFormsJson'       => 'fluentforms',
 

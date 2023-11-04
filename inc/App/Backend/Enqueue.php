@@ -159,13 +159,13 @@ class Enqueue extends EnqueueBase {
 
 				// Modal Step One.
 				'beforeYouPreceed'           => esc_html__( 'Before You Proceed', 'easy-demo-importer' ),
-				'stepOneIntro1'              => esc_html__( 'Before importing demo data, we recommend that you backup your site\'s data and files. You can use a popular backup plugin to ensure you have a copy of your site in case anything goes wrong during the import process.', 'easy-demo-importer' ),
-				'stepOneIntro2'              => esc_html__( 'Please note that this demo import will install all the required plugins, import contents, media, settings, customizer data, widgets, and other necessary elements to replicate the demo site. Make sure to review your existing data and settings as they may be overwritten.', 'easy-demo-importer' ),
+				'stepOneIntro1'              => self::importModalTexts()['stepOne']['introTopText'],
+				'stepOneIntro2'              => self::importModalTexts()['stepOne']['introBottomText'],
 
 				// Modal Step Two.
 				'requiredPluginsTitle'       => esc_html__( 'Required Plugins', 'easy-demo-importer' ),
 				'configureImportTitle'       => esc_html__( 'Configure Your Import', 'easy-demo-importer' ),
-				'requiredPluginsIntro'       => esc_html__( 'In order to replicate the exact appearance of the demo site, the import process will automatically install and activate the following plugins, provided they are not already installed or activated on your website. You may need to scroll through to see the full list:', 'easy-demo-importer' ),
+				'requiredPluginsIntro'       => self::importModalTexts()['stepTwo']['requiredPluginsIntro'],
 				'excludeImagesTitle'         => esc_html__( 'Exclude Demo Images', 'easy-demo-importer' ),
 				'excludeImagesHint'          => esc_html__( 'Select this option if demo import fails repeatedly. Excluding images will speed up the import process.', 'easy-demo-importer' ),
 				'resetDatabaseTitle'         => esc_html__( 'Reset Existing Database', 'easy-demo-importer' ),
@@ -201,10 +201,10 @@ class Enqueue extends EnqueueBase {
 				// Support Modal.
 				'supportTitle'               => esc_html__( 'Need Help?', 'easy-demo-importer' ),
 				'docTitle'                   => esc_html__( 'Documentation & FAQs', 'easy-demo-importer' ),
-				'supportDesc'                => esc_html__( 'In case you encounter any issues, we encourage you to generate a support ticket for prompt assistance. This allows our team to address your concerns effectively and provide you with the necessary guidance and solutions.', 'easy-demo-importer' ),
-				'docDesc'                    => esc_html__( 'Embark on your journey by immersing yourself in our FAQ-rich documentation. It provides an extensive guide, featuring step-by-step instructions, screenshots, and informative videos to address common issues and help you to import demo data successfully.', 'easy-demo-importer' ),
-				'docUrl'                     => '#',
-				'ticketUrl'                  => '#',
+				'supportDesc'                => self::importModalTexts()['supportText'],
+				'docDesc'                    => self::importModalTexts()['docText'],
+				'docUrl'                     => self::importModalTexts()['docUrl'],
+				'ticketUrl'                  => self::importModalTexts()['ticketUrl'],
 				'copySuccess'                => esc_html__( 'System status data copied to clipboard', 'easy-demo-importer' ),
 				'copyFailure'                => esc_html__( 'Unable to copy to clipboard. Try again.', 'easy-demo-importer' ),
 
@@ -219,5 +219,30 @@ class Enqueue extends EnqueueBase {
 				'installedNotActive'         => esc_html__( 'Installed but Not Active', 'easy-demo-importer' ),
 			],
 		];
+	}
+
+	/**
+	 * Import modal texts.
+	 *
+	 * @return array
+	 * @since 1.0.0
+	 */
+	public static function importModalTexts() {
+		return apply_filters(
+			'sd/edi/import_modal_texts',
+			[
+				'stepOne'     => [
+					'introTopText'    => esc_html__( 'Before importing demo data, we recommend that you backup your site\'s data and files. You can use a popular backup plugin to ensure you have a copy of your site in case anything goes wrong during the import process.', 'easy-demo-importer' ),
+					'introBottomText' => esc_html__( 'Please note that this demo import will install all the required plugins, import contents, media, settings, customizer data, widgets, and other necessary elements to replicate the demo site. Make sure to review your existing data and settings as they may be overwritten.', 'easy-demo-importer' ),
+				],
+				'stepTwo'     => [
+					'requiredPluginsIntro' => esc_html__( 'In order to replicate the exact appearance of the demo site, the import process will automatically install and activate the following plugins, provided they are not already installed or activated on your website. You may need to scroll through to see the full list:', 'easy-demo-importer' ),
+				],
+				'supportText' => esc_html__( 'If you have any problems, please create a support ticket. This helps us help you quickly and give you the right solutions.', 'easy-demo-importer' ),
+				'docText'     => esc_html__( 'Start your journey by diving into our detailed FAQ documentation. It offers a comprehensive guide with step-by-step instructions, and helpful screenshots to assist you in successfully importing demo data', 'easy-demo-importer' ),
+				'docUrl'      => 'https://github.com/wp-sigmadevs/easy-demo-importer',
+				'ticketUrl'   => 'https://github.com/wp-sigmadevs/easy-demo-importer/issues',
+			]
+		);
 	}
 }
