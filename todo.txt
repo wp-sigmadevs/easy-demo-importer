@@ -1,0 +1,13 @@
+/**
+ * Fix:
+ *======*
+ * TODO: Run Ajax only for the provided files.
+ * TODO: Create initial pages for ShopBuilder plugin.
+ *
+ * Feature:
+ *======*
+ * TODO: Add Rev Slider import.
+ * TODO: Add import categories.
+ * TODO: Add import tabbed content.
+ * TODO: Add import search.
+ */
