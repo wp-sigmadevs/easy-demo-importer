@@ -1,10 +1,10 @@
-=== Easy Demo Importer - A Modern One Click Demo Import Solution ===
+=== Easy Demo Importer - A Modern One-Click Demo Import Solution ===
 Contributors: sigmadevs
 Donate link:
 Tags: demo importer, one click demo importer, theme demo importer, content, import, demo, data, widgets, settings, redux, theme options
 Requires at least: 5.5
-Tested up to: 6.3
-Stable tag: 1.0.0
+Tested up to: 6.4
+Stable tag: 1.0.1
 Requires PHP: 7.4
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -41,7 +41,7 @@ Experience the ultimate convenience of importing demo data with the Theme Demo I
 
 > **Important Note:** Please be aware that this plugin does not provide a feature to import authors from the demo import file to existing users in your WordPress site. When you import demo content, all content will be attributed to the current user account.
 
-For any bugs or suggestions, please email us: service.sigmadevs@gmail.com
+For any bugs or suggestions, please email us at: service.sigmadevs@gmail.com
 
 = Requirements =
 * **WordPress version:** >= 5.5
@@ -75,7 +75,7 @@ For any bugs or suggestions, please email us: service.sigmadevs@gmail.com
 
 = How to configure demo import? =
 
-Theme authors can configure the demo imports by hooking into the `sd/edi/importer/config` filter. A sample configuration can be found in the *plugin directory -> samples* folder along with a sample zip file. Please note that the XML file needs to be renamed as `content.xml`, customizer file as `customizer.dat` and widget file as `widget.wie`.
+Theme authors can configure the demo imports by hooking into the `sd/edi/importer/config` filter. A sample configuration can be found in the *plugin directory -> samples* folder along with a sample zip file. Please note that there are three mandatory files: **XML File, Customizer File, and Widget File**. The XML file (.xml) needs to be renamed as `content.xml`, the Customizer file (.dat) as `customizer.dat`, and the widget file (.wie) as `widget.wie`, after that these files will be automatically recognized by the demo importer.
 
 = How can I see the demo importer in action? =
 
@@ -87,9 +87,9 @@ If your theme is correctly configured, you can find the demo import page with al
 
 = How can I export plugin settings to configure with the demo import? =
 
-Theme developers can use the [WP Options Importer](https://wordpress.org/plugins/options-importer) plugin to downloading the data from the options table. Then, use some preferable tools to decode and convert this data into a JSON format and include them in the demo zip file.
+Theme developers can use the [WP Options Importer](https://wordpress.org/plugins/options-importer) plugin to download the data from the options table. Then, use some preferable tools to decode and convert this data into a JSON format and include them in the demo zip file.
 
-= I can't import demo. It is saying there are errors. What can I do? =
+= I can't import the demo. It is saying there are errors. What can I do? =
 
 Commonly, errors encountered during the demo import process are often associated with the relatively smaller `max_execution_time` or server timeout settings. A practical first step is to inspect the built-in **Easy System Status** page, which can provide insights into any problematic server parameters. Once these issues are fixed, your demo import should work smoothly.
 
@@ -103,7 +103,7 @@ Bugs can be reported either in our support forum or preferably on the [GitHub re
 
 = Need Any Help? =
 
-For any bug, support or suggestion please email us [here](mailto:service.sigmadevs@gmail.com).
+For any bug, support, or suggestion please email us [here](mailto:service.sigmadevs@gmail.com).
 
 == Screenshots ==
 
@@ -115,6 +115,9 @@ For any bug, support or suggestion please email us [here](mailto:service.sigmade
 6. Example of how the system status page looks.
 
 == Changelog ==
+
+= 1.0.1 (26-November-2023) =
+* Fix: PHP 7.4 compatibility issue.
 
 = 1.0.0 =
 * Initial release

@@ -1,6 +1,6 @@
 {
   "name": "easy-demo-importer",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A one-click, user-friendly WordPress plugin for effortlessly importing theme demos and customizing your website in no time.",
   "main": "index.js",
   "keywords": [

@@ -26,6 +26,6 @@
     "phpcs": "phpcs --standard=phpcs.xml"
   },
   "require": {
-    "php": ">=8.0"
+    "php": ">=7.4"
   }
 }
