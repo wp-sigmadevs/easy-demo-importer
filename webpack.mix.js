@@ -38,6 +38,7 @@ if (process.env.npm_config_package) {
 			"assets",
 			"languages",
 			"lib",
+			"samples",
 			"vendor",
 			"views",
 			"index.php",
