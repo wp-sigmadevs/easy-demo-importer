@@ -688,22 +688,25 @@ class Actions {
 		if ( isset( $element['widgetType'] ) && isset( $data[ $element['widgetType'] ] ) ) {
 			$catKeys = $data[ $element['widgetType'] ];
 
+			// Check if it contains multiple controls.
 			if (is_array($catKeys)) {
-				foreach ($catKeys as $catKey) {
-					error_log( print_r( [$catKey, $element['settings'][$catKey]], true ),3, __DIR__ . "/log.txt") ;
-					if (strpos($catKey, 'repeater_') === 0) {
+				foreach ($catKeys as $catKey => $catID) {
+					// Check if it contains repeater fields.
+					if (is_string( $catKey ) && strpos($catKey, 'repeater_') === 0) {
 						$catKey = substr($catKey, strlen('repeater_'));
 
 						if (isset($element['settings'][$catKey]) && is_array($element['settings'][$catKey])) {
 							foreach ($element['settings'][$catKey] as &$repeaterItem) {
-								self::searchReplaceID($repeaterItem, $catKey);
+								self::replaceCategoryInRepeater( $repeaterItem, $catID );
 							}
 						}
 					} else {
-						self::replaceCategory($element, $catKey);
+						// Not a repeater field. Process normally.
+						self::replaceCategory($element, $catID);
 					}
 				}
 			} else {
+				// Has single control to work with.
 				self::replaceCategory($element, $catKeys);
 			}
 		}
@@ -733,6 +736,34 @@ class Actions {
 			} else {
 				$newId = sd_edi()->getNewID($oldIds);
 				$element['settings'][$catKey] = $newId;
+			}
+		}
+	}
+
+	/**
+	 * Replace category IDs in repeater settings.
+	 *
+	 * @param array  $element The repeater data to be modified by reference.
+	 * @param string $catKey  The control name to be replaced.
+	 *
+	 * @return void
+	 * @since 1.0.0
+	 */
+	public static function replaceCategoryInRepeater(&$element, $catKey) {
+		if (isset($element[$catKey])) {
+			$oldIds = $element[$catKey];
+
+			if (is_array($oldIds)) {
+				$newIds = array_map(
+					function ($oldID) {
+						return sd_edi()->getNewID($oldID);
+					},
+					$oldIds
+				);
+				$element[$catKey] = $newIds;
+			} else {
+				$newId = sd_edi()->getNewID($oldIds);
+				$element[$catKey] = $newId;
 			}
 		}
 	}
