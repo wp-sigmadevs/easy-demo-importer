@@ -234,6 +234,14 @@ abstract class ImporterAjax {
 
 		if ( file_exists( $pluginPath ) ) {
 			$status = is_plugin_active( $path ) ? 'active' : 'inactive';
+
+			require_once ABSPATH . 'wp-admin/includes/update.php';
+
+			$update_list = get_site_transient( 'update_plugins' );
+
+			if ( isset( $update_list->response[ $path ] ) ) {
+				$status = 'update';
+			}
 		}
 
 		return $status;
