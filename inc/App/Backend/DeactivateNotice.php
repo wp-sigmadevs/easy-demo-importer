@@ -52,6 +52,10 @@ class DeactivateNotice extends Base {
 	 * @see Requester::isAdminBackend()
 	 */
 	public function register() {
+		if ( ! apply_filters( 'sd/edi/admin/deactivation_notice', false ) ) {
+			return;
+		}
+
 		$this
 			->deactivateNotice()
 			->deactivateActions();
