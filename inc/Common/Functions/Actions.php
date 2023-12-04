@@ -686,24 +686,53 @@ class Actions {
 	public static function performSearchReplace( &$element, $data ) {
 		// Check if the element's widgetType exists in the data array.
 		if ( isset( $element['widgetType'] ) && isset( $data[ $element['widgetType'] ] ) ) {
-			$catKey = $data[ $element['widgetType'] ];
+			$catKeys = $data[ $element['widgetType'] ];
 
-			// Check if the catKey exists in the element's settings.
-			if ( isset( $element['settings'][ $catKey ] ) ) {
-				$oldIds = $element['settings'][ $catKey ];
+			if (is_array($catKeys)) {
+				foreach ($catKeys as $catKey) {
+					error_log( print_r( [$catKey, $element['settings'][$catKey]], true ),3, __DIR__ . "/log.txt") ;
+					if (strpos($catKey, 'repeater_') === 0) {
+						$catKey = substr($catKey, strlen('repeater_'));
 
-				if ( is_array( $oldIds ) ) {
-					$newIds                         = array_map(
-						function ( $oldID ) {
-							return sd_edi()->getNewID( $oldID );
-						},
-						$oldIds
-					);
-					$element['settings'][ $catKey ] = $newIds;
-				} else {
-					$newId                          = sd_edi()->getNewID( $oldIds );
-					$element['settings'][ $catKey ] = $newId;
+						if (isset($element['settings'][$catKey]) && is_array($element['settings'][$catKey])) {
+							foreach ($element['settings'][$catKey] as &$repeaterItem) {
+								self::searchReplaceID($repeaterItem, $catKey);
+							}
+						}
+					} else {
+						self::replaceCategory($element, $catKey);
+					}
 				}
+			} else {
+				self::replaceCategory($element, $catKeys);
+			}
+		}
+	}
+
+	/**
+	 * Replace category IDs in element settings.
+	 *
+	 * @param array  $element The element data to be modified by reference.
+	 * @param string $catKey  The control name to be replaced.
+	 *
+	 * @return void
+	 * @since 1.0.0
+	 */
+	public static function replaceCategory(&$element, $catKey) {
+		if (isset($element['settings'][$catKey])) {
+			$oldIds = $element['settings'][$catKey];
+
+			if (is_array($oldIds)) {
+				$newIds = array_map(
+					function ($oldID) {
+						return sd_edi()->getNewID($oldID);
+					},
+					$oldIds
+				);
+				$element['settings'][$catKey] = $newIds;
+			} else {
+				$newId = sd_edi()->getNewID($oldIds);
+				$element['settings'][$catKey] = $newId;
 			}
 		}
 	}
