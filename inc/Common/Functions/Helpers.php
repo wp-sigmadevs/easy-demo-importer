@@ -228,9 +228,16 @@ class Helpers {
 
 		if ( file_exists( $pluginPath ) ) {
 			include_once ABSPATH . 'wp-admin/includes/plugin.php';
+			include_once ABSPATH . 'wp-admin/includes/update.php';
 
 			if ( function_exists( 'is_plugin_active' ) ) {
 				$status = is_plugin_active( $filePath ) ? 'active' : 'inactive';
+			}
+
+			$update_list = get_site_transient( 'update_plugins' );
+
+			if ( isset( $update_list->response[ $filePath ] ) ) {
+				$status = 'active' === $status ? 'update' : 'inactive-update';
 			}
 		}
 

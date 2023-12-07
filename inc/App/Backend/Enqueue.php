@@ -214,9 +214,11 @@ class Enqueue extends EnqueueBase {
 				'reqProceed'                 => esc_html__( 'Continue Anyway', 'easy-demo-importer' ),
 
 				// Plugin Status.
-				'notInstalled'               => esc_html__( 'Not Installed', 'easy-demo-importer' ),
-				'installedAndActive'         => esc_html__( 'Installed and Active', 'easy-demo-importer' ),
-				'installedNotActive'         => esc_html__( 'Installed but Not Active', 'easy-demo-importer' ),
+				'notInstalled'               => esc_html__( 'Not installed', 'easy-demo-importer' ),
+				'installedAndActive'         => esc_html__( 'Installed and active', 'easy-demo-importer' ),
+				'installedNotActive'         => esc_html__( 'Installed but not active', 'easy-demo-importer' ),
+				'installedNeedUpdate'        => esc_html__( 'Installed and active, update required', 'easy-demo-importer' ),
+				'inactiveNeedUpdate'         => esc_html__( 'Installed but not active, update required', 'easy-demo-importer' ),
 			],
 		];
 	}
