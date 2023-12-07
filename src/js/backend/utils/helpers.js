@@ -21,6 +21,8 @@ export const getStatusIcon = (status) => {
 			return <CloseCircleTwoTone twoToneColor="#eb2f96" />;
 		case 'active':
 			return <CheckCircleTwoTone twoToneColor="#52c41a" />;
+		case 'inactive-update':
+		case 'update':
 		case 'inactive':
 			return <ExclamationCircleTwoTone twoToneColor="#faad14" />;
 		default:
@@ -41,6 +43,10 @@ export const getPluginText = (status) => {
 			return sdEdiAdminParams.installedAndActive;
 		case 'inactive':
 			return sdEdiAdminParams.installedNotActive;
+		case 'update':
+			return sdEdiAdminParams.installedNeedUpdate;
+		case 'inactive-update':
+			return sdEdiAdminParams.inactiveNeedUpdate;
 		default:
 			return null;
 	}
