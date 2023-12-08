@@ -432,6 +432,39 @@ class SD_EDI_WP_Import extends WP_Importer {
 			return;
 		}
 
+		if ( is_plugin_active( 'woocommerce/woocommerce.php' ) && class_exists( 'WooCommerce' ) ) {
+			$paAttributes = [];
+
+			foreach ( $this->terms as $wTerm ) {
+				// Check if the term_taxonomy starts with 'pa_'.
+				if ( 0 === strpos( $wTerm['term_taxonomy'], 'pa_' ) ) {
+					$labelWithoutPrefix = str_replace( 'pa_', '', $wTerm['term_taxonomy'] );
+					$label              = ucfirst( str_replace( '_', ' ', $labelWithoutPrefix ) );
+
+					$paAttributes[ $wTerm['term_taxonomy'] ]['label'] = $label;
+					$paAttributes[ $wTerm['term_taxonomy'] ]['slug']  = $labelWithoutPrefix;
+				}
+			}
+
+			// Creating product attributes.
+			foreach ( $paAttributes as $key => $value ) {
+				wc_create_attribute(
+					[
+						'name'    => sanitize_text_field( $value['label'] ),
+						'slug'    => sanitize_text_field( $value['slug'] ),
+						'orderby' => 'menu_order',
+					]
+				);
+
+				if ( ! taxonomy_exists( $key ) ) {
+					register_taxonomy( sanitize_key( $key ), [ 'product' ], [] );
+				}
+
+				flush_rewrite_rules();
+				delete_transient( 'wc_attribute_taxonomies' );
+			}
+		}
+
 		foreach ( $this->terms as $term ) {
 			// if the term already exists in the correct taxonomy leave it alone.
 			$term_id = term_exists( $term['slug'], $term['term_taxonomy'] );
