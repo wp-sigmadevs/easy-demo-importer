@@ -6,7 +6,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2023-11-26 17:49+0000\n"
+"POT-Creation-Date: 2023-12-10 08:51+0000\n"
 "Report-Msgid-Bugs-To: https://github.com/wp-sigmadevs/easy-demo-importer/issues\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -102,94 +102,94 @@ msgstr ""
 
 #. translators: 1. Term Taxonomy, 2. Term Name
 #. translators: 1. Taxonomy, 2. Name
-#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:476, ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:729, ../lib/wordpress-importer/class-wp-import.php:476, ../lib/wordpress-importer/class-wp-import.php:729
+#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:509, ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:762, ../lib/wordpress-importer/class-wp-import.php:509, ../lib/wordpress-importer/class-wp-import.php:762
 msgid "Failed to import %1$s %2$s"
 msgstr ""
 
 #. translators: 1. Post Title, 2. Post Type
-#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:570, ../lib/wordpress-importer/class-wp-import.php:570
+#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:603, ../lib/wordpress-importer/class-wp-import.php:603
 msgid "Failed to import &#8220;%1$s&#8221;: Invalid post type %2$s"
 msgstr ""
 
 #. translators: 1. Singular Name, 2. Post Title
-#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:691, ../lib/wordpress-importer/class-wp-import.php:691
+#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:724, ../lib/wordpress-importer/class-wp-import.php:724
 msgid "Failed to import %1$s &#8220;%2$s&#8221;"
 msgstr ""
 
-#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:612, ../lib/wordpress-importer/class-wp-import.php:612
+#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:645, ../lib/wordpress-importer/class-wp-import.php:645
 msgid "%1$s &#8220;%2$s&#8221; already exists."
 msgstr ""
 
-#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:878, ../lib/wordpress-importer/class-wp-import.php:878
+#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:911, ../lib/wordpress-importer/class-wp-import.php:911
 msgid "Menu item skipped due to missing menu slug"
 msgstr ""
 
 #. translators: Menu Slug
-#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:888, ../lib/wordpress-importer/class-wp-import.php:888
+#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:921, ../lib/wordpress-importer/class-wp-import.php:921
 msgid "Menu item skipped due to invalid menu slug: %s"
 msgstr ""
 
-#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:960, ../lib/wordpress-importer/class-wp-import.php:960
+#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:993, ../lib/wordpress-importer/class-wp-import.php:993
 msgid "Fetching attachments is not enabled"
 msgstr ""
 
-#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:978, ../lib/wordpress-importer/class-wp-import.php:978
+#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:1011, ../lib/wordpress-importer/class-wp-import.php:1011
 msgid "Invalid file type"
 msgstr ""
 
-#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:1025, ../lib/wordpress-importer/class-wp-import.php:1025
+#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:1058, ../lib/wordpress-importer/class-wp-import.php:1058
 msgid "Could not create temporary file."
 msgstr ""
 
 #. translators: 1: The WordPress error message. 2: The WordPress error code.
-#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:1048, ../lib/wordpress-importer/class-wp-import.php:1048
+#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:1081, ../lib/wordpress-importer/class-wp-import.php:1081
 msgid "Request failed due to an error: %1$s (%2$s)"
 msgstr ""
 
 #. translators: 1: The HTTP error message. 2: The HTTP error code.
-#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:1065, ../lib/wordpress-importer/class-wp-import.php:1065
+#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:1098, ../lib/wordpress-importer/class-wp-import.php:1098
 msgid "Remote server returned the following unexpected result: %1$s (%2$s)"
 msgstr ""
 
-#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:1078, ../lib/wordpress-importer/class-wp-import.php:1078
+#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:1111, ../lib/wordpress-importer/class-wp-import.php:1111
 msgid "Remote server did not respond"
 msgstr ""
 
-#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:1086, ../lib/wordpress-importer/class-wp-import.php:1086
+#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:1119, ../lib/wordpress-importer/class-wp-import.php:1119
 msgid "Zero size file downloaded"
 msgstr ""
 
-#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:1092, ../lib/wordpress-importer/class-wp-import.php:1092
+#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:1125, ../lib/wordpress-importer/class-wp-import.php:1125
 msgid "Downloaded file has incorrect size"
 msgstr ""
 
 #. translators: Max Size
-#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:1103, ../lib/wordpress-importer/class-wp-import.php:1103
+#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:1136, ../lib/wordpress-importer/class-wp-import.php:1136
 msgid "Remote file is too large, limit is %s"
 msgstr ""
 
-#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:1141, ../lib/wordpress-importer/class-wp-import.php:1141
+#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:1174, ../lib/wordpress-importer/class-wp-import.php:1174
 msgid "Sorry, this file type is not permitted for security reasons."
 msgstr ""
 
-#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:1157, ../lib/wordpress-importer/class-wp-import.php:1157
+#: ../dist/easy-demo-importer/lib/wordpress-importer/class-wp-import.php:1190, ../lib/wordpress-importer/class-wp-import.php:1190
 msgid "The uploaded file could not be moved"
 msgstr ""
 
 #. translators: %s: Plugin name
-#: ../dist/easy-demo-importer/inc/App/Backend/DeactivateNotice.php:106, ../inc/App/Backend/DeactivateNotice.php:106
+#: ../dist/easy-demo-importer/inc/App/Backend/DeactivateNotice.php:110, ../inc/App/Backend/DeactivateNotice.php:110
 msgid "It seems you've imported the theme demo data successfully. So, the purpose of %1$s plugin is fulfilled, and it has no more use. %2$sIf you're satisfied with the imported theme demo data, you can safely deactivate it by clicking the %3$s button."
 msgstr ""
 
-#: ../dist/easy-demo-importer/inc/App/Backend/DeactivateNotice.php:112, ../dist/easy-demo-importer/inc/App/Backend/DeactivateNotice.php:127, ../inc/App/Backend/DeactivateNotice.php:112, ../inc/App/Backend/DeactivateNotice.php:127
+#: ../dist/easy-demo-importer/inc/App/Backend/DeactivateNotice.php:116, ../dist/easy-demo-importer/inc/App/Backend/DeactivateNotice.php:131, ../inc/App/Backend/DeactivateNotice.php:116, ../inc/App/Backend/DeactivateNotice.php:131
 msgid "Deactivate Plugin"
 msgstr ""
 
-#: ../dist/easy-demo-importer/inc/App/Backend/DeactivateNotice.php:130, ../inc/App/Backend/DeactivateNotice.php:130
+#: ../dist/easy-demo-importer/inc/App/Backend/DeactivateNotice.php:134, ../inc/App/Backend/DeactivateNotice.php:134
 msgid "Dismiss This Notice"
 msgstr ""
 
-#: ../dist/easy-demo-importer/inc/App/Backend/DeactivateNotice.php:148, ../inc/App/Backend/DeactivateNotice.php:148
+#: ../dist/easy-demo-importer/inc/App/Backend/DeactivateNotice.php:152, ../inc/App/Backend/DeactivateNotice.php:152
 msgid "Action failed. Please refresh the page and retry."
 msgstr ""
 
@@ -350,34 +350,42 @@ msgid "Continue Anyway"
 msgstr ""
 
 #: ../dist/easy-demo-importer/inc/App/Backend/Enqueue.php:217, ../inc/App/Backend/Enqueue.php:217
-msgid "Not Installed"
+msgid "Not installed"
 msgstr ""
 
 #: ../dist/easy-demo-importer/inc/App/Backend/Enqueue.php:218, ../inc/App/Backend/Enqueue.php:218
-msgid "Installed and Active"
+msgid "Installed and active"
 msgstr ""
 
 #: ../dist/easy-demo-importer/inc/App/Backend/Enqueue.php:219, ../inc/App/Backend/Enqueue.php:219
-msgid "Installed but Not Active"
+msgid "Installed but not active"
 msgstr ""
 
-#: ../dist/easy-demo-importer/inc/App/Backend/Enqueue.php:235, ../inc/App/Backend/Enqueue.php:235
+#: ../dist/easy-demo-importer/inc/App/Backend/Enqueue.php:220, ../inc/App/Backend/Enqueue.php:220
+msgid "Installed and active, update required"
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Enqueue.php:221, ../inc/App/Backend/Enqueue.php:221
+msgid "Installed but not active, update required"
+msgstr ""
+
+#: ../dist/easy-demo-importer/inc/App/Backend/Enqueue.php:237, ../inc/App/Backend/Enqueue.php:237
 msgid "Before importing demo data, we recommend that you backup your site's data and files. You can use a popular backup plugin to ensure you have a copy of your site in case anything goes wrong during the import process."
 msgstr ""
 
-#: ../dist/easy-demo-importer/inc/App/Backend/Enqueue.php:236, ../inc/App/Backend/Enqueue.php:236
+#: ../dist/easy-demo-importer/inc/App/Backend/Enqueue.php:238, ../inc/App/Backend/Enqueue.php:238
 msgid "Please note that this demo import will install all the required plugins, import contents, media, settings, customizer data, widgets, and other necessary elements to replicate the demo site. Make sure to review your existing data and settings as they may be overwritten."
 msgstr ""
 
-#: ../dist/easy-demo-importer/inc/App/Backend/Enqueue.php:239, ../inc/App/Backend/Enqueue.php:239
+#: ../dist/easy-demo-importer/inc/App/Backend/Enqueue.php:241, ../inc/App/Backend/Enqueue.php:241
 msgid "In order to replicate the exact appearance of the demo site, the import process will automatically install and activate the following plugins, provided they are not already installed or activated on your website. You may need to scroll through to see the full list:"
 msgstr ""
 
-#: ../dist/easy-demo-importer/inc/App/Backend/Enqueue.php:241, ../inc/App/Backend/Enqueue.php:241
+#: ../dist/easy-demo-importer/inc/App/Backend/Enqueue.php:243, ../inc/App/Backend/Enqueue.php:243
 msgid "If you have any problems, please create a support ticket. This helps us help you quickly and give you the right solutions."
 msgstr ""
 
-#: ../dist/easy-demo-importer/inc/App/Backend/Enqueue.php:242, ../inc/App/Backend/Enqueue.php:242
+#: ../dist/easy-demo-importer/inc/App/Backend/Enqueue.php:244, ../inc/App/Backend/Enqueue.php:244
 msgid "Start your journey by diving into our detailed FAQ documentation. It offers a comprehensive guide with step-by-step instructions, and helpful screenshots to assist you in successfully importing demo data"
 msgstr ""
 

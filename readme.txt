@@ -4,7 +4,7 @@ Donate link:
 Tags: demo importer, one click demo importer, theme demo importer, content, import, demo, data, widgets, settings, redux, theme options
 Requires at least: 5.5
 Tested up to: 6.4
-Stable tag: 1.0.1
+Stable tag: 1.0.2
 Requires PHP: 7.4
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -115,6 +115,11 @@ For any bug, support, or suggestion please email us [here](mailto:service.sigmad
 6. Example of how the system status page looks.
 
 == Changelog ==
+
+= 1.0.2 (10-December-2023) =
+* Fix: Product attributes import issue.
+* Add: Required plugin update feature.
+* Update: Elementor taxonomy data mapping for multiple and repeater controls.
 
 = 1.0.1 (26-November-2023) =
 * Fix: PHP 7.4 compatibility issue.
