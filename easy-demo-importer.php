@@ -3,7 +3,7 @@
  * Plugin Name: Easy Demo Importer
  * Plugin URI: https://github.com/wp-sigmadevs/easy-demo-importer/
  * Description: A one-click, user-friendly WordPress plugin for effortlessly importing theme demos and customizing your website in no time.
- * Version: 1.0.1
+ * Version: 1.0.2
  * Author: Sigma Devs
  * Author URI: https://profiles.wordpress.org/sigmadevs/
  * License: GPLv3 or later
