@@ -15,6 +15,14 @@
 			padding-top: 75px;
 		}
 
+		@media only screen and (min-height: 950px) {
+			padding-top: 95px;
+		}
+
+		@media only screen and (min-height: 1050px) {
+			padding-top: 125px;
+		}
+
 		.check-container {
 			width: 6.25rem;
 			height: 7.5rem;

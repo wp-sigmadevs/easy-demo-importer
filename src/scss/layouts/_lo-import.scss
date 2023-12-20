@@ -17,6 +17,10 @@
 			//overflow: scroll;
 			position: relative;
 
+			@media only screen and (min-height: 950px) {
+				height: 300px;
+			}
+
 			.ant-timeline {
 				text-align: left;
 				position: absolute;

@@ -3,6 +3,18 @@
  */
 
 .appearance_page_sd-easy-demo-importer {
+	.ant-modal-root {
+		.ant-modal:not(.confirmation-modal):not(.requirement-modal) {
+			@media only screen and (min-width: 1600px) {
+				width: 1000px !important;
+			}
+
+			@media only screen and (min-width: 1920px) {
+				width: 1200px !important;
+			}
+		}
+	}
+
 	.ant-modal-content {
 		height: 600px;
 
@@ -12,6 +24,18 @@
 
 		@media only screen and (min-height: 765px) {
 			height: 700px;
+		}
+
+		@media only screen and (min-height: 850px) {
+			height: 750px;
+		}
+
+		@media only screen and (min-height: 950px) {
+			height: 800px;
+		}
+
+		@media only screen and (min-height: 1050px) {
+			height: 850px;
 		}
 	}
 
@@ -101,11 +125,24 @@
 						border-radius: 6px;
 						box-shadow: 0 4px 50px rgba(0, 0, 0, 0.1);
 						cursor: ns-resize;
+						z-index: 10;
 
 						@extend .no-scrollbar;
 
 						@media only screen and (min-height: 765px) {
 							max-height: 410px;
+						}
+
+						@media only screen and (min-height: 850px) {
+							max-height: 450px;
+						}
+
+						@media only screen and (min-height: 950px) {
+							max-height: 500px;
+						}
+
+						@media only screen and (min-height: 1050px) {
+							max-height: 550px;
 						}
 					}
 				}
@@ -135,6 +172,14 @@
 
 						@media only screen and (min-height: 765px) {
 							height: 370px;
+						}
+
+						@media only screen and (min-height: 950px) {
+							height: 430px;
+						}
+
+						@media only screen and (min-height: 1050px) {
+							height: 480px;
 						}
 					}
 				}
@@ -189,6 +234,18 @@
 
 					@media only screen and (min-height: 765px) {
 						max-height: 220px;
+					}
+
+					@media only screen and (min-height: 850px) {
+						max-height: 300px;
+					}
+
+					@media only screen and (min-height: 950px) {
+						max-height: 350px;
+					}
+
+					@media only screen and (min-height: 1050px) {
+						max-height: 400px;
 					}
 
 					.ant-list-items {
