@@ -12,6 +12,7 @@ declare( strict_types=1 );
 
 namespace SigmaDevs\EasyDemoImporter\Common\Functions;
 
+use WP_Query;
 use SigmaDevs\EasyDemoImporter\Common\Models\DBSearchReplace;
 
 // Do not allow directly accessing this file.
@@ -99,13 +100,22 @@ class Actions {
 	 * @since 1.0.0
 	 */
 	public static function afterImportActions( $obj ) {
-		self::assignPages( $obj )
+		// Setting up Home and Blog pages.
+		self::setPages( $obj )
+
+			// Replace URLs'.
 			->replaceUrls( $obj )
-			->assignWooPages()
-			->setElementorActiveKit()
-			->setElementorSettings()
-			->elementorTaxonomyFix( $obj )
+
+			// WooCommerce Actions.
+			->WooCommerceActions()
+
+			// Elementor Actions.
+			->ElementorActions($obj)
+
+			// Update Permalinks.
 			->updatePermalinks()
+
+			// Update rewrite flag.
 			->rewriteFlag();
 	}
 
@@ -179,7 +189,7 @@ class Actions {
 	 * @return static
 	 * @since 1.0.0
 	 */
-	public static function assignPages( $obj ) {
+	public static function setPages( $obj ) {
 		$homeSlug = $obj->demoSlug;
 		$blogSlug = '';
 
@@ -405,16 +415,32 @@ class Actions {
 	}
 
 	/**
-	 * Assigns WooCommerce pages.
+	 * WooCommerce actions.
 	 *
 	 * @return static
-	 * @since 1.0.0
+	 * @since 1.0.3
 	 */
-	public static function assignWooPages() {
+	public static function WooCommerceActions() {
 		if ( ! class_exists( 'WooCommerce' ) ) {
 			return new static();
 		}
 
+		// Setting up WooCommerce Pages
+		self::setWooPages()
+
+			// Fixing product stock.
+			->fixProductStock();
+
+		return new static();
+	}
+
+	/**
+	 * Setting up WooCommerce pages.
+	 *
+	 * @return static
+	 * @since 1.0.0
+	 */
+	public static function setWooPages() {
 		global $wpdb;
 
 		$wcPages = [
@@ -510,6 +536,71 @@ class Actions {
 	}
 
 	/**
+	 * Fix product stock.
+	 *
+	 * @return static
+	 * @since 1.0.0
+	 */
+	public static function fixProductStock() {
+		$args = [
+			'post_type'      => 'product',
+			'post_status'    => 'publish',
+			'posts_per_page' => -1,
+			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
+			'meta_query'     => [
+				'relation' => 'AND',
+				[
+					'key'   => '_stock_status',
+					'value' => 'outofstock',
+				],
+				[
+					'key'   => '_stock',
+					'value' => '',
+				],
+			],
+			'fields'         => 'ids',
+		];
+
+		$query = new WP_Query( $args );
+
+		if ( $query->have_posts() ) {
+			while ( $query->have_posts() ) {
+				$query->the_post();
+				$productId = get_the_ID();
+
+				update_post_meta( $productId, '_stock_status', 'instock' );
+			}
+
+			wp_reset_postdata();
+		}
+
+		return new static();
+	}
+
+	/**
+	 * Elementor actions.
+	 *
+	 * @return static
+	 * @since 1.0.3
+	 */
+	public static function ElementorActions( $obj ) {
+		if ( ! defined( 'ELEMENTOR_PATH' ) ) {
+			return new static();
+		}
+
+		// Setting up active kit.
+		self::setElementorActiveKit()
+
+			// Set some settings.
+			->setElementorSettings()
+
+			// Taxonomy mapping.
+			->elementorTaxonomyFix( $obj );
+
+		return new static();
+	}
+
+	/**
 	 * Sets the active Elementor kit.
 	 *
 	 * @return static
@@ -592,7 +683,6 @@ class Actions {
 		if ( ! apply_filters( 'sd/edi/disabled_elementor_options', false ) ) {
 			update_option( 'elementor_disable_color_schemes', 'yes' );
 			update_option( 'elementor_disable_typography_schemes', 'yes' );
-			update_option( 'elementor_experiment-e_swiper_latest', 'inactive' );
 			update_option( 'elementor_unfiltered_files_upload', '1' );
 		}
 
