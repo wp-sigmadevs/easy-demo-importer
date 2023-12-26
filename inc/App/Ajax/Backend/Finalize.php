@@ -74,6 +74,9 @@ class Finalize extends ImporterAjax {
 		 */
 		do_action( 'sd/edi/after_import', $this );
 
+		// Resetting permalink.
+		flush_rewrite_rules();
+
 		// Response.
 		$this->prepareResponse(
 			'',
