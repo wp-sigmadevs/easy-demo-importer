@@ -378,6 +378,12 @@ class RestEndpoints extends Base {
 			'error' => $this->convertToBytes( ini_get( 'max_execution_time' ) ) < $this->convertedRequirements()['max_execution_time'] ? esc_html__( 'Recommended PHP Max Execution Time is ', 'easy-demo-importer' ) . esc_html( $this->systemRequirements()['max_execution_time'] ) : '',
 		];
 
+		$fields['max_input_time'] = [
+			'label' => esc_html__( 'PHP Max Input Time', 'easy-demo-importer' ),
+			'value' => esc_html( ini_get( 'max_input_time' ) ),
+			'error' => $this->convertToBytes( ini_get( 'max_input_time' ) ) < $this->convertedRequirements()['max_input_time'] ? esc_html__( 'Recommended PHP Max Input Time is ', 'easy-demo-importer' ) . esc_html( $this->systemRequirements()['max_input_time'] ) : '',
+		];
+
 		$fields['max_upload_size'] = [
 			'label' => esc_html__( 'PHP Max Upload Size', 'easy-demo-importer' ),
 			'value' => esc_html( ini_get( 'upload_max_filesize' ) ),
@@ -754,6 +760,7 @@ class RestEndpoints extends Base {
 			'sd/edi/server_requirements',
 			[
 				'max_execution_time'  => '300',
+				'max_input_time'      => '300',
 				'upload_max_filesize' => '256M',
 				'post_max_size'       => '512M',
 				'memory_limit'        => '256M',

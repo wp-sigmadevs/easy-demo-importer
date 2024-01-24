@@ -1,12 +1,16 @@
 /**
  * Fix:
  *======*
- * TODO: Run Ajax only for the provided files.
+ * TODO: Run Ajax process only for the provided files.
  * TODO: Create initial pages for ShopBuilder plugin.
+ * TODO: RTL Support.
  *
  * Feature:
  *======*
+ * TODO: Elementor data fix for multiZip.
  * TODO: Add Rev Slider import.
+ * TODO: Remove default image regeneration.
+ * TODO: Add custom image regeneration support.
  * TODO: Add import categories.
  * TODO: Add import tabbed content.
  * TODO: Add import search.

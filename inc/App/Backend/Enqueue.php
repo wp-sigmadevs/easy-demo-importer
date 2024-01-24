@@ -87,7 +87,7 @@ class Enqueue extends EnqueueBase {
 			'version'   => $this->plugin->version(),
 		];
 
-		$this->enqueues['style'] = apply_filters( 'sd_edi_registered_admin_styles', $styles, 10, 1 );
+		$this->enqueues['style'] = apply_filters( 'sd/edi/registered_admin_styles', $styles, 10, 1 );
 
 		return $this;
 	}
@@ -109,7 +109,7 @@ class Enqueue extends EnqueueBase {
 			'version'    => $this->plugin->version(),
 		];
 
-		$this->enqueues['script'] = apply_filters( 'sd_edi_registered_admin_scripts', $scripts, 10, 1 );
+		$this->enqueues['script'] = apply_filters( 'sd/edi/registered_admin_scripts', $scripts, 10, 1 );
 
 		return $this;
 	}
