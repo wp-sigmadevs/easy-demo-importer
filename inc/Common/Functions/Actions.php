@@ -110,7 +110,7 @@ class Actions {
 			->WooCommerceActions()
 
 			// Elementor Actions.
-			->ElementorActions($obj)
+			->ElementorActions( $obj )
 
 			// Update Permalinks.
 			->updatePermalinks()
@@ -779,25 +779,25 @@ class Actions {
 			$catKeys = $data[ $element['widgetType'] ];
 
 			// Check if it contains multiple controls.
-			if (is_array($catKeys)) {
-				foreach ($catKeys as $catKey => $catID) {
+			if ( is_array( $catKeys ) ) {
+				foreach ( $catKeys as $catKey => $catID ) {
 					// Check if it contains repeater fields.
-					if (is_string( $catKey ) && strpos($catKey, 'repeater_') === 0) {
-						$catKey = substr($catKey, strlen('repeater_'));
+					if ( is_string( $catKey ) && strpos( $catKey, 'repeater_' ) === 0 ) {
+						$catKey = substr( $catKey, strlen( 'repeater_' ) );
 
-						if (isset($element['settings'][$catKey]) && is_array($element['settings'][$catKey])) {
-							foreach ($element['settings'][$catKey] as &$repeaterItem) {
+						if ( isset( $element['settings'][ $catKey ] ) && is_array( $element['settings'][ $catKey ] ) ) {
+							foreach ( $element['settings'][ $catKey ] as &$repeaterItem ) {
 								self::replaceCategoryInRepeater( $repeaterItem, $catID );
 							}
 						}
 					} else {
 						// Not a repeater field. Process normally.
-						self::replaceCategory($element, $catID);
+						self::replaceCategory( $element, $catID );
 					}
 				}
 			} else {
 				// Has single control to work with.
-				self::replaceCategory($element, $catKeys);
+				self::replaceCategory( $element, $catKeys );
 			}
 		}
 	}
@@ -811,21 +811,21 @@ class Actions {
 	 * @return void
 	 * @since 1.0.0
 	 */
-	public static function replaceCategory(&$element, $catKey) {
-		if (isset($element['settings'][$catKey])) {
-			$oldIds = $element['settings'][$catKey];
+	public static function replaceCategory( &$element, $catKey ) {
+		if ( isset( $element['settings'][ $catKey ] ) ) {
+			$oldIds = $element['settings'][ $catKey ];
 
-			if (is_array($oldIds)) {
-				$newIds = array_map(
-					function ($oldID) {
-						return sd_edi()->getNewID($oldID);
+			if ( is_array( $oldIds ) ) {
+				$newIds                         = array_map(
+					function ( $oldID ) {
+						return sd_edi()->getNewID( $oldID );
 					},
 					$oldIds
 				);
-				$element['settings'][$catKey] = $newIds;
+				$element['settings'][ $catKey ] = $newIds;
 			} else {
-				$newId = sd_edi()->getNewID($oldIds);
-				$element['settings'][$catKey] = $newId;
+				$newId                          = sd_edi()->getNewID( $oldIds );
+				$element['settings'][ $catKey ] = $newId;
 			}
 		}
 	}
@@ -839,21 +839,21 @@ class Actions {
 	 * @return void
 	 * @since 1.0.0
 	 */
-	public static function replaceCategoryInRepeater(&$element, $catKey) {
-		if (isset($element[$catKey])) {
-			$oldIds = $element[$catKey];
+	public static function replaceCategoryInRepeater( &$element, $catKey ) {
+		if ( isset( $element[ $catKey ] ) ) {
+			$oldIds = $element[ $catKey ];
 
-			if (is_array($oldIds)) {
-				$newIds = array_map(
-					function ($oldID) {
-						return sd_edi()->getNewID($oldID);
+			if ( is_array( $oldIds ) ) {
+				$newIds             = array_map(
+					function ( $oldID ) {
+						return sd_edi()->getNewID( $oldID );
 					},
 					$oldIds
 				);
-				$element[$catKey] = $newIds;
+				$element[ $catKey ] = $newIds;
 			} else {
-				$newId = sd_edi()->getNewID($oldIds);
-				$element[$catKey] = $newId;
+				$newId              = sd_edi()->getNewID( $oldIds );
+				$element[ $catKey ] = $newId;
 			}
 		}
 	}

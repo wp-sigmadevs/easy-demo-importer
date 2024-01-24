@@ -34,7 +34,7 @@ final class Plugin {
 	public function data() {
 		return array_merge(
 			apply_filters(
-				'sd_edi_plugin_meta_data',
+				'sd/edi/plugin_meta_data',
 				$this->getPluginMetaData()
 			),
 			$this->getOwnPluginData()

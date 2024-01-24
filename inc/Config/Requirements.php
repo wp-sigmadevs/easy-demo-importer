@@ -46,7 +46,7 @@ final class Requirements extends Base {
 	 */
 	public function specifications() {
 		return apply_filters(
-			'sd_edi_plugin_requirements',
+			'sd/edi/plugin_requirements',
 			[
 				'php' => $this->plugin->requiredPhp(),
 				'wp'  => $this->plugin->requiredWp(),

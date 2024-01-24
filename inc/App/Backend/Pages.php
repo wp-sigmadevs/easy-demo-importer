@@ -83,7 +83,7 @@ class Pages extends Base {
 		$subPages[] = [
 			'parent_slug' => 'themes.php',
 			'page_title'  => esc_html__( 'Easy Demo Importer', 'easy-demo-importer' ),
-			'menu_title'  => esc_html__( 'Easy Demo Importer', 'easy-demo-importer' ),
+			'menu_title'  => apply_filters( 'sd/edi/admin_menu_title', esc_html__( 'Easy Demo Importer', 'easy-demo-importer' ) ),
 			'capability'  => 'manage_options',
 			'menu_slug'   => $this->plugin->data()['demo_import_page'],
 			'callback'    => [ Callbacks::class, 'renderDemoImportPage' ],
