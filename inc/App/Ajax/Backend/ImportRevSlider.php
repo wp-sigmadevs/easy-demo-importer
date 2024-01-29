@@ -66,8 +66,8 @@ class ImportRevSlider extends ImporterAjax {
 		// Verifying AJAX call and user role.
 		Helpers::verifyAjaxCall();
 
-		$slider = $this->multiple ? Helpers::keyExists( $this->config['demoData'][ $this->demoSlug ]['revSliderZip'], 'array' ) : Helpers::keyExists( $this->config['revSliderZip'], 'array' );
-		$sliderFileExists = file_exists( $this->demoUploadDir( $this->demoSlug ) . '/revslider.zip' );
+		$slider           = $this->multiple ? Helpers::keyExists( $this->config['demoData'][ $this->demoSlug ]['revSliderZip'], 'array' ) : Helpers::keyExists( $this->config['revSliderZip'], 'array' );
+		$sliderFileExists = file_exists( $this->demoUploadDir( $this->demoSlug ) . '/' . $slider . '.zip' );
 
 		if ( $slider & $sliderFileExists ) {
 			$this->importSlider( $slider );
@@ -84,25 +84,26 @@ class ImportRevSlider extends ImporterAjax {
 	/**
 	 * Setting nav menus.
 	 *
-	 * @param array $sliderFiles Slider Files.
+	 * @param string $slider Slider zip File name.
 	 *
 	 * @return void
 	 * @since 1.0.0
 	 */
-	private function importSlider( $sliderFiles ) {
-		$unzipDir = wp_tempnam();
-		$zip = new ZipArchive;
+	private function importSlider( $slider ) {
+		$sliderFiles = $this->demoUploadDir( $this->demoSlug ) . '/' . $slider . '.zip';
+		$unzipDir    = $this->demoUploadDir( $this->demoSlug );
+		$zip         = new \ZipArchive();
 
-		if ($zip->open($sliderFiles) === TRUE) {
-			$zip->extractTo($unzipDir);
+		if ( $zip->open( $sliderFiles ) === true ) {
+			$zip->extractTo( $unzipDir );
 			$zip->close();
 
-			if (class_exists('RevSlider')) {
-				$slider = new \RevSlider();
-				$sliderFiles = glob($unzipDir . '/*.zip');
+			if ( class_exists( 'RevSlider' ) ) {
+				$slider      = new \RevSlider();
+				$sliderFiles = glob( $unzipDir . '/' . $slider . '/*.zip' );
 
-				foreach ($sliderFiles as $sliderFile) {
-					$slider->importSliderFromPost(true, true, $sliderFile);
+				foreach ( $sliderFiles as $sliderFile ) {
+					$slider->importSliderFromPost( true, true, $sliderFile );
 				}
 			}
 		}
