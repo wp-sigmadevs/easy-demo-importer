@@ -28,6 +28,7 @@ class ComposerStaticInita3a0f0cbb9b6e205034676f5e8e4d4d6
         'SigmaDevs\\EasyDemoImporter\\App\\Ajax\\Backend\\Finalize' => __DIR__ . '/../..' . '/inc/App/Ajax/Backend/Finalize.php',
         'SigmaDevs\\EasyDemoImporter\\App\\Ajax\\Backend\\ImportFluentForms' => __DIR__ . '/../..' . '/inc/App/Ajax/Backend/ImportFluentForms.php',
         'SigmaDevs\\EasyDemoImporter\\App\\Ajax\\Backend\\ImportMenus' => __DIR__ . '/../..' . '/inc/App/Ajax/Backend/ImportMenus.php',
+        'SigmaDevs\\EasyDemoImporter\\App\\Ajax\\Backend\\ImportRevSlider' => __DIR__ . '/../..' . '/inc/App/Ajax/Backend/ImportRevSlider.php',
         'SigmaDevs\\EasyDemoImporter\\App\\Ajax\\Backend\\ImportSettings' => __DIR__ . '/../..' . '/inc/App/Ajax/Backend/ImportSettings.php',
         'SigmaDevs\\EasyDemoImporter\\App\\Ajax\\Backend\\ImportWidgets' => __DIR__ . '/../..' . '/inc/App/Ajax/Backend/ImportWidgets.php',
         'SigmaDevs\\EasyDemoImporter\\App\\Ajax\\Backend\\Initialize' => __DIR__ . '/../..' . '/inc/App/Ajax/Backend/Initialize.php',

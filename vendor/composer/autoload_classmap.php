@@ -13,6 +13,7 @@ return array(
     'SigmaDevs\\EasyDemoImporter\\App\\Ajax\\Backend\\Finalize' => $baseDir . '/inc/App/Ajax/Backend/Finalize.php',
     'SigmaDevs\\EasyDemoImporter\\App\\Ajax\\Backend\\ImportFluentForms' => $baseDir . '/inc/App/Ajax/Backend/ImportFluentForms.php',
     'SigmaDevs\\EasyDemoImporter\\App\\Ajax\\Backend\\ImportMenus' => $baseDir . '/inc/App/Ajax/Backend/ImportMenus.php',
+    'SigmaDevs\\EasyDemoImporter\\App\\Ajax\\Backend\\ImportRevSlider' => $baseDir . '/inc/App/Ajax/Backend/ImportRevSlider.php',
     'SigmaDevs\\EasyDemoImporter\\App\\Ajax\\Backend\\ImportSettings' => $baseDir . '/inc/App/Ajax/Backend/ImportSettings.php',
     'SigmaDevs\\EasyDemoImporter\\App\\Ajax\\Backend\\ImportWidgets' => $baseDir . '/inc/App/Ajax/Backend/ImportWidgets.php',
     'SigmaDevs\\EasyDemoImporter\\App\\Ajax\\Backend\\Initialize' => $baseDir . '/inc/App/Ajax/Backend/Initialize.php',
