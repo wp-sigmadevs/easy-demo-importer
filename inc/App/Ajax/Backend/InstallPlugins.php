@@ -150,7 +150,7 @@ class InstallPlugins extends ImporterAjax {
 			if ( 'install' === $pluginStatus ) {
 				$upgrader->install( $api->download_link );
 			} elseif ( 'update' === $pluginStatus ) {
-				$upgrader->upgrade( $path );
+				$upgrader->upgrade( $path, [ 'clear_update_cache' => false ] );
 			}
 
 			++$this->installCount;

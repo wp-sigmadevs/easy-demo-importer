@@ -69,7 +69,7 @@ class ImportRevSlider extends ImporterAjax {
 		$slider           = $this->multiple ? Helpers::keyExists( $this->config['demoData'][ $this->demoSlug ]['revSliderZip'], 'array' ) : Helpers::keyExists( $this->config['revSliderZip'], 'array' );
 		$sliderFileExists = file_exists( $this->demoUploadDir( $this->demoSlug ) . '/' . $slider . '.zip' );
 
-		if ( $slider & $sliderFileExists ) {
+		if ( $slider && $sliderFileExists ) {
 			$this->importSlider( $slider );
 		}
 
