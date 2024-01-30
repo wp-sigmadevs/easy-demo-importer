@@ -67,7 +67,7 @@ class ImportRevSlider extends ImporterAjax {
 		Helpers::verifyAjaxCall();
 
 		$slider           = $this->multiple ? Helpers::keyExists( $this->config['demoData'][ $this->demoSlug ]['revSliderZip'], 'array' ) : Helpers::keyExists( $this->config['revSliderZip'], 'array' );
-		$sliderFileExists = file_exists( $this->demoUploadDir( $this->demoSlug ) . '/' . $slider . '.zip' );
+		$sliderFileExists = file_exists( $this->demoUploadDir( $this->demoDir() ) . '/' . $slider . '.zip' );
 
 		if ( $slider && $sliderFileExists ) {
 			$this->importSlider( $slider );
@@ -90,8 +90,8 @@ class ImportRevSlider extends ImporterAjax {
 	 * @since 1.0.0
 	 */
 	private function importSlider( $slider ) {
-		$sliderFiles = $this->demoUploadDir( $this->demoSlug ) . '/' . $slider . '.zip';
-		$unzipDir    = $this->demoUploadDir( $this->demoSlug );
+		$sliderFiles = $this->demoUploadDir( $this->demoDir() ) . '/' . $slider . '.zip';
+		$unzipDir    = $this->demoUploadDir( $this->demoDir() );
 		$zip         = new \ZipArchive();
 
 		if ( $zip->open( $sliderFiles ) === true ) {
@@ -99,11 +99,11 @@ class ImportRevSlider extends ImporterAjax {
 			$zip->close();
 
 			if ( class_exists( 'RevSlider' ) ) {
-				$slider      = new \RevSlider();
+				$revSlider   = new \RevSlider();
 				$sliderFiles = glob( $unzipDir . '/' . $slider . '/*.zip' );
 
 				foreach ( $sliderFiles as $sliderFile ) {
-					$slider->importSliderFromPost( true, true, $sliderFile );
+					$revSlider->importSliderFromPost( true, true, $sliderFile );
 				}
 			}
 		}
