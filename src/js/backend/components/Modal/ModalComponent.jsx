@@ -153,6 +153,11 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 									progressDot
 									current={currentStep - 1}
 									items={steps.map((step, index) => ({
+										title:
+											sdEdiAdminParams &&
+											sdEdiAdminParams.stepTitles
+												? step.title
+												: '',
 										status: getCurrentStatus(
 											currentStep,
 											importComplete,

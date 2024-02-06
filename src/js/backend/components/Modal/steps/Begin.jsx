@@ -53,6 +53,13 @@ const Begin = ({ handleReset, modalData }) => {
 					<div className="import-notice">
 						<p>{sdEdiAdminParams.stepOneIntro1}</p>
 						<p>{sdEdiAdminParams.stepOneIntro2}</p>
+						{sdEdiAdminParams.stepOneIntro3 ? (
+							<p
+								dangerouslySetInnerHTML={{
+									__html: sdEdiAdminParams.stepOneIntro3,
+								}}
+							></p>
+						) : null}
 					</div>
 				</div>
 				<div className="step-actions">
