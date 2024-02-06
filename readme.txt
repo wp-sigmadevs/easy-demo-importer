@@ -16,7 +16,7 @@ A one-click, user-friendly WordPress plugin for effortlessly importing theme dem
 
 Are you tired of the complex and time-consuming process of setting up your WordPress website? Look no further. The Easy Demo Importer plugin is your solution to effortlessly import demo data and have your website up and running in no time.
 
-👉 [Official GitHub repository](https://github.com/wp-sigmadevs/easy-demo-importer) | Plugin Documentation (Coming Soon). 👈
+👉 [Official GitHub repository](https://github.com/wp-sigmadevs/easy-demo-importer) | [Plugin Documentation](https://docs.sigmadevs.com/easy-demo-importer). 👈
 
 == Key Features ==
 

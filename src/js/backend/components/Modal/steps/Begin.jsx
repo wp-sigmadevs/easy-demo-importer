@@ -47,12 +47,25 @@ const Begin = ({ handleReset, modalData }) => {
 						preview={false}
 						alt="Preview"
 					/>
+					<div className="down-arrow"></div>
 				</div>
 				<div className="modal-content-text modal-col-6">
 					<h3>{sdEdiAdminParams.beforeYouPreceed}</h3>
 					<div className="import-notice">
-						<p>{sdEdiAdminParams.stepOneIntro1}</p>
-						<p>{sdEdiAdminParams.stepOneIntro2}</p>
+						{sdEdiAdminParams.stepOneIntro1 ? (
+							<p
+								dangerouslySetInnerHTML={{
+									__html: sdEdiAdminParams.stepOneIntro1,
+								}}
+							></p>
+						) : null}
+						{sdEdiAdminParams.stepOneIntro2 ? (
+							<p
+								dangerouslySetInnerHTML={{
+									__html: sdEdiAdminParams.stepOneIntro2,
+								}}
+							></p>
+						) : null}
 						{sdEdiAdminParams.stepOneIntro3 ? (
 							<p
 								dangerouslySetInnerHTML={{

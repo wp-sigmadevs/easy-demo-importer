@@ -112,7 +112,7 @@
 				}
 
 				.ant-steps-item-title {
-					color: rgba(0, 0, 0, 0.45);
+					@extend .edi-primary-color;
 				}
 			}
 		}

@@ -44,6 +44,7 @@ class SD_EDI_WXR_Parser_SimpleXML {
 			$old_value = libxml_disable_entity_loader( true );
 		}
 
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
 		$success = $dom->loadXML( file_get_contents( $file ) );
 
 		if ( ! is_null( $old_value ) ) {
