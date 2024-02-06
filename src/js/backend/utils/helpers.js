@@ -75,18 +75,22 @@ export const getCurrentStatus = (currentStep, importComplete, index) => {
  * Get the progress steps for the import process.
  */
 export const progressSteps = () => {
-	return [
-		{
-			title: 'Begin',
-		},
-		{
-			title: 'Setup',
-		},
-		{
-			title: 'Imports',
-		},
-		{
-			title: 'Success',
-		},
-	];
+	return sdEdiAdminParams && sdEdiAdminParams.stepTitles
+		? Object.entries(sdEdiAdminParams.stepTitles).map(([key, value]) => ({
+				title: value,
+		  }))
+		: [
+				{
+					title: 'Begin',
+				},
+				{
+					title: 'Setup',
+				},
+				{
+					title: 'Imports',
+				},
+				{
+					title: 'Success',
+				},
+		  ];
 };

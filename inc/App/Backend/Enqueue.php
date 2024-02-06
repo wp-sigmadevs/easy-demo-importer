@@ -161,6 +161,8 @@ class Enqueue extends EnqueueBase {
 				'beforeYouPreceed'           => esc_html__( 'Before You Proceed', 'easy-demo-importer' ),
 				'stepOneIntro1'              => self::importModalTexts()['stepOne']['introTopText'],
 				'stepOneIntro2'              => self::importModalTexts()['stepOne']['introBottomText'],
+				'stepOneIntro3'              => self::importModalTexts()['stepOne']['introExtraText'],
+				'stepTitles'                 => self::importModalTexts()['stepTitles'],
 
 				// Modal Step Two.
 				'requiredPluginsTitle'       => esc_html__( 'Required Plugins', 'easy-demo-importer' ),
@@ -236,6 +238,7 @@ class Enqueue extends EnqueueBase {
 				'stepOne'     => [
 					'introTopText'    => esc_html__( 'Before importing demo data, we recommend that you backup your site\'s data and files. You can use a popular backup plugin to ensure you have a copy of your site in case anything goes wrong during the import process.', 'easy-demo-importer' ),
 					'introBottomText' => esc_html__( 'Please note that this demo import will install all the required plugins, import contents, media, settings, customizer data, widgets, and other necessary elements to replicate the demo site. Make sure to review your existing data and settings as they may be overwritten.', 'easy-demo-importer' ),
+					'introExtraText'  => __( 'This demo consists of the below pages:<ol><li>Home page</li><li>About Us</li><li>Contact Us</li><li>Other Inner Pages</li></ol>', 'easy-demo-importer' ),
 				],
 				'stepTwo'     => [
 					'requiredPluginsIntro' => esc_html__( 'In order to replicate the exact appearance of the demo site, the import process will automatically install and activate the following plugins, provided they are not already installed or activated on your website. You may need to scroll through to see the full list:', 'easy-demo-importer' ),
@@ -244,6 +247,12 @@ class Enqueue extends EnqueueBase {
 				'docText'     => esc_html__( 'Start your journey by diving into our detailed FAQ documentation. It offers a comprehensive guide with step-by-step instructions, and helpful screenshots to assist you in successfully importing demo data', 'easy-demo-importer' ),
 				'docUrl'      => 'https://github.com/wp-sigmadevs/easy-demo-importer',
 				'ticketUrl'   => 'https://github.com/wp-sigmadevs/easy-demo-importer/issues',
+				'stepTitles'  => [
+					'step1' => esc_html__( 'Start', 'easy-demo-importer' ),
+					'step2' => esc_html__( 'Configure', 'easy-demo-importer' ),
+					'step3' => esc_html__( 'Imports', 'easy-demo-importer' ),
+					'step4' => esc_html__( 'End', 'easy-demo-importer' ),
+				]
 			]
 		);
 	}

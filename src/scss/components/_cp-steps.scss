@@ -29,6 +29,11 @@
 				margin-bottom: 40px;
 			}
 
+			.ant-steps-item-title {
+				font-size: 14px;
+				font-weight: 500;
+			}
+
 			.ant-steps-item-icon {
 				width: 20px;
 				height: 20px;
@@ -104,6 +109,10 @@
 						background-size: 200% auto;
 						background-position: right center;
 					}
+				}
+
+				.ant-steps-item-title {
+					color: rgba(0, 0, 0, 0.45);
 				}
 			}
 		}
