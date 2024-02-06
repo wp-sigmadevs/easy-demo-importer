@@ -8,7 +8,7 @@
  * Feature:
  *======*
  * TODO: Elementor data fix for multiZip.
- * TODO: Add Rev Slider import.
+ *̶ ̶T̶O̶D̶O̶:̶ ̶A̶d̶d̶ ̶R̶e̶v̶ ̶S̶l̶i̶d̶e̶r̶ ̶i̶m̶p̶o̶r̶t̶.̶
  * TODO: Remove default image regeneration.
  * TODO: Add custom image regeneration support.
  * TODO: Add import categories.

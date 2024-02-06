@@ -425,7 +425,7 @@ class Actions {
 			return new static();
 		}
 
-		// Setting up WooCommerce Pages
+		// Setting up WooCommerce Pages.
 		self::setWooPages()
 
 			// Fixing product stock.

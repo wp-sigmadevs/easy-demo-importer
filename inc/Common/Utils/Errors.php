@@ -90,6 +90,7 @@ class Errors {
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		if ( isset( $_GET['activate'] ) ) {
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			unset( $_GET['activate'] );
 		}
 	}

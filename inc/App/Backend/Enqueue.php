@@ -195,7 +195,7 @@ class Enqueue extends EnqueueBase {
 				'btnViewSite'                => esc_html__( 'View Site', 'easy-demo-importer' ),
 				'btnClose'                   => esc_html__( 'Close', 'easy-demo-importer' ),
 				'clickEnlarge'               => esc_html__( 'Click to Enlarge', 'easy-demo-importer' ),
-				'createATicket'              => esc_html__( 'Create a Ticket', 'easy-demo-importer' ),
+				'createATicket'              => esc_html__( 'Contact Us', 'easy-demo-importer' ),
 				'viewDocumentation'          => esc_html__( 'View Documentation', 'easy-demo-importer' ),
 				'needHelp'                   => esc_html__( 'Need help?', 'easy-demo-importer' ),
 				'onlineDoc'                  => esc_html__( 'Documentation & FAQ', 'easy-demo-importer' ),
@@ -238,15 +238,24 @@ class Enqueue extends EnqueueBase {
 				'stepOne'     => [
 					'introTopText'    => esc_html__( 'Before importing demo data, we recommend that you backup your site\'s data and files. You can use a popular backup plugin to ensure you have a copy of your site in case anything goes wrong during the import process.', 'easy-demo-importer' ),
 					'introBottomText' => esc_html__( 'Please note that this demo import will install all the required plugins, import contents, media, settings, customizer data, widgets, and other necessary elements to replicate the demo site. Make sure to review your existing data and settings as they may be overwritten.', 'easy-demo-importer' ),
-					'introExtraText'  => __( 'This demo consists of the below pages:<ol><li>Home page</li><li>About Us</li><li>Contact Us</li><li>Other Inner Pages</li></ol>', 'easy-demo-importer' ),
+					'introExtraText'  => sprintf(
+						/* translators: page names */
+						esc_html__( 'This demo consists of the below pages: %s', 'easy-demo-importer' ),
+						'<ol>
+									<li>' . esc_html__( 'Home Page', 'easy-demo-importer' ) . '</li>
+									<li>' . esc_html__( 'About Us', 'easy-demo-importer' ) . '</li>
+									<li>' . esc_html__( 'Contact Us', 'easy-demo-importer' ) . '</li>
+									<li>' . esc_html__( 'Other Inner Pages', 'easy-demo-importer' ) . '</li>
+								</ol>'
+					),
 				],
 				'stepTwo'     => [
 					'requiredPluginsIntro' => esc_html__( 'In order to replicate the exact appearance of the demo site, the import process will automatically install and activate the following plugins, provided they are not already installed or activated on your website. You may need to scroll through to see the full list:', 'easy-demo-importer' ),
 				],
-				'supportText' => esc_html__( 'If you have any problems, please create a support ticket. This helps us help you quickly and give you the right solutions.', 'easy-demo-importer' ),
+				'supportText' => esc_html__( 'If you have any problems, please don\'t hesitate to contact us. This helps us help you quickly and give you the right solutions.', 'easy-demo-importer' ),
 				'docText'     => esc_html__( 'Start your journey by diving into our detailed FAQ documentation. It offers a comprehensive guide with step-by-step instructions, and helpful screenshots to assist you in successfully importing demo data', 'easy-demo-importer' ),
-				'docUrl'      => 'https://github.com/wp-sigmadevs/easy-demo-importer',
-				'ticketUrl'   => 'https://github.com/wp-sigmadevs/easy-demo-importer/issues',
+				'docUrl'      => 'https://docs.sigmadevs.com/easy-demo-importer/',
+				'ticketUrl'   => 'https://docs.sigmadevs.com/easy-demo-importer/contact-us/',
 				'stepTitles'  => [
 					'step1' => esc_html__( 'Start', 'easy-demo-importer' ),
 					'step2' => esc_html__( 'Configure', 'easy-demo-importer' ),
