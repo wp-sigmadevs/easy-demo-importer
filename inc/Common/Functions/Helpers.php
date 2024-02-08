@@ -412,4 +412,31 @@ class Helpers {
 	public static function getInactivePlugins() {
 		return array_diff_key( get_plugins(), self::getActivePlugins() );
 	}
+
+	/**
+	 * Recursively checks if a multidimensional array has a certain key.
+	 *
+	 * @param array $array The array to search.
+	 * @param string $key The key to search for.
+	 *
+	 * @return bool
+	 * @since 1.0.3
+	 */
+	public static function searchArrayKey( $array, $key ) {
+		if ( ! is_array( $array ) ) {
+			return false;
+		}
+
+		if ( array_key_exists( $key, $array ) ) {
+			return true;
+		}
+
+		foreach ( $array as $item ) {
+			if ( is_array( $item ) && self::searchArrayKey( $item, $key ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
 }
