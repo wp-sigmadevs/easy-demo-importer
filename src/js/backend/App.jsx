@@ -1,5 +1,5 @@
 import Header from './Layouts/Header';
-import { Row, Col, Button } from 'antd';
+import { Row, Col, Button, Tabs } from 'antd';
 import Support from './components/Support';
 import DemoCard from './components/DemoCard';
 import React, { useState, useEffect } from 'react';
@@ -35,6 +35,8 @@ const App = () => {
 		setModalVisible,
 		handleModalCancel,
 	} = useSharedDataStore();
+
+	const { TabPane } = Tabs;
 
 	/**
 	 * Effect hook to fetch the import list when the component mounts.
@@ -89,6 +91,24 @@ const App = () => {
 	 */
 	const demoData =
 		importList.success && importList.data && importList.data.demoData;
+
+	console.log(demoData)
+
+	// Grouping demoData by category
+	let groupedDemoData = {};
+	if (demoData) {
+		// Add "All" tab
+		groupedDemoData.All = Object.values(demoData);
+
+		Object.keys(demoData).forEach((key) => {
+			const demo = demoData[key];
+			const category = demo.category;
+			if (!groupedDemoData[category]) {
+				groupedDemoData[category] = [];
+			}
+			groupedDemoData[category].push(demo);
+		});
+	}
 
 	/**
 	 * Extracting the server data.
@@ -169,6 +189,10 @@ const App = () => {
 					heading="Demo Importer"
 				/>
 
+				{
+					console.log(importList)
+				}
+
 				{importList.success && hasErrors(serverInfo) && (
 					<ModalRequirements
 						isVisible={isModalVisible}
@@ -179,53 +203,73 @@ const App = () => {
 
 				<div className="edi-content">
 					<div className={containerClassName}>
-						<Row gutter={[30, 30]}>
-							{loading && !demoData ? (
-								<>
-									{Array.from({
-										length: sdEdiAdminParams.numberOfDemos,
-									}).map((_, i) => (
-										<Col key={i} className="gutter-row">
-											<div className="skeleton-wrapper">
-												{GridSkeleton(loading)}
-											</div>
-										</Col>
-									))}
-								</>
-							) : (
-								<>
-									{!importList.success ? (
-										<ErrorMessage message={errorMessage} />
-									) : (
-										<>
-											{Object.keys(demoData).map(
-												(key, index) => {
-													const demoItem = {
-														...demoData[key],
-														id: key,
-													};
+						<Tabs defaultActiveKey="0" tabPosition="left">
+							{Object.keys(groupedDemoData).map((category, index) => (
+								<TabPane tab={category} key={index}>
+									<Row gutter={[30, 30]}>
+										{groupedDemoData[category].map((demo, demoIndex) => (
+											<Col
+												className="gutter-row edi-demo-card edi-fade-in"
+												key={`demo-${demoIndex}`}
+											>
+												<DemoCard
+													data={demo}
+													showModal={showModal}
+													key={`demo-${demoIndex}`}
+												/>
+											</Col>
+										))}
+									</Row>
+								</TabPane>
+							))}
+						{/*<Row gutter={[30, 30]}>*/}
+						{/*	{loading && !demoData ? (*/}
+						{/*		<>*/}
+						{/*			{Array.from({*/}
+						{/*				length: sdEdiAdminParams.numberOfDemos,*/}
+						{/*			}).map((_, i) => (*/}
+						{/*				<Col key={i} className="gutter-row">*/}
+						{/*					<div className="skeleton-wrapper">*/}
+						{/*						{GridSkeleton(loading)}*/}
+						{/*					</div>*/}
+						{/*				</Col>*/}
+						{/*			))}*/}
+						{/*		</>*/}
+						{/*	) : (*/}
+						{/*		<>*/}
+						{/*			{!importList.success ? (*/}
+						{/*				<ErrorMessage message={errorMessage} />*/}
+						{/*			) : (*/}
+						{/*				<>*/}
+						{/*					{Object.keys(demoData).map(*/}
+						{/*						(key, index) => {*/}
+						{/*							const demoItem = {*/}
+						{/*								...demoData[key],*/}
+						{/*								id: key,*/}
+						{/*							};*/}
 
-													return (
-														<Col
-															className="gutter-row edi-demo-card edi-fade-in"
-															key={`demo-${index}`}
-														>
-															<DemoCard
-																data={demoItem}
-																showModal={
-																	showModal
-																}
-																key={`demo-${index}`}
-															/>
-														</Col>
-													);
-												}
-											)}
-										</>
-									)}
-								</>
-							)}
-						</Row>
+						{/*							return (*/}
+						{/*								<Col*/}
+						{/*									className="gutter-row edi-demo-card edi-fade-in"*/}
+						{/*									key={`demo-${index}`}*/}
+						{/*								>*/}
+						{/*									<DemoCard*/}
+						{/*										data={demoItem}*/}
+						{/*										showModal={*/}
+						{/*											showModal*/}
+						{/*										}*/}
+						{/*										key={`demo-${index}`}*/}
+						{/*									/>*/}
+						{/*								</Col>*/}
+						{/*							);*/}
+						{/*						}*/}
+						{/*					)}*/}
+						{/*				</>*/}
+						{/*			)}*/}
+						{/*		</>*/}
+						{/*	)}*/}
+						{/*</Row>*/}
+						</Tabs>
 					</div>
 				</div>
 				<ModalComponent
