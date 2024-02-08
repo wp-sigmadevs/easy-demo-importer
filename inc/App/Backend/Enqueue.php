@@ -145,6 +145,7 @@ class Enqueue extends EnqueueBase {
 				'restNonce'                  => wp_create_nonce( 'wp_rest' ),
 				'ediLogo'                    => esc_url( $this->plugin->assetsUri() . '/images/sd-edi-logo.svg' ),
 				'numberOfDemos'              => ! empty( sd_edi()->getDemoConfig()['demoData'] ) ? count( sd_edi()->getDemoConfig()['demoData'] ) : 0,
+				'hasTabCategories'           => ! empty( sd_edi()->getDemoConfig()['demoData'] ) ? Helpers::searchArrayKey( sd_edi()->getDemoConfig(), 'category' ) : 'no',
 				Helpers::nonceId()           => wp_create_nonce( Helpers::nonceText() ),
 				'enableSupportButton'        => esc_html( apply_filters( 'sd/edi/support_button', 'yes' ) ),
 
@@ -199,6 +200,7 @@ class Enqueue extends EnqueueBase {
 				'viewDocumentation'          => esc_html__( 'View Documentation', 'easy-demo-importer' ),
 				'needHelp'                   => esc_html__( 'Need help?', 'easy-demo-importer' ),
 				'onlineDoc'                  => esc_html__( 'Documentation & FAQ', 'easy-demo-importer' ),
+				'allDemoBtnText'             => esc_html__( 'All Demos', 'easy-demo-importer' ),
 
 				// Support Modal.
 				'supportTitle'               => esc_html__( 'Need Help?', 'easy-demo-importer' ),

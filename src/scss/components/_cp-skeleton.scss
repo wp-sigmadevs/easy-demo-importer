@@ -48,6 +48,10 @@
 			}
 		}
 	}
+
+	.skeleton-col {
+		grid-column: 1/-1;
+	}
 }
 
 .appearance_page_sd-edi-demo-importer-status {
