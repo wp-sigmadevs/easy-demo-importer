@@ -1,5 +1,5 @@
 import Header from './Layouts/Header';
-import { Row, Col, Button, Tabs, Skeleton } from 'antd';
+import { Row, Col, Button, Tabs, Skeleton, Input } from 'antd';
 import Support from './components/Support';
 import DemoCard from './components/DemoCard';
 import React, { useState, useEffect } from 'react';
@@ -21,6 +21,9 @@ const App = () => {
 	const [modalData, setModalData] = useState(null);
 	const [errorMessage, setErrorMessage] = useState(null);
 	const [isModalVisible, setIsModalVisible] = useState(false);
+	const [searchQuery, setSearchQuery] = useState('');
+	const [filteredDemoData, setFilteredDemoData] = useState(null);
+	const [isSearchQueryEmpty, setIsSearchQueryEmpty] = useState(true);
 
 	/**
 	 * Values from the shared data store.
@@ -85,10 +88,34 @@ const App = () => {
 	}, [serverData, serverInfo]);
 
 	/**
+	 * Filter demo data based on search query.
+	 */
+	useEffect(() => {
+		if (searchQuery.trim() !== '') {
+			const filteredData = Object.values(demoData).filter((demo) => {
+				const searchWords = searchQuery.toLowerCase().split(' ');
+
+				return searchWords.every((word) =>
+					demo.name.toLowerCase().includes(word)
+				);
+			});
+			setFilteredDemoData(filteredData.length > 0 ? filteredData : null);
+		} else {
+			setFilteredDemoData(null);
+		}
+	}, [searchQuery, demoData]);
+
+	useEffect(() => {
+		setIsSearchQueryEmpty(searchQuery.trim() === '');
+	}, [searchQuery]);
+
+	/**
 	 * Extracting the demo data from the import list.
 	 */
 	const demoData =
 		importList.success && importList.data && importList.data.demoData;
+
+	// console.log(demoData)
 
 	/**
 	 * Grouping demoData by category.
@@ -178,6 +205,49 @@ const App = () => {
 		containerClassName += ' theme-config-found';
 	}
 
+	// Function to handle search input change.
+	const handleSearchChange = (e) => {
+		setSearchQuery(e.target.value);
+	};
+
+	// Function to generate JSX for all demo cards
+	const generateAllDemoCards = () => (
+		<Row gutter={[30, 30]}>
+			{Object.values(demoData).map((demo, index) => (
+				<Col
+					className="gutter-row edi-demo-card edi-fade-in"
+					key={`demo-${index}`}
+				>
+					<DemoCard data={demo} showModal={showModal} />
+				</Col>
+			))}
+		</Row>
+	);
+
+	// Function to generate JSX for filtered demo cards.
+	const generateFilteredDemoCards = (demoItems) => (
+		<Row gutter={[30, 30]}>
+			{demoItems.map((demo, index) => (
+				<Col
+					className="gutter-row edi-demo-card edi-fade-in"
+					key={`demo-${index}`}
+				>
+					<DemoCard data={demo} showModal={showModal} />
+				</Col>
+			))}
+		</Row>
+	);
+
+	const generateTabContent = (category) => {
+		if (searchQuery.trim() === '') {
+			return (
+				groupedDemoData[category] &&
+				generateFilteredDemoCards(groupedDemoData[category])
+			);
+		}
+		return filteredDemoData && generateFilteredDemoCards(filteredDemoData);
+	};
+
 	/**
 	 * Generates JSX for rendering demo cards within a Row component.
 	 *
@@ -249,26 +319,59 @@ const App = () => {
 								) : (
 									<>
 										{sdEdiAdminParams.hasTabCategories ? (
-											<Tabs
-												defaultActiveKey="All"
-												centered
-												items={Object.keys(
-													groupedDemoData
-												).map((category) => ({
-													label:
-														category === 'All'
-															? sdEdiAdminParams.allDemoBtnText
-															: category,
-													key: category,
-													children: generateDemoCards(
-														groupedDemoData[
-															category
-														]
-													),
-												}))}
-											></Tabs>
+											<>
+												<div className="edi-nav-wrapper">
+													<div className="edi-nav-tabs">
+														<div className="edi-nav-search">
+															<Input
+																placeholder="Search demos..."
+																value={
+																	searchQuery
+																}
+																onChange={
+																	handleSearchChange
+																}
+															/>
+														</div>
+														<Tabs
+															defaultActiveKey="All"
+															centered
+															items={Object.keys(
+																groupedDemoData
+															).map(
+																(category) => ({
+																	label:
+																		category ===
+																		'All'
+																			? sdEdiAdminParams.allDemoBtnText
+																			: category,
+																	key: category,
+																	children:
+																		generateTabContent(
+																			category
+																		),
+																	disabled:
+																		!isSearchQueryEmpty,
+																})
+															)}
+														></Tabs>
+													</div>
+												</div>
+											</>
 										) : (
-											generateDemoCards(demoData)
+											<>
+												<div className="edi-nav-wrapper">
+													<div className="edi-nav-search"></div>
+												</div>
+												{/*generateDemoCards(demoData)*/}
+												{searchQuery.trim() === ''
+													? generateAllDemoCards()
+													: filteredDemoData !==
+															null &&
+													  generateFilteredDemoCards(
+															filteredDemoData
+													  )}
+											</>
 										)}
 									</>
 								)}
