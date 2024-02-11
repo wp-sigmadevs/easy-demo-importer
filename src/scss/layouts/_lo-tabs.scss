@@ -1,0 +1,51 @@
+/**
+ * Layout: Tabs.
+ */
+.edi-container {
+	.edi-nav-tabs {
+		@extend .edi-pos-r;
+
+		.edi-nav-search {
+			position: absolute;
+			right: 0;
+			width: 30%;
+		}
+	}
+
+	.ant-tabs {
+		.ant-tabs-nav-wrap {
+			justify-content: flex-start !important;
+			max-width: 70%;
+			padding-right: 20px;
+		}
+
+		.ant-tabs-ink-bar {
+			height: 100%;
+			border-radius: 20px;
+		}
+
+		.ant-tabs-nav {
+			margin-bottom: 30px !important;
+			padding-bottom: 30px !important;
+			//&::before {
+			//	content: none !important;
+			//}
+		}
+
+		.ant-tabs-tab {
+			z-index: 1;
+			padding: 0 20px;
+			height: 40px;
+
+			+ .ant-tabs-tab {
+				margin: 0 !important;
+			}
+
+			&.ant-tabs-tab-active {
+				.ant-tabs-tab-btn {
+					@extend .edi-white-color;
+				}
+			}
+		}
+	}
+}

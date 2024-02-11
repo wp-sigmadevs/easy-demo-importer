@@ -42,6 +42,9 @@ const useSharedDataStore = create((set) => ({
 	importComplete: false,
 	reset: true,
 	message: '',
+	searchQuery: '',
+	filteredDemoData: null,
+	isSearchQueryEmpty: true,
 	fetchImportList: async (endpoint) => {
 		try {
 			const response = await Api.get(endpoint, {});
@@ -74,6 +77,9 @@ const useSharedDataStore = create((set) => ({
 	setLoading: (value) => set({ loading: value }),
 	setImportComplete: (value) => set({ importComplete: value }),
 	setMessage: (message) => set(() => ({ message })),
+	setSearchQuery: (query) => set({ searchQuery: query }),
+	setFilteredDemoData: (data) => set({ filteredDemoData: data }),
+	setIsSearchQueryEmpty: (value) => set({ isSearchQueryEmpty: value }),
 }));
 
 export default useSharedDataStore;
