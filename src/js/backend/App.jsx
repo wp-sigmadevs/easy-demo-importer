@@ -13,17 +13,16 @@ import ModalRequirements from './components/Modal/ModaRequirements';
 
 /**
  * The main component representing the demo import application.
+ *
+ * @return {JSX.Element} - JSX element representing the main application component.
  */
 const App = () => {
 	/**
-	 * State hooks.
+	 * State hooks and initialization.
 	 */
 	const [modalData, setModalData] = useState(null);
 	const [errorMessage, setErrorMessage] = useState(null);
 	const [isModalVisible, setIsModalVisible] = useState(false);
-	const [searchQuery, setSearchQuery] = useState('');
-	const [filteredDemoData, setFilteredDemoData] = useState(null);
-	const [isSearchQueryEmpty, setIsSearchQueryEmpty] = useState(true);
 
 	/**
 	 * Values from the shared data store.
@@ -37,10 +36,21 @@ const App = () => {
 		modalVisible,
 		setModalVisible,
 		handleModalCancel,
+		searchQuery,
+		setSearchQuery,
+		filteredDemoData,
+		setFilteredDemoData,
+		isSearchQueryEmpty,
+		setIsSearchQueryEmpty,
 	} = useSharedDataStore();
 
 	/**
-	 * Effect hook to fetch the import list when the component mounts.
+	 * Destructure the Search component from the Input module.
+	 */
+	const { Search } = Input;
+
+	/**
+	 * Fetch the import list when the component mounts.
 	 */
 	useEffect(() => {
 		(async () => {
@@ -53,7 +63,7 @@ const App = () => {
 	}, [fetchImportList]);
 
 	/**
-	 * Effect hook to set the error message if the import list is not successful.
+	 * Set the error message if the import list is not successful.
 	 */
 	useEffect(() => {
 		if (!importList.success) {
@@ -62,7 +72,7 @@ const App = () => {
 	}, [importList]);
 
 	/**
-	 * Effect hook to fetch the server data when the component mounts.
+	 * Fetch the server data when the component mounts.
 	 */
 	useEffect(() => {
 		(async () => {
@@ -75,7 +85,7 @@ const App = () => {
 	}, [fetchServerData]);
 
 	/**
-	 * Effect hook to handle server data response and potential errors.
+	 * Handle server data response and potential errors.
 	 */
 	useEffect(() => {
 		if (!serverData.success) {
@@ -99,15 +109,19 @@ const App = () => {
 					demo.name.toLowerCase().includes(word)
 				);
 			});
+
 			setFilteredDemoData(filteredData.length > 0 ? filteredData : null);
 		} else {
 			setFilteredDemoData(null);
 		}
-	}, [searchQuery, demoData]);
+	}, [searchQuery, setFilteredDemoData, demoData]);
 
+	/**
+	 * Updates the search state.
+	 */
 	useEffect(() => {
 		setIsSearchQueryEmpty(searchQuery.trim() === '');
-	}, [searchQuery]);
+	}, [searchQuery, setIsSearchQueryEmpty]);
 
 	/**
 	 * Extracting the demo data from the import list.
@@ -115,21 +129,22 @@ const App = () => {
 	const demoData =
 		importList.success && importList.data && importList.data.demoData;
 
-	// console.log(demoData)
-
 	/**
 	 * Grouping demoData by category.
 	 */
 	const groupedDemoData = {};
+
 	if (demoData) {
 		groupedDemoData.All = Object.values(demoData);
 
 		Object.keys(demoData).forEach((key) => {
 			const demo = demoData[key];
 			const category = demo.category;
+
 			if (!groupedDemoData[category]) {
 				groupedDemoData[category] = [];
 			}
+
 			groupedDemoData[category].push(demo);
 		});
 	}
@@ -148,6 +163,7 @@ const App = () => {
 		for (const sectionKey in info) {
 			if (Object.prototype.hasOwnProperty.call(info, sectionKey)) {
 				const section = info[sectionKey];
+
 				if (section && section.fields) {
 					for (const fieldKey in section.fields) {
 						if (
@@ -157,19 +173,21 @@ const App = () => {
 							)
 						) {
 							const field = section.fields[fieldKey];
+
 							if (field && field.error) {
-								return true; // Found an error
+								return true;
 							}
 						}
 					}
 				}
 			}
 		}
-		return false; // No errors found
+
+		return false;
 	};
 
 	/**
-	 * Function to show the modal and set the modal data.
+	 * Shows the modal and sets the modal data.
 	 *
 	 * @param {Object} data - The data to be passed to the modal component.
 	 */
@@ -205,12 +223,21 @@ const App = () => {
 		containerClassName += ' theme-config-found';
 	}
 
-	// Function to handle search input change.
+	/**
+	 * Handles changes in the search input field
+	 * by updating the search query state.
+	 *
+	 * @param {Object} e - The event object representing the change in the search input field.
+	 */
 	const handleSearchChange = (e) => {
 		setSearchQuery(e.target.value);
 	};
 
-	// Function to generate JSX for all demo cards
+	/**
+	 * Generates demo cards for all demo data items.
+	 *
+	 * @return {JSX.Element} - JSX element representing the demo cards for all demo data items wrapped in a Row component.
+	 */
 	const generateAllDemoCards = () => (
 		<Row gutter={[30, 30]}>
 			{Object.values(demoData).map((demo, index) => (
@@ -224,7 +251,12 @@ const App = () => {
 		</Row>
 	);
 
-	// Function to generate JSX for filtered demo cards.
+	/**
+	 * Generates JSX for rendering demo cards within a Row component.
+	 *
+	 * @param {Object} demoItems - The demo items to render as cards.
+	 * @return {JSX.Element} - JSX element representing the filtered demo cards wrapped in a Row component.
+	 */
 	const generateFilteredDemoCards = (demoItems) => (
 		<Row gutter={[30, 30]}>
 			{demoItems.map((demo, index) => (
@@ -238,6 +270,12 @@ const App = () => {
 		</Row>
 	);
 
+	/**
+	 * Generate tab content based on the provided category and search query.
+	 *
+	 * @param {string} category - The category for which to generate tab content.
+	 * @return {JSX.Element | null} - The generated tab content.
+	 */
 	const generateTabContent = (category) => {
 		if (searchQuery.trim() === '') {
 			return (
@@ -245,26 +283,9 @@ const App = () => {
 				generateFilteredDemoCards(groupedDemoData[category])
 			);
 		}
+
 		return filteredDemoData && generateFilteredDemoCards(filteredDemoData);
 	};
-
-	/**
-	 * Generates JSX for rendering demo cards within a Row component.
-	 *
-	 * @param {Object} demoItems - The demo items to render as cards.
-	 */
-	const generateDemoCards = (demoItems) => (
-		<Row gutter={[30, 30]}>
-			{Object.keys(demoItems).map((key, index) => (
-				<Col
-					className="gutter-row edi-demo-card edi-fade-in"
-					key={`demo-${index}`}
-				>
-					<DemoCard data={demoItems[key]} showModal={showModal} />
-				</Col>
-			))}
-		</Row>
-	);
 
 	return (
 		<>
@@ -301,6 +322,7 @@ const App = () => {
 											</Col>
 										</>
 									)}
+
 									{Array.from({
 										length: sdEdiAdminParams.numberOfDemos,
 									}).map((_, i) => (
@@ -323,16 +345,22 @@ const App = () => {
 												<div className="edi-nav-wrapper">
 													<div className="edi-nav-tabs">
 														<div className="edi-nav-search">
-															<Input
-																placeholder="Search demos..."
+															<Search
+																placeholder={
+																	sdEdiAdminParams.searchPlaceholder
+																}
 																value={
 																	searchQuery
 																}
 																onChange={
 																	handleSearchChange
 																}
+																allowClear
+																enterButton
+																size="large"
 															/>
 														</div>
+
 														<Tabs
 															defaultActiveKey="All"
 															centered
@@ -363,7 +391,6 @@ const App = () => {
 												<div className="edi-nav-wrapper">
 													<div className="edi-nav-search"></div>
 												</div>
-												{/*generateDemoCards(demoData)*/}
 												{searchQuery.trim() === ''
 													? generateAllDemoCards()
 													: filteredDemoData !==

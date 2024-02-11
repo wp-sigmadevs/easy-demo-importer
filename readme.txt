@@ -103,7 +103,7 @@ Bugs can be reported either in our support forum or preferably on the [GitHub re
 
 = Need Any Help? =
 
-For any bug, support, or suggestion please email us [here](mailto:service.sigmadevs@gmail.com).
+For any inquiries, bug reports, or suggestions, please submit your request [here](https://docs.sigmadevs.com/easy-demo-importer/contact-us/).
 
 == Screenshots ==
 
