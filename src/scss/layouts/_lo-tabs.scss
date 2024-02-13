@@ -9,6 +9,42 @@
 			position: absolute;
 			right: 0;
 			width: 30%;
+			z-index: 10;
+
+			.ant-input-affix-wrapper {
+				padding: 0 15px 0 20px;
+				height: 45px;
+
+				&:hover,
+				&:focus {
+					border-color: $color-primary;
+					box-shadow: none;
+				}
+
+				input {
+					outline: none !important;
+				}
+
+				.ant-input-suffix {
+					svg {
+						width: 15px;
+						height: 15px;
+					}
+				}
+			}
+
+			.ant-input-group-addon {
+				.ant-btn {
+					height: 45px;
+					background-image: linear-gradient(109.6deg, rgb(45, 116, 213) 11.2%, rgb(121, 137, 212) 91.2%);
+					background-size: 200% auto;
+					transition: all 0.3s;
+
+					&:hover {
+						background-position: right center;
+					}
+				}
+			}
 		}
 	}
 
@@ -21,21 +57,24 @@
 
 		.ant-tabs-ink-bar {
 			height: 100%;
-			border-radius: 20px;
+			border-radius: 25px;
+			background-image: linear-gradient(109.6deg, rgb(45, 116, 213) 11.2%, rgb(121, 137, 212) 91.2%);
+			background-size: 200% auto;
 		}
 
 		.ant-tabs-nav {
 			margin-bottom: 30px !important;
 			padding-bottom: 30px !important;
-			//&::before {
-			//	content: none !important;
-			//}
 		}
 
 		.ant-tabs-tab {
 			z-index: 1;
 			padding: 0 20px;
-			height: 40px;
+			height: 45px;
+			min-width: 130px;
+			font-size: 15px;
+			font-weight: 500;
+			justify-content: center;
 
 			+ .ant-tabs-tab {
 				margin: 0 !important;
