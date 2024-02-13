@@ -77,7 +77,7 @@ class ImportRevSlider extends ImporterAjax {
 		$this->prepareResponse(
 			'sd_edi_finalize_demo',
 			esc_html__( 'Finalizing demo data import.', 'easy-demo-importer' ),
-			$slider ? esc_html__( 'Revolution Slider imported.', 'easy-demo-importer' ) : esc_html__( 'Skipping Revolution Slider import!.', 'easy-demo-importer' )
+			$slider ? esc_html__( 'Slider Revolution slides imported.', 'easy-demo-importer' ) : esc_html__( 'Skipping Slider Revolution import!.', 'easy-demo-importer' )
 		);
 	}
 
