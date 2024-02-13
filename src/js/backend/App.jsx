@@ -308,20 +308,28 @@ const App = () => {
 						{loading && !demoData ? (
 							<Row gutter={[30, 30]}>
 								<>
-									{sdEdiAdminParams.hasTabCategories && (
-										<>
-											<Col className="gutter-row skeleton-col">
-												<div className="list-skeleton details">
-													<Skeleton
-														paragraph={{
-															rows: 0,
-														}}
-														active={true}
-													/>
-												</div>
-											</Col>
-										</>
-									)}
+									<Col
+										className={`gutter-row skeleton-col ${
+											sdEdiAdminParams.hasTabCategories
+												? 'has-categories'
+												: 'no-categories'
+										}`}
+									>
+										<div className="list-skeleton details">
+											<Skeleton
+												paragraph={{
+													rows: 0,
+												}}
+												active={true}
+											/>
+											<Skeleton
+												paragraph={{
+													rows: 0,
+												}}
+												active={true}
+											/>
+										</div>
+									</Col>
 
 									{Array.from({
 										length: sdEdiAdminParams.numberOfDemos,
@@ -389,15 +397,43 @@ const App = () => {
 										) : (
 											<>
 												<div className="edi-nav-wrapper">
-													<div className="edi-nav-search"></div>
+													<div className="edi-nav-tabs">
+														<div className="edi-nav-search no-categories">
+															<Search
+																placeholder={
+																	sdEdiAdminParams.searchPlaceholder
+																}
+																value={
+																	searchQuery
+																}
+																onChange={
+																	handleSearchChange
+																}
+																allowClear
+																enterButton
+																size="large"
+															/>
+														</div>
+
+														<div className="ant-tabs">
+															<div className="ant-tabs-nav no-categories"></div>
+															<div className="ant-tabs-content-holder">
+																<div className="ant-tabs-content">
+																	<div className="ant-tabs-tabpane">
+																		{searchQuery.trim() ===
+																		''
+																			? generateAllDemoCards()
+																			: filteredDemoData !==
+																					null &&
+																			  generateFilteredDemoCards(
+																					filteredDemoData
+																			  )}
+																	</div>
+																</div>
+															</div>
+														</div>
+													</div>
 												</div>
-												{searchQuery.trim() === ''
-													? generateAllDemoCards()
-													: filteredDemoData !==
-															null &&
-													  generateFilteredDemoCards(
-															filteredDemoData
-													  )}
 											</>
 										)}
 									</>

@@ -76,7 +76,6 @@ class ImportWidgets extends ImporterAjax {
 			ob_end_clean();
 		}
 
-		// TODO: Need to integrate revolution slider import.
 		$slider           = $this->multiple ? Helpers::keyExists( $this->config['demoData'][ $this->demoSlug ]['revSliderZip'], 'array' ) : Helpers::keyExists( $this->config['revSliderZip'], 'array' );
 		$sliderFileExists = file_exists( $this->demoUploadDir( $this->demoDir() ) . '/' . $slider . '.zip' );
 		$hasSlider        = $slider && $sliderFileExists;
@@ -84,7 +83,7 @@ class ImportWidgets extends ImporterAjax {
 		// Response.
 		$this->prepareResponse(
 			$hasSlider ? 'sd_edi_import_rev_slider' : 'sd_edi_finalize_demo',
-			$hasSlider ? esc_html__( 'Importing Revolution Slider.', 'easy-demo-importer' ) : esc_html__( 'Finalizing demo data import.', 'easy-demo-importer' ),
+			$hasSlider ? esc_html__( 'Importing Slider Revolution Slides.', 'easy-demo-importer' ) : esc_html__( 'Finalizing demo data import.', 'easy-demo-importer' ),
 			$fileExists ? esc_html__( 'Widgets successfully imported.', 'easy-demo-importer' ) : esc_html__( 'No widgets import needed.', 'easy-demo-importer' )
 		);
 	}
