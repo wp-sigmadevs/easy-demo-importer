@@ -1,5 +1,5 @@
 import Header from './Layouts/Header';
-import { Row, Col, Button, Tabs, Skeleton, Input } from 'antd';
+import { Row, Col, Button, Tabs, Skeleton, Input, Empty } from 'antd';
 import Support from './components/Support';
 import DemoCard from './components/DemoCard';
 import React, { useState, useEffect } from 'react';
@@ -137,16 +137,18 @@ const App = () => {
 	if (demoData) {
 		groupedDemoData.All = Object.values(demoData);
 
-		Object.keys(demoData).forEach((key) => {
-			const demo = demoData[key];
-			const category = demo.category;
+		if (sdEdiAdminParams.hasTabCategories) {
+			Object.keys(demoData).forEach((key) => {
+				const demo = demoData[key];
+				const category = demo.category;
 
-			if (!groupedDemoData[category]) {
-				groupedDemoData[category] = [];
-			}
+				if (!groupedDemoData[category]) {
+					groupedDemoData[category] = [];
+				}
 
-			groupedDemoData[category].push(demo);
-		});
+				groupedDemoData[category].push(demo);
+			});
+		}
 	}
 
 	/**
@@ -284,7 +286,21 @@ const App = () => {
 			);
 		}
 
-		return filteredDemoData && generateFilteredDemoCards(filteredDemoData);
+		const filteredData =
+			filteredDemoData ||
+			Object.values(demoData).filter((demo) => {
+				const searchWords = searchQuery.toLowerCase().split(' ');
+
+				return searchWords.every((word) =>
+					demo.name.toLowerCase().includes(word)
+				);
+			});
+
+		if (filteredData.length === 0) {
+			return <Empty description={sdEdiAdminParams.searchNoResults} />;
+		}
+
+		return generateFilteredDemoCards(filteredData);
 	};
 
 	return (
@@ -308,28 +324,30 @@ const App = () => {
 						{loading && !demoData ? (
 							<Row gutter={[30, 30]}>
 								<>
-									<Col
-										className={`gutter-row skeleton-col ${
-											sdEdiAdminParams.hasTabCategories
-												? 'has-categories'
-												: 'no-categories'
-										}`}
-									>
-										<div className="list-skeleton details">
-											<Skeleton
-												paragraph={{
-													rows: 0,
-												}}
-												active={true}
-											/>
-											<Skeleton
-												paragraph={{
-													rows: 0,
-												}}
-												active={true}
-											/>
-										</div>
-									</Col>
+									{!sdEdiAdminParams.removeTabsAndSearch && (
+										<Col
+											className={`gutter-row skeleton-col ${
+												sdEdiAdminParams.hasTabCategories
+													? 'has-categories'
+													: 'no-categories'
+											}`}
+										>
+											<div className="list-skeleton details">
+												<Skeleton
+													paragraph={{
+														rows: 0,
+													}}
+													active={true}
+												/>
+												<Skeleton
+													paragraph={{
+														rows: 0,
+													}}
+													active={true}
+												/>
+											</div>
+										</Col>
+									)}
 
 									{Array.from({
 										length: sdEdiAdminParams.numberOfDemos,
@@ -348,93 +366,47 @@ const App = () => {
 									<ErrorMessage message={errorMessage} />
 								) : (
 									<>
-										{sdEdiAdminParams.hasTabCategories ? (
-											<>
-												<div className="edi-nav-wrapper">
-													<div className="edi-nav-tabs">
-														<div className="edi-nav-search">
-															<Search
-																placeholder={
-																	sdEdiAdminParams.searchPlaceholder
-																}
-																value={
-																	searchQuery
-																}
-																onChange={
-																	handleSearchChange
-																}
-																allowClear
-																enterButton
-																size="large"
-															/>
-														</div>
-
-														<Tabs
-															defaultActiveKey="All"
-															centered
-															items={Object.keys(
-																groupedDemoData
-															).map(
-																(category) => ({
-																	label:
-																		category ===
-																		'All'
-																			? sdEdiAdminParams.allDemoBtnText
-																			: category,
-																	key: category,
-																	children:
-																		generateTabContent(
-																			category
-																		),
-																	disabled:
-																		!isSearchQueryEmpty,
-																})
-															)}
-														></Tabs>
+										{!sdEdiAdminParams.removeTabsAndSearch ? (
+											<div className="edi-nav-wrapper">
+												<div className="edi-nav-tabs">
+													<div className="edi-nav-search">
+														<Search
+															placeholder={
+																sdEdiAdminParams.searchPlaceholder
+															}
+															value={searchQuery}
+															onChange={
+																handleSearchChange
+															}
+															allowClear
+															enterButton
+															size="large"
+														/>
 													</div>
+													<Tabs
+														defaultActiveKey="All"
+														centered
+														items={Object.keys(
+															groupedDemoData
+														).map((category) => ({
+															label:
+																category ===
+																'All'
+																	? sdEdiAdminParams.allDemoBtnText
+																	: category,
+															key: category,
+															children:
+																generateTabContent(
+																	category
+																),
+															disabled:
+																!isSearchQueryEmpty,
+														}))}
+													></Tabs>
 												</div>
-											</>
+											</div>
 										) : (
-											<>
-												<div className="edi-nav-wrapper">
-													<div className="edi-nav-tabs">
-														<div className="edi-nav-search no-categories">
-															<Search
-																placeholder={
-																	sdEdiAdminParams.searchPlaceholder
-																}
-																value={
-																	searchQuery
-																}
-																onChange={
-																	handleSearchChange
-																}
-																allowClear
-																enterButton
-																size="large"
-															/>
-														</div>
-
-														<div className="ant-tabs">
-															<div className="ant-tabs-nav no-categories"></div>
-															<div className="ant-tabs-content-holder">
-																<div className="ant-tabs-content">
-																	<div className="ant-tabs-tabpane">
-																		{searchQuery.trim() ===
-																		''
-																			? generateAllDemoCards()
-																			: filteredDemoData !==
-																					null &&
-																			  generateFilteredDemoCards(
-																					filteredDemoData
-																			  )}
-																	</div>
-																</div>
-															</div>
-														</div>
-													</div>
-												</div>
-											</>
+											<>{generateAllDemoCards()}</>
 										)}
 									</>
 								)}
