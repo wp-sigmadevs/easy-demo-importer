@@ -4,7 +4,7 @@
 
 .appearance_page_sd-easy-demo-importer {
 	.ant-modal-root {
-		.ant-modal:not(.confirmation-modal):not(.requirement-modal) {
+		.ant-modal:not(.confirmation-modal):not(.requirement-modal):not(.support-modal) {
 			@media only screen and (min-width: 1600px) {
 				width: 1000px !important;
 			}
