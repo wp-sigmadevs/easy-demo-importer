@@ -5,7 +5,7 @@
  * Initializes the Revolution Slider import Process.
  *
  * @package SigmaDevs\EasyDemoImporter
- * @since   1.0.0
+ * @since   1.0.3
  */
 
 declare( strict_types=1 );
@@ -27,14 +27,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Backend Ajax Class: ImportRevSlider
  *
- * @since 1.0.0
+ * @since 1.0.3
  */
 class ImportRevSlider extends ImporterAjax {
 	/**
 	 * Singleton trait.
 	 *
 	 * @see Singleton
-	 * @since 1.0.0
+	 * @since 1.0.3
 	 */
 	use Singleton;
 
@@ -45,7 +45,7 @@ class ImportRevSlider extends ImporterAjax {
 	 * as requested in the Bootstrap class.
 	 *
 	 * @return void
-	 * @since 1.0.0
+	 * @since 1.0.3
 	 *
 	 * @see Bootstrap::registerServices
 	 * @see Requester::isAdminBackend()
@@ -60,7 +60,7 @@ class ImportRevSlider extends ImporterAjax {
 	 * Ajax response.
 	 *
 	 * @return void
-	 * @since 1.0.0
+	 * @since 1.0.3
 	 */
 	public function response() {
 		// Verifying AJAX call and user role.
@@ -87,7 +87,7 @@ class ImportRevSlider extends ImporterAjax {
 	 * @param string $slider Slider zip File name.
 	 *
 	 * @return void
-	 * @since 1.0.0
+	 * @since 1.0.3
 	 */
 	private function importSlider( $slider ) {
 		$sliderFiles = $this->demoUploadDir( $this->demoDir() ) . '/' . $slider . '.zip';
