@@ -35,13 +35,13 @@ The Easy Demo Importer is built upon the solid foundation of the WordPress Impor
 
 #### Comprehensive Content Import
 
-We go beyond basic content import. The Easy Demo Importer imports content, Customizer settings, Widgets data, Fluent Forms data, Menus, any Plugin settings, and even theme options. This holistic approach ensures that your site replicates the demo site’s functionality and design intricacies accurately.
+We go beyond basic content import. The Easy Demo Importer imports content, Customizer settings, Widgets data, Fluent Forms data. Slider Revolution slides, Menus, any Plugin settings, and even theme options. This holistic approach ensures that your site replicates the demo site’s functionality and design intricacies accurately.
 
 #### Database Reset Control
 
 The Easy Demo Importer allows users to choose whether to initiate a database reset during the import process. This feature allows users to start with a clean slate by removing all existing content, providing complete control over the import process.
 
-#### Media Import Ccontrol for Speed
+#### Media Import Control for Speed
 
 Recognizing the need for flexibility, our plugin empowers users to decide whether to enable or disable media imports during the demo import process. Disabling media import can significantly enhance import speed, ideal for users seeking a rapid setup without media files.
 
