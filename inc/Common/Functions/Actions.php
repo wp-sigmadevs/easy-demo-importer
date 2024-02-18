@@ -187,7 +187,7 @@ class Actions {
 	 * @param object $obj Reference object.
 	 *
 	 * @return static
-	 * @since 1.0.3
+	 * @since 1.1.0
 	 */
 	public static function setPages( $obj ) {
 		$homeSlug = $obj->demoSlug;
@@ -418,7 +418,7 @@ class Actions {
 	 * WooCommerce actions.
 	 *
 	 * @return static
-	 * @since 1.0.3
+	 * @since 1.1.0
 	 */
 	public static function WooCommerceActions() {
 		if ( ! class_exists( 'WooCommerce' ) ) {
@@ -438,7 +438,7 @@ class Actions {
 	 * Setting up WooCommerce pages.
 	 *
 	 * @return static
-	 * @since 1.0.3
+	 * @since 1.1.0
 	 */
 	public static function setWooPages() {
 		global $wpdb;
@@ -539,7 +539,7 @@ class Actions {
 	 * Fix product stock.
 	 *
 	 * @return static
-	 * @since 1.0.3
+	 * @since 1.1.0
 	 */
 	public static function fixProductStock() {
 		$args = [
@@ -580,8 +580,10 @@ class Actions {
 	/**
 	 * Elementor actions.
 	 *
+	 * @param object $obj Reference object.
+	 *
 	 * @return static
-	 * @since 1.0.3
+	 * @since 1.1.0
 	 */
 	public static function ElementorActions( $obj ) {
 		if ( ! defined( 'ELEMENTOR_PATH' ) ) {

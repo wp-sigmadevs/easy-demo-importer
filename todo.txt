@@ -2,6 +2,7 @@
  * Fix:
  *======*
  * TODO: Run Ajax process only for the provided files.
+ * TODO: Find a way to split the XML ajax call.
  * TODO: Create initial pages for ShopBuilder plugin.
  * TODO: RTL Support.
  * TODO: If no required plugins, need to fix the import error.
