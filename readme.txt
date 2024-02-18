@@ -23,7 +23,7 @@ Are you tired of the complex and time-consuming process of setting up your WordP
 * **One-Click Demo Import:** With just one click, you can import beautifully designed demo content to kickstart your website.
 * **Based on WordPress XML Importer:** Built on the reliable WordPress XML Importer, our plugin ensures a robust import process.
 * **Full Site or Single Site Import:** Demo import can be configured to import a whole demo or individual demos from a multipurpose theme.
-* **Complete Content Import:** Import Customizer settings, widgets, menus, options data, and more, ensuring your website looks and functions just like the demo.
+* **Complete Content Import:** Import Customizer settings, widgets, menus, options data, Redux Framework data and more, ensuring your website looks and functions just like the demo.
 * **User-Friendly Interface:** Our intuitive interface makes it easy for users of all skill levels to import demo data.
 * **Universal Theme Compatibility:** Can be configured to work seamlessly with a wide range of WordPress themes, ensuring broad compatibility.
 * **Developer Hooks:** offers a wide range of hooks that give theme developers full control to perform advanced custom actions. These hooks allow for precise adjustments and customizations in the import process.
@@ -31,6 +31,7 @@ Are you tired of the complex and time-consuming process of setting up your WordP
 * **Media Import Control for Speed:** Our plugin offers flexibility by letting users choose whether to include media during demo imports. Disabling media import can speed up the setup for those who don't need media files.
 * **Plugin Settings and Theme Options:** Can be configured to import any plugin settings and theme options, ensuring a cohesive website setup.
 * **Fluent Forms Import:** Automatically imports Fluent Forms, retaining your forms' integrity.
+* **Slider Revolution Import:** Automatically imports Slider Revolution slides, retaining your forms' integrity.
 * **Modern React-Powered Pages:** Enjoy modern, React-powered pages for a seamless user experience.
 * **Built-in Required Plugins Installer:** Simplify the installation process of necessary plugins right from the start.
 * **System Status Checker:** Our built-in system status checker acts as a helpful pre-import checklist, alerting you to any potential issues that need addressing.

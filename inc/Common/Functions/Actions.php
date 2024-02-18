@@ -187,7 +187,7 @@ class Actions {
 	 * @param object $obj Reference object.
 	 *
 	 * @return static
-	 * @since 1.0.0
+	 * @since 1.0.3
 	 */
 	public static function setPages( $obj ) {
 		$homeSlug = $obj->demoSlug;
@@ -438,7 +438,7 @@ class Actions {
 	 * Setting up WooCommerce pages.
 	 *
 	 * @return static
-	 * @since 1.0.0
+	 * @since 1.0.3
 	 */
 	public static function setWooPages() {
 		global $wpdb;
@@ -539,7 +539,7 @@ class Actions {
 	 * Fix product stock.
 	 *
 	 * @return static
-	 * @since 1.0.0
+	 * @since 1.0.3
 	 */
 	public static function fixProductStock() {
 		$args = [
@@ -809,7 +809,7 @@ class Actions {
 	 * @param string $catKey  The control name to be replaced.
 	 *
 	 * @return void
-	 * @since 1.0.0
+	 * @since 1.0.2
 	 */
 	public static function replaceCategory( &$element, $catKey ) {
 		if ( isset( $element['settings'][ $catKey ] ) ) {
@@ -837,7 +837,7 @@ class Actions {
 	 * @param string $catKey  The control name to be replaced.
 	 *
 	 * @return void
-	 * @since 1.0.0
+	 * @since 1.0.2
 	 */
 	public static function replaceCategoryInRepeater( &$element, $catKey ) {
 		if ( isset( $element[ $catKey ] ) ) {
