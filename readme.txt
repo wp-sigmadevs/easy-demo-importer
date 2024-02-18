@@ -1,10 +1,10 @@
 === Easy Demo Importer - A Modern One-Click Demo Import Solution ===
 Contributors: sigmadevs
 Donate link:
-Tags: demo importer, one click demo importer, theme demo importer, content, import, demo, data, widgets, settings, redux, theme options
+Tags: demo importer, one-click demo importer, theme demo importer, WordPress demo importer, content import plugin, WordPress import plugin, website customization plugin, theme setup plugin, WordPress demo data, website import tool, content, import, demo, data, widgets, settings, redux, theme options
 Requires at least: 5.5
 Tested up to: 6.4
-Stable tag: 1.0.2
+Stable tag: 1.1.0
 Requires PHP: 7.4
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -23,7 +23,7 @@ Are you tired of the complex and time-consuming process of setting up your WordP
 * **One-Click Demo Import:** With just one click, you can import beautifully designed demo content to kickstart your website.
 * **Based on WordPress XML Importer:** Built on the reliable WordPress XML Importer, our plugin ensures a robust import process.
 * **Full Site or Single Site Import:** Demo import can be configured to import a whole demo or individual demos from a multipurpose theme.
-* **Complete Content Import:** Import Customizer settings, widgets, menus, options data, Redux Framework data and more, ensuring your website looks and functions just like the demo.
+* **Complete Content Import:** Import Customizer settings, widgets, menus, options data, Redux Framework data, and more, ensuring your website looks and functions just like the demo.
 * **User-Friendly Interface:** Our intuitive interface makes it easy for users of all skill levels to import demo data.
 * **Universal Theme Compatibility:** Can be configured to work seamlessly with a wide range of WordPress themes, ensuring broad compatibility.
 * **Developer Hooks:** offers a wide range of hooks that give theme developers full control to perform advanced custom actions. These hooks allow for precise adjustments and customizations in the import process.
@@ -31,7 +31,7 @@ Are you tired of the complex and time-consuming process of setting up your WordP
 * **Media Import Control for Speed:** Our plugin offers flexibility by letting users choose whether to include media during demo imports. Disabling media import can speed up the setup for those who don't need media files.
 * **Plugin Settings and Theme Options:** Can be configured to import any plugin settings and theme options, ensuring a cohesive website setup.
 * **Fluent Forms Import:** Automatically imports Fluent Forms, retaining your forms' integrity.
-* **Slider Revolution Import:** Automatically imports Slider Revolution slides, retaining your forms' integrity.
+* **Slider Revolution Import:** Automatically imports Slider Revolution slides, ensuring the slides' functionalities.
 * **Modern React-Powered Pages:** Enjoy modern, React-powered pages for a seamless user experience.
 * **Built-in Required Plugins Installer:** Simplify the installation process of necessary plugins right from the start.
 * **System Status Checker:** Our built-in system status checker acts as a helpful pre-import checklist, alerting you to any potential issues that need addressing.
@@ -100,7 +100,7 @@ Yes, Easy Demo Importer fully supports multi-language.
 
 = Where can I report bugs or contribute to the project? =
 
-Bugs can be reported either in our support forum or preferably on the [GitHub repository](https://github.com/wp-sigmadevs/easy-demo-importer/issues).
+Bugs can be reported either in our support forum or preferably on the [GitHub repository](https://github.com/wp-sigmadevs/easy-demo-importer/issues), also on the [contact page](https://docs.sigmadevs.com/easy-demo-importer/contact-us/).
 
 = Need Any Help? =
 
@@ -117,13 +117,26 @@ For any inquiries, bug reports, or suggestions, please submit your request [here
 
 == Changelog ==
 
+= 1.1.0 (18-February-2023) =
+* Feature: Added support for importing Slider Revolution Sliders.
+* Feature: Introduced tabbed categories in the demo import interface.
+* Feature: Implemented a search functionality for quicker access to specific demos.
+* Add: Included step titles in the demo import process.
+* Add: Enhanced the import modal intro step with an additional paragraph.
+* Fix: Addressed import modal compatibility issues with high-resolution devices.
+* Fix: Resolved Elementor taxonomy data mapping issues for repeater controls.
+* Fix: Improved functionality of the required plugin update feature.
+* Tweak: Conducted code refactoring to optimize performance and maintainability.
+* Update: Added/renamed various action and filter hooks for enhanced customization.
+* Update: Included 'PHP Max Input Time' parameter in the System Status Screen for better diagnostics.
+
 = 1.0.2 (10-December-2023) =
-* Fix: Product attributes import issue.
-* Add: Required plugin update feature.
-* Update: Elementor taxonomy data mapping for multiple and repeater controls.
+* Feature: Added a feature to update required plugins if available.
+* Fix: Resolved an issue with importing product attributes.
+* Update: Elementor taxonomy data mapping for improved compatibility with multiple and repeater controls.
 
 = 1.0.1 (26-November-2023) =
-* Fix: PHP 7.4 compatibility issue.
+* Fix: Resolved compatibility issues with PHP 7.4.
 
 = 1.0.0 =
 * Initial release

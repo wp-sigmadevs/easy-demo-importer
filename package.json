@@ -1,6 +1,6 @@
 {
   "name": "easy-demo-importer",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "A one-click, user-friendly WordPress plugin for effortlessly importing theme demos and customizing your website in no time.",
   "main": "index.js",
   "keywords": [
@@ -59,7 +59,7 @@
     "package": "npm run clean && npm run dev && npm run prod && npm run dev --package",
     "clean": "rm -rf tmp/*",
     "cleanmap": "rm -rf assets/**/*.map",
-    "zip": "npm run package && npm run prod --zip",
+    "zip": "npm run package && npm run dev --zip",
     "eslint": "eslint src/js/**/*.js",
     "eslint:fix": "eslint src/js/**/*.js --fix",
     "stylelint": "stylelint src/sass/**/**/*.{css,scss}",

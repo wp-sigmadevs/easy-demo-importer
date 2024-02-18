@@ -416,11 +416,11 @@ class Helpers {
 	/**
 	 * Recursively checks if a multidimensional array has a certain key.
 	 *
-	 * @param array $array The array to search.
+	 * @param array  $array The array to search.
 	 * @param string $key The key to search for.
 	 *
 	 * @return bool
-	 * @since 1.0.3
+	 * @since 1.1.0
 	 */
 	public static function searchArrayKey( $array, $key ) {
 		if ( ! is_array( $array ) ) {
