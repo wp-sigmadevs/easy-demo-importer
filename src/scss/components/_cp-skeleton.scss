@@ -67,16 +67,16 @@
 			}
 		}
 
-		&.no-categories {
-			> .list-skeleton {
-				> .ant-skeleton {
-					&:first-child {
-						opacity: 0 !important;
-						visibility: hidden !important;
-					}
-				}
-			}
-		}
+		//&.no-categories {
+		//	> .list-skeleton {
+		//		> .ant-skeleton {
+		//			&:first-child {
+		//				opacity: 0 !important;
+		//				visibility: hidden !important;
+		//			}
+		//		}
+		//	}
+		//}
 	}
 }
 
