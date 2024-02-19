@@ -102,13 +102,15 @@ const App = () => {
 	 */
 	useEffect(() => {
 		if (searchQuery.trim() !== '') {
-			const filteredData = Object.values(demoData).filter((demo) => {
-				const searchWords = searchQuery.toLowerCase().split(' ');
-
-				return searchWords.every((word) =>
-					demo.name.toLowerCase().includes(word)
-				);
-			});
+			const filteredData = Object.keys(demoData)
+				.filter((key) => {
+					const demo = demoData[key];
+					const searchWords = searchQuery.toLowerCase().split(' ');
+					return searchWords.every((word) =>
+						demo.name.toLowerCase().includes(word)
+					);
+				})
+				.map((key) => ({ ...demoData[key], id: key }));
 
 			setFilteredDemoData(filteredData.length > 0 ? filteredData : null);
 		} else {
@@ -135,7 +137,10 @@ const App = () => {
 	const groupedDemoData = {};
 
 	if (demoData) {
-		groupedDemoData.All = Object.values(demoData);
+		groupedDemoData.All = Object.keys(demoData).map((key) => ({
+			...demoData[key],
+			id: key,
+		}));
 
 		if (sdEdiAdminParams.hasTabCategories) {
 			Object.keys(demoData).forEach((key) => {
@@ -146,7 +151,7 @@ const App = () => {
 					groupedDemoData[category] = [];
 				}
 
-				groupedDemoData[category].push(demo);
+				groupedDemoData[category].push({ ...demo, id: key });
 			});
 		}
 	}
@@ -242,14 +247,21 @@ const App = () => {
 	 */
 	const generateAllDemoCards = () => (
 		<Row gutter={[30, 30]}>
-			{Object.values(demoData).map((demo, index) => (
-				<Col
-					className="gutter-row edi-demo-card edi-fade-in"
-					key={`demo-${index}`}
-				>
-					<DemoCard data={demo} showModal={showModal} />
-				</Col>
-			))}
+			{Object.keys(demoData).map((key, index) => {
+				const demoItem = {
+					...demoData[key],
+					id: key,
+				};
+
+				return (
+					<Col
+						className="gutter-row edi-demo-card edi-fade-in"
+						key={`demo-${index}`}
+					>
+						<DemoCard data={demoItem} showModal={showModal} />
+					</Col>
+				);
+			})}
 		</Row>
 	);
 
@@ -261,14 +273,21 @@ const App = () => {
 	 */
 	const generateFilteredDemoCards = (demoItems) => (
 		<Row gutter={[30, 30]}>
-			{demoItems.map((demo, index) => (
-				<Col
-					className="gutter-row edi-demo-card edi-fade-in"
-					key={`demo-${index}`}
-				>
-					<DemoCard data={demo} showModal={showModal} />
-				</Col>
-			))}
+			{demoItems.map((demo, index) => {
+				const demoItem = {
+					...demo,
+					id: demo.id,
+				};
+
+				return (
+					<Col
+						className="gutter-row edi-demo-card edi-fade-in"
+						key={`demo-${index}`}
+					>
+						<DemoCard data={demoItem} showModal={showModal} />
+					</Col>
+				);
+			})}
 		</Row>
 	);
 
@@ -414,6 +433,7 @@ const App = () => {
 						)}
 					</div>
 				</div>
+
 				<ModalComponent
 					visible={modalVisible}
 					onCancel={handleModalCancel}
