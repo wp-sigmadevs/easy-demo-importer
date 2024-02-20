@@ -30,6 +30,7 @@ Are you tired of the complex and time-consuming process of setting up your WordP
 * **Database Reset Option Included:** Theme users can decide whether to reset the database during import. It provides a clean slate for a fresh start.
 * **Media Import Control for Speed:** Our plugin offers flexibility by letting users choose whether to include media during demo imports. Disabling media import can speed up the setup for those who don't need media files.
 * **Plugin Settings and Theme Options:** Can be configured to import any plugin settings and theme options, ensuring a cohesive website setup.
+* **Tabbed Categories & Search feature:** Includes a convenient tabbed interface that categorizes demos into various categories with a powerful search feature.
 * **Fluent Forms Import:** Automatically imports Fluent Forms, retaining your forms' integrity.
 * **Slider Revolution Import:** Automatically imports Slider Revolution slides, ensuring the slides' functionalities.
 * **Modern React-Powered Pages:** Enjoy modern, React-powered pages for a seamless user experience.
@@ -117,7 +118,7 @@ For any inquiries, bug reports, or suggestions, please submit your request [here
 
 == Changelog ==
 
-= 1.1.0 (18-February-2023) =
+= 1.1.0 (20-February-2023) =
 * Feature: Added support for importing Slider Revolution Sliders.
 * Feature: Introduced tabbed categories in the demo import interface.
 * Feature: Implemented a search functionality for quicker access to specific demos.
