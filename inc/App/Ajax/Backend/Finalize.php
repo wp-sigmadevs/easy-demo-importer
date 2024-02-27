@@ -70,6 +70,8 @@ class Finalize extends ImporterAjax {
 		 *
 		 * Performs special actions after demo import.
 		 *
+		 * @hooked SigmaDevs\EasyDemoImporter\Common\Functions\Actions::afterImportActions 10
+		 *
 		 * @since 1.0.0
 		 */
 		do_action( 'sd/edi/after_import', $this );

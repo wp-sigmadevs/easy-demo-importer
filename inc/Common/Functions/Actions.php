@@ -53,7 +53,7 @@ class Actions {
 	 */
 	public static function pluginActivationActions( $plugin_path ) {
 		$plugins = apply_filters(
-			'sd/edi/activated_plugin_actions',
+			'sd/edi/plugin_activation_actions',
 			[
 				'woocommerce/woocommerce.php' => [
 					'class'  => '\WC_Install',

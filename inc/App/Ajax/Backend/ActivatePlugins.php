@@ -135,6 +135,8 @@ class ActivatePlugins extends ImporterAjax {
 			 *
 			 * Performs special actions after plugins activation if needed.
 			 *
+			 * @hooked SigmaDevs\EasyDemoImporter\Common\Functions\Actions::pluginActivationActions 10
+			 *
 			 * @since 1.0.0
 			 */
 			do_action( 'sd/edi/after_plugin_activation', $path );
