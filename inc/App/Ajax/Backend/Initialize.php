@@ -82,6 +82,8 @@ class Initialize extends ImporterAjax {
 		 *
 		 * Performs special actions when importer initializes.
 		 *
+		 * @hooked SigmaDevs\EasyDemoImporter\Common\Functions\Actions::beforeImportActions 10
+		 *
 		 * @since 1.0.0
 		 */
 		do_action( 'sd/edi/importer_init', $this );
