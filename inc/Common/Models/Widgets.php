@@ -3,6 +3,7 @@
  * Model Class: Widgets
  *
  * This class is responsible for importing widgets.
+ * Code is mostly from the Widget Importer & Exporter plugin.
  *
  * @package SigmaDevs\EasyDemoImporter
  * @since   1.0.0

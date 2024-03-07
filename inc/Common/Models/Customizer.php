@@ -2,8 +2,8 @@
 /**
  * Model Class: Customizer
  *
- * This class imports Customizer settings. Code is mostly from
- * the Customizer Export/Import plugin.
+ * This class imports Customizer settings.
+ * Code is mostly from the Customizer Export/Import plugin.
  *
  * @see https://wordpress.org/plugins/customizer-export-import/
  *

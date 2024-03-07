@@ -266,7 +266,7 @@ class Enqueue extends EnqueueBase {
 					'step2' => esc_html__( 'Configure', 'easy-demo-importer' ),
 					'step3' => esc_html__( 'Imports', 'easy-demo-importer' ),
 					'step4' => esc_html__( 'End', 'easy-demo-importer' ),
-				]
+				],
 			]
 		);
 	}
