@@ -14,7 +14,9 @@
  *̶ ̶T̶O̶D̶O̶:̶ ̶A̶d̶d̶ ̶R̶e̶v̶ ̶S̶l̶i̶d̶e̶r̶ ̶i̶m̶p̶o̶r̶t̶.̶ ( Added in v1.1.0)
  * TODO: Remove default image regeneration.
  * TODO: Add custom image regeneration support.
+ * TODO: Rebuild the XML import by splitting the import phases.
  ̶*̶ ̶T̶O̶D̶O̶:̶ ̶A̶d̶d̶ ̶i̶m̶p̶o̶r̶t̶ ̶c̶a̶t̶e̶g̶o̶r̶i̶e̶s̶.̶ ( Added in v1.1.0)
 ̶ ̶*̶ ̶T̶O̶D̶O̶:̶ ̶A̶d̶d̶ ̶i̶m̶p̶o̶r̶t̶ ̶t̶a̶b̶b̶e̶d̶ ̶c̶o̶n̶t̶e̶n̶t̶.̶ ( Added in v1.1.0)
 ̶ ̶*̶ ̶T̶O̶D̶O̶:̶ ̶A̶d̶d̶ ̶i̶m̶p̶o̶r̶t̶ ̶s̶e̶a̶r̶c̶h̶.̶ ( Added in v1.1.0)
+ * TODO: Add import log support.
  */

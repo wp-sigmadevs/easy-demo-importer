@@ -101,7 +101,7 @@ class Pages extends Base {
 			$subPages[] = [
 				'parent_slug' => 'themes.php',
 				'page_title'  => esc_html__( 'System Status Report', 'easy-demo-importer' ),
-				'menu_title'  => esc_html__( 'Easy System Status', 'easy-demo-importer' ),
+				'menu_title'  => apply_filters( 'sd/edi/status_menu_title', esc_html__( 'Easy System Status', 'easy-demo-importer' ) ),
 				'capability'  => 'manage_options',
 				'menu_slug'   => $this->plugin->data()['system_status_page'],
 				'callback'    => [ Callbacks::class, 'renderServerStatusPage' ],
