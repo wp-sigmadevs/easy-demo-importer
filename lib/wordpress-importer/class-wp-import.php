@@ -1072,7 +1072,7 @@ class SD_EDI_WP_Import extends WP_Importer {
 		);
 
 		if ( is_wp_error( $remote_response ) ) {
-			@unlink( $tmp_file_name );
+			@unlink( $tmp_file_name ); // phpcs:ignore WordPress.WP.AlternativeFunctions.unlink_unlink
 
 			return new WP_Error(
 				'import_file_error',
@@ -1089,7 +1089,7 @@ class SD_EDI_WP_Import extends WP_Importer {
 
 		// Make sure the fetch was successful.
 		if ( 200 !== $remote_response_code ) {
-			@unlink( $tmp_file_name );
+			@unlink( $tmp_file_name ); // phpcs:ignore WordPress.WP.AlternativeFunctions.unlink_unlink
 
 			return new WP_Error(
 				'import_file_error',
@@ -1106,7 +1106,7 @@ class SD_EDI_WP_Import extends WP_Importer {
 
 		// Request failed.
 		if ( ! $headers ) {
-			@unlink( $tmp_file_name );
+			@unlink( $tmp_file_name ); // phpcs:ignore WordPress.WP.AlternativeFunctions.unlink_unlink
 
 			return new WP_Error( 'import_file_error', esc_html__( 'Remote server did not respond', 'easy-demo-importer' ) );
 		}
@@ -1114,20 +1114,20 @@ class SD_EDI_WP_Import extends WP_Importer {
 		$filesize = (int) filesize( $tmp_file_name );
 
 		if ( 0 === $filesize ) {
-			@unlink( $tmp_file_name );
+			@unlink( $tmp_file_name ); // phpcs:ignore WordPress.WP.AlternativeFunctions.unlink_unlink
 
 			return new WP_Error( 'import_file_error', esc_html__( 'Zero size file downloaded', 'easy-demo-importer' ) );
 		}
 
 		if ( ! isset( $headers['content-encoding'] ) && isset( $headers['content-length'] ) && $filesize !== (int) $headers['content-length'] ) {
-			@unlink( $tmp_file_name );
+			@unlink( $tmp_file_name ); // phpcs:ignore WordPress.WP.AlternativeFunctions.unlink_unlink
 
 			return new WP_Error( 'import_file_error', esc_html__( 'Downloaded file has incorrect size', 'easy-demo-importer' ) );
 		}
 
 		$max_size = (int) $this->max_attachment_size();
 		if ( ! empty( $max_size ) && $filesize > $max_size ) {
-			@unlink( $tmp_file_name );
+			@unlink( $tmp_file_name ); // phpcs:ignore WordPress.WP.AlternativeFunctions.unlink_unlink
 
 			return new WP_Error(
 				'import_file_error',
@@ -1185,7 +1185,7 @@ class SD_EDI_WP_Import extends WP_Importer {
 		$move_new_file = copy( $tmp_file_name, $new_file );
 
 		if ( ! $move_new_file ) {
-			@unlink( $tmp_file_name );
+			@unlink( $tmp_file_name ); // phpcs:ignore WordPress.WP.AlternativeFunctions.unlink_unlink
 
 			return new WP_Error( 'import_file_error', esc_html__( 'The uploaded file could not be moved', 'easy-demo-importer' ) );
 		}
@@ -1193,7 +1193,7 @@ class SD_EDI_WP_Import extends WP_Importer {
 		// Set correct file permissions.
 		$stat  = stat( dirname( $new_file ) );
 		$perms = $stat['mode'] & 0000666;
-		chmod( $new_file, $perms );
+		chmod( $new_file, $perms ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_chmod
 
 		$upload = [
 			'file'  => $new_file,
