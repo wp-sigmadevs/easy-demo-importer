@@ -529,7 +529,7 @@ class SD_EDI_WXR_Parser_Regex {
 			return gzopen( $filename, $mode );
 		}
 
-		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_fopen
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_fopen, WordPress.WP.AlternativeFunctions.file_system_operations_fopen
 		return fopen( $filename, $mode );
 	}
 
@@ -592,7 +592,7 @@ class SD_EDI_WXR_Parser_Regex {
 			return gzclose( $fp );
 		}
 
-		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_fclose
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_fclose, WordPress.WP.AlternativeFunctions.file_system_operations_fclose
 		return fclose( $fp );
 	}
 }

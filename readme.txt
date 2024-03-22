@@ -1,7 +1,7 @@
 === Easy Demo Importer - A Modern One-Click Demo Import Solution ===
 Contributors: sigmadevs
 Donate link:
-Tags: demo importer, one-click demo importer, theme demo importer, WordPress demo importer, content import plugin, WordPress import plugin, website customization plugin, theme setup plugin, WordPress demo data, website import tool, content, import, demo, data, widgets, settings, redux, theme options
+Tags: demo importer, one click demo importer, theme demo importer, WordPress demo importer, content import plugin
 Requires at least: 5.5
 Tested up to: 6.4
 Stable tag: 1.1.0
