@@ -243,16 +243,7 @@ class Enqueue extends EnqueueBase {
 				'stepOne'     => [
 					'introTopText'    => esc_html__( 'Before importing demo data, we recommend that you backup your site\'s data and files. You can use a popular backup plugin to ensure you have a copy of your site in case anything goes wrong during the import process.', 'easy-demo-importer' ),
 					'introBottomText' => esc_html__( 'Please note that this demo import will install all the required plugins, import contents, media, settings, customizer data, widgets, and other necessary elements to replicate the demo site. Make sure to review your existing data and settings as they may be overwritten.', 'easy-demo-importer' ),
-					'introExtraText'  => sprintf(
-						/* translators: page names */
-						esc_html__( 'This demo consists of the below pages: %s', 'easy-demo-importer' ),
-						'<ol>
-									<li>' . esc_html__( 'Home Page', 'easy-demo-importer' ) . '</li>
-									<li>' . esc_html__( 'About Us', 'easy-demo-importer' ) . '</li>
-									<li>' . esc_html__( 'Contact Us', 'easy-demo-importer' ) . '</li>
-									<li>' . esc_html__( 'Other Inner Pages', 'easy-demo-importer' ) . '</li>
-								</ol>'
-					),
+					'introExtraText'  => '',
 				],
 				'stepTwo'     => [
 					'requiredPluginsIntro' => esc_html__( 'In order to replicate the exact appearance of the demo site, the import process will automatically install and activate the following plugins, provided they are not already installed or activated on your website. You may need to scroll through to see the full list:', 'easy-demo-importer' ),
