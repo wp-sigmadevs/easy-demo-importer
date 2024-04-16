@@ -103,7 +103,7 @@ class Enqueue extends EnqueueBase {
 
 		$scripts[] = [
 			'handle'     => 'sd-edi-admin-script',
-			'asset_uri'  => esc_url( $this->plugin->assetsUri() . '/js/backend' . $this->suffix . '.js' ),
+			'asset_uri'  => esc_url( $this->plugin->assetsUri() . '/js/backend.min.js' ),
 			'dependency' => [ 'jquery' ],
 			'in_footer'  => true,
 			'version'    => $this->plugin->version(),

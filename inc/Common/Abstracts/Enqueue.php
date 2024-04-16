@@ -49,7 +49,7 @@ abstract class Enqueue extends Base {
 	public function __construct() {
 		parent::__construct();
 
-		$this->suffix = '.min';
+		$this->suffix = is_rtl() ? '-rtl.min' : '.min';
 	}
 
 	/**

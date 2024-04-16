@@ -100,9 +100,19 @@ if (
 	 */
 	if (!mix.inProduction()) {
 		mix.sass("src/scss/backend.scss", "assets/css/backend.min.css",).sourceMaps(true, 'source-map');
+		mix.sass("src/scss/backend-rtl.scss", "assets/css/rtl/backend-rtl.min.css").sourceMaps(true, 'source-map');
 	} else {
 		mix.sass("src/scss/backend.scss", "assets/css/backend.min.css");
+		mix.sass("src/scss/backend-rtl.scss", "assets/css/rtl/backend-rtl.min.css");
 	}
+
+	mix.postCss('assets/css/backend.min.css', 'assets/css/rtl/compiled-rtl.css', [
+		require('rtlcss'),
+	]);
+	mix.combine([
+		'assets/css/rtl/compiled-rtl.css',
+		'assets/css/rtl/backend-rtl.min.css'
+	], 'assets/css/backend-rtl.min.css');
 }
 if (process.env.npm_config_zip) {
 	async function getVersion() {
