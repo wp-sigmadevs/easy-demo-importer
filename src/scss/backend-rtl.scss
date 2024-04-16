@@ -1,0 +1,70 @@
+/* ================================ */
+/* Backend Extra RTL CSS.
+/* ================================ */
+
+%mirror {
+	transform: scaleX(-1);
+}
+
+%mirror-rotate {
+	transform: scaleX(-1) rotate(360deg);
+}
+
+.appearance_page_sd-easy-demo-importer {
+	.ant-modal-body {
+		.step-actions {
+			.actions-right {
+				.anticon {
+					&-arrow-left,
+					&-arrow-right {
+						@extend %mirror;
+					}
+				}
+			}
+		}
+
+		.modal-content {
+			.required-plugins {
+				.ant-list {
+					.anticon-check-circle {
+						@extend %mirror-rotate;
+					}
+				}
+			}
+		}
+	}
+
+	.modal-content {
+		.import-progress {
+			.ant-timeline {
+				.ant-timeline-item:not(.active) {
+					.ant-timeline-item-head {
+						&::before {
+							@extend %mirror-rotate;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	.ant-result-success {
+		.check-container {
+			.check-background {
+				@extend %mirror-rotate;
+			}
+		}
+	}
+
+	.ant-result {
+		.ant-result-extra {
+			.ant-btn {
+				&.ant-btn-primary {
+					.anticon-export {
+						@extend %mirror;
+					}
+				}
+			}
+		}
+	}
+}
