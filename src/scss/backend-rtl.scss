@@ -23,38 +23,38 @@
 			}
 		}
 
-		.modal-content {
-			.required-plugins {
-				.ant-list {
-					.anticon-check-circle {
-						@extend %mirror-rotate;
-					}
-				}
-			}
-		}
+		//.modal-content {
+		//	.required-plugins {
+		//		.ant-list {
+		//			.anticon-check-circle {
+		//				@extend %mirror-rotate;
+		//			}
+		//		}
+		//	}
+		//}
 	}
 
-	.modal-content {
-		.import-progress {
-			.ant-timeline {
-				.ant-timeline-item:not(.active) {
-					.ant-timeline-item-head {
-						&::before {
-							@extend %mirror-rotate;
-						}
-					}
-				}
-			}
-		}
-	}
+	//.modal-content {
+	//	.import-progress {
+	//		.ant-timeline {
+	//			.ant-timeline-item:not(.active) {
+	//				.ant-timeline-item-head {
+	//					&::before {
+	//						@extend %mirror-rotate;
+	//					}
+	//				}
+	//			}
+	//		}
+	//	}
+	//}
 
-	.ant-result-success {
-		.check-container {
-			.check-background {
-				@extend %mirror-rotate;
-			}
-		}
-	}
+	//.ant-result-success {
+	//	.check-container {
+	//		.check-background {
+	//			@extend %mirror-rotate;
+	//		}
+	//	}
+	//}
 
 	.ant-result {
 		.ant-result-extra {
