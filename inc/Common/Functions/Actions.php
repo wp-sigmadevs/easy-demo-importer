@@ -81,7 +81,7 @@ class Actions {
 	 * @return void
 	 * @since 1.0.0
 	 */
-	public static function beforeImportActions( $obj ) {
+	public static function initImportActions( $obj ) {
 		if ( $obj->reset ) {
 			return;
 		}
@@ -89,6 +89,23 @@ class Actions {
 		self::cleanups()
 			->deletePages()
 			->draftPost();
+	}
+
+	/**
+	 * Executes operations before import.
+	 *
+	 * @return void
+	 * @since 1.0.0
+	 */
+	public static function beforeImportActions() {
+		// Try to update PHP memory limit before import.
+		// phpcs:ignore WordPress.PHP.IniSet.memory_limit_Disallowed
+		ini_set( 'memory_limit', apply_filters( 'sd/edi/temp_boost_memory_limit', '350M' ) );
+
+		// Try to increase PHP max execution time before import.
+		if ( ( strpos( ini_get( 'disable_functions' ), 'set_time_limit' ) === false ) && ini_get( 'max_execution_time' ) < 300 ) {
+			set_time_limit( apply_filters( 'sd/edi/temp_boost_max_execution_time', 300 ) );
+		}
 	}
 
 	/**

@@ -82,7 +82,7 @@ class Initialize extends ImporterAjax {
 		 *
 		 * Performs special actions when importer initializes.
 		 *
-		 * @hooked SigmaDevs\EasyDemoImporter\Common\Functions\Actions::beforeImportActions 10
+		 * @hooked SigmaDevs\EasyDemoImporter\Common\Functions\Actions::initImportActions 10
 		 *
 		 * @since 1.0.0
 		 */
