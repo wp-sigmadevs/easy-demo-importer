@@ -67,10 +67,13 @@ class Hooks extends Base {
 		add_action( 'init', [ Actions::class, 'rewriteFlushCheck' ] );
 
 		// Actions during importer initialization.
-		add_action( 'sd/edi/importer_init', [ Actions::class, 'beforeImportActions' ] );
+		add_action( 'sd/edi/importer_init', [ Actions::class, 'initImportActions' ] );
 
 		// Actions during plugins activation.
 		add_action( 'sd/edi/after_plugin_activation', [ Actions::class, 'pluginActivationActions' ] );
+
+		// Actions before import.
+		add_action( 'sd/edi/before_import', [ Actions::class, 'beforeImportActions' ] );
 
 		// Actions after import.
 		add_action( 'sd/edi/after_import', [ Actions::class, 'afterImportActions' ] );

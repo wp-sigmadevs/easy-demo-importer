@@ -79,10 +79,6 @@ class InstallDemo extends ImporterAjax {
 		 */
 		do_action( 'sd/edi/before_import', $xmlFile, $this );
 
-		// Try to update PHP memory limit before import.
-		// phpcs:ignore WordPress.PHP.IniSet.memory_limit_Disallowed
-		ini_set( 'memory_limit', apply_filters( 'sd/edi/temp_boost_memory_limit', '350M' ) );
-
 		if ( $fileExists ) {
 			$this->importDemoContent( $xmlFile, $this->excludeImages );
 		}
