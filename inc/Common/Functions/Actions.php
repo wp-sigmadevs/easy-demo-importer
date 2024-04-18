@@ -95,7 +95,7 @@ class Actions {
 	 * Executes operations before import.
 	 *
 	 * @return void
-	 * @since 1.0.0
+	 * @since 1.1.1
 	 */
 	public static function beforeImportActions() {
 		// Try to update PHP memory limit before import.
