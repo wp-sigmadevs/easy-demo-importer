@@ -16,11 +16,11 @@ A one-click, user-friendly WordPress plugin for effortlessly importing theme dem
 
 Are you tired of the complex and time-consuming process of setting up your WordPress website? Look no further. The Easy Demo Importer plugin is your solution to effortlessly import demo data and have your website up and running in no time.
 
-👉 [Official GitHub repository](https://github.com/wp-sigmadevs/easy-demo-importer) | [Plugin Documentation](https://docs.sigmadevs.com/easy-demo-importer). 👈
+👉 [Official GitHub Repository](https://github.com/wp-sigmadevs/easy-demo-importer) | [Plugin Documentation](https://docs.sigmadevs.com/easy-demo-importer). 👈
 
-> **Notes for users:** This plugin is not a plug-and-play solution. Integration of the demo import feature requires configuration by the theme developers. If you encounter difficulties or need assistance, kindly reach out to the theme developer for proper setup and integration.
+> **Notes for users:** Please note that this plugin isn't a ready-to-use solution out of the box. The demo data import feature needs to be set up and configured by the theme authors. If you run into any difficulties or need help, please contact the theme author for assistance with the setup and integration. You can find a step-by-step guide on how to import demo data properly in the [User Documentation](https://docs.sigmadevs.com/easy-demo-importer/user-docs/).
 >
-> **Notes for theme developers:** If you encounter any issues or need assistance with integrating the demo importer into your theme, don't hesitate to reach out for support. You can either post your queries in the support forum or utilize the [plugin documentation contact page](https://docs.sigmadevs.com/easy-demo-importer/contact-us/).
+> **Notes for theme authors:** If you encounter any issues or need assistance with integrating the demo importer into your theme, don't hesitate to seek support. You can either post your queries in the support forum or use the [plugin documentation contact page](https://docs.sigmadevs.com/easy-demo-importer/contact-us/). A detailed theme integration guide is available in the [Developer Documentation](https://docs.sigmadevs.com/easy-demo-importer/developer-docs/).
 
 == Key Features ==
 
@@ -45,7 +45,7 @@ Are you tired of the complex and time-consuming process of setting up your WordP
 
 Experience the ultimate convenience of importing demo data with the Easy Demo Importer plugin. Make your website set up a breeze and unleash the full potential of your WordPress theme. Whether you're a user or developer, our feature-rich and user-friendly plugin is designed to simplify your website creation journey.
 
-> **Important Note:** Please be aware that this plugin does not provide a feature to import authors from the demo import file to existing users in your WordPress site. When you import demo content, all content will be attributed to the current user account.
+> **Important Note:** Please be aware that this plugin does not provide a feature to import authors from the demo import file in your WordPress site. When you import demo content, all content will be attributed to the current user account.
 
 For any bugs or suggestions, please email us at: service.sigmadevs@gmail.com
 

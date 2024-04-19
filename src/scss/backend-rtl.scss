@@ -11,6 +11,13 @@
 }
 
 .appearance_page_sd-easy-demo-importer {
+	#sd-edi-demo-import-container {
+		> .ant-float-btn-group {
+			right: auto !important;
+			left: 50px;
+		}
+	}
+
 	.ant-modal-body {
 		.step-actions {
 			.actions-right {
@@ -22,39 +29,7 @@
 				}
 			}
 		}
-
-		//.modal-content {
-		//	.required-plugins {
-		//		.ant-list {
-		//			.anticon-check-circle {
-		//				@extend %mirror-rotate;
-		//			}
-		//		}
-		//	}
-		//}
 	}
-
-	//.modal-content {
-	//	.import-progress {
-	//		.ant-timeline {
-	//			.ant-timeline-item:not(.active) {
-	//				.ant-timeline-item-head {
-	//					&::before {
-	//						@extend %mirror-rotate;
-	//					}
-	//				}
-	//			}
-	//		}
-	//	}
-	//}
-
-	//.ant-result-success {
-	//	.check-container {
-	//		.check-background {
-	//			@extend %mirror-rotate;
-	//		}
-	//	}
-	//}
 
 	.ant-result {
 		.ant-result-extra {
