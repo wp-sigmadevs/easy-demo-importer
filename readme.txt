@@ -136,10 +136,18 @@ For any inquiries, bug reports, or suggestions, please submit your request [here
 
 == Changelog ==
 
-= 1.1.1 (Upcoming) =
-* Add: RTL language support.
+= 1.1.1 (21-April-2024) =
+* Add: Included Support for RTL language.
+* Add: Enhanced Compatibility with WordPress 6.5 and PHP 8.3.
+* Add: Implemented temporary PHP parameters boost during import.
+* Fixed: Addressed some sanitization issues.
+* Fixed: Rectified a PHP warning regarding undefined index.
+* Fixed: Resolved several responsive issues.
+* Fixed: Corrected various CSS issues.
+* Tweak: Made improvements to the codebase.
+* Update: Added/renamed various action and filter hooks.
 
-= 1.1.0 (20-February-2023) =
+= 1.1.0 (20-February-2024) =
 * Feature: Added support for importing Slider Revolution Sliders.
 * Feature: Introduced tabbed categories in the demo import interface.
 * Feature: Implemented a search functionality for quicker access to specific demos.

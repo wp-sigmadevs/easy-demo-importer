@@ -76,7 +76,9 @@ class ImportWidgets extends ImporterAjax {
 			ob_end_clean();
 		}
 
-		$slider           = $this->multiple ? Helpers::keyExists( $this->config['demoData'][ $this->demoSlug ]['revSliderZip'], 'array' ) : Helpers::keyExists( $this->config['revSliderZip'], 'array' );
+		$slider           = $this->multiple ?
+			Helpers::getDemoData( $this->config['demoData'][ $this->demoSlug ], 'revSliderZip' ) :
+			Helpers::getDemoData( $this->config, 'revSliderZip' );
 		$sliderFileExists = file_exists( $this->demoUploadDir( $this->demoDir() ) . '/' . $slider . '.zip' );
 		$hasSlider        = $slider && $sliderFileExists;
 

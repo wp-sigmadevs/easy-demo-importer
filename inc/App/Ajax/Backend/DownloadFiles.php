@@ -65,11 +65,10 @@ class DownloadFiles extends ImporterAjax {
 		// Verifying AJAX call and user role.
 		Helpers::verifyAjaxCall();
 
-		if ( $this->multiple ) {
-			$downloads = $this->downloadDemoFiles( Helpers::keyExists( $this->config['demoData'][ $this->demoSlug ]['demoZip'] ) );
-		} else {
-			$downloads = $this->downloadDemoFiles( Helpers::keyExists( $this->config['demoZip'] ) );
-		}
+		$demoZip   = $this->multiple ?
+			Helpers::getDemoData( $this->config['demoData'][ $this->demoSlug ], 'demoZip' ) :
+			Helpers::getDemoData( $this->config, 'demoZip' );
+		$downloads = $this->downloadDemoFiles( $demoZip );
 
 		// Response.
 		$this->prepareResponse(
