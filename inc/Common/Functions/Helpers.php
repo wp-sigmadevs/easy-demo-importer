@@ -305,20 +305,25 @@ class Helpers {
 	/**
 	 * Check if array key exists;
 	 *
-	 * @param string $key Key to check.
-	 * @param string $dataType Data type.
+	 * @param array  $haystack The array or string to search within.
+	 * @param string $needle The key to search for within the haystack.
+	 * @param string $dataType The expected data type of the value.
 	 *
 	 * @return array|string
 	 * @since  1.0.0
 	 */
-	public static function keyExists( $key, $dataType = 'string' ) {
-		if ( 'array' === $dataType ) {
-			$data = [];
-		} else {
-			$data = '';
+	public static function getDemoData( $haystack, $needle, $dataType = 'string' ) {
+		if ( is_array( $haystack ) && array_key_exists( $needle, $haystack ) ) {
+			$key = $haystack[ $needle ];
+
+			if ( 'array' === $dataType ) {
+				return is_array( $key ) ? $key : [];
+			} elseif ( 'string' === $dataType ) {
+				return is_string( $key ) ? $key : '';
+			}
 		}
 
-		return ! empty( $key ) ? $key : $data;
+		return '';
 	}
 
 	/**

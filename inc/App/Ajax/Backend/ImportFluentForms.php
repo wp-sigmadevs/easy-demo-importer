@@ -68,7 +68,9 @@ class ImportFluentForms extends ImporterAjax {
 		// Verifying AJAX call and user role.
 		Helpers::verifyAjaxCall();
 
-		$forms = $this->multiple ? Helpers::keyExists( $this->config['demoData'][ $this->demoSlug ]['fluentFormsJson'] ) : Helpers::keyExists( $this->config['fluentFormsJson'] );
+		$forms = $this->multiple ?
+			Helpers::getDemoData( $this->config['demoData'][ $this->demoSlug ], 'fluentFormsJson' ) :
+			Helpers::getDemoData( $this->config, 'fluentFormsJson' );
 
 		$formsExists = isset( $forms ) || is_plugin_active( 'fluentform/fluentform.php' );
 
