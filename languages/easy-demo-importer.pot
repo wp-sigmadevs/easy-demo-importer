@@ -6,7 +6,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-04-21 10:04+0000\n"
+"POT-Creation-Date: 2024-05-04 15:45+0000\n"
 "Report-Msgid-Bugs-To: https://github.com/wp-sigmadevs/easy-demo-importer/issues\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -651,15 +651,15 @@ msgstr ""
 msgid "Skipping the fancy customizer settings import!."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/DownloadFiles.php:74
+#: ../inc/App/Ajax/Backend/DownloadFiles.php:76
 msgid "Importing content, sit back, relax! This might take a while."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/DownloadFiles.php:75
+#: ../inc/App/Ajax/Backend/DownloadFiles.php:77
 msgid "Demo files have landed, we are good to go!"
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/DownloadFiles.php:77
+#: ../inc/App/Ajax/Backend/DownloadFiles.php:79
 msgid "Import attempt failed. Demo files can not be downloaded."
 msgstr ""
 
@@ -667,55 +667,55 @@ msgstr ""
 msgid "Hooray! You are all set! Now go out and have a blast!"
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/ImportFluentForms.php:82
+#: ../inc/App/Ajax/Backend/ImportFluentForms.php:84
 msgid "Importing all widgets."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/ImportFluentForms.php:83
+#: ../inc/App/Ajax/Backend/ImportFluentForms.php:85
 msgid "Fluent forms successfully imported."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/ImportFluentForms.php:83
+#: ../inc/App/Ajax/Backend/ImportFluentForms.php:85
 msgid "No Fluent forms found. Skipping."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/ImportMenus.php:77
+#: ../inc/App/Ajax/Backend/ImportMenus.php:79
 msgid "Importing theme settings."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/ImportMenus.php:78
+#: ../inc/App/Ajax/Backend/ImportMenus.php:80
 msgid "Nav Menus are locked and loaded."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/ImportMenus.php:78
+#: ../inc/App/Ajax/Backend/ImportMenus.php:80
 msgid "Skipping the nav menus import!."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/ImportRevSlider.php:78, ../inc/App/Ajax/Backend/ImportWidgets.php:88
+#: ../inc/App/Ajax/Backend/ImportRevSlider.php:80, ../inc/App/Ajax/Backend/ImportWidgets.php:88
 msgid "Finalizing demo data import."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/ImportRevSlider.php:79
+#: ../inc/App/Ajax/Backend/ImportRevSlider.php:81
 msgid "Slider Revolution slides imported."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/ImportRevSlider.php:79
+#: ../inc/App/Ajax/Backend/ImportRevSlider.php:81
 msgid "Skipping Slider Revolution import!."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/ImportSettings.php:102
+#: ../inc/App/Ajax/Backend/ImportSettings.php:104
 msgid "Importing Fluent forms."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/ImportSettings.php:102
+#: ../inc/App/Ajax/Backend/ImportSettings.php:104
 msgid "Importing all widgets"
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/ImportSettings.php:103
+#: ../inc/App/Ajax/Backend/ImportSettings.php:105
 msgid "Theme settings are all set."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/ImportSettings.php:103
+#: ../inc/App/Ajax/Backend/ImportSettings.php:105
 msgid "No theme settings import needed."
 msgstr ""
 
