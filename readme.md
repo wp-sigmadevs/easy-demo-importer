@@ -9,6 +9,8 @@
 
 The Easy Demo Importer is your go-to solution for effortlessly bringing your WordPress site to life. With its user-friendly interface and robust feature set, it streamlines the process of importing demo content, offering an unparalleled level of convenience for both users and developers.
 
+👉 [wordpress.org Plugin Link](https://wordpress.org/plugins/easy-demo-importer/) | [Plugin Documentation](https://docs.sigmadevs.com/easy-demo-importer) 👈
+
 ### Features
 
 -   One-Click Demo Import
