@@ -629,7 +629,7 @@ class RestEndpoints extends Base {
 		$inactivePlugins = Helpers::getInactivePlugins();
 
 		foreach ( $inactivePlugins as $inactivePlugin ) {
-			$pluginName = esc_html( $inactivePlugin['Name'] );
+			$pluginName = html_entity_decode( esc_html( $inactivePlugin['Name'] ) );
 
 			if ( $inactivePlugin['Version'] ) {
 				$pluginName .= ' - v' . $inactivePlugin['Version'];
@@ -637,9 +637,10 @@ class RestEndpoints extends Base {
 
 			$fields[ str_replace( ' ', '_', $inactivePlugin['Name'] ) ] = [
 				'label' => $pluginName,
-				'value' => $inactivePlugin['Author'] ? sprintf( /* translators: 1. Plugin author name. */
+				'value' => $inactivePlugin['Author'] ? sprintf(
+					/* translators: 1. Plugin author name. */
 					esc_html__( 'By %s', 'easy-demo-importer' ),
-					esc_html( $inactivePlugin['Author'] )
+					esc_html( wp_strip_all_tags( $inactivePlugin['Author'] ) )
 				) : 'N/A',
 			];
 		}

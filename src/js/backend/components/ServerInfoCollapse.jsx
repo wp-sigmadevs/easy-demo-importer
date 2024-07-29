@@ -1,3 +1,10 @@
+/**
+ * ServerInfoCollapse component displays server information in a collapsible format.
+ * It allows users to view detailed server status and copy system data to the clipboard.
+ *
+ * @param {Object} serverInfo - The server information to display.
+ */
+
 import React, { useState, useRef } from 'react';
 import { Collapse, Table, Popover, Alert, message, Button } from 'antd';
 import { InfoCircleOutlined, CopyOutlined } from '@ant-design/icons';
@@ -5,17 +12,26 @@ import { InfoCircleOutlined, CopyOutlined } from '@ant-design/icons';
 /* global sdEdiAdminParams */
 
 const ServerInfoCollapse = ({ serverInfo }) => {
-	const { Panel } = Collapse;
 	const [activePanel, setActivePanel] = useState('');
+	const textareaRef = useRef(null);
 
+	/**
+	 * Handles the change of the active accordion panel.
+	 *
+	 * @param {string} key - The key of the active panel.
+	 */
 	const handleAccordionChange = (key) => {
 		setActivePanel(key);
-
 		setTimeout(() => {
 			scrollToPanel(key);
 		}, 300);
 	};
 
+	/**
+	 * Scrolls the page to the specified panel.
+	 *
+	 * @param {string} panelKey - The key of the panel to scroll to.
+	 */
 	const scrollToPanel = (panelKey) => {
 		const panelElement = document.querySelector(
 			`[data-panel-key="${panelKey}"]`
@@ -33,9 +49,13 @@ const ServerInfoCollapse = ({ serverInfo }) => {
 		}
 	};
 
+	/**
+	 * Generates a report string from the server information.
+	 *
+	 * @param {Object} info - The server information object.
+	 */
 	const generateReport = (info) => {
 		const sections = Object.keys(info);
-
 		let report = '';
 
 		sections.forEach((sectionKey) => {
@@ -59,8 +79,10 @@ const ServerInfoCollapse = ({ serverInfo }) => {
 	};
 
 	const report = generateReport(serverInfo);
-	const textareaRef = useRef(null);
 
+	/**
+	 * Copies the content of the textarea to the clipboard.
+	 */
 	const handleCopyToClipboard = () => {
 		if (textareaRef.current) {
 			const textToCopy = textareaRef.current.value;
@@ -73,7 +95,6 @@ const ServerInfoCollapse = ({ serverInfo }) => {
 					})
 					.catch((error) => {
 						console.error(sdEdiAdminParams.copyFailure, error);
-
 						fallbackCopyToClipboard(textToCopy);
 					});
 			} else {
@@ -82,6 +103,11 @@ const ServerInfoCollapse = ({ serverInfo }) => {
 		}
 	};
 
+	/**
+	 * Fallback method to copy text to the clipboard using a temporary textarea.
+	 *
+	 * @param {string} text - The text to copy to the clipboard.
+	 */
 	const fallbackCopyToClipboard = (text) => {
 		const textArea = document.createElement('textarea');
 		textArea.value = text;
@@ -99,6 +125,11 @@ const ServerInfoCollapse = ({ serverInfo }) => {
 		}
 	};
 
+	/**
+	 * Displays a message indicating the result of the copy action.
+	 *
+	 * @param {string} content - The message content to display.
+	 */
 	const showCopyMessage = (content) => {
 		const key = 'copyMessage';
 
@@ -126,30 +157,157 @@ const ServerInfoCollapse = ({ serverInfo }) => {
 		}, 1000);
 	};
 
+	/**
+	 * Generates the header for each panel based on server item information.
+	 *
+	 * @param {Object} serverItem - The server item object containing fields and labels.
+	 */
 	const getPanelHeader = (serverItem) => {
 		const errorCount = Object.keys(serverItem.fields).filter(
 			(fieldKey) => serverItem.fields[fieldKey].error
 		).length;
 
-		if (errorCount === 0) {
-			return (
-				<div data-panel-key={serverItem.id}>
-					<span>{serverItem.label}</span>
-				</div>
-			);
-		}
-
-		const headerText = `${errorCount}`;
-
 		return (
 			<div data-panel-key={serverItem.id}>
 				<span>{serverItem.label}</span>
-				{headerText && (
-					<span className="error-count">{headerText}</span>
+				{errorCount > 0 && (
+					<span className="error-count">{errorCount}</span>
 				)}
 			</div>
 		);
 	};
+
+	// Prepare the items for the Collapse component.
+	const panels = Object.keys(serverInfo).map((key) => {
+		const serverItem = {
+			...serverInfo[key],
+			id: key,
+		};
+
+		return {
+			key: serverItem.id,
+			label: getPanelHeader(serverItem),
+			children:
+				serverItem.id === 'copy_system_data' ? (
+					<div className="demo-importer-status-report">
+						<div id="system-status-report">
+							{Object.keys(serverItem.fields).map((fieldKey) => (
+								<div className="report-inner" key={fieldKey}>
+									<p>{serverItem.fields[fieldKey].label}</p>
+									<textarea
+										ref={textareaRef}
+										readOnly
+										rows={20}
+										value={report}
+									/>
+									<p className="submit">
+										<Button
+											className="edi-copy-button"
+											type="primary"
+											onClick={handleCopyToClipboard}
+										>
+											<span>
+												{
+													serverItem.fields[fieldKey]
+														.value
+												}
+											</span>
+											<CopyOutlined />
+										</Button>
+									</p>
+								</div>
+							))}
+						</div>
+					</div>
+				) : (
+					<Table
+						dataSource={Object.keys(serverItem.fields).map(
+							(fieldKey) => ({
+								...serverItem.fields[fieldKey],
+								key: fieldKey,
+							})
+						)}
+						columns={[
+							{
+								dataIndex: 'label',
+								key: 'label',
+							},
+							{
+								dataIndex: 'value',
+								key: 'value',
+								render: (text, record) => {
+									if (record.error) {
+										return (
+											<span className="error-value">
+												<Popover
+													content={
+														<Alert
+															message="Error"
+															description={
+																record.error
+															}
+															type="error"
+															showIcon
+														/>
+													}
+												>
+													<InfoCircleOutlined
+														style={{
+															marginLeft: '4px',
+														}}
+													/>
+												</Popover>
+												<span>{text}</span>
+											</span>
+										);
+									}
+
+									if (record.info) {
+										return (
+											<span className="info-value">
+												<Popover
+													content={
+														<Alert
+															message="Info"
+															description={
+																record.info
+															}
+															type="info"
+															showIcon
+														/>
+													}
+												>
+													<InfoCircleOutlined
+														style={{
+															marginLeft: '4px',
+														}}
+													/>
+												</Popover>
+												<span>{text}</span>
+											</span>
+										);
+									}
+
+									return text;
+								},
+							},
+						]}
+						pagination={false}
+						rowClassName={(record) => {
+							if (record?.error) {
+								return 'error-row';
+							}
+
+							if (record?.info) {
+								return 'info-row';
+							}
+
+							return 'row';
+						}}
+					/>
+				),
+		};
+	});
 
 	return (
 		<Collapse
@@ -157,157 +315,8 @@ const ServerInfoCollapse = ({ serverInfo }) => {
 			expandIconPosition="end"
 			onChange={handleAccordionChange}
 			activeKey={activePanel}
-		>
-			{Object.keys(serverInfo).map((key) => {
-				const serverItem = {
-					...serverInfo[key],
-					id: key,
-				};
-
-				return (
-					<Panel
-						key={serverItem.id}
-						header={getPanelHeader(serverItem)}
-					>
-						{serverItem.id === 'copy_system_data' ? (
-							<div className="demo-importer-status-report">
-								<div id="system-status-report">
-									{Object.keys(serverItem.fields).map(
-										(fieldKey) => (
-											<div
-												className="report-inner"
-												key={fieldKey}
-											>
-												<p>
-													{
-														serverItem.fields[
-															fieldKey
-														].label
-													}
-												</p>
-												<textarea
-													ref={textareaRef}
-													readOnly
-													rows={20}
-													value={report}
-												/>
-												<p className="submit">
-													<Button
-														className="edi-copy-button"
-														type="primary"
-														onClick={
-															handleCopyToClipboard
-														}
-													>
-														<span>
-															{
-																serverItem
-																	.fields[
-																	fieldKey
-																].value
-															}
-														</span>
-														<CopyOutlined />
-													</Button>
-												</p>
-											</div>
-										)
-									)}
-								</div>
-							</div>
-						) : (
-							<Table
-								dataSource={Object.keys(serverItem.fields).map(
-									(fieldKey) => ({
-										...serverItem.fields[fieldKey],
-										key: fieldKey,
-									})
-								)}
-								columns={[
-									{
-										dataIndex: 'label',
-										key: 'label',
-									},
-									{
-										dataIndex: 'value',
-										key: 'value',
-										render: (text, record) => {
-											if (record.error) {
-												return (
-													<span className="error-value">
-														<Popover
-															content={
-																<Alert
-																	message="Error"
-																	description={
-																		record.error
-																	}
-																	type="error"
-																	showIcon
-																/>
-															}
-														>
-															<InfoCircleOutlined
-																style={{
-																	marginLeft:
-																		'4px',
-																}}
-															/>
-														</Popover>
-														<span>{text}</span>
-													</span>
-												);
-											}
-
-											if (record.info) {
-												return (
-													<span className="info-value">
-														<Popover
-															content={
-																<Alert
-																	message="Error"
-																	description={
-																		record.info
-																	}
-																	type="info"
-																	showIcon
-																/>
-															}
-														>
-															<InfoCircleOutlined
-																style={{
-																	marginLeft:
-																		'4px',
-																}}
-															/>
-														</Popover>
-														<span>{text}</span>
-													</span>
-												);
-											}
-
-											return text;
-										},
-									},
-								]}
-								pagination={false}
-								rowClassName={(record) => {
-									if (record?.error) {
-										return 'error-row';
-									}
-
-									if (record?.info) {
-										return 'info-row';
-									}
-
-									return 'row';
-								}}
-							/>
-						)}
-					</Panel>
-				);
-			})}
-		</Collapse>
+			items={panels}
+		/>
 	);
 };
 
