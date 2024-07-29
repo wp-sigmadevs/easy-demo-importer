@@ -5,11 +5,13 @@
 .appearance_page_sd-edi-demo-importer-status {
 	.ant-table {
 		.ant-table-thead {
+			th,
 			tr,
 			td {
 				padding: 0;
 			}
 
+			th,
 			td {
 				&::before {
 					content: none !important;
@@ -26,6 +28,7 @@
 				position: relative;
 				padding-left: 35px;
 				width: 310px;
+				max-width: 310px;
 			}
 
 			.info-value,
