@@ -54,7 +54,7 @@ final class Plugin {
 			'plugin_uri'          => untrailingslashit( plugin_dir_url( SD_EDI_ROOT_FILE ) ),
 			'plugin_active_file'  => plugin_basename( SD_EDI_ROOT_FILE ),
 			'demo_import_page'    => 'sd-easy-demo-importer',
-			'system_status_page'  => 'sd-edi-demo-importer-status',
+			'system_status_page'  => admin_url( 'themes.php?page=sd-easy-demo-importer#/system_status_page' ),
 			'views_folder'        => 'views',
 			'template_folder'     => 'templates',
 			'ext_template_folder' => 'sd-edi-templates',
