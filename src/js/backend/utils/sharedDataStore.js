@@ -80,6 +80,18 @@ const useSharedDataStore = create((set) => ({
 	setSearchQuery: (query) => set({ searchQuery: query }),
 	setFilteredDemoData: (data) => set({ filteredDemoData: data }),
 	setIsSearchQueryEmpty: (value) => set({ isSearchQueryEmpty: value }),
+	resetStore: () =>
+		set({
+			currentStep: 1,
+			modalVisible: false,
+			excludeImages: false,
+			importComplete: false,
+			reset: true,
+			message: '',
+			searchQuery: '',
+			filteredDemoData: null,
+			isSearchQueryEmpty: true,
+		}),
 }));
 
 export default useSharedDataStore;

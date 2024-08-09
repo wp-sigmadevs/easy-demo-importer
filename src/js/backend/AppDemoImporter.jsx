@@ -23,6 +23,7 @@ const App = () => {
 	const [modalData, setModalData] = useState(null);
 	const [errorMessage, setErrorMessage] = useState(null);
 	const [isModalVisible, setIsModalVisible] = useState(false);
+	const resetStore = useSharedDataStore((state) => state.resetStore);
 
 	/**
 	 * Values from the shared data store.
@@ -48,6 +49,13 @@ const App = () => {
 	 * Destructure the Search component from the Input module.
 	 */
 	const { Search } = Input;
+
+	/**
+	 * Reset state variables when the component mounts or the route changes.
+	 */
+	useEffect(() => {
+		resetStore();
+	}, [resetStore]);
 
 	/**
 	 * Fetch the import list when the component mounts.
