@@ -205,6 +205,15 @@
 			top: 32px !important;
 		}
 	}
+
+	.edi-server-status-wrapper {
+		.edi-content {
+			padding: 0;
+			margin: 0;
+			background: none;
+			box-shadow: none;
+		}
+	}
 }
 
 @keyframes ediSkeletonLoading {
