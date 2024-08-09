@@ -73,6 +73,11 @@
 				.ant-modal-confirm-title {
 					@extend .warn-text;
 				}
+
+				.ant-modal-confirm-paragraph {
+					margin-top: 7px;
+					margin-bottom: 20px;
+				}
 			}
 		}
 	}
