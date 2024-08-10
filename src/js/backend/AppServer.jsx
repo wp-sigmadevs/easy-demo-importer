@@ -1,5 +1,5 @@
 import Header from './Layouts/Header';
-import { Row, Col, Skeleton } from 'antd';
+import {Row, Col, Skeleton, Button} from 'antd';
 import Support from './components/Support';
 import React, { useState, useEffect } from 'react';
 import ErrorMessage from './components/ErrorMessage';
@@ -61,6 +61,11 @@ const AppServer = () => {
 		containerClassName += ' server-config-found';
 	}
 
+	const handleImportPageBtn = () => {
+		const importPageUrl = sdEdiAdminParams.importPageUrl;
+		window.open(importPageUrl, '_self');
+	};
+
 	return (
 		<>
 			<div className="wrap edi-server-status-wrapper">
@@ -76,7 +81,7 @@ const AppServer = () => {
 								<>
 									<Col className="gutter-row">
 										<div className="skeleton-wrapper">
-											{Array.from({ length: 6 }).map(
+											{Array.from({length: 6}).map(
 												(_, buttonIndex) => (
 													<div
 														className="list-skeleton details"
@@ -98,7 +103,7 @@ const AppServer = () => {
 							) : (
 								<>
 									{!serverData.success ? (
-										<ErrorMessage message={errorMessage} />
+										<ErrorMessage message={errorMessage}/>
 									) : (
 										<>
 											<Col className="gutter-row edi-server-info edi-fade-in">
@@ -115,7 +120,17 @@ const AppServer = () => {
 				</div>
 			</div>
 
-			{'yes' === sdEdiAdminParams.enableSupportButton && <Support />}
+			<div className="edi-server-status">
+				<Button
+					className="edi-server-status-btn"
+					type="primary"
+					onClick={handleImportPageBtn}
+				>
+					<span>{sdEdiAdminParams.importPageBtnText}</span>
+				</Button>
+			</div>
+
+			{'yes' === sdEdiAdminParams.enableSupportButton && <Support/>}
 		</>
 	);
 };

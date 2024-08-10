@@ -9,6 +9,14 @@ import { useEffect } from 'react';
 import AppDemoImporter from './AppDemoImporter';
 import AppServer from './AppServer';
 
+/* global sdEdiAdminParams */
+
+/**
+ * Main App component.
+ * Wraps the content with HashRouter.
+ *
+ * @return {JSX.Element} App component
+ */
 const App = () => {
 	return (
 		<HashRouter>
@@ -17,6 +25,12 @@ const App = () => {
 	);
 };
 
+/**
+ * AppContent component.
+ * Handles routing and updates the menu links.
+ *
+ * @return {JSX.Element} AppContent component
+ */
 const AppContent = () => {
 	const location = useLocation();
 
@@ -24,10 +38,14 @@ const AppContent = () => {
 		// Smooth scroll to top when the location changes
 		window.scrollTo({ top: 0, behavior: 'smooth' });
 
+		/**
+		 * Updates the menu links and adds active class based on the current hash.
+		 */
 		const updateMenuLink = () => {
 			const demoImporterLink = document.querySelector(
-				"a[href*='themes.php?page=sd-easy-demo-importer']"
+				`a[href*="${sdEdiAdminParams.importPageLink}"]`
 			);
+
 			if (demoImporterLink && !demoImporterLink.href.includes('#/')) {
 				demoImporterLink.href += '#/';
 			}
@@ -48,7 +66,7 @@ const AppContent = () => {
 			// Check for the active hash
 			if (activeHash.includes('system_status_page')) {
 				const systemStatusMenu = document.querySelector(
-					"a[href*='themes.php?page=sd-easy-demo-importer#/system_status_page']"
+					`a[href="${sdEdiAdminParams.serverPageUrl}"]`
 				);
 				if (systemStatusMenu) {
 					systemStatusMenu.closest('li').classList.add('current');

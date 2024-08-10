@@ -16,7 +16,7 @@ import ModalRequirements from './components/Modal/ModaRequirements';
  *
  * @return {JSX.Element} - JSX element representing the main application component.
  */
-const App = () => {
+const AppDemoImporter = () => {
 	/**
 	 * State hooks and initialization.
 	 */
@@ -467,4 +467,4 @@ const App = () => {
 	);
 };
 
-export default App;
+export default AppDemoImporter;

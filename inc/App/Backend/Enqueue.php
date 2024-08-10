@@ -188,6 +188,9 @@ class Enqueue extends EnqueueBase {
 				// Server Page Button.
 				'serverPageBtnText'          => esc_html__( 'System Status', 'easy-demo-importer' ),
 				'serverPageUrl'              => sd_edi()->getData()['system_status_page'],
+				'importPageBtnText'          => esc_html__( 'Back to Demo Importer', 'easy-demo-importer' ),
+				'importPageUrl'              => admin_url( 'themes.php?page=sd-easy-demo-importer#/' ),
+				'importPageLink'             => 'themes.php?page=sd-easy-demo-importer',
 
 				// Button texts.
 				'btnLivePreview'             => esc_html__( 'Live Preview', 'easy-demo-importer' ),
