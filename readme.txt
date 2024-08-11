@@ -3,8 +3,8 @@ Contributors: sigmadevs
 Donate link:
 Tags: demo importer, one click demo importer, theme demo importer, WordPress demo importer, content import plugin
 Requires at least: 5.5
-Tested up to: 6.5
-Stable tag: 1.1.1
+Tested up to: 6.6
+Stable tag: 1.1.2
 Requires PHP: 7.4
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -136,14 +136,23 @@ For any inquiries, bug reports, or suggestions, please submit your request [here
 
 == Changelog ==
 
+= 1.1.2 (11-August-2024) =
+* Add: Full compatibility with WordPress 6.6.
+* Add: Integrated React Router for smoother and faster page transitions.
+* Fix: Resolved an issue where HTML entities were incorrectly displayed.
+* Fix: Addressed UI issues on the Server Status page.
+* Tweak: Enhanced the database reset script.
+* Update: Updated dependency libraries to their latest versions.
+* Update: UI adjustments to align with the updated versions of the libraries.
+
 = 1.1.1 (21-April-2024) =
 * Add: Included Support for RTL language.
-* Add: Enhanced Compatibility with WordPress 6.5 and PHP 8.3.
+* Add: Compatibility with WordPress 6.5 and PHP 8.3.
 * Add: Implemented temporary PHP parameters boost during import.
-* Fixed: Addressed some sanitization issues.
-* Fixed: Rectified a PHP warning regarding undefined index.
-* Fixed: Resolved several responsive issues.
-* Fixed: Corrected various CSS issues.
+* Fix: Addressed some sanitization issues.
+* Fix: Rectified a PHP warning regarding undefined index.
+* Fix: Resolved several responsive issues.
+* Fix: Corrected various CSS issues.
 * Tweak: Made improvements to the codebase.
 * Update: Added/renamed various action and filter hooks.
 
