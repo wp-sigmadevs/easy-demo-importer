@@ -187,6 +187,16 @@ class Initialize extends ImporterAjax {
 			);
 		}
 
+		// Delete some options from wp_options.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$wpdb->query(
+			"DELETE FROM {$wpdb->prefix}options 
+			WHERE option_name LIKE 'elementor_%' 
+			OR option_name LIKE '_elementor_%' 
+			OR option_name LIKE 'rtsb_%' 
+			OR option_name LIKE 'woocommerce_%';"
+		);
+
 		// Delete Widgets.
 		Helpers::deleteWidgets();
 
