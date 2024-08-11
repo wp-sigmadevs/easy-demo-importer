@@ -2,7 +2,7 @@
 
 ![Requires PHP_>_7.4](https://img.shields.io/badge/Requires-PHP_>_7.4-2d74d5)
 ![Tested up to WordPress 6.5](https://img.shields.io/badge/Tested-Up_to_WordPress_6.5-2d74d5)
-![Stable_Tag 1.1.1](https://img.shields.io/badge/Stable_Tag-1.1.1-2d74d5)
+![Stable_Tag 1.1.2](https://img.shields.io/badge/Stable_Tag-1.1.2-2d74d5)
 ![License GPLv3 or later](https://img.shields.io/badge/License-GPLv3_or_later-2d74d5)
 
 <hr />
