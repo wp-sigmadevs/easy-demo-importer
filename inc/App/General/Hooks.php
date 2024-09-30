@@ -89,5 +89,11 @@ class Hooks extends Base {
 	public function filters() {
 		// Add SVG file support.
 		add_filter( 'upload_mimes', [ Filters::class, 'supportedFileTypes' ] );
+
+		// Sanitize the SVG file before it is uploaded to the server.
+		add_filter( 'wp_handle_upload_prefilter', [ Filters::class, 'sanitizeSVG' ] );
+
+		// Fix WordPress MIME type detection for SVG files.
+		add_filter( 'wp_check_filetype_and_ext', [ Filters::class, 'fixSVGDetection' ], 10, 3 );
 	}
 }
