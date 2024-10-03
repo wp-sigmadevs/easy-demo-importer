@@ -4,7 +4,7 @@ Donate link:
 Tags: demo importer, one click demo importer, theme demo importer, WordPress demo importer, content import plugin
 Requires at least: 5.5
 Tested up to: 6.6
-Stable tag: 1.1.2
+Stable tag: 1.1.3
 Requires PHP: 7.4
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -135,6 +135,13 @@ For any inquiries, bug reports, or suggestions, please submit your request [here
 6. Example of how the system status page looks.
 
 == Changelog ==
+
+= 1.1.3 (03-October-2024) =
+* Add: SVG file sanitization to prevent malicious content uploads.
+* Add: File size validation for SVG uploads, with customizable size limits.
+* Fix: Correct MIME type detection for SVG files in WordPress.
+* Fix: Resolved issue where unsafe SVG files bypassed security checks.
+* Tweak: Improved error messaging for file upload validation.
 
 = 1.1.2 (11-August-2024) =
 * Add: Full compatibility with WordPress 6.6.
