@@ -132,7 +132,7 @@ class Actions {
 			// Update Permalinks.
 			->updatePermalinks()
 
-			// Update rewrite flag.
+			// Update a rewrite flag.
 			->rewriteFlag();
 	}
 
@@ -445,6 +445,9 @@ class Actions {
 		// Setting up WooCommerce Pages.
 		self::setWooPages()
 
+			// Fixing default product category.
+			->fixDefaultCategory()
+
 			// Fixing product stock.
 			->fixProductStock();
 
@@ -548,6 +551,24 @@ class Actions {
 
 		// We no longer need WC setup wizard redirect.
 		delete_transient( '_wc_activation_redirect' );
+
+		return new static();
+	}
+
+	/**
+	 * Fix default product category.
+	 *
+	 * @return static
+	 * @since 1.1.4
+	 */
+	public static function fixDefaultCategory() {
+		$defaultCategoryID = get_option( 'default_product_cat' );
+		$defaultCategoryID = sd_edi()->getNewID( absint( $defaultCategoryID ) ) ?? 0;
+
+
+		if ( $defaultCategoryID ) {
+			update_option( 'default_product_cat', absint( $defaultCategoryID ) );
+		}
 
 		return new static();
 	}
