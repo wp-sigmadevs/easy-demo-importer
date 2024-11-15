@@ -3,8 +3,8 @@ Contributors: sigmadevs
 Donate link:
 Tags: demo importer, one click demo importer, theme demo importer, WordPress demo importer, content import plugin
 Requires at least: 5.5
-Tested up to: 6.6
-Stable tag: 1.1.3
+Tested up to: 6.7
+Stable tag: 1.1.4
 Requires PHP: 7.4
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html

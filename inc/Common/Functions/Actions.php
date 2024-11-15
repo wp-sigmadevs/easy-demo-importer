@@ -99,11 +99,12 @@ class Actions {
 	 */
 	public static function beforeImportActions() {
 		// Try to update PHP memory limit before import.
-		// phpcs:ignore WordPress.PHP.IniSet.memory_limit_Disallowed
+		// phpcs:ignore WordPress.PHP.IniSet.memory_limit_Disallowed, Squiz.PHP.DiscouragedFunctions.Discouraged
 		ini_set( 'memory_limit', apply_filters( 'sd/edi/temp_boost_memory_limit', '350M' ) );
 
 		// Try to increase PHP max execution time before import.
 		if ( ( strpos( ini_get( 'disable_functions' ), 'set_time_limit' ) === false ) && ini_get( 'max_execution_time' ) < 300 ) {
+			// phpcs:ignore Squiz.PHP.DiscouragedFunctions.Discouraged
 			set_time_limit( apply_filters( 'sd/edi/temp_boost_max_execution_time', 300 ) );
 		}
 	}
@@ -207,8 +208,16 @@ class Actions {
 	 * @since 1.1.0
 	 */
 	public static function setPages( $obj ) {
-		$homeSlug = $obj->demoSlug;
-		$blogSlug = '';
+		$homeSlug      = $obj->demoSlug;
+		$blogSlug      = '';
+		$frontPageBlog = ( $obj->config['frontPageBlog'] ?? false ) || ( $obj->config['demoData'][ $obj->demoSlug ]['frontPageBlog'] ?? false );
+
+		if ( $frontPageBlog ) {
+			update_option( 'show_on_front', 'posts' );
+			update_option( 'page_for_posts', 0 );
+
+			return new static();
+		}
 
 		if ( ! empty( $obj->config['blogSlug'] ) || ! empty( $obj->config['demoData'][ $obj->demoSlug ]['blogSlug'] ) ) {
 			$blogSlug = $obj->multiple ? $obj->config['demoData'][ $obj->demoSlug ]['blogSlug'] : $obj->config['blogSlug'];
@@ -564,7 +573,6 @@ class Actions {
 	public static function fixDefaultCategory() {
 		$defaultCategoryID = get_option( 'default_product_cat' );
 		$defaultCategoryID = sd_edi()->getNewID( absint( $defaultCategoryID ) ) ?? 0;
-
 
 		if ( $defaultCategoryID ) {
 			update_option( 'default_product_cat', absint( $defaultCategoryID ) );
