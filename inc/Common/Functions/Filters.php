@@ -109,7 +109,7 @@ class Filters {
 	 */
 	public static function fixSVGDetection( $data, $file, $filename ) {
 		// If the file is an SVG, manually set the MIME type and extension.
-		$ext = $data['ext'] ?? '';
+		$ext = isset( $data['ext'] ) && is_string( $data['ext'] ) ? $data['ext'] : '';
 
 		if ( strlen( $ext ) < 1 ) {
 			$exploded = explode( '.', $filename );

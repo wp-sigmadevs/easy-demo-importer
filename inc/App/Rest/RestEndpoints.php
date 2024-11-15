@@ -441,15 +441,6 @@ class RestEndpoints extends Base {
 			'error' => 'No issue' !== $this->checkWritePermission() ? esc_html__( 'Fix the write permission error in the wp-content directory for successful import.', 'easy-demo-importer' ) : '',
 		];
 
-		$demo           = sd_edi()->getDemoConfig();
-		$downloadServer = ! empty( $demo['demoZip'] ) ? esc_url( $demo['demoZip'] ) : null;
-
-		$fields['demo_connection'] = [
-			'label' => esc_html__( 'Download Server Connection', 'easy-demo-importer' ),
-			'value' => ! empty( $downloadServer ) && wp_remote_get( $downloadServer, [ 'timeout' => 10 ] ) ? esc_html__( 'Connected', 'easy-demo-importer' ) : esc_html__( 'Connection failure', 'easy-demo-importer' ),
-			'error' => empty( $downloadServer ) && ! wp_remote_get( $downloadServer, [ 'timeout' => 10 ] ) ? esc_html__( 'Check the demo data configuration or the internet connection.', 'easy-demo-importer' ) : '',
-		];
-
 		return $fields;
 	}
 
