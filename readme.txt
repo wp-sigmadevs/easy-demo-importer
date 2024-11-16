@@ -136,6 +136,12 @@ For any inquiries, bug reports, or suggestions, please submit your request [here
 
 == Changelog ==
 
+= 1.1.4 (16-November-2024) =
+* Add: Full compatibility with WordPress 6.7.
+* Fix: Resolved the PHP "Uncaught TypeError" error in SVG detection.
+* Performance: Removed the download server connection check to reduce REST API calls.
+* Enhancement: Introduced a way to set the Posts page (blog) as the front page.
+
 = 1.1.3 (03-October-2024) =
 * Add: SVG file sanitization to prevent malicious content uploads.
 * Add: File size validation for SVG uploads, with customizable size limits.
