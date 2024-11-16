@@ -6,7 +6,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-10-03 17:20+0000\n"
+"POT-Creation-Date: 2024-11-16 14:20+0000\n"
 "Report-Msgid-Bugs-To: https://github.com/wp-sigmadevs/easy-demo-importer/issues\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -126,11 +126,11 @@ msgstr ""
 msgid "Are you sure you want to proceed? Resetting the database will delete all your contents, medias and settings."
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:185, ../inc/App/Rest/RestEndpoints.php:412, ../inc/App/Rest/RestEndpoints.php:426, ../inc/App/Rest/RestEndpoints.php:488, ../inc/App/Rest/RestEndpoints.php:546, ../inc/App/Rest/RestEndpoints.php:551, ../inc/App/Rest/RestEndpoints.php:581, ../inc/App/Rest/RestEndpoints.php:586
+#: ../inc/App/Backend/Enqueue.php:185, ../inc/App/Rest/RestEndpoints.php:412, ../inc/App/Rest/RestEndpoints.php:426, ../inc/App/Rest/RestEndpoints.php:479, ../inc/App/Rest/RestEndpoints.php:537, ../inc/App/Rest/RestEndpoints.php:542, ../inc/App/Rest/RestEndpoints.php:572, ../inc/App/Rest/RestEndpoints.php:577
 msgid "Yes"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:186, ../inc/App/Rest/RestEndpoints.php:412, ../inc/App/Rest/RestEndpoints.php:426, ../inc/App/Rest/RestEndpoints.php:488, ../inc/App/Rest/RestEndpoints.php:546, ../inc/App/Rest/RestEndpoints.php:551, ../inc/App/Rest/RestEndpoints.php:581, ../inc/App/Rest/RestEndpoints.php:586
+#: ../inc/App/Backend/Enqueue.php:186, ../inc/App/Rest/RestEndpoints.php:412, ../inc/App/Rest/RestEndpoints.php:426, ../inc/App/Rest/RestEndpoints.php:479, ../inc/App/Rest/RestEndpoints.php:537, ../inc/App/Rest/RestEndpoints.php:542, ../inc/App/Rest/RestEndpoints.php:572, ../inc/App/Rest/RestEndpoints.php:577
 msgid "No"
 msgstr ""
 
@@ -334,7 +334,7 @@ msgstr ""
 msgid "Inactive Plugins"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:336, ../inc/App/Rest/RestEndpoints.php:662
+#: ../inc/App/Rest/RestEndpoints.php:336, ../inc/App/Rest/RestEndpoints.php:653
 msgid "Copy System Data"
 msgstr ""
 
@@ -422,132 +422,116 @@ msgstr ""
 msgid "Fix the write permission error in the wp-content directory for successful import."
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:448
-msgid "Download Server Connection"
-msgstr ""
-
-#: ../inc/App/Rest/RestEndpoints.php:449
-msgid "Connected"
-msgstr ""
-
-#: ../inc/App/Rest/RestEndpoints.php:449
-msgid "Connection failure"
-msgstr ""
-
-#: ../inc/App/Rest/RestEndpoints.php:450
-msgid "Check the demo data configuration or the internet connection."
-msgstr ""
-
-#: ../inc/App/Rest/RestEndpoints.php:467
+#: ../inc/App/Rest/RestEndpoints.php:458
 msgid "Name"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:472
+#: ../inc/App/Rest/RestEndpoints.php:463
 msgid "Version"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:477
+#: ../inc/App/Rest/RestEndpoints.php:468
 msgid "Author"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:482
+#: ../inc/App/Rest/RestEndpoints.php:473
 msgid "Author URL"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:487
+#: ../inc/App/Rest/RestEndpoints.php:478
 msgid "Child Theme"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:489
+#: ../inc/App/Rest/RestEndpoints.php:480
 msgid "Child theme is recommended if you want to modify or extend the features of the theme"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:494
+#: ../inc/App/Rest/RestEndpoints.php:485
 msgid "Parent Theme Name"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:499
+#: ../inc/App/Rest/RestEndpoints.php:490
 msgid "Parent Theme Version"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:504
+#: ../inc/App/Rest/RestEndpoints.php:495
 msgid "Parent Theme Author"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:509
+#: ../inc/App/Rest/RestEndpoints.php:500
 msgid "Parent Theme Author URL"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:529
+#: ../inc/App/Rest/RestEndpoints.php:520
 msgid "WordPress Version"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:531
+#: ../inc/App/Rest/RestEndpoints.php:522
 msgid "WordPress core is outdated. Please update to the latest version."
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:535
+#: ../inc/App/Rest/RestEndpoints.php:526
 msgid "Site URL"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:540
+#: ../inc/App/Rest/RestEndpoints.php:531
 msgid "Home URL"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:545
+#: ../inc/App/Rest/RestEndpoints.php:536
 msgid "Is this Multisite?"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:550
+#: ../inc/App/Rest/RestEndpoints.php:541
 msgid "Has SSL Enabled?"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:555
+#: ../inc/App/Rest/RestEndpoints.php:546
 msgid "Max Upload Size"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:560
+#: ../inc/App/Rest/RestEndpoints.php:551
 msgid "Memory Limit"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:565
+#: ../inc/App/Rest/RestEndpoints.php:556
 msgid "Max Memory Limit"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:570
+#: ../inc/App/Rest/RestEndpoints.php:561
 msgid "Permalink Structure"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:571
+#: ../inc/App/Rest/RestEndpoints.php:562
 msgid "Plain"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:575
+#: ../inc/App/Rest/RestEndpoints.php:566
 msgid "Language"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:580
+#: ../inc/App/Rest/RestEndpoints.php:571
 msgid "Debug Mode Enabled"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:585
+#: ../inc/App/Rest/RestEndpoints.php:576
 msgid "Script Debug Mode Enabled"
 msgstr ""
 
 #. translators: 1. Plugin author name.
-#: ../inc/App/Rest/RestEndpoints.php:612, ../inc/App/Rest/RestEndpoints.php:642
+#: ../inc/App/Rest/RestEndpoints.php:603, ../inc/App/Rest/RestEndpoints.php:633
 msgid "By %s"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:661
+#: ../inc/App/Rest/RestEndpoints.php:652
 msgid "When submitting a support request, kindly include the details generated below in your message. Providing this information will assist us in efficiently diagnosing and addressing the issue you are experiencing."
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:675
+#: ../inc/App/Rest/RestEndpoints.php:666
 msgid "Write permission error"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:681
+#: ../inc/App/Rest/RestEndpoints.php:672
 msgid "No issue"
 msgstr ""
 
