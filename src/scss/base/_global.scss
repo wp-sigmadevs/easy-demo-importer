@@ -49,6 +49,7 @@
 				background-image: linear-gradient(109.6deg, rgb(45, 116, 213) 11.2%, rgb(121, 137, 212) 91.2%);
 				background-size: 200% auto;
 				box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 9px 28px 8px rgba(0, 0, 0, 0.05);
+				z-index: 10;
 
 				&:hover {
 					background-position: right center;

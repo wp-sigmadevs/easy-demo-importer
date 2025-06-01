@@ -36,6 +36,11 @@ const ServerInfoCollapse = ({ serverInfo }) => {
 		const panelElement = document.querySelector(
 			`[data-panel-key="${panelKey}"]`
 		);
+
+		if (!panelElement) {
+			return;
+		}
+
 		const offset = 140;
 		const panelPosition = panelElement.getBoundingClientRect();
 		const currentScrollY = window.scrollY;

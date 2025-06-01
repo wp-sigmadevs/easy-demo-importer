@@ -125,7 +125,7 @@ class Pages extends Base {
 
 		// Conditionally removing all notices.
 		if ( 'themes.php' === $pagenow && ( 'sd-easy-demo-importer' === $page || 'sd-edi-demo-importer-status' === $page ) ) {
-			add_action( 'admin_init', [ $this, 'removeAllNotices' ] );
+			add_action( 'admin_init', [ $this, 'removeAllNotices' ], 99 );
 		}
 	}
 
