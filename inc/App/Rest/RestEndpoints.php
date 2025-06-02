@@ -387,7 +387,7 @@ class RestEndpoints extends Base {
 		$fields['max_upload_size'] = [
 			'label' => esc_html__( 'PHP Max Upload Size', 'easy-demo-importer' ),
 			'value' => esc_html( ini_get( 'upload_max_filesize' ) ),
-			'error' => $this->convertToBytes( ini_get( 'upload_max_filesize' ) ) < $this->convertedRequirements()['upload_max_filesize'] ? esc_html__( 'Recommended PHP Max Execution Time is ', 'easy-demo-importer' ) . esc_html( $this->systemRequirements()['upload_max_filesize'] ) : '',
+			'error' => $this->convertToBytes( ini_get( 'upload_max_filesize' ) ) < $this->convertedRequirements()['upload_max_filesize'] ? esc_html__( 'Recommended PHP Max Upload Size is ', 'easy-demo-importer' ) . esc_html( $this->systemRequirements()['upload_max_filesize'] ) : '',
 		];
 
 		$fields['post_max_size'] = [
