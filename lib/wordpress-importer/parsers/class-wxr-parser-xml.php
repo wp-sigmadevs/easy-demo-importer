@@ -214,8 +214,8 @@ class SD_EDI_WXR_Parser_XML {
 		xml_parser_set_option( $xml, XML_OPTION_SKIP_WHITE, 1 );
 		xml_parser_set_option( $xml, XML_OPTION_CASE_FOLDING, 0 );
 		xml_set_object( $xml, $this );
-		xml_set_character_data_handler( $xml, 'cdata' );
-		xml_set_element_handler( $xml, 'tag_open', 'tag_close' );
+		xml_set_character_data_handler( $xml, [ $this, 'cdata' ] );
+		xml_set_element_handler( $xml, [ $this, 'tag_open' ], [ $this, 'tag_close' ] );
 
 		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
 		if ( ! xml_parse( $xml, file_get_contents( $file ), true ) ) {
