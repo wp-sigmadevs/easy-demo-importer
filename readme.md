@@ -2,8 +2,8 @@
 
 ![Requires PHP_>_7.4](https://img.shields.io/badge/Requires-PHP_>_7.4-2d74d5)
 ![Tested up to PHP_8.3](https://img.shields.io/badge/Tested-Up_to_PHP_8.3-2d74d5)
-![Tested up to WordPress 6.7](https://img.shields.io/badge/Tested-Up_to_WordPress_6.7-2d74d5)
-![Stable_Tag 1.1.4](https://img.shields.io/badge/Stable_Tag-1.1.4-2d74d5)
+![Tested up to WordPress 6.8](https://img.shields.io/badge/Tested-Up_to_WordPress_6.8-2d74d5)
+![Stable_Tag 1.1.5](https://img.shields.io/badge/Stable_Tag-1.1.5-2d74d5)
 ![License GPLv3 or later](https://img.shields.io/badge/License-GPLv3_or_later-2d74d5)
 
 <hr />

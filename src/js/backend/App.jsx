@@ -1,4 +1,3 @@
-// App.jsx
 import {
 	createHashRouter,
 	RouterProvider,
@@ -13,15 +12,22 @@ import AppServer from './AppServer';
 
 /* global sdEdiAdminParams */
 
-// Component to handle scroll and menu logic
+/**
+ * Component to handle scroll and menu logic
+ *
+ * @param {JSX.Element} children - The wrapped content.
+ * @return {JSX.Element} The wrapped content with scroll and menu logic.
+ */
 const LayoutWithEffects = ({ children }) => {
 	const location = useLocation();
-	const navType = useNavigationType(); // Optional: distinguish PUSH/REPLACE
 
 	useEffect(() => {
 		// Scroll to top on route change
 		window.scrollTo({ top: 0, behavior: 'smooth' });
 
+		/**
+		 * Updates the menu links and adds active class based on the current hash.
+		 */
 		const updateMenuLink = () => {
 			const demoImporterLink = document.querySelector(
 				`a[href*="${sdEdiAdminParams.importPageLink}"]`
@@ -31,6 +37,7 @@ const LayoutWithEffects = ({ children }) => {
 				demoImporterLink.href += '#/';
 			}
 
+			// Add active class based on current hash
 			const activeHash = window.location.hash;
 			const menuItems = document.querySelectorAll(
 				'#adminmenu #menu-appearance .wp-submenu a'
@@ -42,6 +49,7 @@ const LayoutWithEffects = ({ children }) => {
 				}
 			});
 
+			// Check for the active hash
 			if (activeHash.includes('system_status_page')) {
 				const systemStatusMenu = document.querySelector(
 					`a[href="${sdEdiAdminParams.serverPageUrl}"]`
@@ -59,6 +67,8 @@ const LayoutWithEffects = ({ children }) => {
 		};
 
 		updateMenuLink();
+
+		// Listen for hash changes
 		window.addEventListener('hashchange', updateMenuLink);
 
 		return () => {
@@ -69,7 +79,11 @@ const LayoutWithEffects = ({ children }) => {
 	return children;
 };
 
-// Routes with layout wrapper
+/**
+ * Array of routes.
+ *
+ * @type {Array}
+ */
 const routes = [
 	{
 		path: '/',
@@ -99,6 +113,12 @@ const router = createHashRouter(routes, {
 	},
 });
 
+/**
+ * Main App component.
+ * Wraps the content with HashRouter.
+ *
+ * @return {JSX.Element} App component
+ */
 const App = () => {
 	return (
 		<RouterProvider
