@@ -826,6 +826,9 @@ class Actions {
 		if ( isset( $element['widgetType'] ) && isset( $data[ $element['widgetType'] ] ) ) {
 			$catKeys = $data[ $element['widgetType'] ];
 
+			// Check if this is a WordPress widget.
+			$isWPWidget = strpos( $element['widgetType'], 'wp-widget-' ) === 0;
+
 			// Check if it contains multiple controls.
 			if ( is_array( $catKeys ) ) {
 				foreach ( $catKeys as $catKey => $catID ) {
@@ -839,13 +842,17 @@ class Actions {
 							}
 						}
 					} else {
-						// Not a repeater field. Process normally.
-						self::replaceCategory( $element, $catID );
+						// Not a repeater field. Process based on widget type.
+						$isWPWidget
+							? self::replaceCategoryWP( $element, $catID )
+							: self::replaceCategory( $element, $catID );
 					}
 				}
 			} else {
 				// Has single control to work with.
-				self::replaceCategory( $element, $catKeys );
+				$isWPWidget
+					? self::replaceCategoryWP( $element, $catKeys )
+					: self::replaceCategory( $element, $catKeys );
 			}
 		}
 	}
@@ -874,6 +881,34 @@ class Actions {
 			} else {
 				$newId                          = sd_edi()->getNewID( $oldIds );
 				$element['settings'][ $catKey ] = $newId;
+			}
+		}
+	}
+
+	/**
+	 * Replace category IDs in WordPress widget settings (nested under 'wp' key).
+	 *
+	 * @param array  $element The element data to be modified by reference.
+	 * @param string $catKey  The control name to be replaced.
+	 *
+	 * @return void
+	 * @since 1.1.5
+	 */
+	public static function replaceCategoryWP( &$element, $catKey ) {
+		if ( isset( $element['settings']['wp'][ $catKey ] ) ) {
+			$oldIds = $element['settings']['wp'][ $catKey ];
+
+			if ( is_array( $oldIds ) ) {
+				$newIds                               = array_map(
+					function ( $oldID ) {
+						return sd_edi()->getNewID( $oldID );
+					},
+					$oldIds
+				);
+				$element['settings']['wp'][ $catKey ] = $newIds;
+			} else {
+				$newId                                = sd_edi()->getNewID( $oldIds );
+				$element['settings']['wp'][ $catKey ] = $newId;
 			}
 		}
 	}
