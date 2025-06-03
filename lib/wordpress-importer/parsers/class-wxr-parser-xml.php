@@ -213,7 +213,6 @@ class SD_EDI_WXR_Parser_XML {
 		$xml = xml_parser_create( 'UTF-8' );
 		xml_parser_set_option( $xml, XML_OPTION_SKIP_WHITE, 1 );
 		xml_parser_set_option( $xml, XML_OPTION_CASE_FOLDING, 0 );
-		xml_set_object( $xml, $this );
 		xml_set_character_data_handler( $xml, [ $this, 'cdata' ] );
 		xml_set_element_handler( $xml, [ $this, 'tag_open' ], [ $this, 'tag_close' ] );
 
