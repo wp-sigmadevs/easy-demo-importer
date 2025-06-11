@@ -70,10 +70,28 @@ class CustomizerImport extends ImporterAjax {
 		$fileExists         = file_exists( $customizerFilePath );
 
 		if ( $fileExists ) {
+			/**
+			 * Action Hook: 'sd/edi/before_customizer_import'
+			 *
+			 * Performs special actions before customizer import if needed.
+			 *
+			 * @since 1.1.5
+			 */
+			do_action( 'sd/edi/before_customizer_import', $customizerFilePath );
+
 			// Import customizer data.
 			ob_start();
 			( new Customizer() )->import( $customizerFilePath, $this->excludeImages );
 			ob_end_clean();
+
+			/**
+			 * Action Hook: 'sd/edi/after_customizer_import'
+			 *
+			 * Performs special actions after customizer import if needed.
+			 *
+			 * @since 1.1.5
+			 */
+			do_action( 'sd/edi/after_customizer_import', $customizerFilePath );
 		}
 
 		// Response.

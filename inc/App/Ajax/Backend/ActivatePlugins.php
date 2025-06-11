@@ -128,6 +128,15 @@ class ActivatePlugins extends ImporterAjax {
 	 */
 	public function activatePlugin( $path ) {
 		if ( $path ) {
+			/**
+			 * Action Hook: 'sd/edi/before_plugin_activation'
+			 *
+			 * Performs special actions before plugins activation if needed.
+			 *
+			 * @since 1.1.5
+			 */
+			do_action( 'sd/edi/before_plugin_activation', $path );
+
 			activate_plugin( $path, '', false, true );
 
 			/**

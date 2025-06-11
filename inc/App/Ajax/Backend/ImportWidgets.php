@@ -70,10 +70,28 @@ class ImportWidgets extends ImporterAjax {
 		$fileExists      = file_exists( $widgetsFilePath );
 
 		if ( $fileExists ) {
+			/**
+			 * Action Hook: 'sd/edi/before_widgets_import'
+			 *
+			 * Performs special actions before widgets import.
+			 *
+			 * @since 1.1.5
+			 */
+			do_action( 'sd/edi/before_widgets_import', $widgetsFilePath );
+
 			// Import widgets data.
 			ob_start();
 			( new Widgets() )->import( $widgetsFilePath );
 			ob_end_clean();
+
+			/**
+			 * Action Hook: 'sd/edi/after_widgets_import'
+			 *
+			 * Performs special actions after widgets import.
+			 *
+			 * @since 1.1.5
+			 */
+			do_action( 'sd/edi/after_widgets_import', $widgetsFilePath );
 		}
 
 		$slider           = $this->multiple ?
