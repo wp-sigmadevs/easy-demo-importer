@@ -83,6 +83,15 @@ class InstallDemo extends ImporterAjax {
 			$this->importDemoContent( $xmlFile, $this->excludeImages );
 		}
 
+		/**
+		 * Action Hook: 'sd/edi/after_content_import'
+		 *
+		 * Performs special actions after content import.
+		 *
+		 * @since 1.1.5
+		 */
+		do_action( 'sd/edi/after_content_import', $xmlFile, $this );
+
 		// Response.
 		$this->prepareResponse(
 			$fileExists ? 'sd_edi_import_customizer' : '',

@@ -107,6 +107,13 @@ class Actions {
 			// phpcs:ignore Squiz.PHP.DiscouragedFunctions.Discouraged
 			set_time_limit( apply_filters( 'sd/edi/temp_boost_max_execution_time', 300 ) );
 		}
+
+		/**
+		 * Temporarily disable big image scaling.
+		 *
+		 * @since 1.1.5
+		 */
+		add_filter( 'big_image_size_threshold', '__return_false' );
 	}
 
 	/**
