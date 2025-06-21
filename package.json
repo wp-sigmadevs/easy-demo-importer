@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@ant-design/icons": "^5.6.1",
-    "antd": "^5.25.4",
+    "antd": "^5.26.0",
     "array-move": "^4.0.0",
     "axios": "^1.9.0",
     "lodash": "^4.17.21",

@@ -92,6 +92,15 @@ class ActivatePlugins extends ImporterAjax {
 		// Activate Required Plugins.
 		$this->activatePlugins();
 
+		/**
+		 * Action Hook: 'sd/edi/after_plugins_activation'
+		 *
+		 * Performs special actions after plugins activation.
+		 *
+		 * @since 1.1.5
+		 */
+		do_action( 'sd/edi/after_plugins_activation', $this );
+
 		// Response.
 		$this->prepareResponse(
 			'sd_edi_download_demo_files',
