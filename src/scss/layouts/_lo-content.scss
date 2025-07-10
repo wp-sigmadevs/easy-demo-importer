@@ -10,6 +10,10 @@
 		@extend .edi-white-color-bg;
 		@extend .edi-box-shadow;
 
+		> *[style] {
+			transition: none !important;
+		}
+
 		.demo-card {
 			box-shadow: 0 4px 50px rgba(0, 0, 0, 0.1);
 			border-radius: 5px;
@@ -35,6 +39,14 @@
 
 				.ant-image-mask {
 					&.custom-mask {
+						will-change: opacity;
+						transform: translateZ(0);
+						transition: opacity 0.3s ease !important;
+
+						&[style] {
+							transition: none !important;
+						}
+
 						.ant-space {
 							flex-wrap: nowrap;
 							overflow: hidden;
@@ -60,7 +72,8 @@
 									white-space: nowrap;
 									font-weight: 600;
 									color: #666;
-									transition: padding 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.15), max-width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.15);
+									transition: padding 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.15),
+										max-width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.15);
 								}
 							}
 
