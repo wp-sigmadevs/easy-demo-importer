@@ -974,6 +974,29 @@ class SD_EDI_WP_Import extends WP_Importer {
 
 		if ( $id && ! is_wp_error( $id ) ) {
 			$this->processed_menu_items[ intval( $item['post_id'] ) ] = (int) $id;
+
+			// List of core WP menu item meta-keys to exclude.
+			$core_meta_keys = [
+				'_menu_item_type',
+				'_menu_item_menu_item_parent',
+				'_menu_item_object_id',
+				'_menu_item_object',
+				'_menu_item_target',
+				'_menu_item_classes',
+				'_menu_item_xfn',
+				'_menu_item_url',
+			];
+
+			// Loop through postmeta and save custom fields only.
+			foreach ( $item['postmeta'] as $meta ) {
+				$key   = $meta['key'];
+				$value = $meta['value'];
+
+				// Save only if it's not a core WP menu meta key.
+				if ( ! in_array( $key, $core_meta_keys, true ) ) {
+					update_post_meta( $id, $key, $value );
+				}
+			}
 		}
 	}
 
