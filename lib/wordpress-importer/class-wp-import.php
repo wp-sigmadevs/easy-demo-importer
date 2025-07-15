@@ -613,6 +613,10 @@ class SD_EDI_WP_Import extends WP_Importer {
 				continue;
 			}
 
+			if ( ! $this->is_non_unique_post_type( $post['post_type'] ) ) {
+				continue;
+			}
+
 			if ( 'auto-draft' == $post['status'] ) {
 				continue;
 			}
@@ -625,6 +629,10 @@ class SD_EDI_WP_Import extends WP_Importer {
 			$post_type_object = get_post_type_object( $post['post_type'] );
 
 			$post_exists = post_exists( $post['post_title'], '', $post['post_date'], $post['post_type'] );
+
+			if ( $this->is_non_unique_post_type( $post['post_type'] ) ) {
+				$post_exists = 0;
+			}
 
 			/**
 			 * Filter ID of the existing post corresponding to post currently importing.
@@ -734,8 +742,10 @@ class SD_EDI_WP_Import extends WP_Importer {
 				}
 			}
 
-			// Map pre-import ID to local ID.
-			$this->processed_posts[ intval( $post['post_id'] ) ] = (int) $post_id;
+			if ( ! $this->is_non_unique_post_type( $post['post_type'] ) ) {
+				// Map pre-import ID to local ID.
+				$this->processed_posts[ intval( $post['post_id'] ) ] = (int) $post_id;
+			}
 
 			if ( ! isset( $post['terms'] ) ) {
 				$post['terms'] = [];
@@ -1500,5 +1510,19 @@ class SD_EDI_WP_Import extends WP_Importer {
 		}
 
 		return isset( $map[ $mime_type ] ) ? $map[ $mime_type ] : null;
+	}
+
+	/**
+	 * Checks if a post type is a non-unique post type.
+	 *
+	 * @param string $post_type Post type to check.
+	 *
+	 * @return bool
+	 * @since 1.0.0
+	 */
+	protected function is_non_unique_post_type( $post_type ) {
+		$non_unique_post_types = apply_filters( 'sd/edi/importer/non_unique_post_types', [ 'rtcl_cf' ] );
+
+		return in_array( $post_type, $non_unique_post_types, true );
 	}
 }
