@@ -609,11 +609,11 @@ class SD_EDI_WP_Import extends WP_Importer {
 				continue;
 			}
 
-			if ( isset( $this->processed_posts[ $post['post_id'] ] ) && ! empty( $post['post_id'] ) ) {
-				continue;
-			}
-
-			if ( ! $this->is_non_unique_post_type( $post['post_type'] ) ) {
+			if (
+				isset( $this->processed_posts[ $post['post_id'] ] ) &&
+				! empty( $post['post_id'] ) &&
+				! $this->is_non_unique_post_type( $post['post_type'] )
+			) {
 				continue;
 			}
 
