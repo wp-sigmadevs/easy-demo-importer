@@ -4,7 +4,7 @@
  * TODO: Run Ajax process only for the provided files.
  * TODO: Find a way to split the XML ajax call.
  * TODO: Create initial pages for ShopBuilder plugin.
- * TODO: RTL Support.
+ *̶ ̶T̶O̶D̶O̶:̶ ̶R̶T̶L̶ ̶S̶u̶p̶p̶o̶r̶t̶.̶ ( Added in v1.1.1 )
  * TODO: Multi-site Support.
  * TODO: If no required plugins, need to fix the import error.
  *

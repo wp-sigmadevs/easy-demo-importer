@@ -3,8 +3,8 @@ Contributors: sigmadevs
 Donate link:
 Tags: demo importer, one click demo importer, theme demo importer, WordPress demo importer, content import plugin
 Requires at least: 5.5
-Tested up to: 6.7
-Stable tag: 1.1.4
+Tested up to: 6.8
+Stable tag: 1.1.5
 Requires PHP: 7.4
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -135,6 +135,22 @@ For any inquiries, bug reports, or suggestions, please submit your request [here
 6. Example of how the system status page looks.
 
 == Changelog ==
+
+= 1.1.5 (22-July-2025) =
+* Add: Full compatibility with WordPress 6.8.
+* Add: Nav menu item custom meta-data is now preserved during import.
+* Add: Importer now supports non-unique post-types (e.g., grouped fields).
+* Fix: PHP 8.4 compatibility improvements for the XML parser.
+* Fix: Resolved CSS issues across various admin views.
+* Fix: Corrected Elementor taxonomy mapping issues in default WordPress widgets.
+* Fix: Fixed a typo in the system status report.
+* Dev: Introduced new action hooks for advanced developer customization.
+* Tweak: Temporarily disable big image scaling during the import process.
+* Tweak: Enhanced CSS transitions for smoother visual behavior.
+* Tweak: Refactored post-processing logic in the importer.
+* Update: Upgraded the core Import library to the latest stable version.
+* Update: Updated all dependency libraries to their latest versions.
+* Update: UI enhancements to align with updated external libraries and frameworks.
 
 = 1.1.4 (16-November-2024) =
 * Add: Full compatibility with WordPress 6.7.
