@@ -58,6 +58,14 @@ abstract class ImporterAjax {
 	public $excludeImages = '';
 
 	/**
+	 * Skip image regeneration.
+	 *
+	 * @var bool
+	 * @since 1.2.0
+	 */
+	public $skipImageRegeneration = false;
+
+	/**
 	 * Multiple Zip check.
 	 *
 	 * @var bool
@@ -127,6 +135,9 @@ abstract class ImporterAjax {
 			// Check if images import is needed.
 			$this->excludeImages = ! empty( $_POST['excludeImages'] ) ? sanitize_text_field( wp_unslash( $_POST['excludeImages'] ) ) : '';
 
+			// Check if image regeneration should be skipped.
+			$this->skipImageRegeneration = isset( $_POST['skipImageRegeneration'] ) && 'true' === sanitize_text_field( wp_unslash( $_POST['skipImageRegeneration'] ) );
+
 			// Check if database reset needed.
 			$this->reset = isset( $_POST['reset'] ) && 'true' === sanitize_text_field( wp_unslash( $_POST['reset'] ) );
 		}
@@ -167,14 +178,15 @@ abstract class ImporterAjax {
 	 */
 	public function prepareResponse( $nextPhase, $nextPhaseMessage, $complete = '', $error = false, $errorMessage = '' ) {
 		$this->response = [
-			'demo'             => $this->demoSlug,
-			'excludeImages'    => $this->excludeImages,
-			'reset'            => $this->reset,
-			'nextPhase'        => $nextPhase,
-			'nextPhaseMessage' => $nextPhaseMessage,
-			'completedMessage' => $complete,
-			'error'            => $error,
-			'errorMessage'     => $errorMessage,
+			'demo'                  => $this->demoSlug,
+			'excludeImages'         => $this->excludeImages,
+			'skipImageRegeneration' => $this->skipImageRegeneration,
+			'reset'                 => $this->reset,
+			'nextPhase'             => $nextPhase,
+			'nextPhaseMessage'      => $nextPhaseMessage,
+			'completedMessage'      => $complete,
+			'error'                 => $error,
+			'errorMessage'          => $errorMessage,
 		];
 
 		$this->sendResponse();

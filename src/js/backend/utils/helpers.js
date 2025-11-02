@@ -78,7 +78,7 @@ export const progressSteps = () => {
 	return sdEdiAdminParams && sdEdiAdminParams.stepTitles
 		? Object.entries(sdEdiAdminParams.stepTitles).map(([key, value]) => ({
 				title: value,
-		  }))
+			}))
 		: [
 				{
 					title: 'Begin',
@@ -92,5 +92,5 @@ export const progressSteps = () => {
 				{
 					title: 'Success',
 				},
-		  ];
+			];
 };

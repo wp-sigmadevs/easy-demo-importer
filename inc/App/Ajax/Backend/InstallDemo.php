@@ -80,7 +80,7 @@ class InstallDemo extends ImporterAjax {
 		do_action( 'sd/edi/before_import', $xmlFile, $this );
 
 		if ( $fileExists ) {
-			$this->importDemoContent( $xmlFile, $this->excludeImages );
+			$this->importDemoContent( $xmlFile, $this->excludeImages, $this->skipImageRegeneration );
 		}
 
 		/**
@@ -107,11 +107,12 @@ class InstallDemo extends ImporterAjax {
 	 *
 	 * @param string $xmlFilePath XML file path.
 	 * @param string $excludeImages Exclude images.
+	 * @param bool   $skipImageRegeneration Skip image regeneration.
 	 *
 	 * @return void
 	 * @since 1.0.0
 	 */
-	private function importDemoContent( $xmlFilePath, $excludeImages ) {
+	private function importDemoContent( $xmlFilePath, $excludeImages, $skipImageRegeneration ) {
 		if ( ! defined( 'SD_EDI_LOAD_IMPORTERS' ) ) {
 			define( 'SD_EDI_LOAD_IMPORTERS', true );
 		}
@@ -132,6 +133,11 @@ class InstallDemo extends ImporterAjax {
 				$wp_import                    = new SD_EDI_WP_Import();
 				$wp_import->fetch_attachments = $excludeImages;
 
+				if ( $skipImageRegeneration ) {
+					add_filter( 'intermediate_image_sizes_advanced', '__return_empty_array', 9999 );
+					add_filter( 'wp_generate_attachment_metadata', '__return_empty_array', 9999 );
+				}
+
 				// Import XML.
 				ob_start();
 				$wp_import->import( $xmlFilePath );
@@ -139,6 +145,11 @@ class InstallDemo extends ImporterAjax {
 
 				if ( ! $excludeImages ) {
 					$this->unsetThumbnails();
+				}
+
+				if ( $skipImageRegeneration ) {
+					remove_filter( 'intermediate_image_sizes_advanced', '__return_empty_array', 9999 );
+					remove_filter( 'wp_generate_attachment_metadata', '__return_empty_array', 9999 );
 				}
 			}
 		}
