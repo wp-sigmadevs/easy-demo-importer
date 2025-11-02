@@ -172,11 +172,13 @@ class Enqueue extends EnqueueBase {
 				'requiredPluginsTitle'       => esc_html__( 'Required Plugins', 'easy-demo-importer' ),
 				'configureImportTitle'       => esc_html__( 'Configure Your Import', 'easy-demo-importer' ),
 				'requiredPluginsIntro'       => self::importModalTexts()['stepTwo']['requiredPluginsIntro'],
-				'excludeImagesTitle'         => esc_html__( 'Exclude Demo Images', 'easy-demo-importer' ),
+				'excludeImagesTitle'         => esc_html__( 'Don\'t Import Demo Images', 'easy-demo-importer' ),
 				'excludeImagesHint'          => esc_html__( 'Select this option if demo import fails repeatedly. Excluding images will speed up the import process.', 'easy-demo-importer' ),
+				'skipImageRegenerationTitle' => esc_html__( 'Don\'t Regenerate Images', 'easy-demo-importer' ),
+				'skipImageRegenerationHint'  => esc_html__( 'Enabling this option will skip image regeneration during import, making the process faster. You can regenerate them later using plugins like \'Regenerate Thumbnails\'.', 'easy-demo-importer' ),
 				'resetDatabaseTitle'         => esc_html__( 'Reset Existing Database', 'easy-demo-importer' ),
 				'resetDatabaseWarning'       => esc_html__( 'Caution: ', 'easy-demo-importer' ),
-				'resetDatabaseHint'          => esc_html__( 'Resetting the database will erase all of your content, including posts, pages, images, custom post types, taxonomies and settings. It is advised to reset the database for a full demo import.', 'easy-demo-importer' ),
+				'resetDatabaseHint'          => esc_html__( 'Resetting the database will erase all of your content, including posts, pages, images, custom post types, taxonomies and settings. However, it is advised to reset the database for a full demo import.', 'easy-demo-importer' ),
 
 				// Confirmation Modal.
 				'confirmationModal'          => esc_html__( 'Are you sure you want to proceed?', 'easy-demo-importer' ),

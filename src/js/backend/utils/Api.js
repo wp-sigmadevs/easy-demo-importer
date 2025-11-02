@@ -41,6 +41,7 @@ export const doAxios = async (
 		params.append('demo', request.demo);
 		params.append('reset', request.reset);
 		params.append('excludeImages', request.excludeImages);
+		params.append('skipImageRegeneration', request.skipImageRegeneration);
 		params.append('sd_edi_nonce', sdEdiAdminParams.sd_edi_nonce);
 
 		const requestUrl = sdEdiAdminParams.ajaxUrl;

@@ -27,6 +27,7 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 		setReset,
 		excludeImages,
 		setExcludeImages,
+		skipImageRegeneration,
 		currentStep,
 		setCurrentStep,
 		importComplete,
@@ -68,6 +69,7 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 					demo: id,
 					reset,
 					excludeImages,
+					skipImageRegeneration,
 					nextPhase: 'sd_edi_install_demo',
 					nextPhaseMessage: resetMessage,
 				};

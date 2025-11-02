@@ -444,7 +444,10 @@ const AppDemoImporter = () => {
 
 				<ModalComponent
 					visible={modalVisible}
-					onCancel={handleModalCancel}
+					onCancel={() => {
+						handleModalCancel();
+						resetStore();
+					}}
 					modalData={modalData}
 				/>
 			</div>

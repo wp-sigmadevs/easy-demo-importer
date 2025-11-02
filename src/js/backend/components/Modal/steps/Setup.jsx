@@ -1,12 +1,13 @@
 import ModalHeader from '../ModalHeader';
 import React, { useEffect } from 'react';
 import PluginList from '../../PluginList';
-import { Button, Col, Row, Skeleton, Switch } from 'antd';
+import { Button, Col, Row, Skeleton, Switch, Tooltip } from 'antd';
 import useSharedDataStore from '../../../utils/sharedDataStore';
 import {
 	ArrowLeftOutlined,
 	CloseOutlined,
 	DownloadOutlined,
+	QuestionCircleTwoTone,
 } from '@ant-design/icons';
 
 /* global sdEdiAdminParams */
@@ -36,6 +37,8 @@ const Setup = ({ modalData, handleImport, handleReset }) => {
 		setLoading,
 		currentStep,
 		setCurrentStep,
+		skipImageRegeneration,
+		setSkipImageRegeneration,
 	} = useSharedDataStore();
 
 	/**
@@ -77,7 +80,7 @@ const Setup = ({ modalData, handleImport, handleReset }) => {
 		Object.keys(modalData?.data?.plugins || {}).length > 0
 			? pluginDataArray.filter(
 					(plugin) => modalData.data.plugins[plugin.key] !== undefined
-			  )
+				)
 			: pluginDataArray;
 
 	/**
@@ -136,49 +139,101 @@ const Setup = ({ modalData, handleImport, handleReset }) => {
 					>
 						<div className="import-options">
 							<h3>{sdEdiAdminParams.configureImportTitle}</h3>
-							<div className="import-option">
-								<div className="choose exclude-images edi-d-flex edi-align-items-center">
+							<div className="import-option new">
+								<div className="choose exclude-images edi-d-flex edi-align-items-center edi-pos-r">
 									<Switch
 										checked={excludeImages}
 										onChange={(checked) =>
 											setExcludeImages(checked)
 										}
 									/>
-									<h4>
+									<h4
+										className="edi-d-flex edi-align-items-center"
+										style={{ margin: 0 }}
+									>
 										{sdEdiAdminParams.excludeImagesTitle}
 									</h4>
-								</div>
-								<div className="option-details">
-									<p>{sdEdiAdminParams.excludeImagesHint}</p>
+									<Tooltip
+										title={
+											sdEdiAdminParams.excludeImagesHint
+										}
+									>
+										<span
+											style={{
+												marginLeft: 8,
+												cursor: 'pointer',
+												fontSize: 20,
+												position: 'absolute',
+												right: 0,
+											}}
+										>
+											<QuestionCircleTwoTone />
+										</span>
+									</Tooltip>
 								</div>
 							</div>
-							<div>
-								<div className="import-option last">
-									<div className="choose reset-db edi-d-flex edi-align-items-center">
+							{!excludeImages && (
+								<div className="import-option new">
+									<div className="choose exclude-images edi-d-flex edi-align-items-center edi-pos-r">
 										<Switch
-											checked={reset}
+											checked={skipImageRegeneration}
 											onChange={(checked) =>
-												setReset(checked)
+												setSkipImageRegeneration(
+													checked
+												)
 											}
 										/>
-										<h4>
+										<h4
+											className="edi-d-flex edi-align-items-center"
+											style={{ margin: 0 }}
+										>
 											{
-												sdEdiAdminParams.resetDatabaseTitle
+												sdEdiAdminParams.skipImageRegenerationTitle
 											}
 										</h4>
+										<Tooltip
+											title={
+												sdEdiAdminParams.skipImageRegenerationHint
+											}
+										>
+											<span
+												style={{
+													marginLeft: 8,
+													cursor: 'pointer',
+													fontSize: 20,
+													position: 'absolute',
+													right: 0,
+												}}
+											>
+												<QuestionCircleTwoTone />
+											</span>
+										</Tooltip>
 									</div>
-									<div className="option-details warn-text">
-										<p>
-											<b>
-												<i>
-													{
-														sdEdiAdminParams.resetDatabaseWarning
-													}
-												</i>
-											</b>
-											{sdEdiAdminParams.resetDatabaseHint}
-										</p>
-									</div>
+								</div>
+							)}
+							<div className="import-option last">
+								<div className="choose reset-db edi-d-flex edi-align-items-center">
+									<Switch
+										checked={reset}
+										onChange={(checked) =>
+											setReset(checked)
+										}
+									/>
+									<h4>
+										{sdEdiAdminParams.resetDatabaseTitle}
+									</h4>
+								</div>
+								<div className="option-details warn-text">
+									<p>
+										<b>
+											<i>
+												{
+													sdEdiAdminParams.resetDatabaseWarning
+												}
+											</i>
+										</b>
+										{sdEdiAdminParams.resetDatabaseHint}
+									</p>
 								</div>
 							</div>
 						</div>
