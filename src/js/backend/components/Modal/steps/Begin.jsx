@@ -1,12 +1,12 @@
-import React from 'react';
-import { Button, Image } from 'antd';
-import ModalHeader from '../ModalHeader';
-import useSharedDataStore from '../../../utils/sharedDataStore';
 import {
 	ArrowRightOutlined,
 	CloseOutlined,
 	AimOutlined,
 } from '@ant-design/icons';
+import { Button, Image } from 'antd';
+import ModalHeader from '../ModalHeader';
+import React, { useState, useEffect, useRef } from 'react';
+import useSharedDataStore from '../../../utils/sharedDataStore';
 
 /* global sdEdiAdminParams */
 
@@ -21,6 +21,36 @@ const Begin = ({ handleReset, modalData }) => {
 	 * Values from the shared data store.
 	 */
 	const { currentStep, setCurrentStep } = useSharedDataStore();
+
+	const imageContainerRef = useRef(null);
+	const [showTopArrow, setShowTopArrow] = useState(false);
+	const [showBottomArrow, setShowBottomArrow] = useState(false);
+
+	/**
+	 * Attach scroll listener to the image container and check initial scroll state.
+	 */
+	useEffect(() => {
+		const wrapper = imageContainerRef.current;
+		if (!wrapper) return;
+
+		const container = wrapper.querySelector('.ant-image');
+		if (!container) return;
+
+		const checkScroll = () => {
+			const { scrollTop, scrollHeight, clientHeight } = container;
+			setShowTopArrow(scrollTop > 0);
+			setShowBottomArrow(scrollTop + clientHeight < scrollHeight - 1);
+		};
+
+		// Delay initial check to let the image render and establish scroll height.
+		const timer = setTimeout(checkScroll, 300);
+		container.addEventListener('scroll', checkScroll);
+
+		return () => {
+			clearTimeout(timer);
+			container.removeEventListener('scroll', checkScroll);
+		};
+	}, [modalData]);
 
 	/**
 	 * Handles moving to the next step.
@@ -41,13 +71,14 @@ const Begin = ({ handleReset, modalData }) => {
 		<>
 			<ModalHeader currentStep={currentStep} />
 			<div className="modal-content-inner modal-row">
-				<div className="modal-content-image modal-col-6">
+				<div className="modal-content-image modal-col-6" ref={imageContainerRef}>
 					<Image
 						src={modalData?.data?.previewImage}
 						preview={false}
 						alt="Preview"
 					/>
-					<div className="down-arrow"></div>
+					{showTopArrow && <div className="up-arrow"></div>}
+					{showBottomArrow && <div className="down-arrow"></div>}
 				</div>
 				<div className="modal-content-text modal-col-6">
 					<h3>{sdEdiAdminParams.beforeYouPreceed}</h3>

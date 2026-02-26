@@ -91,10 +91,10 @@ final class Requirements extends Base {
 			[
 				'current' => phpversion(),
 				'compare' => $this->plugin->requiredPhp(),
-				'title'   => esc_html__( 'Invalid PHP version', 'easy-demo-importer' ),
+				'title'   => esc_html__( 'PHP Version Too Low', 'easy-demo-importer' ),
 				'message' => sprintf(
 					/* translators: 1. Required php version, 2. Current php version */
-					esc_html__( 'You must be using PHP %1$1s or greater. You are currently using PHP %2$2s.', 'easy-demo-importer' ),
+					esc_html__( 'PHP %1$1s or higher is required. You are currently running PHP %2$2s.', 'easy-demo-importer' ),
 					$this->plugin->requiredPhp(),
 					phpversion()
 				),
@@ -103,10 +103,10 @@ final class Requirements extends Base {
 			[
 				'current' => get_bloginfo( 'version' ),
 				'compare' => $this->plugin->requiredWp(),
-				'title'   => esc_html__( 'Invalid WordPress version', 'easy-demo-importer' ),
+				'title'   => esc_html__( 'WordPress Version Too Low', 'easy-demo-importer' ),
 				'message' => sprintf(
 					/* translators: 2. Required WordPress version, 2. Current WordPress version */
-					esc_html__( 'You must be using WordPress %1$s or greater. You are currently using WordPress %2$s.', 'easy-demo-importer' ),
+					esc_html__( 'WordPress %1$s or higher is required. You are currently running WordPress %2$s.', 'easy-demo-importer' ),
 					$this->plugin->requiredWp(),
 					get_bloginfo( 'version' )
 				),

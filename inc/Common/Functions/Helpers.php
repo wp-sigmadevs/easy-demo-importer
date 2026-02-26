@@ -76,7 +76,7 @@ class Helpers {
 			wp_send_json(
 				[
 					'error'        => true,
-					'errorMessage' => esc_html__( 'Security Check Failed. Access Denied!', 'easy-demo-importer' ),
+					'errorMessage' => esc_html__( 'Security check failed. Access denied.', 'easy-demo-importer' ),
 				]
 			);
 		}
@@ -96,7 +96,7 @@ class Helpers {
 			wp_send_json(
 				[
 					'error'        => true,
-					'errorMessage' => esc_html__( 'You do not have the necessary permissions to import. Access Denied!', 'easy-demo-importer' ),
+					'errorMessage' => esc_html__( 'You don\'t have permission to perform this action.', 'easy-demo-importer' ),
 				]
 			);
 		}

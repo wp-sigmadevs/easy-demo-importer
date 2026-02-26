@@ -79,7 +79,7 @@ const Success = ({ importComplete, handleReset, message }) => {
 			extra={[
 				<Button key="close" onClick={handleReset}>
 					<CloseOutlined />
-					<span>Close</span>
+					<span>{sdEdiAdminParams.btnClose}</span>
 				</Button>,
 				<Button
 					key="retry"

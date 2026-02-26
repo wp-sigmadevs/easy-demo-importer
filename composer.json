@@ -27,6 +27,20 @@
   },
   "require": {
     "php": ">=7.4",
-    "enshrined/svg-sanitize": "^0.20.0"
+    "enshrined/svg-sanitize": "^0.22.0"
+  },
+  "audit": {
+    "ignore": [
+      "PKSA-4g5g-4rkv-myqs"
+    ]
+  },
+  "config": {
+    "audit": {
+      "abandoned": "ignore",
+      "block-insecure": false
+    }
+  },
+  "require-dev": {
+    "rector/rector": "^2.3"
   }
 }

@@ -155,7 +155,7 @@ abstract class ImporterAjax {
 			return '';
 		}
 
-		$firstDemoSlug = array_key_first( $this->config['demoData'] );
+		$firstDemoSlug = ! empty( $this->config['demoData'] ) ? array_key_first( $this->config['demoData'] ) : '';
 
 		if ( empty( $_POST['demo'] ) ) {
 			return $firstDemoSlug;

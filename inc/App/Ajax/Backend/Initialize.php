@@ -218,7 +218,13 @@ class Initialize extends ImporterAjax {
 	 * @since 1.0.0
 	 */
 	private function clearUploads( $dir ) {
-		$files = array_diff( scandir( $dir ), [ '.', '..' ] );
+		$scanned = scandir( $dir );
+
+		if ( false === $scanned ) {
+			return;
+		}
+
+		$files = array_diff( $scanned, [ '.', '..' ] );
 
 		foreach ( $files as $file ) {
 			( is_dir( "$dir/$file" ) ) ? $this->clearUploads( "$dir/$file" ) : wp_delete_file( "$dir/$file" );
