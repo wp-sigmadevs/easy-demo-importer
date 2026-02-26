@@ -1,4 +1,4 @@
-# Copyright (C) 2025 Easy Demo Importer - A one-click, user-friendly WordPress plugin importing theme demos.
+# Copyright (C) 2026 Easy Demo Importer - A one-click, user-friendly WordPress plugin importing theme demos.
 # This file is distributed under the same license as the Easy Demo Importer - A one-click, user-friendly WordPress plugin importing theme demos. package.
 msgid ""
 msgstr ""
@@ -6,7 +6,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-07-22 15:52+0000\n"
+"POT-Creation-Date: 2026-02-26 18:05+0000\n"
 "Report-Msgid-Bugs-To: https://github.com/wp-sigmadevs/easy-demo-importer/issues\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -20,21 +20,21 @@ msgid "Easy Demo Importer is unable to find the Bootstrap class."
 msgstr ""
 
 #: ../inc/Config/Requirements.php:94
-msgid "Invalid PHP version"
+msgid "PHP Version Too Low"
 msgstr ""
 
 #. translators: 1. Required php version, 2. Current php version
 #: ../inc/Config/Requirements.php:97
-msgid "You must be using PHP %1$1s or greater. You are currently using PHP %2$2s."
+msgid "PHP %1$1s or higher is required. You are currently running PHP %2$2s."
 msgstr ""
 
 #: ../inc/Config/Requirements.php:106
-msgid "Invalid WordPress version"
+msgid "WordPress Version Too Low"
 msgstr ""
 
 #. translators: 2. Required WordPress version, 2. Current WordPress version
 #: ../inc/Config/Requirements.php:109
-msgid "You must be using WordPress %1$s or greater. You are currently using WordPress %2$s."
+msgid "WordPress %1$s or higher is required. You are currently running WordPress %2$s."
 msgstr ""
 
 #. translators: %s: Plugin name
@@ -51,7 +51,7 @@ msgid "Dismiss This Notice"
 msgstr ""
 
 #: ../inc/App/Backend/DeactivateNotice.php:152
-msgid "Action failed. Please refresh the page and retry."
+msgid "Action failed. Please refresh the page and try again."
 msgstr ""
 
 #: ../inc/App/Backend/Enqueue.php:151
@@ -59,7 +59,7 @@ msgid "Search demos..."
 msgstr ""
 
 #: ../inc/App/Backend/Enqueue.php:152
-msgid "Nothing found. Please try again."
+msgid "No demos found. Try a different search term."
 msgstr ""
 
 #: ../inc/App/Backend/Enqueue.php:156
@@ -71,7 +71,7 @@ msgid "Preparing to install demo data. Resetting database first."
 msgstr ""
 
 #: ../inc/App/Backend/Enqueue.php:158
-msgid "Something went wrong with the import."
+msgid "Something went wrong during import. Please try again."
 msgstr ""
 
 #: ../inc/App/Backend/Enqueue.php:159
@@ -95,190 +95,198 @@ msgid "Configure Your Import"
 msgstr ""
 
 #: ../inc/App/Backend/Enqueue.php:175
-msgid "Exclude Demo Images"
+msgid "Skip Demo Images"
 msgstr ""
 
 #: ../inc/App/Backend/Enqueue.php:176
-msgid "Select this option if demo import fails repeatedly. Excluding images will speed up the import process."
+msgid "Exclude demo images to speed up the import. Recommended if the import fails repeatedly."
 msgstr ""
 
 #: ../inc/App/Backend/Enqueue.php:177
-msgid "Reset Existing Database"
+msgid "Skip Image Regeneration"
 msgstr ""
 
 #: ../inc/App/Backend/Enqueue.php:178
-msgid "Caution: "
+msgid "Skips image regeneration during import for a faster experience. You can regenerate thumbnails later using a plugin like 'Regenerate Thumbnails'."
 msgstr ""
 
 #: ../inc/App/Backend/Enqueue.php:179
-msgid "Resetting the database will erase all of your content, including posts, pages, images, custom post types, taxonomies and settings. It is advised to reset the database for a full demo import."
+msgid "Reset Existing Database"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:182
-msgid "Are you sure you want to proceed?"
+#: ../inc/App/Backend/Enqueue.php:180
+msgid "Caution: "
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:183
-msgid "Resetting the database will delete all your contents."
+#: ../inc/App/Backend/Enqueue.php:181
+msgid "This will permanently erase all existing content — posts, pages, images, custom post types, taxonomies, and settings. A full database reset is recommended for the best demo import experience."
 msgstr ""
 
 #: ../inc/App/Backend/Enqueue.php:184
-msgid "Are you sure you want to proceed? Resetting the database will delete all your contents, medias and settings."
+msgid "Are you sure you want to continue?"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:185, ../inc/App/Rest/RestEndpoints.php:412, ../inc/App/Rest/RestEndpoints.php:426, ../inc/App/Rest/RestEndpoints.php:479, ../inc/App/Rest/RestEndpoints.php:537, ../inc/App/Rest/RestEndpoints.php:542, ../inc/App/Rest/RestEndpoints.php:572, ../inc/App/Rest/RestEndpoints.php:577
+#: ../inc/App/Backend/Enqueue.php:185
+msgid "This will permanently delete all your existing content."
+msgstr ""
+
+#: ../inc/App/Backend/Enqueue.php:186
+msgid "This will permanently delete all your content, media, and settings. Are you sure you want to continue?"
+msgstr ""
+
+#: ../inc/App/Backend/Enqueue.php:187, ../inc/App/Rest/RestEndpoints.php:412, ../inc/App/Rest/RestEndpoints.php:426, ../inc/App/Rest/RestEndpoints.php:479, ../inc/App/Rest/RestEndpoints.php:537, ../inc/App/Rest/RestEndpoints.php:542, ../inc/App/Rest/RestEndpoints.php:572, ../inc/App/Rest/RestEndpoints.php:577
 msgid "Yes"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:186, ../inc/App/Rest/RestEndpoints.php:412, ../inc/App/Rest/RestEndpoints.php:426, ../inc/App/Rest/RestEndpoints.php:479, ../inc/App/Rest/RestEndpoints.php:537, ../inc/App/Rest/RestEndpoints.php:542, ../inc/App/Rest/RestEndpoints.php:572, ../inc/App/Rest/RestEndpoints.php:577
+#: ../inc/App/Backend/Enqueue.php:188, ../inc/App/Rest/RestEndpoints.php:412, ../inc/App/Rest/RestEndpoints.php:426, ../inc/App/Rest/RestEndpoints.php:479, ../inc/App/Rest/RestEndpoints.php:537, ../inc/App/Rest/RestEndpoints.php:542, ../inc/App/Rest/RestEndpoints.php:572, ../inc/App/Rest/RestEndpoints.php:577
 msgid "No"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:189, ../inc/App/Backend/PluginRowMeta.php:83
+#: ../inc/App/Backend/Enqueue.php:191, ../inc/App/Backend/PluginRowMeta.php:83
 msgid "System Status"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:191
+#: ../inc/App/Backend/Enqueue.php:193
 msgid "Back to Demo Importer"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:196
+#: ../inc/App/Backend/Enqueue.php:198
 msgid "Live Preview"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:197
+#: ../inc/App/Backend/Enqueue.php:199
 msgid "Import"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:198
+#: ../inc/App/Backend/Enqueue.php:200
 msgid "Cancel"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:199
+#: ../inc/App/Backend/Enqueue.php:201
 msgid "Continue"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:200
+#: ../inc/App/Backend/Enqueue.php:202
 msgid "Previous"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:201
+#: ../inc/App/Backend/Enqueue.php:203
 msgid "Start Import"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:202
+#: ../inc/App/Backend/Enqueue.php:204
 msgid "View Site"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:203
+#: ../inc/App/Backend/Enqueue.php:205
 msgid "Close"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:204
+#: ../inc/App/Backend/Enqueue.php:206
 msgid "Click to Enlarge"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:205
+#: ../inc/App/Backend/Enqueue.php:207
 msgid "Contact Us"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:206
+#: ../inc/App/Backend/Enqueue.php:208
 msgid "View Documentation"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:207
+#: ../inc/App/Backend/Enqueue.php:209
 msgid "Need help?"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:208
+#: ../inc/App/Backend/Enqueue.php:210
 msgid "Documentation & FAQ"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:209
+#: ../inc/App/Backend/Enqueue.php:211
 msgid "All Demos"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:212
+#: ../inc/App/Backend/Enqueue.php:214
 msgid "Need Help?"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:213
+#: ../inc/App/Backend/Enqueue.php:215
 msgid "Documentation & FAQs"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:218
-msgid "System status data copied to clipboard"
+#: ../inc/App/Backend/Enqueue.php:220
+msgid "System status data copied to clipboard."
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:219
-msgid "Unable to copy to clipboard. Try again."
-msgstr ""
-
-#: ../inc/App/Backend/Enqueue.php:222
-msgid "Server Requirements Error"
-msgstr ""
-
-#: ../inc/App/Backend/Enqueue.php:223
-msgid "Server Requirements for demo import have not been met. Kindly head to the server status page to review the details. Please note that if the minimum server requirements have not met, the demo import may be stuck or unsuccessful."
+#: ../inc/App/Backend/Enqueue.php:221
+msgid "Could not copy to clipboard. Please try again."
 msgstr ""
 
 #: ../inc/App/Backend/Enqueue.php:224
+msgid "Server Requirements Not Met"
+msgstr ""
+
+#: ../inc/App/Backend/Enqueue.php:225
+msgid "Your server does not meet the minimum requirements for demo import. Please review the System Status page for details. Proceeding without meeting these requirements may result in a failed or incomplete import."
+msgstr ""
+
+#: ../inc/App/Backend/Enqueue.php:226
 msgid "Continue Anyway"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:227
+#: ../inc/App/Backend/Enqueue.php:229
 msgid "Not installed"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:228
+#: ../inc/App/Backend/Enqueue.php:230
 msgid "Installed and active"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:229
+#: ../inc/App/Backend/Enqueue.php:231
 msgid "Installed but not active"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:230
-msgid "Installed and active, update required"
+#: ../inc/App/Backend/Enqueue.php:232
+msgid "Installed & active — update available"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:231
-msgid "Installed but not active, update required"
+#: ../inc/App/Backend/Enqueue.php:233
+msgid "Installed but inactive — update available"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:247
-msgid "Before importing demo data, we recommend that you backup your site's data and files. You can use a popular backup plugin to ensure you have a copy of your site in case anything goes wrong during the import process."
+#: ../inc/App/Backend/Enqueue.php:249
+msgid "We recommend backing up your site before proceeding. A backup plugin can help you restore your site if anything goes wrong during the import."
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:248
-msgid "Please note that this demo import will install all the required plugins, import contents, media, settings, customizer data, widgets, and other necessary elements to replicate the demo site. Make sure to review your existing data and settings as they may be overwritten."
-msgstr ""
-
-#: ../inc/App/Backend/Enqueue.php:252
-msgid "In order to replicate the exact appearance of the demo site, the import process will automatically install and activate the following plugins, provided they are not already installed or activated on your website. You may need to scroll through to see the full list:"
+#: ../inc/App/Backend/Enqueue.php:250
+msgid "This import will install all required plugins and bring in content, media, settings, customizer data, and widgets needed to replicate the demo site. Please review your existing content, as some data may be overwritten."
 msgstr ""
 
 #: ../inc/App/Backend/Enqueue.php:254
-msgid "If you have any problems, please don't hesitate to contact us. This helps us help you quickly and give you the right solutions."
+msgid "To replicate the demo site, the following plugins will be automatically installed and activated if not already present. Scroll down to see the full list."
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:255
-msgid "Start your journey by diving into our detailed FAQ documentation. It offers a comprehensive guide with step-by-step instructions, and helpful screenshots to assist you in successfully importing demo data"
+#: ../inc/App/Backend/Enqueue.php:256
+msgid "Having trouble? Reach out to us and we'll help you get sorted quickly."
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:259
-msgid "Start"
-msgstr ""
-
-#: ../inc/App/Backend/Enqueue.php:260
-msgid "Configure"
+#: ../inc/App/Backend/Enqueue.php:257
+msgid "Explore our documentation for step-by-step guides, helpful screenshots, and FAQs to walk you through the demo import process."
 msgstr ""
 
 #: ../inc/App/Backend/Enqueue.php:261
-msgid "Imports"
+msgid "Start"
 msgstr ""
 
 #: ../inc/App/Backend/Enqueue.php:262
+msgid "Configure"
+msgstr ""
+
+#: ../inc/App/Backend/Enqueue.php:263
+msgid "Imports"
+msgstr ""
+
+#: ../inc/App/Backend/Enqueue.php:264
 msgid "End"
 msgstr ""
 
@@ -549,11 +557,11 @@ msgid "This SVG file contains unsafe content and cannot be uploaded."
 msgstr ""
 
 #: ../inc/Common/Functions/Helpers.php:79
-msgid "Security Check Failed. Access Denied!"
+msgid "Security check failed. Access denied."
 msgstr ""
 
 #: ../inc/Common/Functions/Helpers.php:99
-msgid "You do not have the necessary permissions to import. Access Denied!"
+msgid "You don't have permission to perform this action."
 msgstr ""
 
 #. translators: View file name.
@@ -562,15 +570,15 @@ msgid "%s file not found"
 msgstr ""
 
 #: ../inc/Common/Models/Customizer.php:52
-msgid "The customizer import file is not in a correct format. Please make sure to use the correct customizer import file."
+msgid "The customizer import file is invalid. Please ensure you are using the correct export file."
 msgstr ""
 
 #: ../inc/Common/Models/Customizer.php:56
-msgid "Error importing settings! Please check that you uploaded a customizer export file."
+msgid "Settings import failed. Please make sure you uploaded a valid customizer export file."
 msgstr ""
 
 #: ../inc/Common/Models/Customizer.php:60
-msgid "The customizer import file is not suitable for current theme. You can only import customizer settings for the same theme or a child theme."
+msgid "This customizer file is not compatible with your current theme. Customizer settings can only be imported for the same theme or a child theme."
 msgstr ""
 
 #. translators: the row number.
@@ -673,11 +681,11 @@ msgid "Importing all widgets."
 msgstr ""
 
 #: ../inc/App/Ajax/Backend/ImportFluentForms.php:85
-msgid "Fluent forms successfully imported."
+msgid "Fluent Forms successfully imported."
 msgstr ""
 
 #: ../inc/App/Ajax/Backend/ImportFluentForms.php:85
-msgid "No Fluent forms found. Skipping."
+msgid "No Fluent Forms found. Skipping."
 msgstr ""
 
 #: ../inc/App/Ajax/Backend/ImportMenus.php:79
@@ -705,7 +713,7 @@ msgid "Skipping Slider Revolution import!."
 msgstr ""
 
 #: ../inc/App/Ajax/Backend/ImportSettings.php:104
-msgid "Importing Fluent forms."
+msgid "Importing Fluent Forms."
 msgstr ""
 
 #: ../inc/App/Ajax/Backend/ImportSettings.php:104

@@ -149,7 +149,7 @@ class DeactivateNotice extends Base {
 			$nonce = sanitize_text_field( wp_unslash( $_GET['_deactivate_sd_edi_plugin_nonce'] ) );
 
 			if ( ! wp_verify_nonce( $nonce, 'deactivate_sd_edi_plugin' ) ) {
-				wp_die( esc_html__( 'Action failed. Please refresh the page and retry.', 'easy-demo-importer' ) );
+				wp_die( esc_html__( 'Action failed. Please refresh the page and try again.', 'easy-demo-importer' ) );
 			}
 
 			Errors::deactivate();

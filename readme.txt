@@ -3,8 +3,8 @@ Contributors: sigmadevs
 Donate link:
 Tags: demo importer, one click demo importer, theme demo importer, WordPress demo importer, content import plugin
 Requires at least: 5.5
-Tested up to: 6.8
-Stable tag: 1.1.5
+Tested up to: 6.9
+Stable tag: 1.1.6
 Requires PHP: 7.4
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -135,6 +135,13 @@ For any inquiries, bug reports, or suggestions, please submit your request [here
 6. Example of how the system status page looks.
 
 == Changelog ==
+
+= 1.1.6 (25-February-2026) =
+* Add: Full compatibility with WordPress 6.9.
+* Fix: PHP 8.4 compatibility — wp_register_script() and wp_enqueue_script() now use the args array format with deferred loading strategy.
+* Fix: Added null guard for scandir() in upload directory cleanup to prevent fatal errors on unreadable directories.
+* Fix: Added empty check before array_key_first() on demo data config to prevent warnings when demoData is absent.
+* Dev: Added .wp-env.json for local development with WordPress 6.9 + PHP 8.4 via @wordpress/env.
 
 = 1.1.5 (22-July-2025) =
 * Add: Full compatibility with WordPress 6.8.

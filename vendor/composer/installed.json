@@ -2,17 +2,17 @@
     "packages": [
         {
             "name": "enshrined/svg-sanitize",
-            "version": "0.20.0",
-            "version_normalized": "0.20.0.0",
+            "version": "0.22.0",
+            "version_normalized": "0.22.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/darylldoyle/svg-sanitizer.git",
-                "reference": "068d9fcf912c88a0471d101d95a2caa87c50aee7"
+                "reference": "0afa95ea74be155a7bcd6c6fb60c276c39984500"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/darylldoyle/svg-sanitizer/zipball/068d9fcf912c88a0471d101d95a2caa87c50aee7",
-                "reference": "068d9fcf912c88a0471d101d95a2caa87c50aee7",
+                "url": "https://api.github.com/repos/darylldoyle/svg-sanitizer/zipball/0afa95ea74be155a7bcd6c6fb60c276c39984500",
+                "reference": "0afa95ea74be155a7bcd6c6fb60c276c39984500",
                 "shasum": ""
             },
             "require": {
@@ -23,7 +23,7 @@
             "require-dev": {
                 "phpunit/phpunit": "^6.5 || ^8.5"
             },
-            "time": "2024-09-05T10:18:12+00:00",
+            "time": "2025-08-12T10:13:48+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -44,11 +44,133 @@
             "description": "An SVG sanitizer for PHP",
             "support": {
                 "issues": "https://github.com/darylldoyle/svg-sanitizer/issues",
-                "source": "https://github.com/darylldoyle/svg-sanitizer/tree/0.20.0"
+                "source": "https://github.com/darylldoyle/svg-sanitizer/tree/0.22.0"
             },
             "install-path": "../enshrined/svg-sanitize"
+        },
+        {
+            "name": "phpstan/phpstan",
+            "version": "2.1.40",
+            "version_normalized": "2.1.40.0",
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/9b2c7aeb83a75d8680ea5e7c9b7fca88052b766b",
+                "reference": "9b2c7aeb83a75d8680ea5e7c9b7fca88052b766b",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.4|^8.0"
+            },
+            "conflict": {
+                "phpstan/phpstan-shim": "*"
+            },
+            "time": "2026-02-23T15:04:35+00:00",
+            "bin": [
+                "phpstan",
+                "phpstan.phar"
+            ],
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "files": [
+                    "bootstrap.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "PHPStan - PHP Static Analysis Tool",
+            "keywords": [
+                "dev",
+                "static analysis"
+            ],
+            "support": {
+                "docs": "https://phpstan.org/user-guide/getting-started",
+                "forum": "https://github.com/phpstan/phpstan/discussions",
+                "issues": "https://github.com/phpstan/phpstan/issues",
+                "security": "https://github.com/phpstan/phpstan/security/policy",
+                "source": "https://github.com/phpstan/phpstan-src"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/ondrejmirtes",
+                    "type": "github"
+                },
+                {
+                    "url": "https://github.com/phpstan",
+                    "type": "github"
+                }
+            ],
+            "install-path": "../phpstan/phpstan"
+        },
+        {
+            "name": "rector/rector",
+            "version": "2.3.8",
+            "version_normalized": "2.3.8.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/rectorphp/rector.git",
+                "reference": "bbd37aedd8df749916cffa2a947cfc4714d1ba2c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/rectorphp/rector/zipball/bbd37aedd8df749916cffa2a947cfc4714d1ba2c",
+                "reference": "bbd37aedd8df749916cffa2a947cfc4714d1ba2c",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.4|^8.0",
+                "phpstan/phpstan": "^2.1.38"
+            },
+            "conflict": {
+                "rector/rector-doctrine": "*",
+                "rector/rector-downgrade-php": "*",
+                "rector/rector-phpunit": "*",
+                "rector/rector-symfony": "*"
+            },
+            "suggest": {
+                "ext-dom": "To manipulate phpunit.xml via the custom-rule command"
+            },
+            "time": "2026-02-22T09:45:50+00:00",
+            "bin": [
+                "bin/rector"
+            ],
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "files": [
+                    "bootstrap.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Instant Upgrade and Automated Refactoring of any PHP code",
+            "homepage": "https://getrector.com/",
+            "keywords": [
+                "automation",
+                "dev",
+                "migration",
+                "refactoring"
+            ],
+            "support": {
+                "issues": "https://github.com/rectorphp/rector/issues",
+                "source": "https://github.com/rectorphp/rector/tree/2.3.8"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/tomasvotruba",
+                    "type": "github"
+                }
+            ],
+            "install-path": "../rector/rector"
         }
     ],
     "dev": true,
-    "dev-package-names": []
+    "dev-package-names": [
+        "phpstan/phpstan",
+        "rector/rector"
+    ]
 }

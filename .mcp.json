@@ -1,0 +1,63 @@
+{
+  "mcpServers": {
+    "shopify-dev-mcp": {
+      "command": "npx",
+      "args": ["-y", "@shopify/dev-mcp@latest"],
+      "env": {
+        "OPT_OUT_INSTRUMENTATION": "true",
+        "LIQUID_VALIDATION_MODE": "full"
+      }
+    },
+    "postgres": {
+      "command": "npx",
+      "args": ["-y", "@anthropic-ai/mcp-postgres"],
+      "env": {
+        "DATABASE_URL": "postgresql://neondb_owner:npg_6AcEMdLYDr8N@ep-flat-cloud-a1c9fbe2-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
+      }
+    },
+    "next-devtools": {
+      "command": "npx",
+      "args": ["-y", "next-devtools-mcp@latest"]
+    },
+    "sequential-thinking": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"]
+    },
+    "puppeteer": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-puppeteer"]
+    },
+    "memory": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-memory"]
+    },
+    "fetch": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-fetch"]
+    },
+    "prisma": {
+      "command": "npx",
+      "args": ["-y", "@anthropic-ai/mcp-prisma"],
+      "env": {
+        "DATABASE_URL": "postgresql://neondb_owner:npg_6AcEMdLYDr8N@ep-flat-cloud-a1c9fbe2-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
+      }
+    },
+    "Artiforge": {
+      "url": "https://tools.artiforge.ai/mcp?pat=QjfTzZHsijtseIJxMQ52uAVzB0Wf5Oja",
+      "type": "http",
+      "description": "Artiforge - Build with AI without frictions"
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["@playwright/mcp@latest"]
+    },
+    "ddg-search": {
+      "command": "uvx",
+      "args": ["duckduckgo-mcp-server"]
+    },
+    "mcp-compass": {
+      "command": "npx",
+      "args": ["-y", "@liuyoshio/mcp-compass"]
+    }
+  }
+}

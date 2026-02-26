@@ -1,6 +1,6 @@
 {
   "name": "easy-demo-importer",
-  "version": "1.1.5",
+  "version": "1.1.6",
   "description": "A one-click, user-friendly WordPress plugin for effortlessly importing theme demos and customizing your website in no time.",
   "main": "index.js",
   "keywords": [
@@ -43,7 +43,7 @@
     "laravel-mix": "^6.0.49",
     "postcss": "^8.4.40",
     "rtlcss": "^4.2.0",
-    "sass": "^1.77.2",
+    "sass": "1.77.2",
     "sass-loader": "^16.0.0",
     "stylelint": "^16.8.0",
     "stylelint-scss": "^6.4.1",

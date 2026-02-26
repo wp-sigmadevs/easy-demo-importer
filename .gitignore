@@ -79,6 +79,10 @@ package-lock.json
 mix-manifest.json
 composer.lock
 yarn.lock
+
+# Composer #
+############
+vendor/
 _ext_dev
 dist
 assets/css

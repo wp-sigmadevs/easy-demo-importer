@@ -79,7 +79,7 @@ abstract class Enqueue extends Base {
 					$key['asset_uri'] ?? '',
 					$key['dependency'] ?? [],
 					$key['version'] ?? null,
-					( 'style' === $type ) ? 'all' : $loadInFooter
+					( 'style' === $type ) ? 'all' : [ 'in_footer' => $loadInFooter, 'strategy' => 'defer' ]
 				);
 			}
 		}

@@ -6,23 +6,28 @@ namespace Composer\Autoload;
 
 class ComposerStaticInita3a0f0cbb9b6e205034676f5e8e4d4d6
 {
+    public static $files = array (
+        '9b38cf48e83f5d8f60375221cd213eee' => __DIR__ . '/..' . '/phpstan/phpstan/bootstrap.php',
+        '38143a9afc50997d55e4815db8489d1c' => __DIR__ . '/..' . '/rector/rector/bootstrap.php',
+    );
+
     public static $prefixLengthsPsr4 = array (
-        'e' => 
+        'e' =>
         array (
             'enshrined\\svgSanitize\\' => 22,
         ),
-        'S' => 
+        'S' =>
         array (
             'SigmaDevs\\EasyDemoImporter\\' => 27,
         ),
     );
 
     public static $prefixDirsPsr4 = array (
-        'enshrined\\svgSanitize\\' => 
+        'enshrined\\svgSanitize\\' =>
         array (
             0 => __DIR__ . '/..' . '/enshrined/svg-sanitize/src',
         ),
-        'SigmaDevs\\EasyDemoImporter\\' => 
+        'SigmaDevs\\EasyDemoImporter\\' =>
         array (
             0 => __DIR__ . '/../..' . '/inc',
         ),

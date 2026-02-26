@@ -49,15 +49,15 @@ class Customizer {
 
 		// Data checks.
 		if ( 'array' != gettype( $data ) ) {
-			return new WP_Error( 'sd_edi_customizer_import_data_error', esc_html__( 'The customizer import file is not in a correct format. Please make sure to use the correct customizer import file.', 'easy-demo-importer' ) );
+			return new WP_Error( 'sd_edi_customizer_import_data_error', esc_html__( 'The customizer import file is invalid. Please ensure you are using the correct export file.', 'easy-demo-importer' ) );
 		}
 
 		if ( ! isset( $data['template'] ) || ! isset( $data['mods'] ) ) {
-			return new WP_Error( 'sd_edi_customizer_import_no_data', esc_html__( 'Error importing settings! Please check that you uploaded a customizer export file.', 'easy-demo-importer' ) );
+			return new WP_Error( 'sd_edi_customizer_import_no_data', esc_html__( 'Settings import failed. Please make sure you uploaded a valid customizer export file.', 'easy-demo-importer' ) );
 		}
 
 		if ( $data['template'] !== $template ) {
-			return new WP_Error( 'sd_edi_customizer_import_wrong_theme', esc_html__( 'The customizer import file is not suitable for current theme. You can only import customizer settings for the same theme or a child theme.', 'easy-demo-importer' ) );
+			return new WP_Error( 'sd_edi_customizer_import_wrong_theme', esc_html__( 'This customizer file is not compatible with your current theme. Customizer settings can only be imported for the same theme or a child theme.', 'easy-demo-importer' ) );
 		}
 
 		// Import Images.
