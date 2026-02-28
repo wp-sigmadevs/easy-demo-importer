@@ -136,11 +136,15 @@ For any inquiries, bug reports, or suggestions, please submit your request [here
 
 == Changelog ==
 
-= 1.1.6 (25-February-2026) =
+= 1.1.6 (28-February-2026) =
 * Add: Full compatibility with WordPress 6.9.
-* Fix: PHP 8.4 compatibility — wp_register_script() and wp_enqueue_script() now use the args array format with deferred loading strategy.
-* Fix: Added null guard for scandir() in upload directory cleanup to prevent fatal errors on unreadable directories.
-* Fix: Added empty check before array_key_first() on demo data config to prevent warnings when demoData is absent.
+* Add: Option to skip image regeneration during import — speeds up the process.
+* Add: Smart scroll indicators on the demo preview image in the import modal.
+* Fix: PHP 8.4 compatibility — wp_register_script() now uses the args array format with deferred loading strategy.
+* Fix: Added null guard in upload directory cleanup to prevent fatal errors on unreadable directories.
+* Fix: Added empty check on demo data config to prevent warnings when demoData is absent.
+* Tweak: Refreshed some user-facing strings for more professional and consistent wording.
+* Update: Updated enshrined/svg-sanitize dependency.
 * Dev: Added .wp-env.json for local development with WordPress 6.9 + PHP 8.4 via @wordpress/env.
 
 = 1.1.5 (22-July-2025) =
