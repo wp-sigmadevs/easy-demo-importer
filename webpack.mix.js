@@ -46,12 +46,24 @@ if (process.env.npm_config_package) {
 			`${package_slug}.php`,
 		];
 
+		// Dev-only vendor subdirectories to exclude from the zip.
+		const vendorExcludes = [
+			path.join(package_path, "vendor", "bin"),
+			path.join(package_path, "vendor", "phpstan"),
+			path.join(package_path, "vendor", "rector"),
+		];
+
+		const vendorFilter = (src) =>
+			!vendorExcludes.some((excluded) => src.startsWith(excluded));
+
 		fs.ensureDir(copyTo, function (err) {
 			if (err) return console.error(err);
 			includes.map((include) => {
+				const options = include === "vendor" ? { filter: vendorFilter } : {};
 				fs.copy(
 					`${package_path}/${include}`,
 					`${copyTo}/${include}`,
+					options,
 					function (err) {
 						if (err) return console.error(err);
 						console.log(

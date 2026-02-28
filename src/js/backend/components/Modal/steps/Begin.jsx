@@ -27,14 +27,18 @@ const Begin = ({ handleReset, modalData }) => {
 	const [showBottomArrow, setShowBottomArrow] = useState(false);
 
 	/**
-	 * Attach scroll listener to the image container and check initial scroll state.
+	 * Attach a scroll listener to the image container and check the initial scroll state.
 	 */
 	useEffect(() => {
 		const wrapper = imageContainerRef.current;
-		if (!wrapper) return;
+		if (!wrapper) {
+			return;
+		}
 
 		const container = wrapper.querySelector('.ant-image');
-		if (!container) return;
+		if (!container) {
+			return;
+		}
 
 		const checkScroll = () => {
 			const { scrollTop, scrollHeight, clientHeight } = container;
@@ -42,7 +46,7 @@ const Begin = ({ handleReset, modalData }) => {
 			setShowBottomArrow(scrollTop + clientHeight < scrollHeight - 1);
 		};
 
-		// Delay initial check to let the image render and establish scroll height.
+		// Delay the initial check to let the image render and establish scroll height.
 		const timer = setTimeout(checkScroll, 300);
 		container.addEventListener('scroll', checkScroll);
 
@@ -71,7 +75,10 @@ const Begin = ({ handleReset, modalData }) => {
 		<>
 			<ModalHeader currentStep={currentStep} />
 			<div className="modal-content-inner modal-row">
-				<div className="modal-content-image modal-col-6" ref={imageContainerRef}>
+				<div
+					className="modal-content-image modal-col-6"
+					ref={imageContainerRef}
+				>
 					<Image
 						src={modalData?.data?.previewImage}
 						preview={false}
