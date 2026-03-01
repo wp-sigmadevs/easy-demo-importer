@@ -15,6 +15,7 @@ namespace SigmaDevs\EasyDemoImporter\App\Ajax\Backend;
 use SigmaDevs\EasyDemoImporter\Common\{
 	Traits\Singleton,
 	Functions\Helpers,
+	Functions\SessionManager,
 	Abstracts\ImporterAjax
 };
 
@@ -78,6 +79,11 @@ class Finalize extends ImporterAjax {
 
 		// Resetting permalink.
 		flush_rewrite_rules();
+
+		// Release the import session lock.
+		if ( ! empty( $this->sessionId ) ) {
+			SessionManager::release( $this->sessionId );
+		}
 
 		// Response.
 		$this->prepareResponse(

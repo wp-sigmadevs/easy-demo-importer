@@ -57,6 +57,14 @@ class InstallPlugins extends ImporterAjax {
 	private $plugins = [];
 
 	/**
+	 * Plugin install errors.
+	 *
+	 * @var array
+	 * @since 1.2.0
+	 */
+	private $installErrors = [];
+
+	/**
 	 * Registers the class.
 	 *
 	 * This backend class is only being instantiated in the backend
@@ -94,6 +102,23 @@ class InstallPlugins extends ImporterAjax {
 
 		// Install Required Plugins.
 		$this->installPlugins();
+
+		if ( ! empty( $this->installErrors ) ) {
+			$failedPlugins = implode( ', ', $this->installErrors );
+			$this->prepareResponse(
+				'',
+				'',
+				'',
+				true,
+				sprintf(
+					/* translators: %s: comma-separated list of plugin slugs */
+					esc_html__( 'Failed to install required plugin(s): %s.', 'easy-demo-importer' ),
+					$failedPlugins
+				),
+				esc_html__( 'Check your server\'s outbound internet access and ensure WordPress.org is reachable. You can also try installing the plugins manually from Plugins > Add New, then run the import again.', 'easy-demo-importer' )
+			);
+			return;
+		}
 
 		// Response.
 		$this->prepareResponse(
@@ -144,13 +169,23 @@ class InstallPlugins extends ImporterAjax {
 			// Get Plugin Info.
 			$api = $this->callPluginApi( $slug );
 
+			if ( is_wp_error( $api ) ) {
+				$this->installErrors[] = $slug;
+				return;
+			}
+
 			$skin     = new WP_Ajax_Upgrader_Skin();
 			$upgrader = new Plugin_Upgrader( $skin );
 
 			if ( 'install' === $pluginStatus ) {
-				$upgrader->install( $api->download_link );
-			} elseif ( 'update' === $pluginStatus ) {
-				$upgrader->upgrade( $path, [ 'clear_update_cache' => false ] );
+				$result = $upgrader->install( $api->download_link );
+			} else {
+				$result = $upgrader->upgrade( $path, [ 'clear_update_cache' => false ] );
+			}
+
+			if ( is_wp_error( $result ) || false === $result ) {
+				$this->installErrors[] = $slug;
+				return;
 			}
 
 			++$this->installCount;
@@ -220,27 +255,35 @@ class InstallPlugins extends ImporterAjax {
 
 			global $wp_filesystem;
 
-			$plugin = $this->demoUploadDir() . 'plugin.zip';
+			$plugin   = $this->demoUploadDir() . 'plugin.zip';
+			$timeout  = (int) apply_filters( 'sd/edi/download_timeout', 120 );
+			$sslverify = (bool) apply_filters( 'sd/edi/download_sslverify', true );
 
-			$file = wp_remote_retrieve_body(
-				wp_remote_get(
-					$externalUrl,
-					[
-						'timeout' => 60,
-					]
-				)
+			$response = wp_remote_get(
+				$externalUrl,
+				[
+					'timeout'   => $timeout,
+					'sslverify' => $sslverify,
+				]
 			);
 
+			if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) !== 200 ) {
+				$this->installErrors[] = basename( $path );
+				return;
+			}
+
 			$wp_filesystem->mkdir( $this->demoUploadDir() );
-			$wp_filesystem->put_contents( $plugin, $file );
+			$wp_filesystem->put_contents( $plugin, wp_remote_retrieve_body( $response ) );
 
-			// Unzip file.
-			unzip_file( $plugin, WP_PLUGIN_DIR );
+			$unzip_result = unzip_file( $plugin, WP_PLUGIN_DIR );
 
-			WP_PLUGIN_DIR . '/' . esc_html( $path );
-
-			// Delete zip.
+			// Delete zip regardless of unzip result.
 			$wp_filesystem->delete( $plugin );
+
+			if ( is_wp_error( $unzip_result ) ) {
+				$this->installErrors[] = basename( $path );
+				return;
+			}
 
 			++$this->installCount;
 		}

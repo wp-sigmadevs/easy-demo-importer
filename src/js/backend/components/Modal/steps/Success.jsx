@@ -1,17 +1,21 @@
 import React from 'react';
 import { Result, Button } from 'antd';
-import { ExportOutlined, CloseOutlined, RedoOutlined } from '@ant-design/icons';
+import { ExportOutlined, CloseOutlined, RedoOutlined, RollbackOutlined } from '@ant-design/icons';
 
 /* global sdEdiAdminParams */
 
 /**
  * Component representing the import success or failure message.
  *
- * @param {boolean}  importComplete - Flag indicating whether the import was completed.
- * @param {Function} handleReset    - Function to handle the reset action.
- * @param {string}   message        - Import messages.
+ * @param {boolean}  importComplete  - Flag indicating whether the import was completed.
+ * @param {Function} handleReset     - Function to handle the reset action.
+ * @param {Function} handleResume    - Function to resume the import from the failed step.
+ * @param {Function} handleStartOver - Function to release the lock and reload.
+ * @param {boolean}  canResume       - Whether a resumable request is available.
+ * @param {string}   message         - Import message.
+ * @param {string}   hint            - Actionable hint for error resolution.
  */
-const Success = ({ importComplete, handleReset, message }) => {
+const Success = ({ importComplete, handleReset, handleResume, handleStartOver, canResume, message, hint }) => {
 	if (importComplete) {
 		/**
 		 * Handle 'View Site' button behavior.
@@ -76,20 +80,30 @@ const Success = ({ importComplete, handleReset, message }) => {
 		<Result
 			status="error"
 			title={message}
+			subTitle={hint || null}
 			extra={[
 				<Button key="close" onClick={handleReset}>
 					<CloseOutlined />
 					<span>{sdEdiAdminParams.btnClose}</span>
 				</Button>,
+				canResume && (
+					<Button
+						key="resume"
+						type="primary"
+						onClick={handleResume}
+					>
+						<RollbackOutlined />
+						<span>{sdEdiAdminParams.btnResume || 'Resume Import'}</span>
+					</Button>
+				),
 				<Button
-					key="retry"
-					type="primary"
-					onClick={() => window.location.reload()}
+					key="start-over"
+					onClick={handleStartOver}
 				>
 					<RedoOutlined />
-					<span>Reload & Retry</span>
+					<span>{sdEdiAdminParams.btnStartOver || 'Start Over'}</span>
 				</Button>,
-			]}
+			].filter(Boolean)}
 		/>
 	);
 };

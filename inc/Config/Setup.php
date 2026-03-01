@@ -78,14 +78,16 @@ class Setup {
 	/**
 	 * Run only once after plugin is uninstalled.
 	 *
+	 * Cleanup is handled by uninstall.php in the plugin root.
+	 * WordPress calls that file automatically on deletion, which takes
+	 * precedence over register_uninstall_hook() callbacks.
+	 *
 	 * @static
 	 * @return void
 	 * @since 1.0.0
 	 */
 	public static function uninstall() {
-		if ( ! current_user_can( 'activate_plugins' ) ) {
-			return;
-		}
+		// See uninstall.php.
 	}
 
 	/**

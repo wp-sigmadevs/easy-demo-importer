@@ -200,18 +200,43 @@ All subsequent phases (chunked XML, image regen, rollback, history) share a sess
 
 ---
 
-### 1.2 — Remaining Bug Fixes
+### 1.2 — Bug Fixes + Meaningful Error Messages
 
-- [ ] **`clearUploads()` symlink guard** (`Initialize.php:~220`):
-  ```php
-  if ( is_link( "$dir/$file" ) ) {
-      continue; // Skip symlinks entirely — never follow them
-  }
-  ```
-- [ ] **Nonce hard-fail** (`ImporterAjax.php:~154`): Silent empty string return → `wp_send_json_error(['message' => 'Security check failed.'], 403)` + `wp_die()`
-- [ ] **Config validation** (`ImporterAjax.php:~119`): Validate required keys exist before access. Return clear AJAX error if missing
-- [ ] **Download guard** (`DownloadFiles.php:~91`): Check `is_wp_error($response)` and HTTP status before `unzip_file()`. Return clear error on failure
-- [ ] **Download timeout** (`DownloadFiles.php:~117`): Default `120` seconds. Add `sd/edi/download_timeout` filter
+- [ ] **`clearUploads()` symlink guard** (`Initialize.php:~220`): Skip symlinks — never follow them
+- [ ] **Nonce hard-fail** (`ImporterAjax.php`): Silent empty string return → `wp_send_json_error(['message' => 'Security check failed. Please refresh the page and try again.'], 403)` + `wp_die()`
+- [ ] **Config validation** (`ImporterAjax.php`): Validate required keys exist before access. Return clear AJAX error if missing
+- [ ] **Download timeout** (`DownloadFiles.php`): Default `120` seconds via `sd/edi/download_timeout` filter
+- [ ] **`InstallPlugins.php` error handling**: `installOrgPlugin()` and `installCustomPlugin()` silently fail — capture `WP_Error` and surface with message + hint
+- [ ] **`installCustomPlugin()` download guard**: Check `is_wp_error()` + HTTP status before `unzip_file()`. Currently proceeds on any response
+- [ ] **Add `errorHint` to `prepareResponse()`**: New optional param forwarded to JS as `errorHint` — displayed as a subtitle below the error message in the UI
+- [ ] **`Api.js` crash fix**: `error.response` is `undefined` on network timeout/dropped connection — catch block crashes instead of displaying an error
+- [ ] **`Api.js` HTTP status mapping**: Map status codes to human-readable messages with actionable hints (see table below)
+- [ ] **Remove generic `importError` string** from `Enqueue.php` — replace with per-code strings on the JS side
+
+#### HTTP Status Code → Message + Hint Mapping (JS)
+
+| Code | Message | Hint |
+|------|---------|------|
+| 401 / 403 | Request was blocked by the server. | Check if your WordPress admin session is still active. Try logging out and back in. |
+| 404 | The requested resource was not found on the server. | The demo configuration may point to a missing file. Contact theme support. |
+| 408 / 504 | The server took too long to respond. | Your server may be under load or PHP `max_execution_time` is too low. Try again, or ask your host to increase the execution time limit. |
+| 500 | The server encountered an internal error. | Check your PHP error log for details. This is usually a server configuration issue. |
+| 503 | The server is temporarily unavailable. | The demo file server may be down. Wait a few minutes and try again. |
+| Network error (no response) | Lost connection to the server. | Check your internet connection. If you are on a local server, ensure it is running correctly. |
+| Unknown | An unexpected error occurred. | Try refreshing the page. If the problem persists, contact theme support with your browser console log. |
+
+#### HTTPS / SSL Download Fix
+
+**Root cause:** `wp_remote_get()` uses `sslverify => true` by default. On shared hosting with outdated CA certificate bundles, PHP/cURL cannot verify the remote server's SSL certificate and returns a `WP_Error`. The error is currently discarded — the user only sees the generic download failure message.
+
+**Fix:**
+- [ ] Capture `WP_Error` message from failed `wp_remote_get()` calls
+- [ ] Detect SSL errors by inspecting the error message for keywords: `SSL`, `certificate`, `curl error 60`, `curl error 35`
+- [ ] On SSL error, return a specific message + hint:
+  - *Message:* "Could not verify the SSL certificate of the demo file server."
+  - *Hint:* "Your server's SSL/cURL configuration may be outdated. Ask your host to update the CA certificate bundle. As a temporary workaround, add `add_filter('sd/edi/download_sslverify', '__return_false');` to your theme's `functions.php`. Note: this disables SSL verification."
+- [ ] Add `sd/edi/download_sslverify` filter (default `true`) — theme authors can disable verification if needed
+- [ ] Surface HTTP status code in download errors (e.g. "Server returned 503") instead of discarding it
 
 ---
 

@@ -34,6 +34,7 @@ return array(
     'SigmaDevs\\EasyDemoImporter\\Common\\Functions\\Filters' => $baseDir . '/inc/Common/Functions/Filters.php',
     'SigmaDevs\\EasyDemoImporter\\Common\\Functions\\Functions' => $baseDir . '/inc/Common/Functions/Functions.php',
     'SigmaDevs\\EasyDemoImporter\\Common\\Functions\\Helpers' => $baseDir . '/inc/Common/Functions/Helpers.php',
+    'SigmaDevs\\EasyDemoImporter\\Common\\Functions\\SessionManager' => $baseDir . '/inc/Common/Functions/SessionManager.php',
     'SigmaDevs\\EasyDemoImporter\\Common\\Models\\AdminPage' => $baseDir . '/inc/Common/Models/AdminPage.php',
     'SigmaDevs\\EasyDemoImporter\\Common\\Models\\Customizer' => $baseDir . '/inc/Common/Models/Customizer.php',
     'SigmaDevs\\EasyDemoImporter\\Common\\Models\\CustomizerOption' => $baseDir . '/inc/Common/Models/CustomizerOption.php',
