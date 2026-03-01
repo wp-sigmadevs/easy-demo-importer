@@ -12,7 +12,10 @@ declare( strict_types=1 );
 
 namespace SigmaDevs\EasyDemoImporter\Common\Abstracts;
 
-use SigmaDevs\EasyDemoImporter\Common\Functions\Helpers;
+use SigmaDevs\EasyDemoImporter\Common\Functions\{
+	Helpers,
+	SessionManager
+};
 
 // Do not allow directly accessing this file.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -90,6 +93,14 @@ abstract class ImporterAjax {
 	public $reset;
 
 	/**
+	 * Import session ID.
+	 *
+	 * @var string
+	 * @since 1.2.0
+	 */
+	public $sessionId = '';
+
+	/**
 	 * Registers the class.
 	 *
 	 * This backend class is only being instantiated in the backend
@@ -115,11 +126,30 @@ abstract class ImporterAjax {
 	 * @return void
 	 */
 	protected function handlePostSubmission() {
+		// Hard-fail on nonce mismatch — do not proceed silently.
+		if ( ! check_ajax_referer( Helpers::nonceText(), Helpers::nonceId(), false ) ) {
+			wp_send_json_error(
+				[
+					'errorMessage' => esc_html__( 'Security check failed. Please refresh the page and try again.', 'easy-demo-importer' ),
+					'errorHint'    => esc_html__( 'This can happen if you stayed on the page too long. Refreshing resets the security token.', 'easy-demo-importer' ),
+				],
+				403
+			);
+			wp_die();
+		}
+
 		// Theme config.
 		$this->config = sd_edi()->getDemoConfig();
 
 		if ( empty( $this->config ) ) {
-			return;
+			wp_send_json_error(
+				[
+					'errorMessage' => esc_html__( 'Demo configuration is missing or empty.', 'easy-demo-importer' ),
+					'errorHint'    => esc_html__( 'Make sure your theme is calling the sd/edi/importer/config filter and returning a valid configuration array.', 'easy-demo-importer' ),
+				],
+				500
+			);
+			wp_die();
 		}
 
 		// Uploads Directory.
@@ -131,16 +161,32 @@ abstract class ImporterAjax {
 		// Demo slug.
 		$this->demoSlug = $this->getDemoSlug();
 
-		if ( check_ajax_referer( Helpers::nonceText(), Helpers::nonceId() ) ) {
-			// Check if images import is needed.
-			$this->excludeImages = ! empty( $_POST['excludeImages'] ) ? sanitize_text_field( wp_unslash( $_POST['excludeImages'] ) ) : '';
+		// Validate session ID if one was sent (all phases after Initialize).
+		$posted_session_id = ! empty( $_POST['sessionId'] ) ? sanitize_text_field( wp_unslash( $_POST['sessionId'] ) ) : '';
 
-			// Check if image regeneration should be skipped.
-			$this->skipImageRegeneration = isset( $_POST['skipImageRegeneration'] ) && 'true' === sanitize_text_field( wp_unslash( $_POST['skipImageRegeneration'] ) );
+		if ( ! empty( $posted_session_id ) ) {
+			if ( ! SessionManager::isValid( $posted_session_id ) ) {
+				wp_send_json_error(
+					[
+						'errorMessage' => esc_html__( 'The import session is no longer valid.', 'easy-demo-importer' ),
+						'errorHint'    => esc_html__( 'This can happen if the import timed out or another import started. Refresh the page and try again.', 'easy-demo-importer' ),
+					],
+					409
+				);
+				wp_die();
+			}
 
-			// Check if database reset needed.
-			$this->reset = isset( $_POST['reset'] ) && 'true' === sanitize_text_field( wp_unslash( $_POST['reset'] ) );
+			$this->sessionId = $posted_session_id;
 		}
+
+		// Check if images import is needed.
+		$this->excludeImages = ! empty( $_POST['excludeImages'] ) ? sanitize_text_field( wp_unslash( $_POST['excludeImages'] ) ) : '';
+
+		// Check if image regeneration should be skipped.
+		$this->skipImageRegeneration = isset( $_POST['skipImageRegeneration'] ) && 'true' === sanitize_text_field( wp_unslash( $_POST['skipImageRegeneration'] ) );
+
+		// Check if database reset needed.
+		$this->reset = isset( $_POST['reset'] ) && 'true' === sanitize_text_field( wp_unslash( $_POST['reset'] ) );
 	}
 
 	/**
@@ -151,10 +197,7 @@ abstract class ImporterAjax {
 	 * @since 1.0.0
 	 */
 	private function getDemoSlug() {
-		if ( ! check_ajax_referer( Helpers::nonceText(), Helpers::nonceId() ) ) {
-			return '';
-		}
-
+		// Nonce already verified in handlePostSubmission() before this is called.
 		$firstDemoSlug = ! empty( $this->config['demoData'] ) ? array_key_first( $this->config['demoData'] ) : '';
 
 		if ( empty( $_POST['demo'] ) ) {
@@ -176,17 +219,19 @@ abstract class ImporterAjax {
 	 * @return void
 	 * @since 1.0.0
 	 */
-	public function prepareResponse( $nextPhase, $nextPhaseMessage, $complete = '', $error = false, $errorMessage = '' ) {
+	public function prepareResponse( $nextPhase, $nextPhaseMessage, $complete = '', $error = false, $errorMessage = '', $errorHint = '' ) {
 		$this->response = [
 			'demo'                  => $this->demoSlug,
 			'excludeImages'         => $this->excludeImages,
 			'skipImageRegeneration' => $this->skipImageRegeneration,
 			'reset'                 => $this->reset,
+			'sessionId'             => $this->sessionId,
 			'nextPhase'             => $nextPhase,
 			'nextPhaseMessage'      => $nextPhaseMessage,
 			'completedMessage'      => $complete,
 			'error'                 => $error,
 			'errorMessage'          => $errorMessage,
+			'errorHint'             => $errorHint,
 		];
 
 		$this->sendResponse();

@@ -16,6 +16,7 @@ use WP_Filesystem_Direct;
 use SigmaDevs\EasyDemoImporter\Common\{
 	Traits\Singleton,
 	Functions\Helpers,
+	Functions\SessionManager,
 	Abstracts\ImporterAjax
 };
 
@@ -54,6 +55,31 @@ class Initialize extends ImporterAjax {
 		parent::register();
 
 		add_action( 'wp_ajax_sd_edi_install_demo', [ $this, 'response' ] );
+		add_action( 'wp_ajax_sd_edi_cancel_session', [ $this, 'cancelSession' ] );
+	}
+
+	/**
+	 * Release the active import session lock.
+	 *
+	 * Called by the "Start Over" button so the user can restart after a failed import
+	 * without waiting for the 30-minute lock TTL to expire.
+	 *
+	 * @return void
+	 * @since 1.2.0
+	 */
+	public function cancelSession() {
+		Helpers::verifyAjaxCall();
+
+		$session_id = ! empty( $_POST['sessionId'] ) ? sanitize_text_field( wp_unslash( $_POST['sessionId'] ) ) : '';
+
+		if ( ! empty( $session_id ) ) {
+			SessionManager::release( $session_id );
+		} else {
+			// No specific session ID — force-clear any lock, including active ones.
+			SessionManager::forceRelease();
+		}
+
+		wp_send_json_success();
 	}
 
 	/**
@@ -65,6 +91,23 @@ class Initialize extends ImporterAjax {
 	public function response() {
 		// Verifying AJAX call and user role.
 		Helpers::verifyAjaxCall();
+
+		// Reject if another import is already running.
+		if ( SessionManager::isLocked() ) {
+			$this->prepareResponse(
+				'',
+				'',
+				'',
+				true,
+				esc_html__( 'Another import is already in progress.', 'easy-demo-importer' ),
+				esc_html__( 'Wait for the current import to finish before starting a new one. If you believe the previous import has crashed, wait 30 minutes for the lock to expire automatically, then try again.', 'easy-demo-importer' )
+			);
+			return;
+		}
+
+		// Start new import session and acquire the mutex lock.
+		$session         = SessionManager::start();
+		$this->sessionId = $session['session_id'];
 
 		// Resetting database.
 		if ( $this->reset ) {
@@ -227,6 +270,11 @@ class Initialize extends ImporterAjax {
 		$files = array_diff( $scanned, [ '.', '..' ] );
 
 		foreach ( $files as $file ) {
+			// Never follow symlinks — skip them entirely to prevent deleting files outside the uploads directory.
+			if ( is_link( "$dir/$file" ) ) {
+				continue;
+			}
+
 			( is_dir( "$dir/$file" ) ) ? $this->clearUploads( "$dir/$file" ) : wp_delete_file( "$dir/$file" );
 		}
 

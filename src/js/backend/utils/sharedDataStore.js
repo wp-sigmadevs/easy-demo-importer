@@ -2,6 +2,32 @@ import { create } from 'zustand';
 import { Api } from './Api';
 
 /**
+ * localStorage key for persisting the resume request across page reloads.
+ */
+const RESUME_KEY = 'sd_edi_resume_request';
+
+const loadResumeRequest = () => {
+	try {
+		const saved = localStorage.getItem(RESUME_KEY);
+		return saved ? JSON.parse(saved) : null;
+	} catch {
+		return null;
+	}
+};
+
+const saveResumeRequest = (request) => {
+	try {
+		if (request) {
+			localStorage.setItem(RESUME_KEY, JSON.stringify(request));
+		} else {
+			localStorage.removeItem(RESUME_KEY);
+		}
+	} catch {
+		// Ignore storage errors.
+	}
+};
+
+/**
  * Shared data store for managing shared state and actions.
  *
  * @typedef  {Object}   SharedDataStore
@@ -14,6 +40,7 @@ import { Api } from './Api';
  * @property {boolean}  importComplete    - The import completion status.
  * @property {boolean}  reset             - The reset option.
  * @property {string}   message           - The message.
+ * @property {string}   activeSessionId   - The session ID of the currently running import.
  * @property {Function} fetchImportList   - Fetch the import list data.
  * @property {Function} fetchPluginList   - Fetch the plugin list data.
  * @property {Function} setCurrentStep    - Set the current step.
@@ -24,6 +51,7 @@ import { Api } from './Api';
  * @property {Function} setLoading        - Set the loading state.
  * @property {Function} setImportComplete - Set the import completion status.
  * @property {Function} setMessage        - Set the message.
+ * @property {Function} setActiveSessionId - Set the active session ID.
  */
 
 /**
@@ -43,6 +71,9 @@ const useSharedDataStore = create((set) => ({
 	importComplete: false,
 	reset: true,
 	message: '',
+	hint: '',
+	resumeRequest: loadResumeRequest(),
+	activeSessionId: '',
 	searchQuery: '',
 	filteredDemoData: null,
 	isSearchQueryEmpty: true,
@@ -79,6 +110,12 @@ const useSharedDataStore = create((set) => ({
 	setLoading: (value) => set({ loading: value }),
 	setImportComplete: (value) => set({ importComplete: value }),
 	setMessage: (message) => set(() => ({ message })),
+	setHint: (hint) => set(() => ({ hint })),
+	setResumeRequest: (resumeRequest) => {
+		saveResumeRequest(resumeRequest);
+		set(() => ({ resumeRequest }));
+	},
+	setActiveSessionId: (activeSessionId) => set(() => ({ activeSessionId })),
 	setSearchQuery: (query) => set({ searchQuery: query }),
 	setFilteredDemoData: (data) => set({ filteredDemoData: data }),
 	setIsSearchQueryEmpty: (value) => set({ isSearchQueryEmpty: value }),
@@ -91,6 +128,9 @@ const useSharedDataStore = create((set) => ({
 			importComplete: false,
 			reset: true,
 			message: '',
+			hint: '',
+			// resumeRequest is intentionally persisted across page reloads — do not clear it here.
+			activeSessionId: '',
 			searchQuery: '',
 			filteredDemoData: null,
 			isSearchQueryEmpty: true,

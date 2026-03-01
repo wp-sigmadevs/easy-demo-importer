@@ -155,7 +155,6 @@ class Enqueue extends EnqueueBase {
 				// Imports messages.
 				'prepareImporting'           => esc_html__( 'Preparing to install demo data. Doing some cleanups first.', 'easy-demo-importer' ),
 				'resetDatabase'              => esc_html__( 'Preparing to install demo data. Resetting database first.', 'easy-demo-importer' ),
-				'importError'                => esc_html__( 'Something went wrong during import. Please try again.', 'easy-demo-importer' ),
 				'importSuccess'              => esc_html__( 'All done. Have fun!', 'easy-demo-importer' ),
 
 				// Modal texts.
@@ -203,6 +202,12 @@ class Enqueue extends EnqueueBase {
 				'btnStartImport'             => esc_html__( 'Start Import', 'easy-demo-importer' ),
 				'btnViewSite'                => esc_html__( 'View Site', 'easy-demo-importer' ),
 				'btnClose'                   => esc_html__( 'Close', 'easy-demo-importer' ),
+				'btnReloadRetry'             => esc_html__( 'Reload & Retry', 'easy-demo-importer' ),
+				'btnResume'                  => esc_html__( 'Resume Import', 'easy-demo-importer' ),
+				'btnStartOver'               => esc_html__( 'Start Over', 'easy-demo-importer' ),
+				'resumingImport'             => esc_html__( 'Resuming import from where it left off...', 'easy-demo-importer' ),
+				'importInterruptedTitle'     => esc_html__( 'Import was interrupted.', 'easy-demo-importer' ),
+				'importInterruptedHint'      => esc_html__( 'Your previous import did not complete. Resume from where it left off, or start over to begin fresh.', 'easy-demo-importer' ),
 				'clickEnlarge'               => esc_html__( 'Click to Enlarge', 'easy-demo-importer' ),
 				'createATicket'              => esc_html__( 'Contact Us', 'easy-demo-importer' ),
 				'viewDocumentation'          => esc_html__( 'View Documentation', 'easy-demo-importer' ),
