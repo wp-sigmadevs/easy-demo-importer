@@ -74,8 +74,8 @@ class DownloadFiles extends ImporterAjax {
 		// Response.
 		$this->prepareResponse(
 			$success ? 'sd_edi_import_xml' : '',
-			$success ? esc_html__( 'Importing content, sit back, relax! This might take a while.', 'easy-demo-importer' ) : '',
-			$success ? esc_html__( 'Demo files have landed, we are good to go!', 'easy-demo-importer' ) : '',
+			$success ? __( 'Importing content, sit back, relax! This might take a while.', 'easy-demo-importer' ) : '',
+			$success ? __( 'Demo files have landed, we are good to go!', 'easy-demo-importer' ) : '',
 			! $success,
 			! $success ? $result['message'] : '',
 			! $success ? $result['hint'] : '',
@@ -107,8 +107,8 @@ class DownloadFiles extends ImporterAjax {
 		if ( ! $wp_filesystem->exists( $this->demoUploadDir() ) && ! $wp_filesystem->mkdir( $this->demoUploadDir() ) ) {
 			return [
 				'success' => false,
-				'message' => esc_html__( 'Could not create the demo upload directory.', 'easy-demo-importer' ),
-				'hint'    => esc_html__( 'Check that your uploads directory is writable. Go to Tools > Site Health for file permission details.', 'easy-demo-importer' ),
+				'message' => __( 'Could not create the demo upload directory.', 'easy-demo-importer' ),
+				'hint'    => __( 'Check that your uploads directory is writable. Go to Tools > Site Health for file permission details.', 'easy-demo-importer' ),
 			];
 		}
 
@@ -131,10 +131,10 @@ class DownloadFiles extends ImporterAjax {
 			if ( $is_ssl_error ) {
 				return [
 					'success' => false,
-					'message' => esc_html__( 'Could not verify the SSL certificate of the demo file server.', 'easy-demo-importer' ),
+					'message' => __( 'Could not verify the SSL certificate of the demo file server.', 'easy-demo-importer' ),
 					/* translators: %s: WordPress filter name */
 					'hint'    => sprintf(
-						esc_html__( "Your server's SSL/cURL configuration may be outdated. Ask your host to update their CA certificate bundle. As a temporary workaround, add %s to your theme's functions.php — note: this disables SSL certificate verification.", 'easy-demo-importer' ),
+						__( "Your server's SSL/cURL configuration may be outdated. Ask your host to update their CA certificate bundle. As a temporary workaround, add %s to your theme's functions.php — note: this disables SSL certificate verification.", 'easy-demo-importer' ),
 						'add_filter(\'sd/edi/download_sslverify\', \'__return_false\');'
 					),
 				];
@@ -142,8 +142,8 @@ class DownloadFiles extends ImporterAjax {
 
 			return [
 				'success' => false,
-				'message' => esc_html__( 'Lost connection to the demo file server.', 'easy-demo-importer' ),
-				'hint'    => esc_html__( 'Check that your server has outbound internet access. If you are on a local environment, ensure it can reach external URLs.', 'easy-demo-importer' ),
+				'message' => __( 'Lost connection to the demo file server.', 'easy-demo-importer' ),
+				'hint'    => __( 'Check that your server has outbound internet access. If you are on a local environment, ensure it can reach external URLs.', 'easy-demo-importer' ),
 			];
 		}
 
@@ -166,8 +166,8 @@ class DownloadFiles extends ImporterAjax {
 		if ( is_wp_error( $unzip_result ) ) {
 			return [
 				'success' => false,
-				'message' => esc_html__( 'Demo files were downloaded but could not be extracted.', 'easy-demo-importer' ),
-				'hint'    => esc_html__( 'Ensure the ZipArchive PHP extension is enabled. Contact your host if you are unsure.', 'easy-demo-importer' ),
+				'message' => __( 'Demo files were downloaded but could not be extracted.', 'easy-demo-importer' ),
+				'hint'    => __( 'Ensure the ZipArchive PHP extension is enabled. Contact your host if you are unsure.', 'easy-demo-importer' ),
 			];
 		}
 
@@ -185,36 +185,36 @@ class DownloadFiles extends ImporterAjax {
 	private function httpCodeToError( int $code ): array {
 		$messages = [
 			401 => [
-				'message' => esc_html__( 'Access to the demo file was denied (401 Unauthorized).', 'easy-demo-importer' ),
-				'hint'    => esc_html__( 'The demo file URL may require authentication. Contact the theme author to verify the demo file URL is publicly accessible.', 'easy-demo-importer' ),
+				'message' => __( 'Access to the demo file was denied (401 Unauthorized).', 'easy-demo-importer' ),
+				'hint'    => __( 'The demo file URL may require authentication. Contact the theme author to verify the demo file URL is publicly accessible.', 'easy-demo-importer' ),
 			],
 			403 => [
-				'message' => esc_html__( 'Access to the demo file was forbidden (403 Forbidden).', 'easy-demo-importer' ),
-				'hint'    => esc_html__( 'The demo file server is blocking the request. This can happen if your server IP is restricted. Contact the theme author.', 'easy-demo-importer' ),
+				'message' => __( 'Access to the demo file was forbidden (403 Forbidden).', 'easy-demo-importer' ),
+				'hint'    => __( 'The demo file server is blocking the request. This can happen if your server IP is restricted. Contact the theme author.', 'easy-demo-importer' ),
 			],
 			404 => [
-				'message' => esc_html__( 'The demo file was not found on the server (404 Not Found).', 'easy-demo-importer' ),
-				'hint'    => esc_html__( 'The demo ZIP URL in the theme configuration may be incorrect or the file has been moved. Contact the theme author for an updated demo package.', 'easy-demo-importer' ),
+				'message' => __( 'The demo file was not found on the server (404 Not Found).', 'easy-demo-importer' ),
+				'hint'    => __( 'The demo ZIP URL in the theme configuration may be incorrect or the file has been moved. Contact the theme author for an updated demo package.', 'easy-demo-importer' ),
 			],
 			408 => [
-				'message' => esc_html__( 'The demo file server took too long to respond (408 Request Timeout).', 'easy-demo-importer' ),
-				'hint'    => esc_html__( 'The file server may be temporarily overloaded. Try again in a few minutes. You can also increase the timeout by adding add_filter(\'sd/edi/download_timeout\', fn() => 300); to your theme\'s functions.php.', 'easy-demo-importer' ),
+				'message' => __( 'The demo file server took too long to respond (408 Request Timeout).', 'easy-demo-importer' ),
+				'hint'    => __( 'The file server may be temporarily overloaded. Try again in a few minutes. You can also increase the timeout by adding add_filter(\'sd/edi/download_timeout\', fn() => 300); to your theme\'s functions.php.', 'easy-demo-importer' ),
 			],
 			429 => [
-				'message' => esc_html__( 'Too many download requests were made (429 Too Many Requests).', 'easy-demo-importer' ),
-				'hint'    => esc_html__( 'Wait a few minutes before trying again. The demo file server may be rate-limiting requests.', 'easy-demo-importer' ),
+				'message' => __( 'Too many download requests were made (429 Too Many Requests).', 'easy-demo-importer' ),
+				'hint'    => __( 'Wait a few minutes before trying again. The demo file server may be rate-limiting requests.', 'easy-demo-importer' ),
 			],
 			500 => [
-				'message' => esc_html__( 'The demo file server encountered an internal error (500 Internal Server Error).', 'easy-demo-importer' ),
-				'hint'    => esc_html__( 'This is a problem on the demo file server, not your site. Try again later or contact the theme author.', 'easy-demo-importer' ),
+				'message' => __( 'The demo file server encountered an internal error (500 Internal Server Error).', 'easy-demo-importer' ),
+				'hint'    => __( 'This is a problem on the demo file server, not your site. Try again later or contact the theme author.', 'easy-demo-importer' ),
 			],
 			503 => [
-				'message' => esc_html__( 'The demo file server is temporarily unavailable (503 Service Unavailable).', 'easy-demo-importer' ),
-				'hint'    => esc_html__( 'The demo server may be undergoing maintenance. Wait a few minutes and try again.', 'easy-demo-importer' ),
+				'message' => __( 'The demo file server is temporarily unavailable (503 Service Unavailable).', 'easy-demo-importer' ),
+				'hint'    => __( 'The demo server may be undergoing maintenance. Wait a few minutes and try again.', 'easy-demo-importer' ),
 			],
 			504 => [
-				'message' => esc_html__( 'The demo file server gateway timed out (504 Gateway Timeout).', 'easy-demo-importer' ),
-				'hint'    => esc_html__( 'The demo server is temporarily overloaded or unreachable. Try again in a few minutes. If the problem persists, contact the theme author.', 'easy-demo-importer' ),
+				'message' => __( 'The demo file server gateway timed out (504 Gateway Timeout).', 'easy-demo-importer' ),
+				'hint'    => __( 'The demo server is temporarily overloaded or unreachable. Try again in a few minutes. If the problem persists, contact the theme author.', 'easy-demo-importer' ),
 			],
 		];
 
@@ -225,8 +225,8 @@ class DownloadFiles extends ImporterAjax {
 		return [
 			'success' => false,
 			/* translators: %d: HTTP status code */
-			'message' => sprintf( esc_html__( 'The demo file server returned an unexpected response (HTTP %d).', 'easy-demo-importer' ), $code ),
-			'hint'    => esc_html__( 'Try again later. If the problem persists, note the error code and contact the theme author.', 'easy-demo-importer' ),
+			'message' => sprintf( __( 'The demo file server returned an unexpected response (HTTP %d).', 'easy-demo-importer' ), $code ),
+			'hint'    => __( 'Try again later. If the problem persists, note the error code and contact the theme author.', 'easy-demo-importer' ),
 		];
 	}
 }
