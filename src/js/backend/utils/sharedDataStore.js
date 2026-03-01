@@ -6,10 +6,24 @@ import { Api } from './Api';
  */
 const RESUME_KEY = 'sd_edi_resume_request';
 
+const RESUME_TTL_MS = 30 * 60 * 1000; // 30 minutes — matches server-side mutex stale timeout
+
 const loadResumeRequest = () => {
 	try {
 		const saved = localStorage.getItem(RESUME_KEY);
-		return saved ? JSON.parse(saved) : null;
+
+		if (!saved) {
+			return null;
+		}
+
+		const data = JSON.parse(saved);
+
+		if (data._expires && Date.now() > data._expires) {
+			localStorage.removeItem(RESUME_KEY);
+			return null;
+		}
+
+		return data;
 	} catch {
 		return null;
 	}
@@ -18,7 +32,13 @@ const loadResumeRequest = () => {
 const saveResumeRequest = (request) => {
 	try {
 		if (request) {
-			localStorage.setItem(RESUME_KEY, JSON.stringify(request));
+			localStorage.setItem(
+				RESUME_KEY,
+				JSON.stringify({
+					...request,
+					_expires: Date.now() + RESUME_TTL_MS,
+				})
+			);
 		} else {
 			localStorage.removeItem(RESUME_KEY);
 		}
@@ -31,26 +51,26 @@ const saveResumeRequest = (request) => {
  * Shared data store for managing shared state and actions.
  *
  * @typedef  {Object}   SharedDataStore
- * @property {Object}   importList        - The import list data.
- * @property {Object}   pluginList        - The plugin list data.
- * @property {boolean}  loading           - The loading state.
- * @property {number}   currentStep       - The current step in the process.
- * @property {boolean}  modalVisible      - The visibility of the modal.
- * @property {boolean}  excludeImages     - The exclude images option.
- * @property {boolean}  importComplete    - The import completion status.
- * @property {boolean}  reset             - The reset option.
- * @property {string}   message           - The message.
- * @property {string}   activeSessionId   - The session ID of the currently running import.
- * @property {Function} fetchImportList   - Fetch the import list data.
- * @property {Function} fetchPluginList   - Fetch the plugin list data.
- * @property {Function} setCurrentStep    - Set the current step.
- * @property {Function} setModalVisible   - Set the visibility of the modal.
- * @property {Function} handleModalCancel - Handle the modal cancellation.
- * @property {Function} setExcludeImages  - Set the exclude images option.
- * @property {Function} setReset          - Set the reset option.
- * @property {Function} setLoading        - Set the loading state.
- * @property {Function} setImportComplete - Set the import completion status.
- * @property {Function} setMessage        - Set the message.
+ * @property {Object}   importList         - The import list data.
+ * @property {Object}   pluginList         - The plugin list data.
+ * @property {boolean}  loading            - The loading state.
+ * @property {number}   currentStep        - The current step in the process.
+ * @property {boolean}  modalVisible       - The visibility of the modal.
+ * @property {boolean}  excludeImages      - The exclude images option.
+ * @property {boolean}  importComplete     - The import completion status.
+ * @property {boolean}  reset              - The reset option.
+ * @property {string}   message            - The message.
+ * @property {string}   activeSessionId    - The session ID of the currently running import.
+ * @property {Function} fetchImportList    - Fetch the import list data.
+ * @property {Function} fetchPluginList    - Fetch the plugin list data.
+ * @property {Function} setCurrentStep     - Set the current step.
+ * @property {Function} setModalVisible    - Set the visibility of the modal.
+ * @property {Function} handleModalCancel  - Handle the modal cancellation.
+ * @property {Function} setExcludeImages   - Set the exclude images option.
+ * @property {Function} setReset           - Set the reset option.
+ * @property {Function} setLoading         - Set the loading state.
+ * @property {Function} setImportComplete  - Set the import completion status.
+ * @property {Function} setMessage         - Set the message.
  * @property {Function} setActiveSessionId - Set the active session ID.
  */
 

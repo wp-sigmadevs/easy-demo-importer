@@ -72,13 +72,12 @@ class Initialize extends ImporterAjax {
 
 		$session_id = ! empty( $_POST['sessionId'] ) ? sanitize_text_field( wp_unslash( $_POST['sessionId'] ) ) : '';
 
-		if ( ! empty( $session_id ) ) {
-			SessionManager::release( $session_id );
-		} else {
-			// No specific session ID — force-clear any lock, including active ones.
-			SessionManager::forceRelease();
+		if ( empty( $session_id ) ) {
+			wp_send_json_error( [ 'errorMessage' => __( 'Missing session ID.', 'easy-demo-importer' ) ], 400 );
+			return;
 		}
 
+		SessionManager::release( $session_id );
 		wp_send_json_success();
 	}
 

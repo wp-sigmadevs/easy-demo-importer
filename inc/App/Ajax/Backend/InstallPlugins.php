@@ -112,10 +112,10 @@ class InstallPlugins extends ImporterAjax {
 				true,
 				sprintf(
 					/* translators: %s: comma-separated list of plugin slugs */
-					esc_html__( 'Failed to install required plugin(s): %s.', 'easy-demo-importer' ),
+					__( 'Failed to install required plugin(s): %s.', 'easy-demo-importer' ),
 					$failedPlugins
 				),
-				esc_html__( 'Check your server\'s outbound internet access and ensure WordPress.org is reachable. You can also try installing the plugins manually from Plugins > Add New, then run the import again.', 'easy-demo-importer' )
+				__( "Check your server's outbound internet access and ensure WordPress.org is reachable. You can also try installing the plugins manually from Plugins > Add New, then run the import again.", 'easy-demo-importer' )
 			);
 			return;
 		}

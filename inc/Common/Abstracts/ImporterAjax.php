@@ -204,7 +204,15 @@ abstract class ImporterAjax {
 			return $firstDemoSlug;
 		}
 
-		return sanitize_text_field( wp_unslash( $_POST['demo'] ) );
+		$slug = sanitize_text_field( wp_unslash( $_POST['demo'] ) );
+
+		// For multi-demo themes, reject slugs that don't exist in the config.
+		if ( ! empty( $this->config['demoData'] ) && ! array_key_exists( $slug, $this->config['demoData'] ) ) {
+			wp_send_json_error( [ 'errorMessage' => __( 'Invalid demo selection.', 'easy-demo-importer' ) ], 400 );
+			wp_die();
+		}
+
+		return $slug;
 	}
 
 	/**
