@@ -87,6 +87,7 @@ class Enqueue extends EnqueueBase {
 			'version'   => $this->plugin->version(),
 		];
 
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 		$this->enqueues['style'] = apply_filters( 'sd/edi/registered_admin_styles', $styles, 10, 1 );
 
 		return $this;
@@ -109,6 +110,7 @@ class Enqueue extends EnqueueBase {
 			'version'    => $this->plugin->version(),
 		];
 
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 		$this->enqueues['script'] = apply_filters( 'sd/edi/registered_admin_scripts', $scripts, 10, 1 );
 
 		return $this;
@@ -147,10 +149,10 @@ class Enqueue extends EnqueueBase {
 				'numberOfDemos'              => ! empty( sd_edi()->getDemoConfig()['demoData'] ) ? count( sd_edi()->getDemoConfig()['demoData'] ) : 0,
 				'hasTabCategories'           => ! empty( sd_edi()->getDemoConfig()['demoData'] ) ? Helpers::searchArrayKey( sd_edi()->getDemoConfig(), 'category' ) : 'no',
 				Helpers::nonceId()           => wp_create_nonce( Helpers::nonceText() ),
-				'enableSupportButton'        => esc_html( apply_filters( 'sd/edi/support_button', 'yes' ) ),
+				'enableSupportButton'        => esc_html( apply_filters( 'sd/edi/support_button', 'yes' ) ), // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 				'searchPlaceholder'          => esc_html__( 'Search demos...', 'easy-demo-importer' ),
 				'searchNoResults'            => esc_html__( 'No demos found. Try a different search term.', 'easy-demo-importer' ),
-				'removeTabsAndSearch'        => esc_html( apply_filters( 'sd/edi/remove_tab_and_search', false ) ),
+				'removeTabsAndSearch'        => esc_html( apply_filters( 'sd/edi/remove_tab_and_search', false ) ), // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
 				// Imports messages.
 				'prepareImporting'           => esc_html__( 'Preparing to install demo data. Doing some cleanups first.', 'easy-demo-importer' ),
@@ -248,7 +250,7 @@ class Enqueue extends EnqueueBase {
 	 */
 	public static function importModalTexts() {
 		return apply_filters(
-			'sd/edi/import_modal_texts',
+			'sd/edi/import_modal_texts', // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 			[
 				'stepOne'     => [
 					'introTopText'    => esc_html__( 'We recommend backing up your site before proceeding. A backup plugin can help you restore your site if anything goes wrong during the import.', 'easy-demo-importer' ),

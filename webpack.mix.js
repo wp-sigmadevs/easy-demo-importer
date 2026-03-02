@@ -41,6 +41,7 @@ if (process.env.npm_config_package) {
 			"samples",
 			"vendor",
 			"views",
+			"composer.json",
 			"index.php",
 			"readme.txt",
 			`${package_slug}.php`,

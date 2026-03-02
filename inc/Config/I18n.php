@@ -46,10 +46,6 @@ final class I18n extends Base {
 	 * @since 1.0.0
 	 */
 	public function load() {
-		load_plugin_textdomain(
-			$this->plugin->textDomain(),
-			false,
-			dirname( plugin_basename( SD_EDI_ROOT_FILE ) ) . $this->plugin->data()['domain-path']
-		);
+		// WordPress 4.6+ automatically loads translations for wp.org-hosted plugins.
 	}
 }

@@ -61,7 +61,7 @@ class Initialize extends ImporterAjax {
 	/**
 	 * Release the active import session lock.
 	 *
-	 * Called by the "Start Over" button so the user can restart after a failed import
+	 * Called by the "Start Over" button, so the user can restart after a failed import
 	 * without waiting for the 30-minute lock TTL to expire.
 	 *
 	 * @return void
@@ -70,6 +70,7 @@ class Initialize extends ImporterAjax {
 	public function cancelSession() {
 		Helpers::verifyAjaxCall();
 
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing
 		$session_id = ! empty( $_POST['sessionId'] ) ? sanitize_text_field( wp_unslash( $_POST['sessionId'] ) ) : '';
 
 		if ( empty( $session_id ) ) {
@@ -104,7 +105,7 @@ class Initialize extends ImporterAjax {
 			return;
 		}
 
-		// Start new import session and acquire the mutex lock.
+		// Start a new import session and acquire the mutex lock.
 		$session         = SessionManager::start();
 		$this->sessionId = $session['session_id'];
 
@@ -122,7 +123,7 @@ class Initialize extends ImporterAjax {
 		/**
 		 * Action Hook: 'sd/edi/importer_init'
 		 *
-		 * Performs special actions when importer initializes.
+		 * Performs special actions when the importer initializes.
 		 *
 		 * @hooked SigmaDevs\EasyDemoImporter\Common\Functions\Actions::initImportActions 10
 		 *

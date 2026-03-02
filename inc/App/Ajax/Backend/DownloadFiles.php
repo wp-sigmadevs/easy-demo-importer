@@ -132,8 +132,8 @@ class DownloadFiles extends ImporterAjax {
 				return [
 					'success' => false,
 					'message' => __( 'Could not verify the SSL certificate of the demo file server.', 'easy-demo-importer' ),
-					/* translators: %s: WordPress filter name */
 					'hint'    => sprintf(
+						/* translators: %s: WordPress filter name */
 						__( "Your server's SSL/cURL configuration may be outdated. Ask your host to update their CA certificate bundle. As a temporary workaround, add %s to your theme's functions.php — note: this disables SSL certificate verification.", 'easy-demo-importer' ),
 						'add_filter(\'sd/edi/download_sslverify\', \'__return_false\');'
 					),
