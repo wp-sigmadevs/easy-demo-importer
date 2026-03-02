@@ -200,10 +200,12 @@ abstract class ImporterAjax {
 		// Nonce already verified in handlePostSubmission() before this is called.
 		$firstDemoSlug = ! empty( $this->config['demoData'] ) ? array_key_first( $this->config['demoData'] ) : '';
 
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing
 		if ( empty( $_POST['demo'] ) ) {
 			return $firstDemoSlug;
 		}
 
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing
 		$slug = sanitize_text_field( wp_unslash( $_POST['demo'] ) );
 
 		// For multi-demo themes, reject slugs that don't exist in the config.
@@ -223,6 +225,7 @@ abstract class ImporterAjax {
 	 * @param string $complete Completed message.
 	 * @param bool   $error Error.
 	 * @param string $errorMessage Error message.
+	 * @param string $errorHint Error hint.
 	 *
 	 * @return void
 	 * @since 1.0.0
@@ -282,7 +285,7 @@ abstract class ImporterAjax {
 	}
 
 	/**
-	 * Check if plugin is active or not.
+	 * Check if the plugin is active or not.
 	 *
 	 * @param string $path Plugin path.
 	 *

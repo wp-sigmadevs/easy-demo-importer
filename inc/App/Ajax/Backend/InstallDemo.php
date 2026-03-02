@@ -69,7 +69,7 @@ class InstallDemo extends ImporterAjax {
 		global $wpdb;
 
 		// ── Step-level mutex ────────────────────────────────────────────────────────
-		// When the user reloads mid-import PHP keeps running in the background (output
+		// When the user reloads mid-import, PHP keeps running in the background (output
 		// is buffered so the disconnect is never detected).  If the user then resumes,
 		// a second request reaches this method while the first is still executing,
 		// which causes two parallel XML imports and duplicated content.
@@ -78,7 +78,7 @@ class InstallDemo extends ImporterAjax {
 		// guarantees exactly one process gets the row.  The other gets 0 rows affected
 		// and must wait before retrying.
 		//
-		// Stale-lock guard: if the mutex has been held for more than 30 minutes the
+		// Stale-lock guard: if the mutex has been held for more than 30 minutes, the
 		// original process likely crashed — force-release so the site isn't stuck.
 		$mutex_option = 'sd_edi_xml_import_mutex';
 		$mutex_ts     = (int) get_option( $mutex_option, 0 );
@@ -89,7 +89,7 @@ class InstallDemo extends ImporterAjax {
 		}
 
 		if ( ! $mutex_ts ) {
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$mutex_acquired = (bool) $wpdb->query(
 				$wpdb->prepare(
 					"INSERT IGNORE INTO {$wpdb->options} (option_name, option_value, autoload) VALUES (%s, %s, 'no')",
@@ -103,19 +103,21 @@ class InstallDemo extends ImporterAjax {
 
 		if ( ! $mutex_acquired ) {
 			// Background XML import is still running.  Ask the client to wait 5 s and retry.
-			wp_send_json( [
-				'demo'                  => $this->demoSlug,
-				'excludeImages'         => $this->excludeImages,
-				'skipImageRegeneration' => $this->skipImageRegeneration,
-				'reset'                 => $this->reset,
-				'sessionId'             => $this->sessionId,
-				'nextPhase'             => 'sd_edi_import_xml',
-				'nextPhaseMessage'      => esc_html__( 'Waiting for previous import to finish…', 'easy-demo-importer' ),
-				'completedMessage'      => '',
-				'error'                 => false,
-				'retry'                 => true,
-				'retryAfter'            => 5,
-			] );
+			wp_send_json(
+				[
+					'demo'                  => $this->demoSlug,
+					'excludeImages'         => $this->excludeImages,
+					'skipImageRegeneration' => $this->skipImageRegeneration,
+					'reset'                 => $this->reset,
+					'sessionId'             => $this->sessionId,
+					'nextPhase'             => 'sd_edi_import_xml',
+					'nextPhaseMessage'      => esc_html__( 'Waiting for previous import to finish…', 'easy-demo-importer' ),
+					'completedMessage'      => '',
+					'error'                 => false,
+					'retry'                 => true,
+					'retryAfter'            => 5,
+				]
+			);
 			return;
 		}
 
@@ -254,22 +256,22 @@ class InstallDemo extends ImporterAjax {
 		if ( ! empty( $term_ids ) ) {
 			$term_ids_in = implode( ',', array_map( 'intval', $term_ids ) );
 
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			$wpdb->query( "DELETE FROM {$wpdb->terms}             WHERE term_id IN ({$term_ids_in})" );
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			$wpdb->query( "DELETE FROM {$wpdb->term_taxonomy}     WHERE term_id IN ({$term_ids_in})" );
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			$wpdb->query( "DELETE FROM {$wpdb->termmeta}          WHERE term_id IN ({$term_ids_in})" );
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			$wpdb->query( "DELETE FROM {$wpdb->terms} WHERE term_id IN ({$term_ids_in})" );
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			$wpdb->query( "DELETE FROM {$wpdb->term_taxonomy} WHERE term_id IN ({$term_ids_in})" );
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			$wpdb->query( "DELETE FROM {$wpdb->termmeta} WHERE term_id IN ({$term_ids_in})" );
 		}
 
 		if ( ! empty( $post_ids ) ) {
 			$post_ids_in = implode( ',', array_map( 'intval', $post_ids ) );
 
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			$wpdb->query( "DELETE FROM {$wpdb->posts}              WHERE ID IN ({$post_ids_in})" );
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			$wpdb->query( "DELETE FROM {$wpdb->postmeta}           WHERE post_id IN ({$post_ids_in})" );
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			$wpdb->query( "DELETE FROM {$wpdb->posts} WHERE ID IN ({$post_ids_in})" );
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			$wpdb->query( "DELETE FROM {$wpdb->postmeta} WHERE post_id IN ({$post_ids_in})" );
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 			$wpdb->query( "DELETE FROM {$wpdb->term_relationships} WHERE object_id IN ({$post_ids_in})" );
 		}
 

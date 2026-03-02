@@ -62,7 +62,7 @@
         </properties>
     </rule>
 
-    <!-- Defining Cyclomatic Complexity for more modular approach -->
+    <!-- Defining Cyclomatic Complexity for a more modular approach -->
     <rule ref="Generic.Metrics.CyclomaticComplexity">
         <properties>
             <property name="complexity" value="30"/>
