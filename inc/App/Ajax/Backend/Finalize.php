@@ -75,7 +75,7 @@ class Finalize extends ImporterAjax {
 		 *
 		 * @since 1.0.0
 		 */
-		do_action( 'sd/edi/after_import', $this );
+		do_action( 'sd/edi/after_import', $this ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
 		// Resetting permalink.
 		flush_rewrite_rules();

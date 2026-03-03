@@ -34,7 +34,7 @@ final class Plugin {
 	public function data() {
 		return array_merge(
 			apply_filters(
-				'sd/edi/plugin_meta_data',
+				'sd/edi/plugin_meta_data', // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 				$this->getPluginMetaData()
 			),
 			$this->getOwnPluginData()

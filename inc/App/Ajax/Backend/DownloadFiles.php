@@ -65,11 +65,11 @@ class DownloadFiles extends ImporterAjax {
 		// Verifying AJAX call and user role.
 		Helpers::verifyAjaxCall();
 
-		$demoZip  = $this->multiple ?
+		$demoZip = $this->multiple ?
 			Helpers::getDemoData( $this->config['demoData'][ $this->demoSlug ], 'demoZip' ) :
 			Helpers::getDemoData( $this->config, 'demoZip' );
-		$result   = $this->downloadDemoFiles( $demoZip );
-		$success  = $result['success'];
+		$result  = $this->downloadDemoFiles( $demoZip );
+		$success = $result['success'];
 
 		// Response.
 		$this->prepareResponse(
@@ -112,8 +112,8 @@ class DownloadFiles extends ImporterAjax {
 			];
 		}
 
-		$timeout  = (int) apply_filters( 'sd/edi/download_timeout', 120 );
-		$sslverify = (bool) apply_filters( 'sd/edi/download_sslverify', true );
+		$timeout   = (int) apply_filters( 'sd/edi/download_timeout', 120 ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+		$sslverify = (bool) apply_filters( 'sd/edi/download_sslverify', true ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 		$demoData  = $this->demoUploadDir() . 'imported-demo-data.zip';
 
 		$response = wp_remote_get(
@@ -171,7 +171,11 @@ class DownloadFiles extends ImporterAjax {
 			];
 		}
 
-		return [ 'success' => true, 'message' => '', 'hint' => '' ];
+		return [
+			'success' => true,
+			'message' => '',
+			'hint'    => '',
+		];
 	}
 
 	/**

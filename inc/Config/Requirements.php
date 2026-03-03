@@ -46,7 +46,7 @@ final class Requirements extends Base {
 	 */
 	public function specifications() {
 		return apply_filters(
-			'sd/edi/plugin_requirements',
+			'sd/edi/plugin_requirements', // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 			[
 				'php' => $this->plugin->requiredPhp(),
 				'wp'  => $this->plugin->requiredWp(),

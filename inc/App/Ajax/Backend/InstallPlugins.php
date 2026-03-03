@@ -255,9 +255,9 @@ class InstallPlugins extends ImporterAjax {
 
 			global $wp_filesystem;
 
-			$plugin   = $this->demoUploadDir() . 'plugin.zip';
-			$timeout  = (int) apply_filters( 'sd/edi/download_timeout', 120 );
-			$sslverify = (bool) apply_filters( 'sd/edi/download_sslverify', true );
+			$plugin    = $this->demoUploadDir() . 'plugin.zip';
+			$timeout   = (int) apply_filters( 'sd/edi/download_timeout', 120 ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+			$sslverify = (bool) apply_filters( 'sd/edi/download_sslverify', true ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
 			$response = wp_remote_get(
 				$externalUrl,

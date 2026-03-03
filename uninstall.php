@@ -29,25 +29,26 @@ $wpdb->query(
 );
 
 // Drop the taxonomy import tracking table.
-$table_name = $wpdb->prefix . 'sd_edi_taxonomy_import';
-// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQLPlaceholders.UnquotedComplexPlaceholder
+$table_name = $wpdb->prefix . 'sd_edi_taxonomy_import'; // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
+// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQLPlaceholders.UnquotedComplexPlaceholder
 $wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %1$s', $table_name ) );
 
 // Clear any scheduled cron events registered by the plugin.
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
 $cron_hooks = [
 	'sd_edi_import_cron',
 ];
 
-foreach ( $cron_hooks as $hook ) {
-	$timestamp = wp_next_scheduled( $hook );
+foreach ( $cron_hooks as $hook ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
+	$timestamp = wp_next_scheduled( $hook ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
 	if ( $timestamp ) {
 		wp_unschedule_event( $timestamp, $hook );
 	}
 }
 
 // Delete the uploads/easy-demo-importer/ staging directory.
-$upload_dir   = wp_upload_dir();
-$edi_dir      = trailingslashit( $upload_dir['basedir'] ) . 'easy-demo-importer';
+$upload_dir = wp_upload_dir(); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
+$edi_dir    = trailingslashit( $upload_dir['basedir'] ) . 'easy-demo-importer'; // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
 
 if ( is_dir( $edi_dir ) ) {
 	if ( ! function_exists( 'WP_Filesystem' ) ) {

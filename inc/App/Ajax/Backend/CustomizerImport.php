@@ -77,7 +77,7 @@ class CustomizerImport extends ImporterAjax {
 			 *
 			 * @since 1.1.5
 			 */
-			do_action( 'sd/edi/before_customizer_import', $customizerFilePath );
+			do_action( 'sd/edi/before_customizer_import', $customizerFilePath ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
 			// Import customizer data.
 			ob_start();
@@ -91,7 +91,7 @@ class CustomizerImport extends ImporterAjax {
 			 *
 			 * @since 1.1.5
 			 */
-			do_action( 'sd/edi/after_customizer_import', $customizerFilePath );
+			do_action( 'sd/edi/after_customizer_import', $customizerFilePath ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 		}
 
 		// Response.

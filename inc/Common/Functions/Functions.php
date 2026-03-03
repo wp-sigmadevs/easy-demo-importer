@@ -49,7 +49,7 @@ class Functions extends Base {
 	}
 
 	/**
-	 * Get plugin path.
+	 * Get the plugin path.
 	 *
 	 * @return string
 	 * @since 1.0.0
@@ -75,11 +75,11 @@ class Functions extends Base {
 	 * @since 1.0.0
 	 */
 	public function getDemoConfig() {
-		return apply_filters( 'sd/edi/importer/config', [] );
+		return apply_filters( 'sd/edi/importer/config', [] ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 	}
 
 	/**
-	 * Get active theme.
+	 * Get the active theme.
 	 *
 	 * @return false|mixed|null
 	 * @since 1.0.0
@@ -96,7 +96,7 @@ class Functions extends Base {
 	 */
 	public function supportedThemes() {
 		return apply_filters(
-			'sd/edi/supported_themes',
+			'sd/edi/supported_themes', // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 			[
 				! empty( $this->getDemoConfig()['themeSlug'] ) ? esc_html( $this->getDemoConfig()['themeSlug'] ) : '',
 			]

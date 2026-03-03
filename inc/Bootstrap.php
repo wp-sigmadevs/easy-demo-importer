@@ -84,7 +84,7 @@ final class Bootstrap extends Base {
 	 * @since 1.0.0
 	 */
 	public function registerServices( $composer ) {
-		do_action( 'sd/edi/plugin_loaded' );
+		do_action( 'sd/edi/plugin_loaded' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
 		// Check plugin requirements.
 		$this->checkRequirements();
@@ -203,7 +203,7 @@ final class Bootstrap extends Base {
 	 * @since 1.0.0
 	 */
 	public function initServices() {
-		$this->services = apply_filters( 'sd/edi/initialized_classes', $this->services );
+		$this->services = apply_filters( 'sd/edi/initialized_classes', $this->services ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
 		foreach ( $this->services as $service ) {
 			$class = $service::instance();

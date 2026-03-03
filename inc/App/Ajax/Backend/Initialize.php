@@ -129,7 +129,7 @@ class Initialize extends ImporterAjax {
 		 *
 		 * @since 1.0.0
 		 */
-		do_action( 'sd/edi/importer_init', $this );
+		do_action( 'sd/edi/importer_init', $this ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
 		// Response.
 		$this->prepareResponse(

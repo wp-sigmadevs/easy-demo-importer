@@ -56,8 +56,8 @@ class Filters {
 			return $file;
 		}
 
-		// Set maximum file size (500KB max).
-		$max_file_size = apply_filters( 'sd/edi/import/max_svg_file_size', 500 * 1024 );
+		// Set the maximum file size (500KB max).
+		$max_file_size = apply_filters( 'sd/edi/import/max_svg_file_size', 500 * 1024 ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 		$size_in_kb    = $max_file_size / 1024;
 		$size_in_mb    = $size_in_kb / 1024;
 		$size_message  = ( $size_in_kb < 1024 ) ? $size_in_kb . 'KB' : number_format( $size_in_mb, 2 ) . 'MB';

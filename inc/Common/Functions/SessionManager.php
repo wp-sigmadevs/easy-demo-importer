@@ -51,7 +51,7 @@ class SessionManager {
 		static::cleanup();
 
 		$session_id = wp_generate_uuid4();
-		$ttl        = (int) apply_filters( 'sd/edi/lock_ttl', 30 * MINUTE_IN_SECONDS );
+		$ttl        = (int) apply_filters( 'sd/edi/lock_ttl', 30 * MINUTE_IN_SECONDS ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
 		$session_data = [
 			'session_id' => $session_id,
