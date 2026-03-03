@@ -68,12 +68,12 @@ class Widgets {
 		// Loop import data's sidebars.
 		foreach ( $data as $sidebarId => $widgets ) {
 
-			// Skip inactive widgets (should not be in export file).
+			// Skip inactive widgets (should not be in the export file).
 			if ( 'wp_inactive_widgets' === $sidebarId ) {
 				continue;
 			}
 
-			// Check if sidebar is available on this site. Otherwise, add widgets to inactive, and say so.
+			// Check if a sidebar is available on this site. Otherwise, add widgets to inactive and say so.
 			if ( isset( $wp_registered_sidebars[ $sidebarId ] ) ) {
 				$sidebarAvailable   = true;
 				$useSidebarId       = $sidebarId;
@@ -81,7 +81,7 @@ class Widgets {
 				$sidebarMessage     = '';
 			} else {
 				$sidebarAvailable   = false;
-				$useSidebarId       = 'wp_inactive_widgets'; // Add to inactive if sidebar does not exist in theme.
+				$useSidebarId       = 'wp_inactive_widgets'; // Add to inactive if the sidebar does not exist in the theme.
 				$sidebarMessageType = 'error';
 				$sidebarMessage     = esc_html__( 'Sidebar does not exist in theme (moving widget to Inactive)', 'easy-demo-importer' );
 			}
@@ -101,34 +101,34 @@ class Widgets {
 					$widget->nav_menu = sd_edi()->getNewID( $widget->nav_menu );
 				}
 
-				// Get id_base (remove -# from end) and instance ID number.
+				// Get id_base (remove # from the end) and instance ID number.
 				$idBase           = preg_replace( '/-[0-9]+$/', '', $widgetInstanceId );
 				$instanceIdNumber = str_replace( $idBase . '-', '', $widgetInstanceId );
 
-				// Does site support this widget?
+				// Does the site support this widget?
 				if ( ! $fail && ! isset( $availableWidgets[ $idBase ] ) ) {
 					$fail              = true;
 					$widgetMessageType = 'error';
 					$widgetMessage     = esc_html__( 'Site does not support widget', 'easy-demo-importer' ); // Explain why widget not imported.
 				}
 
-				// Filter to modify settings object before conversion to array and import
-				// Leave this filter here for backwards compatibility with manipulating objects (before conversion to array below)
-				// Ideally the newer wie_widget_settings_array below will be used instead of this.
-				$widget = apply_filters( 'wie_widget_settings', $widget ); // object
+				// Filter to modify a settings object before conversion to array and import
+				// Leave this filter here for backwards compatibility with manipulating objects (before the conversion to array below)
+				// Ideally, the newer wie_widget_settings_array below will be used instead of this.
+				$widget = apply_filters( 'wie_widget_settings', $widget ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 				// Convert multidimensional objects to multidimensional arrays
 				// Some plugins like Jetpack Widget Visibility store settings as multidimensional arrays
 				// Without this, they are imported as objects and cause fatal error on Widgets page
-				// If this creates problems for plugins that do actually intend settings in objects then may need to consider other approach: https://wordpress.org/support/topic/problem-with-array-of-arrays
+				// If this creates problems for plugins that do actually intend settings in objects then may need to consider another approach: https://wordpress.org/support/topic/problem-with-array-of-arrays
 				// It is probably much more likely that arrays are used than objects, however.
 				$widget = json_decode( wp_json_encode( $widget ), true );
 
 				// Filter to modify settings array
 				// This is preferred over the older wie_widget_settings filter above
-				// Do before identical check because changes may make it identical to end result (such as URL replacements).
-				$widget = apply_filters( 'wie_widget_settings_array', $widget );
+				// Do before identical check because changes may make it identical to an end result (such as URL replacements).
+				$widget = apply_filters( 'wie_widget_settings_array', $widget ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
-				// Does widget with identical settings already exist in same sidebar?
+				// Does a widget with identical settings already exist in the same sidebar?
 				if ( ! $fail && isset( $widgetInstances[ $idBase ] ) ) {
 
 					// Get existing widgets in this sidebar.
@@ -138,7 +138,8 @@ class Widgets {
 					$singleWidgetInstances = ! empty( $widgetInstances[ $idBase ] ) ? $widgetInstances[ $idBase ] : [];
 					foreach ( $singleWidgetInstances as $checkId => $check_widget ) {
 
-						// Is widget in same sidebar and has identical settings?
+						// Is the widget in the same sidebar and has identical settings?
+						// phpcs:ignore WordPress.PHP.StrictInArray.MissingTrueStrict
 						if ( in_array( "$idBase-$checkId", $sidebarWidgets ) && (array) $widget == $check_widget ) {
 							$fail              = true;
 							$widgetMessageType = 'warning';
@@ -152,7 +153,7 @@ class Widgets {
 				// No failure.
 				if ( ! $fail ) {
 
-					// Add widget instance.
+					// Add a widget instance.
 					$singleWidgetInstances   = get_option( 'widget_' . $idBase ); // all instances for that widget ID base, get fresh every time.
 					$singleWidgetInstances   = ! empty( $singleWidgetInstances ) ? $singleWidgetInstances : [ '_multiwidget' => 1 ]; // start fresh if we have to.
 					$singleWidgetInstances[] = $widget; // add it
@@ -160,25 +161,25 @@ class Widgets {
 					end( $singleWidgetInstances );
 					$newInstanceIdNumber = key( $singleWidgetInstances );
 
-					// If key is 0, make it 1
-					// When 0, an issue can occur where adding a widget causes data from other widget to load, and the widget doesn't stick (reload wipes it).
+					// If the key is 0, make it 1
+					// When 0, an issue can occur where adding a widget causes data from another widget to load, and the widget doesn't stick (reload wipes it).
 					if ( '0' === strval( $newInstanceIdNumber ) ) {
 						$newInstanceIdNumber                           = 1;
 						$singleWidgetInstances[ $newInstanceIdNumber ] = $singleWidgetInstances[0];
 						unset( $singleWidgetInstances[0] );
 					}
 
-					// Move _multiwidget to end of array for uniformity.
+					// Move _multiwidget to the end of the array for uniformity.
 					if ( isset( $singleWidgetInstances['_multiwidget'] ) ) {
 						$multiwidget = $singleWidgetInstances['_multiwidget'];
 						unset( $singleWidgetInstances['_multiwidget'] );
 						$singleWidgetInstances['_multiwidget'] = $multiwidget;
 					}
 
-					// Update option with new widget.
+					// Update option with a new widget.
 					update_option( 'widget_' . $idBase, $singleWidgetInstances );
 
-					// Assign widget instance to sidebar.
+					// Assign a widget instance to the sidebar.
 					$sidebarsWidgets = get_option( 'sidebars_widgets' ); // which sidebars have which widgets, get fresh every time
 					// Avoid rarely fatal error when the option is an empty string
 					// https://github.com/churchthemes/widget-importer-exporter/pull/11.
@@ -186,8 +187,8 @@ class Widgets {
 						$sidebarsWidgets = [];
 					}
 
-					$newInstanceId                      = $idBase . '-' . $newInstanceIdNumber; // use ID number from new widget instance.
-					$sidebarsWidgets[ $useSidebarId ][] = $newInstanceId; // add new instance to sidebar.
+					$newInstanceId                      = $idBase . '-' . $newInstanceIdNumber; // use ID number from the new widget instance.
+					$sidebarsWidgets[ $useSidebarId ][] = $newInstanceId; // add a new instance to the sidebar.
 
 					update_option( 'sidebars_widgets', $sidebarsWidgets ); // save the amended data
 					// After widget import action.
@@ -201,7 +202,7 @@ class Widgets {
 						'widget_id_num'     => $newInstanceIdNumber,
 						'widget_id_num_old' => $instanceIdNumber,
 					];
-					do_action( 'wie_after_widget_import', $afterWidgetImport );
+					do_action( 'wie_after_widget_import', $afterWidgetImport ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
 					// Success message.
 					if ( $sidebarAvailable ) {
@@ -213,7 +214,7 @@ class Widgets {
 					}
 				}
 
-				// Result for widget instance.
+				// Result for the widget instance.
 				$results[ $sidebarId ]['widgets'][ $widgetInstanceId ]['name']         = ! empty( $availableWidgets[ $idBase ]['name'] ) ? $availableWidgets[ $idBase ]['name'] : $idBase;
 				$results[ $sidebarId ]['widgets'][ $widgetInstanceId ]['title']        = ! empty( $widget['title'] ) ? $widget['title'] : esc_html__( 'No Title', 'easy-demo-importer' );
 				$results[ $sidebarId ]['widgets'][ $widgetInstanceId ]['message_type'] = $widgetMessageType;

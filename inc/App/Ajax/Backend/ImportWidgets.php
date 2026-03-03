@@ -77,7 +77,7 @@ class ImportWidgets extends ImporterAjax {
 			 *
 			 * @since 1.1.5
 			 */
-			do_action( 'sd/edi/before_widgets_import', $widgetsFilePath );
+			do_action( 'sd/edi/before_widgets_import', $widgetsFilePath ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
 			// Import widgets data.
 			ob_start();
@@ -91,7 +91,7 @@ class ImportWidgets extends ImporterAjax {
 			 *
 			 * @since 1.1.5
 			 */
-			do_action( 'sd/edi/after_widgets_import', $widgetsFilePath );
+			do_action( 'sd/edi/after_widgets_import', $widgetsFilePath ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 		}
 
 		$slider           = $this->multiple ?

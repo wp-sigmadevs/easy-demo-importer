@@ -312,8 +312,8 @@ class DBSearchReplace {
 					)
 				);
 
-				// SQL already prepared.
-				// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+				// SQL already prepared; column names are DB-sourced and values are escaped via mysql_escape_mimic().
+				// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
 				$result = $this->wpdb->query( $sql );
 
 				if ( ! $result ) {

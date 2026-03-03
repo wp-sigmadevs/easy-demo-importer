@@ -234,7 +234,7 @@ class RestEndpoints extends Base {
 		}
 
 		$errorData = apply_filters(
-			'sd/edi/config/no_demo',
+			'sd/edi/config/no_demo', // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 			[
 				'text'    => esc_html__( 'We apologize for any inconvenience, but it appears that the configuration file for the demo importer is either missing or you are using an unsupported theme. As a result, the installation of the demo content cannot proceed any further at this time. Thank you for your understanding.', 'easy-demo-importer' ),
 				'btnUrl'  => '',
@@ -749,7 +749,7 @@ class RestEndpoints extends Base {
 	 */
 	private function systemRequirements() {
 		return apply_filters(
-			'sd/edi/server_requirements',
+			'sd/edi/server_requirements', // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 			[
 				'max_execution_time'  => '300',
 				'max_input_time'      => '300',

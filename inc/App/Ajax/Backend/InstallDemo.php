@@ -145,7 +145,7 @@ class InstallDemo extends ImporterAjax {
 		 *
 		 * @since 1.0.0
 		 */
-		do_action( 'sd/edi/before_import', $xmlFile, $this );
+		do_action( 'sd/edi/before_import', $xmlFile, $this ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
 		if ( $fileExists ) {
 			// Clear any nav menus left by a previous (possibly partial) run so the
@@ -162,7 +162,7 @@ class InstallDemo extends ImporterAjax {
 		 *
 		 * @since 1.1.5
 		 */
-		do_action( 'sd/edi/after_content_import', $xmlFile, $this );
+		do_action( 'sd/edi/after_content_import', $xmlFile, $this ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
 		// Response.
 		$this->prepareResponse(

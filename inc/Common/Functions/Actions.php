@@ -53,7 +53,7 @@ class Actions {
 	 */
 	public static function pluginActivationActions( $plugin_path ) {
 		$plugins = apply_filters(
-			'sd/edi/plugin_activation_actions',
+			'sd/edi/plugin_activation_actions', // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 			[
 				'woocommerce/woocommerce.php' => [
 					'class'  => '\WC_Install',
@@ -98,13 +98,13 @@ class Actions {
 	 * @since 1.1.1
 	 */
 	public static function beforeImportActions() {
-		// Try to update PHP memory limit before import.
-		// phpcs:ignore WordPress.PHP.IniSet.memory_limit_Disallowed, Squiz.PHP.DiscouragedFunctions.Discouraged
+		// Try to update the PHP memory limit before import.
+		// phpcs:ignore WordPress.PHP.IniSet.memory_limit_Disallowed, Squiz.PHP.DiscouragedFunctions.Discouraged, WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 		ini_set( 'memory_limit', apply_filters( 'sd/edi/temp_boost_memory_limit', '350M' ) );
 
 		// Try to increase PHP max execution time before import.
 		if ( ( strpos( ini_get( 'disable_functions' ), 'set_time_limit' ) === false ) && ini_get( 'max_execution_time' ) < 300 ) {
-			// phpcs:ignore Squiz.PHP.DiscouragedFunctions.Discouraged
+			// phpcs:ignore Squiz.PHP.DiscouragedFunctions.Discouraged, WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 			set_time_limit( apply_filters( 'sd/edi/temp_boost_max_execution_time', 300 ) );
 		}
 
@@ -230,7 +230,7 @@ class Actions {
 			$blogSlug = $obj->multiple ? $obj->config['demoData'][ $obj->demoSlug ]['blogSlug'] : $obj->config['blogSlug'];
 		}
 
-		// Setting up front page.
+		// Setting up a front page.
 		if ( $homeSlug ) {
 			$page = get_page_by_path( $homeSlug );
 
@@ -247,7 +247,7 @@ class Actions {
 			}
 		}
 
-		// Setting up blog page.
+		// Setting up a blog page.
 		if ( $blogSlug ) {
 			$blog = get_page_by_path( $blogSlug );
 
@@ -305,7 +305,7 @@ class Actions {
 		}
 
 		$tables = apply_filters(
-			'sd/edi/db_search/tables',
+			'sd/edi/db_search/tables', // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 			[
 				$wpdb->prefix . 'commentmeta',
 				$wpdb->prefix . 'comments',
@@ -419,7 +419,7 @@ class Actions {
 	}
 
 	/**
-	 * Replace GUIDs in WordPress posts table.
+	 * Replace GUIDs in the WordPress posts table.
 	 *
 	 * @param string $oldUrl The old URL to search for in GUIDs.
 	 * @param string $newUrl The new URL to replace with.
@@ -731,10 +731,12 @@ class Actions {
 			'elementor_library',
 		];
 
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 		$postTypesSupport = apply_filters( 'sd/edi/elementor_post_types_support', array_diff( array_merge( $defaultPostTypes, array_keys( $customPostTypes ) ), $excludedPostTypes ) );
 
 		update_option( 'elementor_cpt_support', $postTypesSupport );
 
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 		if ( ! apply_filters( 'sd/edi/disabled_elementor_options', false ) ) {
 			update_option( 'elementor_disable_color_schemes', 'yes' );
 			update_option( 'elementor_disable_typography_schemes', 'yes' );
@@ -849,7 +851,7 @@ class Actions {
 							}
 						}
 					} else {
-						// Not a repeater field. Process based on widget type.
+						// Not a repeater field. Process based on the widget type.
 						$isWPWidget
 							? self::replaceCategoryWP( $element, $catID )
 							: self::replaceCategory( $element, $catID );

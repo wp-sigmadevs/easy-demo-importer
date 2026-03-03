@@ -6,7 +6,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-03-02 18:01+0000\n"
+"POT-Creation-Date: 2026-03-03 17:17+0000\n"
 "Report-Msgid-Bugs-To: https://github.com/wp-sigmadevs/easy-demo-importer/issues\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -38,275 +38,275 @@ msgid "WordPress %1$s or higher is required. You are currently running WordPress
 msgstr ""
 
 #. translators: %s: Plugin name
-#: ../inc/App/Backend/DeactivateNotice.php:110
+#: ../inc/App/Backend/DeactivateNotice.php:111
 msgid "It seems you've imported the theme demo data successfully. So, the purpose of %1$s plugin is fulfilled, and it has no more use. %2$sIf you're satisfied with the imported theme demo data, you can safely deactivate it by clicking the %3$s button."
 msgstr ""
 
-#: ../inc/App/Backend/DeactivateNotice.php:116, ../inc/App/Backend/DeactivateNotice.php:131
+#: ../inc/App/Backend/DeactivateNotice.php:117, ../inc/App/Backend/DeactivateNotice.php:132
 msgid "Deactivate Plugin"
 msgstr ""
 
-#: ../inc/App/Backend/DeactivateNotice.php:134
+#: ../inc/App/Backend/DeactivateNotice.php:135
 msgid "Dismiss This Notice"
 msgstr ""
 
-#: ../inc/App/Backend/DeactivateNotice.php:152
+#: ../inc/App/Backend/DeactivateNotice.php:153
 msgid "Action failed. Please refresh the page and try again."
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:151
+#: ../inc/App/Backend/Enqueue.php:153
 msgid "Search demos..."
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:152
+#: ../inc/App/Backend/Enqueue.php:154
 msgid "No demos found. Try a different search term."
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:156
+#: ../inc/App/Backend/Enqueue.php:158
 msgid "Preparing to install demo data. Doing some cleanups first."
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:157
+#: ../inc/App/Backend/Enqueue.php:159
 msgid "Preparing to install demo data. Resetting database first."
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:158
+#: ../inc/App/Backend/Enqueue.php:160
 msgid "All done. Have fun!"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:161
+#: ../inc/App/Backend/Enqueue.php:163
 msgid "Importing Demo:"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:164
+#: ../inc/App/Backend/Enqueue.php:166
 msgid "Before You Proceed"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:171
+#: ../inc/App/Backend/Enqueue.php:173
 msgid "Required Plugins"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:172
+#: ../inc/App/Backend/Enqueue.php:174
 msgid "Configure Your Import"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:174
+#: ../inc/App/Backend/Enqueue.php:176
 msgid "Skip Demo Images"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:175
+#: ../inc/App/Backend/Enqueue.php:177
 msgid "Exclude demo images to speed up the import. Recommended if the import fails repeatedly."
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:176
+#: ../inc/App/Backend/Enqueue.php:178
 msgid "Skip Image Regeneration"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:177
+#: ../inc/App/Backend/Enqueue.php:179
 msgid "Skips image regeneration during import for a faster experience. You can regenerate thumbnails later using a plugin like 'Regenerate Thumbnails'."
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:178
+#: ../inc/App/Backend/Enqueue.php:180
 msgid "Reset Existing Database"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:179
+#: ../inc/App/Backend/Enqueue.php:181
 msgid "Caution: "
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:180
+#: ../inc/App/Backend/Enqueue.php:182
 msgid "This will permanently erase all existing content — posts, pages, images, custom post types, taxonomies, and settings. A full database reset is recommended for the best demo import experience."
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:183
+#: ../inc/App/Backend/Enqueue.php:185
 msgid "Are you sure you want to continue?"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:184
+#: ../inc/App/Backend/Enqueue.php:186
 msgid "This will permanently delete all your existing content."
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:185
+#: ../inc/App/Backend/Enqueue.php:187
 msgid "This will permanently delete all your content, media, and settings. Are you sure you want to continue?"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:186, ../inc/App/Rest/RestEndpoints.php:412, ../inc/App/Rest/RestEndpoints.php:426, ../inc/App/Rest/RestEndpoints.php:479, ../inc/App/Rest/RestEndpoints.php:537, ../inc/App/Rest/RestEndpoints.php:542, ../inc/App/Rest/RestEndpoints.php:572, ../inc/App/Rest/RestEndpoints.php:577
+#: ../inc/App/Backend/Enqueue.php:188, ../inc/App/Rest/RestEndpoints.php:412, ../inc/App/Rest/RestEndpoints.php:426, ../inc/App/Rest/RestEndpoints.php:479, ../inc/App/Rest/RestEndpoints.php:537, ../inc/App/Rest/RestEndpoints.php:542, ../inc/App/Rest/RestEndpoints.php:572, ../inc/App/Rest/RestEndpoints.php:577
 msgid "Yes"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:187, ../inc/App/Rest/RestEndpoints.php:412, ../inc/App/Rest/RestEndpoints.php:426, ../inc/App/Rest/RestEndpoints.php:479, ../inc/App/Rest/RestEndpoints.php:537, ../inc/App/Rest/RestEndpoints.php:542, ../inc/App/Rest/RestEndpoints.php:572, ../inc/App/Rest/RestEndpoints.php:577
+#: ../inc/App/Backend/Enqueue.php:189, ../inc/App/Rest/RestEndpoints.php:412, ../inc/App/Rest/RestEndpoints.php:426, ../inc/App/Rest/RestEndpoints.php:479, ../inc/App/Rest/RestEndpoints.php:537, ../inc/App/Rest/RestEndpoints.php:542, ../inc/App/Rest/RestEndpoints.php:572, ../inc/App/Rest/RestEndpoints.php:577
 msgid "No"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:190, ../inc/App/Backend/PluginRowMeta.php:83
+#: ../inc/App/Backend/Enqueue.php:192, ../inc/App/Backend/PluginRowMeta.php:83
 msgid "System Status"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:192
+#: ../inc/App/Backend/Enqueue.php:194
 msgid "Back to Demo Importer"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:197
+#: ../inc/App/Backend/Enqueue.php:199
 msgid "Live Preview"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:198
+#: ../inc/App/Backend/Enqueue.php:200
 msgid "Import"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:199
+#: ../inc/App/Backend/Enqueue.php:201
 msgid "Cancel"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:200
+#: ../inc/App/Backend/Enqueue.php:202
 msgid "Continue"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:201
+#: ../inc/App/Backend/Enqueue.php:203
 msgid "Previous"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:202
+#: ../inc/App/Backend/Enqueue.php:204
 msgid "Start Import"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:203
+#: ../inc/App/Backend/Enqueue.php:205
 msgid "View Site"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:204
+#: ../inc/App/Backend/Enqueue.php:206
 msgid "Close"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:205
+#: ../inc/App/Backend/Enqueue.php:207
 msgid "Reload & Retry"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:206
+#: ../inc/App/Backend/Enqueue.php:208
 msgid "Resume Import"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:207
+#: ../inc/App/Backend/Enqueue.php:209
 msgid "Start Over"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:208
+#: ../inc/App/Backend/Enqueue.php:210
 msgid "Resuming import from where it left off..."
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:209
+#: ../inc/App/Backend/Enqueue.php:211
 msgid "Import was interrupted."
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:210
+#: ../inc/App/Backend/Enqueue.php:212
 msgid "Your previous import did not complete. Resume from where it left off, or start over to begin fresh."
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:211
+#: ../inc/App/Backend/Enqueue.php:213
 msgid "Click to Enlarge"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:212
+#: ../inc/App/Backend/Enqueue.php:214
 msgid "Contact Us"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:213
+#: ../inc/App/Backend/Enqueue.php:215
 msgid "View Documentation"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:214
+#: ../inc/App/Backend/Enqueue.php:216
 msgid "Need help?"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:215
+#: ../inc/App/Backend/Enqueue.php:217
 msgid "Documentation & FAQ"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:216
+#: ../inc/App/Backend/Enqueue.php:218
 msgid "All Demos"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:219
+#: ../inc/App/Backend/Enqueue.php:221
 msgid "Need Help?"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:220
+#: ../inc/App/Backend/Enqueue.php:222
 msgid "Documentation & FAQs"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:225
+#: ../inc/App/Backend/Enqueue.php:227
 msgid "System status data copied to clipboard."
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:226
+#: ../inc/App/Backend/Enqueue.php:228
 msgid "Could not copy to clipboard. Please try again."
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:229
+#: ../inc/App/Backend/Enqueue.php:231
 msgid "Server Requirements Not Met"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:230
+#: ../inc/App/Backend/Enqueue.php:232
 msgid "Your server does not meet the minimum requirements for demo import. Please review the System Status page for details. Proceeding without meeting these requirements may result in a failed or incomplete import."
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:231
+#: ../inc/App/Backend/Enqueue.php:233
 msgid "Continue Anyway"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:234
+#: ../inc/App/Backend/Enqueue.php:236
 msgid "Not installed"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:235
+#: ../inc/App/Backend/Enqueue.php:237
 msgid "Installed and active"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:236
+#: ../inc/App/Backend/Enqueue.php:238
 msgid "Installed but not active"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:237
+#: ../inc/App/Backend/Enqueue.php:239
 msgid "Installed & active — update available"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:238
+#: ../inc/App/Backend/Enqueue.php:240
 msgid "Installed but inactive — update available"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:254
+#: ../inc/App/Backend/Enqueue.php:256
 msgid "We recommend backing up your site before proceeding. A backup plugin can help you restore your site if anything goes wrong during the import."
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:255
+#: ../inc/App/Backend/Enqueue.php:257
 msgid "This import will install all required plugins and bring in content, media, settings, customizer data, and widgets needed to replicate the demo site. Please review your existing content, as some data may be overwritten."
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:259
+#: ../inc/App/Backend/Enqueue.php:261
 msgid "To replicate the demo site, the following plugins will be automatically installed and activated if not already present. Scroll down to see the full list."
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:261
+#: ../inc/App/Backend/Enqueue.php:263
 msgid "Having trouble? Reach out to us and we'll help you get sorted quickly."
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:262
+#: ../inc/App/Backend/Enqueue.php:264
 msgid "Explore our documentation for step-by-step guides, helpful screenshots, and FAQs to walk you through the demo import process."
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:266
+#: ../inc/App/Backend/Enqueue.php:268
 msgid "Start"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:267
+#: ../inc/App/Backend/Enqueue.php:269
 msgid "Configure"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:268
+#: ../inc/App/Backend/Enqueue.php:270
 msgid "Imports"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:269
+#: ../inc/App/Backend/Enqueue.php:271
 msgid "End"
 msgstr ""
 
@@ -591,7 +591,7 @@ msgstr ""
 msgid "This can happen if the import timed out or another import started. Refresh the page and try again."
 msgstr ""
 
-#: ../inc/Common/Abstracts/ImporterAjax.php:211
+#: ../inc/Common/Abstracts/ImporterAjax.php:213
 msgid "Invalid demo selection."
 msgstr ""
 
@@ -646,19 +646,19 @@ msgstr ""
 msgid "Site does not support widget"
 msgstr ""
 
-#: ../inc/Common/Models/Widgets.php:145
+#: ../inc/Common/Models/Widgets.php:146
 msgid "Widget already exists"
 msgstr ""
 
-#: ../inc/Common/Models/Widgets.php:212
+#: ../inc/Common/Models/Widgets.php:213
 msgid "Imported to Inactive"
 msgstr ""
 
-#: ../inc/Common/Models/Widgets.php:209
+#: ../inc/Common/Models/Widgets.php:210
 msgid "Imported"
 msgstr ""
 
-#: ../inc/Common/Models/Widgets.php:218
+#: ../inc/Common/Models/Widgets.php:219
 msgid "No Title"
 msgstr ""
 
@@ -749,76 +749,76 @@ msgstr ""
 msgid "Ensure the ZipArchive PHP extension is enabled. Contact your host if you are unsure."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/DownloadFiles.php:188
+#: ../inc/App/Ajax/Backend/DownloadFiles.php:192
 msgid "Access to the demo file was denied (401 Unauthorized)."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/DownloadFiles.php:189
+#: ../inc/App/Ajax/Backend/DownloadFiles.php:193
 msgid "The demo file URL may require authentication. Contact the theme author to verify the demo file URL is publicly accessible."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/DownloadFiles.php:192
+#: ../inc/App/Ajax/Backend/DownloadFiles.php:196
 msgid "Access to the demo file was forbidden (403 Forbidden)."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/DownloadFiles.php:193
+#: ../inc/App/Ajax/Backend/DownloadFiles.php:197
 msgid "The demo file server is blocking the request. This can happen if your server IP is restricted. Contact the theme author."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/DownloadFiles.php:196
+#: ../inc/App/Ajax/Backend/DownloadFiles.php:200
 msgid "The demo file was not found on the server (404 Not Found)."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/DownloadFiles.php:197
+#: ../inc/App/Ajax/Backend/DownloadFiles.php:201
 msgid "The demo ZIP URL in the theme configuration may be incorrect or the file has been moved. Contact the theme author for an updated demo package."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/DownloadFiles.php:200
+#: ../inc/App/Ajax/Backend/DownloadFiles.php:204
 msgid "The demo file server took too long to respond (408 Request Timeout)."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/DownloadFiles.php:201
+#: ../inc/App/Ajax/Backend/DownloadFiles.php:205
 msgid "The file server may be temporarily overloaded. Try again in a few minutes. You can also increase the timeout by adding add_filter('sd/edi/download_timeout', fn() => 300); to your theme's functions.php."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/DownloadFiles.php:204
+#: ../inc/App/Ajax/Backend/DownloadFiles.php:208
 msgid "Too many download requests were made (429 Too Many Requests)."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/DownloadFiles.php:205
+#: ../inc/App/Ajax/Backend/DownloadFiles.php:209
 msgid "Wait a few minutes before trying again. The demo file server may be rate-limiting requests."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/DownloadFiles.php:208
+#: ../inc/App/Ajax/Backend/DownloadFiles.php:212
 msgid "The demo file server encountered an internal error (500 Internal Server Error)."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/DownloadFiles.php:209
+#: ../inc/App/Ajax/Backend/DownloadFiles.php:213
 msgid "This is a problem on the demo file server, not your site. Try again later or contact the theme author."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/DownloadFiles.php:212
+#: ../inc/App/Ajax/Backend/DownloadFiles.php:216
 msgid "The demo file server is temporarily unavailable (503 Service Unavailable)."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/DownloadFiles.php:213
+#: ../inc/App/Ajax/Backend/DownloadFiles.php:217
 msgid "The demo server may be undergoing maintenance. Wait a few minutes and try again."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/DownloadFiles.php:216
+#: ../inc/App/Ajax/Backend/DownloadFiles.php:220
 msgid "The demo file server gateway timed out (504 Gateway Timeout)."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/DownloadFiles.php:217
+#: ../inc/App/Ajax/Backend/DownloadFiles.php:221
 msgid "The demo server is temporarily overloaded or unreachable. Try again in a few minutes. If the problem persists, contact the theme author."
 msgstr ""
 
 #. translators: %d: HTTP status code
-#: ../inc/App/Ajax/Backend/DownloadFiles.php:228
+#: ../inc/App/Ajax/Backend/DownloadFiles.php:232
 msgid "The demo file server returned an unexpected response (HTTP %d)."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/DownloadFiles.php:229
+#: ../inc/App/Ajax/Backend/DownloadFiles.php:233
 msgid "Try again later. If the problem persists, note the error code and contact the theme author."
 msgstr ""
 
@@ -890,43 +890,43 @@ msgstr ""
 msgid "No widgets import needed."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/Initialize.php:76
+#: ../inc/App/Ajax/Backend/Initialize.php:77
 msgid "Missing session ID."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/Initialize.php:101
+#: ../inc/App/Ajax/Backend/Initialize.php:102
 msgid "Another import is already in progress."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/Initialize.php:102
+#: ../inc/App/Ajax/Backend/Initialize.php:103
 msgid "Wait for the current import to finish before starting a new one. If you believe the previous import has crashed, wait 30 minutes for the lock to expire automatically, then try again."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/Initialize.php:136
+#: ../inc/App/Ajax/Backend/Initialize.php:137
 msgid "Let us install the required plugins."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/Initialize.php:137
+#: ../inc/App/Ajax/Backend/Initialize.php:138
 msgid "Database reset completed."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/Initialize.php:137
+#: ../inc/App/Ajax/Backend/Initialize.php:138
 msgid "Minor cleanups done."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/InstallDemo.php:113
+#: ../inc/App/Ajax/Backend/InstallDemo.php:114
 msgid "Waiting for previous import to finish…"
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/InstallDemo.php:168
+#: ../inc/App/Ajax/Backend/InstallDemo.php:170
 msgid "Importing Customizer settings."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/InstallDemo.php:169
+#: ../inc/App/Ajax/Backend/InstallDemo.php:171
 msgid "Everything has been imported smoothly."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/InstallDemo.php:171
+#: ../inc/App/Ajax/Backend/InstallDemo.php:173
 msgid "Demo import process failed. No content file found."
 msgstr ""
 

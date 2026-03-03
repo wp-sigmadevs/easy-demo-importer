@@ -52,6 +52,7 @@ class DeactivateNotice extends Base {
 	 * @see Requester::isAdminBackend()
 	 */
 	public function register() {
+        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 		if ( ! apply_filters( 'sd/edi/admin/deactivation_notice', false ) ) {
 			return;
 		}

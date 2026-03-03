@@ -99,7 +99,7 @@ class ActivatePlugins extends ImporterAjax {
 		 *
 		 * @since 1.1.5
 		 */
-		do_action( 'sd/edi/after_plugins_activation', $this );
+		do_action( 'sd/edi/after_plugins_activation', $this ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
 		// Response.
 		$this->prepareResponse(
@@ -144,7 +144,7 @@ class ActivatePlugins extends ImporterAjax {
 			 *
 			 * @since 1.1.5
 			 */
-			do_action( 'sd/edi/before_plugin_activation', $path );
+			do_action( 'sd/edi/before_plugin_activation', $path ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
 			activate_plugin( $path, '', false, true );
 
@@ -157,7 +157,7 @@ class ActivatePlugins extends ImporterAjax {
 			 *
 			 * @since 1.0.0
 			 */
-			do_action( 'sd/edi/after_plugin_activation', $path );
+			do_action( 'sd/edi/after_plugin_activation', $path ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 		}
 	}
 }

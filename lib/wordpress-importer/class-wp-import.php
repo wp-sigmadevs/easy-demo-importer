@@ -238,7 +238,7 @@ class SD_EDI_WP_Import extends WP_Importer {
 		wp_defer_term_counting( true );
 		wp_defer_comment_counting( true );
 
-		do_action( 'import_start' );
+		do_action( 'import_start' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 	}
 
 	/**
@@ -262,7 +262,7 @@ class SD_EDI_WP_Import extends WP_Importer {
 		echo '<p>' . esc_html__( 'All done.', 'easy-demo-importer' ) . ' <a href="' . esc_url( admin_url() ) . '">' . esc_html__( 'Have fun!', 'easy-demo-importer' ) . '</a></p>';
 		echo '<p>' . esc_html__( 'Remember to update the passwords and roles of imported users.', 'easy-demo-importer' ) . '</p>';
 
-		do_action( 'import_end' );
+		do_action( 'import_end' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 	}
 
 	/**
@@ -557,7 +557,7 @@ class SD_EDI_WP_Import extends WP_Importer {
 			 *
 			 * @since 0.6.2
 			 */
-			$key = apply_filters( 'import_term_meta_key', $meta['key'], $term_id, $term );
+			$key = apply_filters( 'import_term_meta_key', $meta['key'], $term_id, $term ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 			if ( ! $key ) {
 				continue;
 			}
@@ -576,7 +576,7 @@ class SD_EDI_WP_Import extends WP_Importer {
 			 *
 			 * @since 0.6.2
 			 */
-			do_action( 'import_term_meta', $term_id, $key, $value );
+			do_action( 'import_term_meta', $term_id, $key, $value ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 		}
 	}
 
@@ -849,10 +849,10 @@ class SD_EDI_WP_Import extends WP_Importer {
 
 			$post['postmeta'] = apply_filters( 'wp_import_post_meta', $post['postmeta'], $post_id, $post );
 
-			// Add/update post meta.
+			// Add/update post-meta.
 			if ( ! empty( $post['postmeta'] ) ) {
 				foreach ( $post['postmeta'] as $meta ) {
-					$key   = apply_filters( 'import_post_meta_key', $meta['key'], $post_id, $post );
+					$key   = apply_filters( 'import_post_meta_key', $meta['key'], $post_id, $post ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 					$value = false;
 
 					if ( '_edit_last' == $key ) {
@@ -871,9 +871,9 @@ class SD_EDI_WP_Import extends WP_Importer {
 
 						add_post_meta( $post_id, wp_slash( $key ), sd_edi()->slash_strings_only( $value ) );
 
-						do_action( 'import_post_meta', $post_id, $key, $value );
+						do_action( 'import_post_meta', $post_id, $key, $value ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
-						// if the post has a featured image, take note of this in case of remap.
+						// if the post has a featured image, take note of this in case of remapping.
 						if ( '_thumbnail_id' == $key ) {
 							$this->featured_images[ $post_id ] = (int) $value;
 						}
@@ -1386,7 +1386,7 @@ class SD_EDI_WP_Import extends WP_Importer {
 	 * @since 1.0.0
 	 */
 	public function max_attachment_size() {
-		return apply_filters( 'import_attachment_size_limit', 0 );
+		return apply_filters( 'import_attachment_size_limit', 0 ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 	}
 
 	/**
@@ -1521,7 +1521,7 @@ class SD_EDI_WP_Import extends WP_Importer {
 	 * @since 1.0.0
 	 */
 	protected function is_non_unique_post_type( $post_type ) {
-		$non_unique_post_types = apply_filters( 'sd/edi/importer/non_unique_post_types', [ 'rtcl_cf' ] );
+		$non_unique_post_types = apply_filters( 'sd/edi/importer/non_unique_post_types', [ 'rtcl_cf' ] ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
 		return in_array( $post_type, $non_unique_post_types, true );
 	}
