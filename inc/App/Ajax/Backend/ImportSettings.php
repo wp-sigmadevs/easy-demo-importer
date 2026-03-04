@@ -71,8 +71,29 @@ class ImportSettings extends ImporterAjax {
 
 		$settingsExists = isset( $settings ) && is_array( $settings );
 
+		// Block known sensitive core options that must never be overwritten by demo data.
+		$blocked_options = [
+			'siteurl',
+			'home',
+			'admin_email',
+			'default_role',
+			'active_plugins',
+			'blogname',
+			'blogdescription',
+			'users_can_register',
+			'default_comment_status',
+			'permalink_structure',
+		];
+
 		if ( $settingsExists ) {
 			foreach ( $settings as $option ) {
+				// Skip blocked core options.
+				if ( in_array( $option, $blocked_options, true ) ) {
+					continue;
+				}
+
+				// Strip directory separators from theme-config value before building path.
+				$option     = basename( $option );
 				$optionFile = $this->demoUploadDir( $this->demoDir() ) . '/' . $option . '.json';
 				$fileExists = file_exists( $optionFile );
 
@@ -94,6 +115,8 @@ class ImportSettings extends ImporterAjax {
 		$formsFileExists = false;
 
 		if ( $formsExists ) {
+			// Strip directory separators from the theme-config value before building a path.
+			$forms           = basename( $forms );
 			$formFile        = $this->demoUploadDir( $this->demoDir() ) . '/' . $forms . '.json';
 			$formsFileExists = file_exists( $formFile );
 		}

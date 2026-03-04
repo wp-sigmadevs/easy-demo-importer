@@ -95,6 +95,8 @@ class ImportFluentForms extends ImporterAjax {
 	 * @since 1.0.0
 	 */
 	private function importFluentForms( $form ) {
+		// Strip directory separators from the theme-config value before building a path.
+		$form       = basename( $form );
 		$formFile   = $this->demoUploadDir( $this->demoDir() ) . '/' . $form . '.json';
 		$fileExists = file_exists( $formFile );
 
@@ -116,10 +118,14 @@ class ImportFluentForms extends ImporterAjax {
 						$formFields = wp_json_encode( $fields );
 					}
 
+					// Sanitise title and whitelist status to prevent stored XSS.
+					$allowed_statuses = [ 'published', 'unpublished', 'draft' ];
+					$raw_status       = Arr::get( $formItem, 'status', 'published' );
+
 					$form = [
-						'title'       => Arr::get( $formItem, 'title' ),
+						'title'       => sanitize_text_field( Arr::get( $formItem, 'title' ) ),
 						'form_fields' => $formFields,
-						'status'      => Arr::get( $formItem, 'status', 'published' ),
+						'status'      => in_array( $raw_status, $allowed_statuses, true ) ? $raw_status : 'published',
 						'has_payment' => Arr::get( $formItem, 'has_payment', 0 ),
 						'type'        => Arr::get( $formItem, 'type', 'form' ),
 						'created_by'  => get_current_user_id(),

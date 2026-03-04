@@ -65,9 +65,11 @@ class ImportRevSlider extends ImporterAjax {
 		// Verifying AJAX call and user role.
 		Helpers::verifyAjaxCall();
 
-		$slider           = $this->multiple ?
+		$slider           = basename(
+			$this->multiple ?
 			Helpers::getDemoData( $this->config['demoData'][ $this->demoSlug ], 'revSliderZip' ) :
-			Helpers::getDemoData( $this->config, 'revSliderZip' );
+			Helpers::getDemoData( $this->config, 'revSliderZip' )
+		);
 		$sliderFileExists = file_exists( $this->demoUploadDir( $this->demoDir() ) . '/' . $slider . '.zip' );
 
 		if ( $slider && $sliderFileExists ) {
@@ -91,11 +93,29 @@ class ImportRevSlider extends ImporterAjax {
 	 * @since 1.1.0
 	 */
 	private function importSlider( $slider ) {
+		// Strip path separators from theme-config value.
+		$slider      = basename( $slider );
 		$sliderFiles = $this->demoUploadDir( $this->demoDir() ) . '/' . $slider . '.zip';
 		$unzipDir    = $this->demoUploadDir( $this->demoDir() );
 		$zip         = new \ZipArchive();
 
 		if ( $zip->open( $sliderFiles ) === true ) {
+			// Validate every ZIP entry before extracting to prevent ZipSlip.
+			$real_unzip = realpath( $unzipDir );
+
+			if ( false !== $real_unzip ) {
+				for ( $i = 0; $i < $zip->numFiles; $i++ ) {
+					$entry_name = $zip->getNameIndex( $i );
+					$dest       = $real_unzip . DIRECTORY_SEPARATOR . $entry_name;
+
+					// Reject the entire archive if any entry escapes the target dir.
+					if ( false === $dest || 0 !== strpos( realpath( dirname( $dest ) ) . DIRECTORY_SEPARATOR, $real_unzip . DIRECTORY_SEPARATOR ) ) {
+						$zip->close();
+						return;
+					}
+				}
+			}
+
 			$zip->extractTo( $unzipDir );
 			$zip->close();
 
