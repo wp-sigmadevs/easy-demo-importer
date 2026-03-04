@@ -65,6 +65,7 @@ return array(
     'SigmaDevs\\EasyDemoImporter\\App\\Ajax\\Backend\\DownloadFiles' => $baseDir . '/inc/App/Ajax/Backend/DownloadFiles.php',
     'SigmaDevs\\EasyDemoImporter\\App\\Ajax\\Backend\\Finalize' => $baseDir . '/inc/App/Ajax/Backend/Finalize.php',
     'SigmaDevs\\EasyDemoImporter\\App\\Ajax\\Backend\\ImportFluentForms' => $baseDir . '/inc/App/Ajax/Backend/ImportFluentForms.php',
+    'SigmaDevs\\EasyDemoImporter\\App\\Ajax\\Backend\\ImportLayerSlider' => $baseDir . '/inc/App/Ajax/Backend/ImportLayerSlider.php',
     'SigmaDevs\\EasyDemoImporter\\App\\Ajax\\Backend\\ImportMenus' => $baseDir . '/inc/App/Ajax/Backend/ImportMenus.php',
     'SigmaDevs\\EasyDemoImporter\\App\\Ajax\\Backend\\ImportRevSlider' => $baseDir . '/inc/App/Ajax/Backend/ImportRevSlider.php',
     'SigmaDevs\\EasyDemoImporter\\App\\Ajax\\Backend\\ImportSettings' => $baseDir . '/inc/App/Ajax/Backend/ImportSettings.php',
