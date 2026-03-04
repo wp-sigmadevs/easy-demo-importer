@@ -86,13 +86,13 @@ class Helpers {
 	}
 
 	/**
-	 * Verify if the current user has the 'import' capability.
+	 * Verify if the current user has the 'manage_options' capability.
 	 *
 	 * @return void
 	 * @since 1.0.0
 	 */
 	public static function verifyUserRole() {
-		if ( ! current_user_can( 'import' ) ) {
+		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_send_json(
 				[
 					'error'        => true,

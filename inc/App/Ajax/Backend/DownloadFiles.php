@@ -12,6 +12,9 @@ declare( strict_types=1 );
 
 namespace SigmaDevs\EasyDemoImporter\App\Ajax\Backend;
 
+use FilesystemIterator;
+use RecursiveIteratorIterator;
+use RecursiveDirectoryIterator;
 use SigmaDevs\EasyDemoImporter\Common\{
 	Traits\Singleton,
 	Functions\Helpers,
@@ -112,6 +115,24 @@ class DownloadFiles extends ImporterAjax {
 			];
 		}
 
+		// Validate the demo ZIP URL before making any network request.
+		if ( ! wp_http_validate_url( $external_url ) ) {
+			return [
+				'success' => false,
+				'message' => __( 'The demo ZIP URL is not a valid URL.', 'easy-demo-importer' ),
+				'hint'    => __( 'Check the demoZip value in your theme configuration.', 'easy-demo-importer' ),
+			];
+		}
+
+		$parsed_scheme = wp_parse_url( $external_url, PHP_URL_SCHEME );
+		if ( ! in_array( $parsed_scheme, [ 'http', 'https' ], true ) ) {
+			return [
+				'success' => false,
+				'message' => __( 'The demo ZIP URL must use http or https.', 'easy-demo-importer' ),
+				'hint'    => __( 'Check the demoZip value in your theme configuration.', 'easy-demo-importer' ),
+			];
+		}
+
 		$timeout   = (int) apply_filters( 'sd/edi/download_timeout', 120 ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 		$sslverify = (bool) apply_filters( 'sd/edi/download_sslverify', true ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 		$demoData  = $this->demoUploadDir() . 'imported-demo-data.zip';
@@ -169,6 +190,31 @@ class DownloadFiles extends ImporterAjax {
 				'message' => __( 'Demo files were downloaded but could not be extracted.', 'easy-demo-importer' ),
 				'hint'    => __( 'Ensure the ZipArchive PHP extension is enabled. Contact your host if you are unsure.', 'easy-demo-importer' ),
 			];
+		}
+
+		// Guard against ZipSlip: ensure every extracted file is inside the upload dir.
+		$upload_dir_real = realpath( $this->demoUploadDir() );
+
+		if ( false !== $upload_dir_real ) {
+			$iterator = new RecursiveIteratorIterator(
+				new RecursiveDirectoryIterator( $upload_dir_real, FilesystemIterator::SKIP_DOTS ),
+				RecursiveIteratorIterator::SELF_FIRST
+			);
+
+			foreach ( $iterator as $item ) {
+				$real_item = realpath( $item->getPathname() );
+
+				if ( false !== $real_item && 0 !== strpos( $real_item, $upload_dir_real ) ) {
+					// Escape hatch: wipe the dir and reject the archive.
+					$wp_filesystem->delete( $this->demoUploadDir(), true );
+
+					return [
+						'success' => false,
+						'message' => __( 'The demo archive contained unsafe file paths and was rejected.', 'easy-demo-importer' ),
+						'hint'    => __( 'Contact the theme author — the demo ZIP may be corrupted or tampered with.', 'easy-demo-importer' ),
+					];
+				}
+			}
 		}
 
 		return [
