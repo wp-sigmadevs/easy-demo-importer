@@ -18,6 +18,7 @@ class ComposerStaticInita3a0f0cbb9b6e205034676f5e8e4d4d6
         ),
         'S' =>
         array (
+            'SzepeViktor\\PHPStan\\WordPress\\' => 30,
             'SigmaDevs\\EasyDemoImporter\\' => 27,
         ),
         'P' =>
@@ -30,6 +31,10 @@ class ComposerStaticInita3a0f0cbb9b6e205034676f5e8e4d4d6
         'enshrined\\svgSanitize\\' =>
         array (
             0 => __DIR__ . '/..' . '/enshrined/svg-sanitize/src',
+        ),
+        'SzepeViktor\\PHPStan\\WordPress\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/szepeviktor/phpstan-wordpress/src',
         ),
         'SigmaDevs\\EasyDemoImporter\\' =>
         array (
@@ -139,6 +144,21 @@ class ComposerStaticInita3a0f0cbb9b6e205034676f5e8e4d4d6
         'SigmaDevs\\EasyDemoImporter\\Config\\Plugin' => __DIR__ . '/../..' . '/inc/Config/Plugin.php',
         'SigmaDevs\\EasyDemoImporter\\Config\\Requirements' => __DIR__ . '/../..' . '/inc/Config/Requirements.php',
         'SigmaDevs\\EasyDemoImporter\\Config\\Setup' => __DIR__ . '/../..' . '/inc/Config/Setup.php',
+        'SzepeViktor\\PHPStan\\WordPress\\ApplyFiltersDynamicFunctionReturnTypeExtension' => __DIR__ . '/..' . '/szepeviktor/phpstan-wordpress/src/ApplyFiltersDynamicFunctionReturnTypeExtension.php',
+        'SzepeViktor\\PHPStan\\WordPress\\AssertWpErrorTypeSpecifyingExtension' => __DIR__ . '/..' . '/szepeviktor/phpstan-wordpress/src/AssertWpErrorTypeSpecifyingExtension.php',
+        'SzepeViktor\\PHPStan\\WordPress\\EscSqlDynamicFunctionReturnTypeExtension' => __DIR__ . '/..' . '/szepeviktor/phpstan-wordpress/src/EscSqlDynamicFunctionReturnTypeExtension.php',
+        'SzepeViktor\\PHPStan\\WordPress\\HookCallbackRule' => __DIR__ . '/..' . '/szepeviktor/phpstan-wordpress/src/HookCallbackRule.php',
+        'SzepeViktor\\PHPStan\\WordPress\\HookDocBlock' => __DIR__ . '/..' . '/szepeviktor/phpstan-wordpress/src/HookDocBlock.php',
+        'SzepeViktor\\PHPStan\\WordPress\\HookDocsRule' => __DIR__ . '/..' . '/szepeviktor/phpstan-wordpress/src/HookDocsRule.php',
+        'SzepeViktor\\PHPStan\\WordPress\\HookDocsVisitor' => __DIR__ . '/..' . '/szepeviktor/phpstan-wordpress/src/HookDocsVisitor.php',
+        'SzepeViktor\\PHPStan\\WordPress\\NormalizeWhitespaceDynamicFunctionReturnTypeExtension' => __DIR__ . '/..' . '/szepeviktor/phpstan-wordpress/src/NormalizeWhitespaceDynamicFunctionReturnTypeExtension.php',
+        'SzepeViktor\\PHPStan\\WordPress\\NormalizedArguments' => __DIR__ . '/..' . '/szepeviktor/phpstan-wordpress/src/NormalizedArguments.php',
+        'SzepeViktor\\PHPStan\\WordPress\\ShortcodeAttsDynamicFunctionReturnTypeExtension' => __DIR__ . '/..' . '/szepeviktor/phpstan-wordpress/src/ShortcodeAttsDynamicFunctionReturnTypeExtension.php',
+        'SzepeViktor\\PHPStan\\WordPress\\SlashitFunctionsDynamicFunctionReturnTypeExtension' => __DIR__ . '/..' . '/szepeviktor/phpstan-wordpress/src/SlashitFunctionsDynamicFunctionReturnTypeExtension.php',
+        'SzepeViktor\\PHPStan\\WordPress\\StripslashesFromStringsOnlyDynamicFunctionReturnTypeExtension' => __DIR__ . '/..' . '/szepeviktor/phpstan-wordpress/src/StripslashesFromStringsOnlyDynamicFunctionReturnTypeExtension.php',
+        'SzepeViktor\\PHPStan\\WordPress\\WpConstantFetchRule' => __DIR__ . '/..' . '/szepeviktor/phpstan-wordpress/src/WpConstantFetchRule.php',
+        'SzepeViktor\\PHPStan\\WordPress\\WpParseUrlFunctionDynamicReturnTypeExtension' => __DIR__ . '/..' . '/szepeviktor/phpstan-wordpress/src/WpParseUrlFunctionDynamicReturnTypeExtension.php',
+        'SzepeViktor\\PHPStan\\WordPress\\WpSlashDynamicFunctionReturnTypeExtension' => __DIR__ . '/..' . '/szepeviktor/phpstan-wordpress/src/WpSlashDynamicFunctionReturnTypeExtension.php',
         'enshrined\\svgSanitize\\ElementReference\\Resolver' => __DIR__ . '/..' . '/enshrined/svg-sanitize/src/ElementReference/Resolver.php',
         'enshrined\\svgSanitize\\ElementReference\\Subject' => __DIR__ . '/..' . '/enshrined/svg-sanitize/src/ElementReference/Subject.php',
         'enshrined\\svgSanitize\\ElementReference\\Usage' => __DIR__ . '/..' . '/enshrined/svg-sanitize/src/ElementReference/Usage.php',

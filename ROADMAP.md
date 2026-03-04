@@ -261,7 +261,52 @@ All subsequent phases (chunked XML, image regen, rollback, history) share a sess
 
 ---
 
-### 1.5 — Release
+### 1.5 — Code Quality Fixes (PHPStan Baseline Review)
+
+Fixing real bugs surfaced by static analysis. These were baselined in §1.4 but must be resolved before tagging `1.2.0`.
+
+#### P1 — Actual crashes / wrong behavior
+
+- [ ] **`InstallPlugins.php` — `$api->download_link` on possible array** (`installOrgPlugin()` line ~181)
+  - `callPluginApi()` returns `array|object|WP_Error`. After `is_wp_error()` guard, `$api` can still be an `array` — property access on array is a fatal error
+  - Fix: change guard to `if ( is_wp_error( $api ) || ! is_object( $api ) )`
+
+- [ ] **`ImportFluentForms.php` — Broken `$formsExists` condition** (`response()` line ~75)
+  - `isset( $forms )` is always `true` (assigned unconditionally above), so `|| is_plugin_active(...)` is always `true` → forms are imported even when FluentForms isn't active
+  - Fix: `$formsExists = ! empty( $forms ) && is_plugin_active( 'fluentform/fluentform.php' );`
+
+- [ ] **`ImporterAjax.php` — `$uploadsDir` typed as `string`, assigned `array`** (`handlePostSubmission()` line ~156)
+  - `wp_get_upload_dir()` returns an `array`. Property declared without type defaults to string in PHPStan's view → causes cascade of false errors in `demoUploadDir()` (`is_array()` always false)
+  - Fix: change property docblock to `@var array` and default to `[]`
+
+#### P2 — Undefined variable risks
+
+- [ ] **`Widgets.php` — `$widgetMessageType` / `$widgetMessage` possibly undefined** (lines ~220–221)
+  - Both are only assigned inside conditional branches. If none of those branches execute, they're undefined when read at the end of the inner foreach loop
+  - Fix: initialize both to `''` at the top of the `foreach ( $widgets as ... )` loop
+
+- [ ] **`ImportSettings.php` — Same `isset()` / `||` pattern as FluentForms**
+  - Read file and apply the same fix: `!empty()` + `&&`
+
+#### P3 — Type correctness
+
+- [ ] **`DBSearchReplace.php:419` — `__METHOD__` as instance method callback**
+  - `array_map( __METHOD__, $input )` passes a static-style string. `mysql_escape_mimic()` uses `$this` — would fail if ever called statically
+  - Fix: `array_map( [ $this, 'mysql_escape_mimic' ], $input )`
+
+- [ ] **`DBSearchReplace.php:360` — `@param array $data` but default value is `''`**
+  - `recursive_unserialize_replace()` accepts both strings and arrays throughout its body, but the docblock says `array`
+  - Fix: update docblock to `@param string|array $data`
+
+#### P4 — Dead code
+
+- [ ] **`ImporterAjax.php` — `wp_die()` after `wp_send_json_error()`**
+  - `wp_send_json_error()` calls `die()` internally — subsequent `wp_die()` calls are unreachable
+  - Fix: remove all `wp_die()` calls that immediately follow `wp_send_json_error()`
+
+---
+
+### 1.6 — Release
 
 - [ ] Write `CHANGELOG.md` entry for `1.2.0`
 - [ ] Tag release
@@ -894,7 +939,7 @@ Doubles the target audience. Helps theme authors create demo packages without ma
 | Version | Headline deliverable |
 |---------|---------------------|
 | `1.1.6` | WP 6.9 + PHP 8.4 compat, Rector auto-fix, critical runtime bugs |
-| `1.2.0` | Session system, mutex lock, uninstall, PHPStan baseline |
+| `1.2.0` | Session system, mutex lock, uninstall, PHPStan baseline, code quality fixes |
 | `1.3.0` | 8-step wizard, XMLReader chunker, activity log, cache flush, conditional demos |
 | `1.4.0` | Plugin-owned image regen — counted, named, failure-tracked |
 | `1.5.0` | Selective item import, dependency resolver, rollback, auto URL fix |
