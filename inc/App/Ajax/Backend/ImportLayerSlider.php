@@ -1,11 +1,11 @@
 <?php
 /**
- * Backend Ajax Class: ImportRevSlider
+ * Backend Ajax Class: ImportLayerSlider
  *
- * Initializes the Revolution Slider import Process.
+ * Initializes the LayerSlider import Process.
  *
  * @package SigmaDevs\EasyDemoImporter
- * @since   1.1.0
+ * @since   1.2.0
  */
 
 declare( strict_types=1 );
@@ -24,16 +24,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Backend Ajax Class: ImportRevSlider
+ * Backend Ajax Class: ImportLayerSlider
  *
- * @since 1.1.0
+ * @since 1.2.0
  */
-class ImportRevSlider extends ImporterAjax {
+class ImportLayerSlider extends ImporterAjax {
 	/**
 	 * Singleton trait.
 	 *
 	 * @see Singleton
-	 * @since 1.1.0
+	 * @since 1.2.0
 	 */
 	use Singleton;
 
@@ -44,7 +44,7 @@ class ImportRevSlider extends ImporterAjax {
 	 * as requested in the Bootstrap class.
 	 *
 	 * @return void
-	 * @since 1.1.0
+	 * @since 1.2.0
 	 *
 	 * @see Bootstrap::registerServices
 	 * @see Requester::isAdminBackend()
@@ -52,14 +52,14 @@ class ImportRevSlider extends ImporterAjax {
 	public function register() {
 		parent::register();
 
-		add_action( 'wp_ajax_sd_edi_import_rev_slider', [ $this, 'response' ] );
+		add_action( 'wp_ajax_sd_edi_import_layer_slider', [ $this, 'response' ] );
 	}
 
 	/**
 	 * Ajax response.
 	 *
 	 * @return void
-	 * @since 1.1.0
+	 * @since 1.2.0
 	 */
 	public function response() {
 		// Verifying AJAX call and user role.
@@ -67,46 +67,38 @@ class ImportRevSlider extends ImporterAjax {
 
 		$slider           = basename(
 			$this->multiple ?
-			Helpers::getDemoData( $this->config['demoData'][ $this->demoSlug ], 'revSliderZip' ) :
-			Helpers::getDemoData( $this->config, 'revSliderZip' )
+			Helpers::getDemoData( $this->config['demoData'][ $this->demoSlug ], 'layerSliderZip' ) :
+			Helpers::getDemoData( $this->config, 'layerSliderZip' )
 		);
 		$sliderFileExists = file_exists( $this->demoUploadDir( $this->demoDir() ) . '/' . $slider . '.zip' );
 
 		if ( $slider && $sliderFileExists ) {
-			$this->importSlider( $slider );
+			$this->importLayerSlider( $slider );
 		}
-
-		$layerSlider    = basename(
-			$this->multiple ?
-			Helpers::getDemoData( $this->config['demoData'][ $this->demoSlug ], 'layerSliderZip' ) :
-			Helpers::getDemoData( $this->config, 'layerSliderZip' )
-		);
-		$hasLayerSlider = $layerSlider && file_exists( $this->demoUploadDir( $this->demoDir() ) . '/' . $layerSlider . '.zip' );
 
 		// Response.
 		$this->prepareResponse(
-			$hasLayerSlider ? 'sd_edi_import_layer_slider' : 'sd_edi_finalize_demo',
-			$hasLayerSlider ? esc_html__( 'Importing LayerSlider layouts.', 'easy-demo-importer' ) : esc_html__( 'Finalizing demo data import.', 'easy-demo-importer' ),
-			$slider ? esc_html__( 'Slider Revolution slides imported.', 'easy-demo-importer' ) : esc_html__( 'Skipping Slider Revolution import.', 'easy-demo-importer' )
+			'sd_edi_finalize_demo',
+			esc_html__( 'Finalizing demo data import.', 'easy-demo-importer' ),
+			$slider ? esc_html__( 'LayerSlider slides imported.', 'easy-demo-importer' ) : esc_html__( 'Skipping LayerSlider import.', 'easy-demo-importer' )
 		);
 	}
 
 	/**
-	 * Import Slider Revolution slides.
+	 * Import LayerSlider slides.
 	 *
-	 * @param string $slider Slider zip File name.
+	 * @param string $slider Slider ZIP file name.
 	 *
 	 * @return void
-	 * @since 1.1.0
+	 * @since 1.2.0
 	 */
-	private function importSlider( $slider ) {
-		// Strip path separators from theme-config value.
-		$slider      = basename( $slider );
-		$sliderFiles = $this->demoUploadDir( $this->demoDir() ) . '/' . $slider . '.zip';
-		$extractDir  = $this->demoUploadDir( $this->demoDir() ) . '/' . $slider;
-		$zip         = new \ZipArchive();
+	private function importLayerSlider( $slider ) {
+		$slider     = basename( $slider );
+		$sliderFile = $this->demoUploadDir( $this->demoDir() ) . '/' . $slider . '.zip';
+		$extractDir = $this->demoUploadDir( $this->demoDir() ) . '/' . $slider;
+		$zip        = new \ZipArchive();
 
-		if ( $zip->open( $sliderFiles ) === true ) {
+		if ( $zip->open( $sliderFile ) === true ) {
 			// Create the dedicated extraction subdirectory first so realpath() resolves.
 			wp_mkdir_p( $extractDir );
 			$real_extract = realpath( $extractDir );
@@ -125,15 +117,23 @@ class ImportRevSlider extends ImporterAjax {
 				}
 			}
 
+			// Extract into demo-content/layer-slider/ so inner ZIPs are at a known path.
 			$zip->extractTo( $extractDir );
 			$zip->close();
 
-			if ( class_exists( 'RevSlider' ) ) {
-				$revSlider   = new \RevSlider();
-				$sliderFiles = glob( $extractDir . '/*.zip' );
+			if ( class_exists( 'LS_Sliders' ) && defined( 'LS_ROOT_PATH' ) ) {
+				$import_util_path = LS_ROOT_PATH . '/classes/class.ls.importutil.php';
+				$filesystem_path  = LS_ROOT_PATH . '/classes/class.ls.filesystem.php';
 
-				foreach ( $sliderFiles as $sliderFile ) {
-					$revSlider->importSliderFromPost( true, true, $sliderFile );
+				if ( file_exists( $import_util_path ) && file_exists( $filesystem_path ) ) {
+					require_once $import_util_path;
+					require_once $filesystem_path;
+
+					$sliderFiles = glob( $extractDir . '/*.zip' );
+
+					foreach ( $sliderFiles as $sliderFile ) {
+						new \LS_ImportUtil( $sliderFile );
+					}
 				}
 			}
 		}
