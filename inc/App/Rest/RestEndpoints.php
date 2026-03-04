@@ -13,6 +13,7 @@ declare( strict_types=1 );
 namespace SigmaDevs\EasyDemoImporter\App\Rest;
 
 use WP_Error;
+use WP_REST_Request;
 use WP_REST_Response;
 use SigmaDevs\EasyDemoImporter\Common\{
 	Abstracts\Base,
@@ -194,6 +195,13 @@ class RestEndpoints extends Base {
 				'methods'             => 'GET',
 				'callback'            => [ $this, 'serverStatus' ],
 				'permission_callback' => [ $this, 'permission' ],
+				'args'                => [
+					'force' => [
+						'type'              => 'integer',
+						'default'           => 0,
+						'sanitize_callback' => 'absint',
+					],
+				],
 			]
 		);
 	}
@@ -289,11 +297,26 @@ class RestEndpoints extends Base {
 	/**
 	 * Builds server status.
 	 *
+	 * Cached for 5 minutes. Pass ?force=1 to bypass the cache.
+	 *
+	 * @param WP_REST_Request $request REST request object.
+	 *
 	 * @return WP_REST_Response
 	 * @since 1.0.0
 	 */
-	public function serverStatus() {
+	public function serverStatus( WP_REST_Request $request ) {
+		$cache_key = 'sd_edi_server_status';
+
+		if ( ! $request->get_param( 'force' ) ) {
+			$cached = get_transient( $cache_key );
+			if ( false !== $cached ) {
+				return $this->sendResponse( $cached, esc_html__( 'Data is ready to fetch', 'easy-demo-importer' ) );
+			}
+		}
+
 		$info = $this->serverStatusTabs();
+
+		set_transient( $cache_key, $info, 5 * MINUTE_IN_SECONDS );
 
 		return $this->sendResponse( $info, esc_html__( 'Data is ready to fetch', 'easy-demo-importer' ) );
 	}

@@ -133,6 +133,21 @@ class DownloadFiles extends ImporterAjax {
 			];
 		}
 
+		// Allow theme authors to restrict which domains may serve demo files.
+		// Return a non-empty array of hostnames to enable the allowlist.
+		$allowed_domains = (array) apply_filters( 'sd/edi/allowed_download_domains', [] ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+		if ( ! empty( $allowed_domains ) ) {
+			$host = (string) wp_parse_url( $external_url, PHP_URL_HOST );
+
+			if ( ! in_array( $host, $allowed_domains, true ) ) {
+				return [
+					'success' => false,
+					'message' => __( 'The demo ZIP URL is not on an allowed domain.', 'easy-demo-importer' ),
+					'hint'    => __( 'The demo file host is not in the sd/edi/allowed_download_domains allowlist. Contact the theme author.', 'easy-demo-importer' ),
+				];
+			}
+		}
+
 		$timeout   = (int) apply_filters( 'sd/edi/download_timeout', 120 ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 		$sslverify = (bool) apply_filters( 'sd/edi/download_sslverify', true ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 		$demoData  = $this->demoUploadDir() . 'imported-demo-data.zip';
