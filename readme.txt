@@ -136,6 +136,17 @@ For any inquiries, bug reports, or suggestions, please submit your request [here
 
 == Changelog ==
 
+= 1.2.0 (05-March-2026) =
+* Feature: Added support for importing LayerSlider Sliders.
+* Feature: Introduced a Session Manager to track and resume import sessions with TTL-based expiry.
+* Fix: Resolved an issue in archive extraction to prevent path traversal attacks.
+* Fix: Added input validation across AJAX handlers for improved request integrity.
+* Fix: Resolved multiple WordPress plugin check compliance errors (code quality & sanitization).
+* Tweak: Improved error handling in AJAX handlers and the JS frontend for clearer failure reporting.
+* Tweak: Enhanced import resume/retry capability via session state.
+* Tweak: Improved uninstall cleanup to properly remove session data.
+* Update: Updated i18n strings and translation template.
+
 = 1.1.6 (28-February-2026) =
 * Add: Full compatibility with WordPress 6.9.
 * Add: Option to skip image regeneration during import — speeds up the process.
@@ -145,7 +156,6 @@ For any inquiries, bug reports, or suggestions, please submit your request [here
 * Fix: Added empty check on demo data config to prevent warnings when demoData is absent.
 * Tweak: Refreshed some user-facing strings for more professional and consistent wording.
 * Update: Updated enshrined/svg-sanitize dependency.
-* Dev: Added .wp-env.json for local development with WordPress 6.9 + PHP 8.4 via @wordpress/env.
 
 = 1.1.5 (22-July-2025) =
 * Add: Full compatibility with WordPress 6.8.
