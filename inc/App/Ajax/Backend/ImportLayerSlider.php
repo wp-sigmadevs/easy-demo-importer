@@ -65,75 +65,42 @@ class ImportLayerSlider extends ImporterAjax {
 		// Verifying AJAX call and user role.
 		Helpers::verifyAjaxCall();
 
-		$slider           = basename(
-			$this->multiple ?
-			Helpers::getDemoData( $this->config['demoData'][ $this->demoSlug ], 'layerSliderZip' ) :
-			Helpers::getDemoData( $this->config, 'layerSliderZip' )
+		$sliderImported = $this->unzipAndImportSlider(
+			'layerSliderZip',
+			function ( $extractDir, $slider ) {
+				$this->importLayerSlider( $extractDir, $slider );
+			}
 		);
-		$sliderFileExists = file_exists( $this->demoUploadDir( $this->demoDir() ) . '/' . $slider . '.zip' );
-
-		if ( $slider && $sliderFileExists ) {
-			$this->importLayerSlider( $slider );
-		}
 
 		// Response.
 		$this->prepareResponse(
 			'sd_edi_finalize_demo',
 			esc_html__( 'Finalizing demo data import.', 'easy-demo-importer' ),
-			$slider ? esc_html__( 'LayerSlider slides imported.', 'easy-demo-importer' ) : esc_html__( 'Skipping LayerSlider import.', 'easy-demo-importer' )
+			$sliderImported ? esc_html__( 'LayerSlider slides imported.', 'easy-demo-importer' ) : esc_html__( 'Skipping LayerSlider import.', 'easy-demo-importer' )
 		);
 	}
 
 	/**
 	 * Import LayerSlider slides.
 	 *
-	 * @param string $slider Slider ZIP file name.
+	 * @param string $extractDir Directory where slider files were extracted.
 	 *
 	 * @return void
 	 * @since 1.2.0
 	 */
-	private function importLayerSlider( $slider ) {
-		$slider     = basename( $slider );
-		$sliderFile = $this->demoUploadDir( $this->demoDir() ) . '/' . $slider . '.zip';
-		$extractDir = $this->demoUploadDir( $this->demoDir() ) . '/' . $slider;
-		$zip        = new \ZipArchive();
+	private function importLayerSlider( $extractDir ) {
+		if ( class_exists( 'LS_Sliders' ) && defined( 'LS_ROOT_PATH' ) ) {
+			$import_util_path = LS_ROOT_PATH . '/classes/class.ls.importutil.php';
+			$filesystem_path  = LS_ROOT_PATH . '/classes/class.ls.filesystem.php';
 
-		if ( $zip->open( $sliderFile ) === true ) {
-			// Create the dedicated extraction subdirectory first so realpath() resolves.
-			wp_mkdir_p( $extractDir );
-			$real_extract = realpath( $extractDir );
+			if ( file_exists( $import_util_path ) && file_exists( $filesystem_path ) ) {
+				require_once $import_util_path;
+				require_once $filesystem_path;
 
-			// Validate every ZIP entry before extracting to prevent ZipSlip.
-			if ( false !== $real_extract ) {
-				for ( $i = 0; $i < $zip->numFiles; $i++ ) {
-					$entry_name = $zip->getNameIndex( $i );
-					$dest       = $real_extract . DIRECTORY_SEPARATOR . $entry_name;
+				$sliderFiles = glob( $extractDir . '/*.zip' );
 
-					// Reject the entire archive if any entry escapes the target dir.
-					if ( false === $dest || 0 !== strpos( realpath( dirname( $dest ) ) . DIRECTORY_SEPARATOR, $real_extract . DIRECTORY_SEPARATOR ) ) {
-						$zip->close();
-						return;
-					}
-				}
-			}
-
-			// Extract into demo-content/layer-slider/ so inner ZIPs are at a known path.
-			$zip->extractTo( $extractDir );
-			$zip->close();
-
-			if ( class_exists( 'LS_Sliders' ) && defined( 'LS_ROOT_PATH' ) ) {
-				$import_util_path = LS_ROOT_PATH . '/classes/class.ls.importutil.php';
-				$filesystem_path  = LS_ROOT_PATH . '/classes/class.ls.filesystem.php';
-
-				if ( file_exists( $import_util_path ) && file_exists( $filesystem_path ) ) {
-					require_once $import_util_path;
-					require_once $filesystem_path;
-
-					$sliderFiles = glob( $extractDir . '/*.zip' );
-
-					foreach ( $sliderFiles as $sliderFile ) {
-						new \LS_ImportUtil( $sliderFile );
-					}
+				foreach ( $sliderFiles as $sliderFile ) {
+					new \LS_ImportUtil( $sliderFile );
 				}
 			}
 		}

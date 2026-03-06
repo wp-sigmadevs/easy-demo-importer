@@ -318,4 +318,59 @@ abstract class ImporterAjax {
 	 * @since 1.0.0
 	 */
 	abstract public function response();
+
+	/**
+	 * Unzips and imports slider files.
+	 *
+	 * @param string   $sliderFileKey The key to retrieve slider zip from config (e.g., 'layerSliderZip', 'revSliderZip').
+	 * @param callable $importCallback The callback function to execute the specific slider import logic.
+	 * @param string   $customExtractDir Optional. The custom directory to extract files to. If null, a default is used.
+	 *
+	 * @return bool True if import was attempted and successful, false otherwise.
+	 * @since 1.2.0
+	 */
+	protected function unzipAndImportSlider( $sliderFileKey, $importCallback, $customExtractDir = null ) {
+		$slider = basename(
+			$this->multiple ?
+			Helpers::getDemoData( $this->config['demoData'][ $this->demoSlug ], $sliderFileKey ) :
+			Helpers::getDemoData( $this->config, $sliderFileKey )
+		);
+
+		$defaultExtractDir = $this->demoUploadDir( $this->demoDir() ) . '/' . $slider;
+		$targetExtractDir  = $customExtractDir ?? $defaultExtractDir;
+
+		$sliderFileExists = file_exists( $this->demoUploadDir( $this->demoDir() ) . '/' . $slider . '.zip' );
+
+		if ( ! $slider || ! $sliderFileExists ) {
+			return false;
+		}
+
+		$sliderPath = $this->demoUploadDir( $this->demoDir() ) . '/' . $slider . '.zip';
+		$zip        = new \ZipArchive();
+
+		if ( $zip->open( $sliderPath ) === true ) {
+			// Validate every ZIP entry before extracting to prevent ZipSlip.
+			for ( $i = 0; $i < $zip->numFiles; $i++ ) {
+				$entry_name = $zip->getNameIndex( $i );
+
+				// Reject path-traversal sequences and absolute paths.
+				if ( false !== strpos( $entry_name, '..' ) ||
+					'/' === substr( $entry_name, 0, 1 ) ||
+					'\\' === substr( $entry_name, 0, 1 ) ) {
+					$zip->close();
+					return false;
+				}
+			}
+
+			wp_mkdir_p( $targetExtractDir );
+			$zip->extractTo( $targetExtractDir );
+			$zip->close();
+
+			call_user_func( $importCallback, $targetExtractDir, $slider );
+
+			return true;
+		}
+
+		return false;
+	}
 }
