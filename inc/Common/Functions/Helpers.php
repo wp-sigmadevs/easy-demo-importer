@@ -26,14 +26,24 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 1.0.0
  */
-class Helpers {
+	class Helpers {
+	/**
+	 * Whitelist of allowed view names for renderView().
+	 *
+	 * @var array
+	 * @since 1.2.0
+	 */
+	private static $allowedViews = [
+		'demo-import',
+		'server-status',
+	];
+
 	/**
 	 * Gets Ajax URL.
 	 *
 	 * @static
 	 *
-	 * @return string
-	 * @since  1.0.0
+	 * @return string	 * @since  1.0.0
 	 */
 	public static function ajaxUrl() {
 		return admin_url( 'admin-ajax.php' );
@@ -196,6 +206,15 @@ class Helpers {
 	 * @since  1.0.0
 	 */
 	public static function renderView( $viewName, $args = [] ) {
+		// Enforce whitelist for security.
+		if ( ! in_array( $viewName, self::$allowedViews, true ) ) {
+			return new WP_Error(
+				'invalid_view_name',
+				/* translators: View file name. */
+				sprintf( esc_html__( 'Invalid view name: %s', 'easy-demo-importer' ), esc_html( $viewName ) )
+			);
+		}
+
 		$file       = str_replace( '.', '/', $viewName );
 		$file       = ltrim( $file, '/' );
 		$pluginPath = sd_edi()->getData()['plugin_path'];
@@ -204,9 +223,9 @@ class Helpers {
 
 		if ( ! file_exists( $viewFile ) ) {
 			return new WP_Error(
-				'brock',
+				'view_file_not_found',
 				/* translators: View file name. */
-				sprintf( esc_html__( '%s file not found', 'easy-demo-importer' ), $viewFile )
+				sprintf( esc_html__( '%s file not found', 'easy-demo-importer' ), esc_html( $viewFile ) )
 			);
 		}
 
