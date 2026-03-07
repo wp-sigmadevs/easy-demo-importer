@@ -78,6 +78,12 @@ class Initialize extends ImporterAjax {
 			return;
 		}
 
+		if ( ! SessionManager::isValid( $session_id ) ) {
+			wp_send_json_error( [ 'errorMessage' => __( 'Session does not belong to you or has expired.', 'easy-demo-importer' ) ], 403 );
+			// @phpstan-ignore deadCode.unreachable
+			return;
+		}
+
 		SessionManager::release( $session_id );
 		wp_send_json_success();
 	}

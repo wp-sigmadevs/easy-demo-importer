@@ -26,19 +26,31 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 final class Plugin {
 	/**
+	 * Plugin data cache.
+	 *
+	 * @var array|null
+	 * @since 1.2.0
+	 */
+	private $pluginData = null;
+
+	/**
 	 * Get the plugin meta data.
 	 *
 	 * @return array
 	 * @since 1.0.0
 	 */
 	public function data() {
-		return array_merge(
-			apply_filters(
-				'sd/edi/plugin_meta_data', // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
-				$this->getPluginMetaData()
-			),
-			$this->getOwnPluginData()
-		);
+		if ( null === $this->pluginData ) {
+			$this->pluginData = array_merge(
+				apply_filters(
+					'sd/edi/plugin_meta_data', // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+					$this->getPluginMetaData()
+				),
+				$this->getOwnPluginData()
+			);
+		}
+
+		return $this->pluginData;
 	}
 
 	/**

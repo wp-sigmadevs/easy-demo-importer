@@ -83,6 +83,17 @@ class ImportSettings extends ImporterAjax {
 			'users_can_register',
 			'default_comment_status',
 			'permalink_structure',
+			'template',
+			'stylesheet',
+			'db_version',
+			'cron',
+			'rewrite_rules',
+			'auth_key',
+			'auth_salt',
+			'logged_in_key',
+			'logged_in_salt',
+			'nonce_key',
+			'nonce_salt',
 		];
 
 		if ( $settingsExists ) {

@@ -1,13 +1,14 @@
 import Header from './Layouts/Header';
-import { Row, Col, Button, Tabs, Skeleton, Input, Empty } from 'antd';
 import Support from './components/Support';
 import DemoCard from './components/DemoCard';
+import { useShallow } from 'zustand/react/shallow';
 import React, { useState, useEffect } from 'react';
 import GridSkeleton from './components/GridSkeleton';
 import ErrorMessage from './components/ErrorMessage';
 import useSharedDataStore from './utils/sharedDataStore';
 import ModalComponent from './components/Modal/ModalComponent';
 import ModalRequirements from './components/Modal/ModaRequirements';
+import { Row, Col, Button, Tabs, Skeleton, Input, Empty } from 'antd';
 
 /* global sdEdiAdminParams */
 
@@ -43,7 +44,24 @@ const AppDemoImporter = () => {
 		setFilteredDemoData,
 		isSearchQueryEmpty,
 		setIsSearchQueryEmpty,
-	} = useSharedDataStore();
+	} = useSharedDataStore(
+		useShallow((state) => ({
+			importList: state.importList,
+			serverData: state.serverData,
+			loading: state.loading,
+			fetchImportList: state.fetchImportList,
+			fetchServerData: state.fetchServerData,
+			modalVisible: state.modalVisible,
+			setModalVisible: state.setModalVisible,
+			handleModalCancel: state.handleModalCancel,
+			searchQuery: state.searchQuery,
+			setSearchQuery: state.setSearchQuery,
+			filteredDemoData: state.filteredDemoData,
+			setFilteredDemoData: state.setFilteredDemoData,
+			isSearchQueryEmpty: state.isSearchQueryEmpty,
+			setIsSearchQueryEmpty: state.setIsSearchQueryEmpty,
+		}))
+	);
 
 	/**
 	 * Destructure the Search component from the Input module.

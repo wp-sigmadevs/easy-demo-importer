@@ -112,10 +112,10 @@ class ImportFluentForms extends ImporterAjax {
 
 					// phpcs:ignore Generic.CodeAnalysis.AssignmentInCondition.Found, Squiz.PHP.DisallowMultipleAssignments.FoundInControlStructure
 					if ( $fields = Arr::get( $formItem, 'form', '' ) ) {
-						$formFields = wp_json_encode( $fields );
+						$formFields = wp_json_encode( wp_kses_post_deep( $fields ) );
 					// phpcs:ignore Generic.CodeAnalysis.AssignmentInCondition.Found, Squiz.PHP.DisallowMultipleAssignments.FoundInControlStructure
 					} elseif ( $fields = Arr::get( $formItem, 'form_fields', '' ) ) {
-						$formFields = wp_json_encode( $fields );
+						$formFields = wp_json_encode( wp_kses_post_deep( $fields ) );
 					}
 
 					// Sanitise title and whitelist status to prevent stored XSS.
@@ -132,11 +132,11 @@ class ImportFluentForms extends ImporterAjax {
 					];
 
 					if ( Arr::get( $formItem, 'conditions' ) ) {
-						$form['conditions'] = Arr::get( $formItem, 'conditions' );
+						$form['conditions'] = wp_kses_post_deep( Arr::get( $formItem, 'conditions' ) );
 					}
 
 					if ( isset( $formItem['appearance_settings'] ) ) {
-						$form['appearance_settings'] = Arr::get( $formItem, 'appearance_settings' );
+						$form['appearance_settings'] = wp_kses_post_deep( Arr::get( $formItem, 'appearance_settings' ) );
 					}
 
 					$formId                   = Form::insertGetId( $form );

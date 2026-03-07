@@ -73,8 +73,8 @@ final class Requirements extends Base {
 					plugin_basename( __FILE__ )
 				);
 
-				// Through error & kill plugin.
-				$this->throughError( $error );
+				// Throw error & kill plugin.
+				$this->throwError( $error );
 			}
 		}
 	}
@@ -122,7 +122,7 @@ final class Requirements extends Base {
 	 * @return void
 	 * @since 1.0.0
 	 */
-	public function throughError( $error ) {
+	public function throwError( $error ) {
 		// Gives a error notice.
 		Notice::trigger( $error, 'error' );
 

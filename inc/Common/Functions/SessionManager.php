@@ -43,7 +43,7 @@ class SessionManager {
 	 * Generates a UUID v4 session ID, stores session data in a transient,
 	 * and acquires the mutex lock. Cleans up any orphaned previous session first.
 	 *
-	 * @return array{session_id: string, started_at: int} The new session data.
+	 * @return array{session_id: string, user_id: int, started_at: int} The new session data.
 	 * @since 1.2.0
 	 */
 	public static function start(): array {
@@ -55,6 +55,7 @@ class SessionManager {
 
 		$session_data = [
 			'session_id' => $session_id,
+			'user_id'    => get_current_user_id(),
 			'started_at' => time(),
 		];
 
@@ -70,7 +71,7 @@ class SessionManager {
 	/**
 	 * Get the currently active session.
 	 *
-	 * @return array{session_id: string, started_at: int}|null Session data or null if no active session.
+	 * @return array{session_id: string, user_id: int, started_at: int}|null Session data or null if no active session.
 	 * @since 1.2.0
 	 */
 	public static function get(): ?array {
@@ -111,7 +112,13 @@ class SessionManager {
 	 */
 	public static function isValid( string $session_id ): bool {
 		$active = static::get();
-		return null !== $active && $active['session_id'] === $session_id;
+
+		if ( null === $active || $active['session_id'] !== $session_id ) {
+			return false;
+		}
+
+		// Tie sessions to user IDs: only the user who started the import can proceed with it.
+		return (int) $active['user_id'] === get_current_user_id();
 	}
 
 	/**
