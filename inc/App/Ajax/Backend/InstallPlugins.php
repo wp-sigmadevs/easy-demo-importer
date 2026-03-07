@@ -13,8 +13,11 @@ declare( strict_types=1 );
 namespace SigmaDevs\EasyDemoImporter\App\Ajax\Backend;
 
 use WP_Error;
+use FilesystemIterator;
 use Plugin_Upgrader;
 use WP_Ajax_Upgrader_Skin;
+use RecursiveIteratorIterator;
+use RecursiveDirectoryIterator;
 use SigmaDevs\EasyDemoImporter\Common\{
 	Traits\Singleton,
 	Functions\Helpers,
@@ -255,6 +258,29 @@ class InstallPlugins extends ImporterAjax {
 
 			global $wp_filesystem;
 
+			// Validate the plugin ZIP URL before making any network request.
+			if ( ! wp_http_validate_url( $externalUrl ) ) {
+				$this->installErrors[] = basename( $path );
+				return;
+			}
+
+			$parsed_scheme = wp_parse_url( $externalUrl, PHP_URL_SCHEME );
+			if ( ! in_array( $parsed_scheme, [ 'http', 'https' ], true ) ) {
+				$this->installErrors[] = basename( $path );
+				return;
+			}
+
+			// Allow theme authors to restrict which domains may serve plugin files.
+			$allowed_domains = (array) apply_filters( 'sd/edi/allowed_download_domains', [] ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+			if ( ! empty( $allowed_domains ) ) {
+				$host = (string) wp_parse_url( $externalUrl, PHP_URL_HOST );
+
+				if ( ! in_array( $host, $allowed_domains, true ) ) {
+					$this->installErrors[] = basename( $path );
+					return;
+				}
+			}
+
 			$plugin    = $this->demoUploadDir() . 'plugin.zip';
 			$timeout   = (int) apply_filters( 'sd/edi/download_timeout', 120 ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 			$sslverify = (bool) apply_filters( 'sd/edi/download_sslverify', true ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
@@ -275,15 +301,60 @@ class InstallPlugins extends ImporterAjax {
 			$wp_filesystem->mkdir( $this->demoUploadDir() );
 			$wp_filesystem->put_contents( $plugin, wp_remote_retrieve_body( $response ) );
 
-			$unzip_result = unzip_file( $plugin, WP_PLUGIN_DIR );
+			// Unzip to a temporary directory first to validate.
+			$temp_unzip_dir = $this->demoUploadDir() . 'temp-plugin-' . uniqid();
+			$wp_filesystem->mkdir( $temp_unzip_dir );
 
-			// Delete zip regardless of unzip result.
-			$wp_filesystem->delete( $plugin );
+			$unzip_result = unzip_file( $plugin, $temp_unzip_dir );
 
 			if ( is_wp_error( $unzip_result ) ) {
+				$wp_filesystem->delete( $plugin );
+				$wp_filesystem->delete( $temp_unzip_dir, true );
 				$this->installErrors[] = basename( $path );
 				return;
 			}
+
+			// Guard against ZipSlip: ensure every extracted file is inside the temp dir.
+			$temp_unzip_dir_real = realpath( $temp_unzip_dir );
+
+			if ( false !== $temp_unzip_dir_real ) {
+				$iterator = new RecursiveIteratorIterator(
+					new RecursiveDirectoryIterator( $temp_unzip_dir_real, FilesystemIterator::SKIP_DOTS ),
+					RecursiveIteratorIterator::SELF_FIRST
+				);
+
+				foreach ( $iterator as $item ) {
+					$real_item = realpath( $item->getPathname() );
+
+					if ( false !== $real_item && 0 !== strpos( $real_item, $temp_unzip_dir_real ) ) {
+						// Escape hatch: wipe the dir and reject the archive.
+						$wp_filesystem->delete( $plugin );
+						$wp_filesystem->delete( $temp_unzip_dir, true );
+						$this->installErrors[] = basename( $path );
+						return;
+					}
+				}
+			}
+
+			// If valid, move to WP_PLUGIN_DIR.
+			$files = $wp_filesystem->dirlist( $temp_unzip_dir );
+
+			if ( ! empty( $files ) ) {
+				foreach ( $files as $file ) {
+					$from = trailingslashit( $temp_unzip_dir ) . $file['name'];
+					$to   = trailingslashit( WP_PLUGIN_DIR ) . $file['name'];
+
+					if ( $wp_filesystem->exists( $to ) ) {
+						$wp_filesystem->delete( $to, true );
+					}
+
+					$wp_filesystem->move( $from, $to );
+				}
+			}
+
+			// Clean up.
+			$wp_filesystem->delete( $plugin );
+			$wp_filesystem->delete( $temp_unzip_dir, true );
 
 			++$this->installCount;
 		}

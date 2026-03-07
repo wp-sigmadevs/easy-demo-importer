@@ -140,7 +140,7 @@ class Widgets {
 
 						// Is the widget in the same sidebar and has identical settings?
 						// phpcs:ignore WordPress.PHP.StrictInArray.MissingTrueStrict
-						if ( in_array( "$idBase-$checkId", $sidebarWidgets ) && (array) $widget == $check_widget ) {
+						if ( in_array( "$idBase-$checkId", $sidebarWidgets, true ) && (array) $widget === $check_widget ) {
 							$fail              = true;
 							$widgetMessageType = 'warning';
 							$widgetMessage     = esc_html__( 'Widget already exists', 'easy-demo-importer' );

@@ -176,7 +176,7 @@ class DBSearchReplace {
 		if ( is_array( $fields ) ) {
 			foreach ( $fields as $column ) {
 				$columns[] = $column->Field;
-				if ( 'PRI' == $column->Key ) {
+				if ( 'PRI' === $column->Key ) {
 					$primary_key = $column->Field;
 				}
 			}
@@ -454,7 +454,7 @@ class DBSearchReplace {
 		$serialized_string = trim( $serialized_string );
 
 		// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.serialize_unserialize, WordPress.PHP.NoSilencedErrors.Discouraged
-		return @unserialize( $serialized_string );
+		return @unserialize( $serialized_string, [ 'allowed_classes' => false ] );
 	}
 
 	/**

@@ -48,9 +48,9 @@ $sd_edi_autoloader = require plugin_dir_path( SD_EDI_ROOT_FILE ) . 'vendor/autol
  *
  * @since 1.0.0
  */
-register_activation_hook( SD_EDI_ROOT_FILE, [ setup::class, 'activation' ] );
-register_deactivation_hook( SD_EDI_ROOT_FILE, [ setup::class, 'deactivation' ] );
-register_uninstall_hook( SD_EDI_ROOT_FILE, [ setup::class, 'uninstall' ] );
+register_activation_hook( SD_EDI_ROOT_FILE, [ Setup::class, 'activation' ] );
+register_deactivation_hook( SD_EDI_ROOT_FILE, [ Setup::class, 'deactivation' ] );
+register_uninstall_hook( SD_EDI_ROOT_FILE, [ Setup::class, 'uninstall' ] );
 
 if ( ! class_exists( 'SigmaDevs\EasyDemoImporter\\Bootstrap' ) ) {
 	wp_die( esc_html__( 'Easy Demo Importer is unable to find the Bootstrap class.', 'easy-demo-importer' ) );
@@ -78,5 +78,11 @@ add_action(
  * @since 1.0.0
  */
 function sd_edi() {
-	return new Functions();
+	static $instance = null;
+
+	if ( null === $instance ) {
+		$instance = new Functions();
+	}
+
+	return $instance;
 }

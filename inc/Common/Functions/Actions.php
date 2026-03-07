@@ -132,10 +132,10 @@ class Actions {
 			->replaceUrls( $obj )
 
 			// WooCommerce Actions.
-			->WooCommerceActions()
+			->woocommerceActions()
 
 			// Elementor Actions.
-			->ElementorActions( $obj )
+			->elementorActions( $obj )
 
 			// Update Permalinks.
 			->updatePermalinks()
@@ -453,7 +453,7 @@ class Actions {
 	 * @return static
 	 * @since 1.1.0
 	 */
-	public static function WooCommerceActions() {
+	public static function woocommerceActions() {
 		if ( ! class_exists( 'WooCommerce' ) ) {
 			return new static();
 		}
@@ -638,7 +638,7 @@ class Actions {
 	 * @return static
 	 * @since 1.1.0
 	 */
-	public static function ElementorActions( $obj ) {
+	public static function elementorActions( $obj ) {
 		if ( ! defined( 'ELEMENTOR_PATH' ) ) {
 			return new static();
 		}

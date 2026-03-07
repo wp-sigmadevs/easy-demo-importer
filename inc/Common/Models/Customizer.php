@@ -44,11 +44,30 @@ class Customizer {
 		$template = get_template();
 
 		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
-		$data          = maybe_unserialize( file_get_contents( $customizerFile ) );
+		$raw_data = trim( file_get_contents( $customizerFile ) );
+
+		// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.serialize_unserialize
+		if ( is_serialized( $raw_data ) ) {
+			// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.serialize_unserialize
+			$data = unserialize( $raw_data, [ 'allowed_classes' => false ] );
+		} else {
+			// Decode base64 data from Customizer Export/Import.
+			// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode
+			$decoded_data = base64_decode( $raw_data, true );
+
+			// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.serialize_unserialize
+			if ( false !== $decoded_data && is_serialized( $decoded_data ) ) {
+				// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.serialize_unserialize
+				$data = unserialize( $decoded_data, [ 'allowed_classes' => false ] );
+			} else {
+				$data = $raw_data;
+			}
+		}
+
 		$excludeImages = 'true' === $excludeImages;
 
 		// Data checks.
-		if ( 'array' != gettype( $data ) ) {
+		if ( ! is_array( $data ) ) {
 			return new WP_Error( 'sd_edi_customizer_import_data_error', esc_html__( 'The customizer import file is invalid. Please ensure you are using the correct export file.', 'easy-demo-importer' ) );
 		}
 

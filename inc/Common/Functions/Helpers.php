@@ -83,12 +83,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	public static function verifyAjaxCall() {
 		// Verifies the Ajax request.
 		if ( ! check_ajax_referer( self::nonceText(), self::nonceId(), false ) ) {
-			wp_send_json(
+			wp_send_json_error(
 				[
-					'error'        => true,
 					'errorMessage' => esc_html__( 'Security check failed. Access denied.', 'easy-demo-importer' ),
-				]
+				],
+				403
 			);
+			// @phpstan-ignore deadCode.unreachable
+			wp_die();
 		}
 
 		// Verifies the user role.
@@ -103,12 +105,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	 */
 	public static function verifyUserRole() {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_send_json(
+			wp_send_json_error(
 				[
-					'error'        => true,
 					'errorMessage' => esc_html__( 'You don\'t have permission to perform this action.', 'easy-demo-importer' ),
-				]
+				],
+				403
 			);
+			// @phpstan-ignore deadCode.unreachable
+			wp_die();
 		}
 	}
 

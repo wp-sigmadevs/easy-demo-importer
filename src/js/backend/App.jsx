@@ -3,12 +3,12 @@ import {
 	RouterProvider,
 	Navigate,
 	useLocation,
-	useNavigationType,
 } from 'react-router-dom';
 import { useEffect } from 'react';
 
-import AppDemoImporter from './AppDemoImporter';
 import AppServer from './AppServer';
+import AppDemoImporter from './AppDemoImporter';
+import ErrorBoundary from './components/ErrorBoundary';
 
 /* global sdEdiAdminParams */
 
@@ -88,17 +88,21 @@ const routes = [
 	{
 		path: '/',
 		element: (
-			<LayoutWithEffects>
-				<AppDemoImporter />
-			</LayoutWithEffects>
+			<ErrorBoundary>
+				<LayoutWithEffects>
+					<AppDemoImporter />
+				</LayoutWithEffects>
+			</ErrorBoundary>
 		),
 	},
 	{
 		path: '/system_status_page',
 		element: (
-			<LayoutWithEffects>
-				<AppServer />
-			</LayoutWithEffects>
+			<ErrorBoundary>
+				<LayoutWithEffects>
+					<AppServer />
+				</LayoutWithEffects>
+			</ErrorBoundary>
 		),
 	},
 	{
