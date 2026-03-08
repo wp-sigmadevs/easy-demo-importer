@@ -94,7 +94,9 @@ class Widgets {
 
 			// Loop widgets.
 			foreach ( $widgets as $widgetInstanceId => $widget ) {
-				$fail = false;
+				$fail              = false;
+				$widgetMessageType = 'success';
+				$widgetMessage     = '';
 
 				// Replace the old nav_manu ID with the new one.
 				if ( isset( $widget->nav_menu ) ) {
