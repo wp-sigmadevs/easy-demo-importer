@@ -193,6 +193,14 @@ class DownloadFiles extends ImporterAjax {
 
 		$wp_filesystem->put_contents( $demoData, $file );
 
+		if ( ! $wp_filesystem->exists( $demoData ) ) {
+			return [
+				'success' => false,
+				'message' => __( 'Demo files were downloaded but could not be saved to the server.', 'easy-demo-importer' ),
+				'hint'    => __( 'Check your server disk space and file permissions.', 'easy-demo-importer' ),
+			];
+		}
+
 		// Unzip file.
 		$unzip_result = unzip_file( $demoData, $this->demoUploadDir() );
 
