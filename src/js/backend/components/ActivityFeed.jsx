@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Empty, Tag } from 'antd';
+import { Empty } from 'antd';
 import {
 	InfoCircleOutlined, CheckCircleOutlined,
 	WarningOutlined, CloseCircleOutlined,

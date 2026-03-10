@@ -12,7 +12,7 @@ import { Api } from '../../utils/Api';
 const ImportingStep = () => {
 	const navigate    = useNavigate();
 	const { importOptions, selectedDemo } = useWizard();
-	const { activeSessionId, setActiveSessionId, resetStore } = useSharedDataStore();
+	const { activeSessionId, setActiveSessionId } = useSharedDataStore();
 
 	const [ stepLabel,   setStepLabel   ] = useState( 'Starting…' );
 	const [ xmlProgress, setXmlProgress ] = useState( { done: 0, total: 0 } );
@@ -21,14 +21,15 @@ const ImportingStep = () => {
 	const [ done,        setDone        ] = useState( false );
 	const [ sessionId,   setSessionId   ] = useState( activeSessionId || '' );
 
-	const abortRef = useRef( false );
+	const abortRef     = useRef( false );
+	const sessionIdRef = useRef( activeSessionId || '' );
 
 	// ── AJAX helper ─────────────────────────────────────────────────────────
 	const ajaxPost = async ( action, extra = {} ) => {
 		const body = new URLSearchParams( {
 			action,
 			nonce:     sdEdiAdminParams.nonce,
-			sessionId: sessionId,
+			sessionId: sessionIdRef.current,
 			demo:      selectedDemo?.slug ?? '',
 			excludeImages:           importOptions.media          ? '' : '1',
 			reset:                   importOptions.resetDb        ? 'true' : 'false',
@@ -74,6 +75,7 @@ const ImportingStep = () => {
 				setOverallPct( 5 );
 				const initData = await ajaxPost( 'sd_edi_initialize' );
 				sid = initData.sessionId ?? sid;
+				sessionIdRef.current = sid;
 				setSessionId( sid );
 				setActiveSessionId( sid );
 
