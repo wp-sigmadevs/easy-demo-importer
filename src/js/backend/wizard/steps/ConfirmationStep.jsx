@@ -19,7 +19,7 @@ const ConfirmationStep = () => {
 		Api.get( `/sd/edi/v1/demo-stats?demo=${ selectedDemo.slug ?? '' }` )
 			.then( ( res ) => setDryRunStats( res.data ) )
 			.catch( () => setDryRunStats( { error: true } ) );
-	}, [ selectedDemo ] );
+	}, [ selectedDemo, dryRunStats ] );
 
 	const back   = document.getElementById( 'edi-wizard-back-slot' );
 	const footer = document.getElementById( 'edi-wizard-next-slot' );
