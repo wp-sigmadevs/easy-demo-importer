@@ -376,6 +376,11 @@ class RestEndpoints extends Base {
 			'fields' => $this->inactivePluginsFields(),
 		];
 
+		$tabs['regen_info'] = [
+			'label'  => esc_html__( 'Image Regeneration', 'easy-demo-importer' ),
+			'fields' => $this->regenInfoFields(),
+		];
+
 		$tabs['copy_system_data'] = [
 			'label'  => esc_html__( 'Copy System Data', 'easy-demo-importer' ),
 			'fields' => $this->copyData(),
@@ -677,6 +682,60 @@ class RestEndpoints extends Base {
 					esc_html__( 'By %s', 'easy-demo-importer' ),
 					esc_html( wp_strip_all_tags( $inactivePlugin['Author'] ) )
 				) : 'N/A',
+			];
+		}
+
+		return $fields;
+	}
+
+	/**
+	 * Image Regeneration Status Fields.
+	 *
+	 * @return array
+	 * @since 1.4.0
+	 */
+	private function regenInfoFields(): array {
+		$fields = [];
+
+		$session_id = (string) get_option( 'sd_edi_background_regen_session', '' );
+
+		if ( ! empty( $session_id ) ) {
+			$progress = get_transient( 'sd_edi_background_regen_progress_' . $session_id );
+
+			if ( is_array( $progress ) ) {
+				$fields['regen_status'] = [
+					'label' => esc_html__( 'Status', 'easy-demo-importer' ),
+					'value' => sprintf(
+						/* translators: 1: done count, 2: total count */
+						esc_html__( 'Running — %1$d of %2$d images done', 'easy-demo-importer' ),
+						(int) $progress['done'],
+						(int) $progress['total']
+					),
+				];
+
+				return $fields;
+			}
+		}
+
+		$last = get_option( 'sd_edi_last_regen', [] );
+
+		if ( ! empty( $last['date'] ) ) {
+			$fields['regen_last_date']     = [
+				'label' => esc_html__( 'Last Run', 'easy-demo-importer' ),
+				'value' => esc_html( $last['date'] ),
+			];
+			$fields['regen_last_count']    = [
+				'label' => esc_html__( 'Images Processed', 'easy-demo-importer' ),
+				'value' => (int) ( $last['count'] ?? 0 ),
+			];
+			$fields['regen_last_failures'] = [
+				'label' => esc_html__( 'Failures', 'easy-demo-importer' ),
+				'value' => (int) ( $last['failures'] ?? 0 ),
+			];
+		} else {
+			$fields['regen_status'] = [
+				'label' => esc_html__( 'Status', 'easy-demo-importer' ),
+				'value' => esc_html__( 'No regeneration session recorded.', 'easy-demo-importer' ),
 			];
 		}
 
