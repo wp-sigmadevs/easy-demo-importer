@@ -47,7 +47,7 @@ class XmlChunker {
 	 * @since 1.3.0
 	 */
 	public static function getItems( string $file_path ): array {
-		$items = array();
+		$items = [];
 
 		if ( ! file_exists( $file_path ) || ! is_readable( $file_path ) ) {
 			return $items;
@@ -93,11 +93,11 @@ class XmlChunker {
 
 			if ( \XMLReader::END_ELEMENT === $reader->nodeType && 'item' === $reader->localName ) {
 				if ( $in_item ) {
-					$items[] = array(
+					$items[] = [
 						'post_id'    => $post_id,
 						'post_type'  => $post_type ?: 'post',
 						'post_title' => $post_title,
-					);
+					];
 					$in_item = false;
 				}
 			}
@@ -145,7 +145,7 @@ class XmlChunker {
 	 * @param int    $limit       Number of items to include. Default: chunkSize().
 	 * @param int[]  $allowed_ids If non-empty, only items whose wp:post_id is in
 	 *                            this list are counted toward $offset and $limit.
-	 *                            (Phase 4 selective import hook-in — pass [] for all.)
+	 *                            Pass [] to include all items (Phase 4 hook-in).
 	 * @return string|null Absolute path to the temp WXR file, or null on failure.
 	 * @since 1.3.0
 	 */
@@ -153,7 +153,7 @@ class XmlChunker {
 		string $file_path,
 		int $offset,
 		int $limit = 0,
-		array $allowed_ids = array()
+		array $allowed_ids = []
 	): ?string {
 		if ( ! file_exists( $file_path ) || ! is_readable( $file_path ) ) {
 			return null;
@@ -177,7 +177,7 @@ class XmlChunker {
 			return null;
 		}
 
-		$item_xmls = array();
+		$item_xmls = [];
 		$seen      = 0;
 		$collected = 0;
 

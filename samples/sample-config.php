@@ -95,10 +95,12 @@ class SD_EDI_Demo_Importer {
 					'previewUrl'   => 'https://demoimport4.sigmadevs.com/',
 
 					// Optional: grey out this demo if required plugins are not active.
+					// phpcs:disable Squiz.Commenting.InlineComment.InvalidEndChar
 					// 'requires' => [
-					//     'woocommerce/woocommerce.php',
-					//     'elementor/elementor.php',
+					// 'woocommerce/woocommerce.php',
+					// 'elementor/elementor.php',
 					// ],
+					// phpcs:enable
 				],
 				'home-2' => [
 					'name'         => esc_html__( 'Digital Agency', 'easy-demo-importer' ),
