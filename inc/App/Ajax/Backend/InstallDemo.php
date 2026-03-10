@@ -134,43 +134,51 @@ class InstallDemo extends ImporterAjax {
 			$mutex_option
 		);
 
-		// ── Run the import ──────────────────────────────────────────────────────────
+		// ── Queue chunked import instead of full import ─────────────────────────
 		$xmlFile    = $this->demoUploadDir( $this->demoDir() ) . '/content.xml';
 		$fileExists = file_exists( $xmlFile );
 
 		/**
 		 * Action Hook: 'sd/edi/before_import'
 		 *
-		 * Performs special actions before demo import.
-		 *
 		 * @since 1.0.0
 		 */
 		do_action( 'sd/edi/before_import', $xmlFile, $this ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
-		if ( $fileExists ) {
-			// Clear any nav menus left by a previous (possibly partial) run so the
-			// importer always starts from a clean slate.
-			$this->clearNavMenus();
-
-			$this->importDemoContent( $xmlFile, $this->excludeImages, $this->skipImageRegeneration );
+		if ( ! $fileExists ) {
+			$this->prepareResponse(
+				'',
+				'',
+				'',
+				true,
+				esc_html__( 'Demo import process failed. No content file found.', 'easy-demo-importer' ),
+			);
 		}
 
-		/**
-		 * Action Hook: 'sd/edi/after_content_import'
-		 *
-		 * Performs special actions after content import.
-		 *
-		 * @since 1.1.5
-		 */
-		do_action( 'sd/edi/after_content_import', $xmlFile, $this ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+		// Scan item count and cache it for the chunk polling loop.
+		$items = \SigmaDevs\EasyDemoImporter\Common\Utils\XmlChunker::getItems( $xmlFile );
+		$total = count( $items );
 
-		// Response.
+		set_transient( 'sd_edi_xml_total_' . $this->sessionId, $total, HOUR_IN_SECONDS );
+
+		\SigmaDevs\EasyDemoImporter\Common\Utils\ImportLogger::log(
+			sprintf(
+				/* translators: %d: total number of items */
+				__( 'XML content ready: %d items queued for import.', 'easy-demo-importer' ),
+				$total
+			),
+			'info',
+			$this->sessionId
+		);
+
 		$this->prepareResponse(
-			$fileExists ? 'sd_edi_import_customizer' : '',
-			$fileExists ? esc_html__( 'Importing Customizer settings.', 'easy-demo-importer' ) : '',
-			$fileExists ? esc_html__( 'Everything has been imported smoothly.', 'easy-demo-importer' ) : '',
-			! $fileExists,
-			! $fileExists ? esc_html__( 'Demo import process failed. No content file found.', 'easy-demo-importer' ) : '',
+			'sd_edi_import_xml_chunk',
+			esc_html__( 'Importing XML content.', 'easy-demo-importer' ),
+			sprintf(
+				/* translators: %d: total items */
+				esc_html__( '%d items queued. Starting chunked import…', 'easy-demo-importer' ),
+				$total
+			)
 		);
 	}
 
