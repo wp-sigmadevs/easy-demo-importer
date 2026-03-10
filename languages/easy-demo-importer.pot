@@ -6,7 +6,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-03-10 07:12+0000\n"
+"POT-Creation-Date: 2026-03-10 09:16+0000\n"
 "Report-Msgid-Bugs-To: https://github.com/wp-sigmadevs/easy-demo-importer/issues\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -130,11 +130,11 @@ msgstr ""
 msgid "This will permanently delete all your content, media, and settings. Are you sure you want to continue?"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:190, ../inc/App/Rest/RestEndpoints.php:456, ../inc/App/Rest/RestEndpoints.php:470, ../inc/App/Rest/RestEndpoints.php:523, ../inc/App/Rest/RestEndpoints.php:581, ../inc/App/Rest/RestEndpoints.php:586, ../inc/App/Rest/RestEndpoints.php:616, ../inc/App/Rest/RestEndpoints.php:621
+#: ../inc/App/Backend/Enqueue.php:190, ../inc/App/Rest/RestEndpoints.php:461, ../inc/App/Rest/RestEndpoints.php:475, ../inc/App/Rest/RestEndpoints.php:528, ../inc/App/Rest/RestEndpoints.php:586, ../inc/App/Rest/RestEndpoints.php:591, ../inc/App/Rest/RestEndpoints.php:621, ../inc/App/Rest/RestEndpoints.php:626
 msgid "Yes"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:191, ../inc/App/Rest/RestEndpoints.php:456, ../inc/App/Rest/RestEndpoints.php:470, ../inc/App/Rest/RestEndpoints.php:523, ../inc/App/Rest/RestEndpoints.php:581, ../inc/App/Rest/RestEndpoints.php:586, ../inc/App/Rest/RestEndpoints.php:616, ../inc/App/Rest/RestEndpoints.php:621
+#: ../inc/App/Backend/Enqueue.php:191, ../inc/App/Rest/RestEndpoints.php:461, ../inc/App/Rest/RestEndpoints.php:475, ../inc/App/Rest/RestEndpoints.php:528, ../inc/App/Rest/RestEndpoints.php:586, ../inc/App/Rest/RestEndpoints.php:591, ../inc/App/Rest/RestEndpoints.php:621, ../inc/App/Rest/RestEndpoints.php:626
 msgid "No"
 msgstr ""
 
@@ -366,208 +366,237 @@ msgstr ""
 msgid "Inactive Plugins"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:380, ../inc/App/Rest/RestEndpoints.php:697
+#: ../inc/App/Rest/RestEndpoints.php:380
+msgid "Image Regeneration"
+msgstr ""
+
+#: ../inc/App/Rest/RestEndpoints.php:385, ../inc/App/Rest/RestEndpoints.php:756
 msgid "Copy System Data"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:399
+#: ../inc/App/Rest/RestEndpoints.php:404
 msgid "Operating System"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:404
+#: ../inc/App/Rest/RestEndpoints.php:409
 msgid "Server"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:405
+#: ../inc/App/Rest/RestEndpoints.php:410
 msgid "Detection Error"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:409
+#: ../inc/App/Rest/RestEndpoints.php:414
 msgid "MySQL Version"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:415
+#: ../inc/App/Rest/RestEndpoints.php:420
 msgid "PHP Version"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:420
+#: ../inc/App/Rest/RestEndpoints.php:425
 msgid "PHP Max Execution Time"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:422
+#: ../inc/App/Rest/RestEndpoints.php:427
 msgid "Recommended PHP Max Execution Time is "
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:426
+#: ../inc/App/Rest/RestEndpoints.php:431
 msgid "PHP Max Input Time"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:428
+#: ../inc/App/Rest/RestEndpoints.php:433
 msgid "Recommended PHP Max Input Time is "
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:432
+#: ../inc/App/Rest/RestEndpoints.php:437
 msgid "PHP Max Upload Size"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:434
+#: ../inc/App/Rest/RestEndpoints.php:439
 msgid "Recommended PHP Max Upload Size is "
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:438
+#: ../inc/App/Rest/RestEndpoints.php:443
 msgid "PHP Post Max Size"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:440
+#: ../inc/App/Rest/RestEndpoints.php:445
 msgid "Recommended PHP Post Max Size is "
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:444
+#: ../inc/App/Rest/RestEndpoints.php:449
 msgid "PHP Max Input Vars"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:449
+#: ../inc/App/Rest/RestEndpoints.php:454
 msgid "PHP Memory Limit"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:451
+#: ../inc/App/Rest/RestEndpoints.php:456
 msgid "Recommended PHP Memory Limit is "
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:455
+#: ../inc/App/Rest/RestEndpoints.php:460
 msgid "cURL Installed"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:463
+#: ../inc/App/Rest/RestEndpoints.php:468
 msgid "cURL version"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:469
+#: ../inc/App/Rest/RestEndpoints.php:474
 msgid "GD Installed"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:477
+#: ../inc/App/Rest/RestEndpoints.php:482
 msgid "GD version"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:483
+#: ../inc/App/Rest/RestEndpoints.php:488
 msgid "Write Permission"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:485
+#: ../inc/App/Rest/RestEndpoints.php:490
 msgid "Fix the write permission error in the wp-content directory for successful import."
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:502
+#: ../inc/App/Rest/RestEndpoints.php:507
 msgid "Name"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:507
+#: ../inc/App/Rest/RestEndpoints.php:512
 msgid "Version"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:512
+#: ../inc/App/Rest/RestEndpoints.php:517
 msgid "Author"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:517
+#: ../inc/App/Rest/RestEndpoints.php:522
 msgid "Author URL"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:522
+#: ../inc/App/Rest/RestEndpoints.php:527
 msgid "Child Theme"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:524
+#: ../inc/App/Rest/RestEndpoints.php:529
 msgid "Child theme is recommended if you want to modify or extend the features of the theme"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:529
+#: ../inc/App/Rest/RestEndpoints.php:534
 msgid "Parent Theme Name"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:534
+#: ../inc/App/Rest/RestEndpoints.php:539
 msgid "Parent Theme Version"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:539
+#: ../inc/App/Rest/RestEndpoints.php:544
 msgid "Parent Theme Author"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:544
+#: ../inc/App/Rest/RestEndpoints.php:549
 msgid "Parent Theme Author URL"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:564
+#: ../inc/App/Rest/RestEndpoints.php:569
 msgid "WordPress Version"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:566
+#: ../inc/App/Rest/RestEndpoints.php:571
 msgid "WordPress core is outdated. Please update to the latest version."
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:570
+#: ../inc/App/Rest/RestEndpoints.php:575
 msgid "Site URL"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:575
+#: ../inc/App/Rest/RestEndpoints.php:580
 msgid "Home URL"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:580
+#: ../inc/App/Rest/RestEndpoints.php:585
 msgid "Is this Multisite?"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:585
+#: ../inc/App/Rest/RestEndpoints.php:590
 msgid "Has SSL Enabled?"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:590
+#: ../inc/App/Rest/RestEndpoints.php:595
 msgid "Max Upload Size"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:595
+#: ../inc/App/Rest/RestEndpoints.php:600
 msgid "Memory Limit"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:600
+#: ../inc/App/Rest/RestEndpoints.php:605
 msgid "Max Memory Limit"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:605
+#: ../inc/App/Rest/RestEndpoints.php:610
 msgid "Permalink Structure"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:606
+#: ../inc/App/Rest/RestEndpoints.php:611
 msgid "Plain"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:610
+#: ../inc/App/Rest/RestEndpoints.php:615
 msgid "Language"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:615
+#: ../inc/App/Rest/RestEndpoints.php:620
 msgid "Debug Mode Enabled"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:620
+#: ../inc/App/Rest/RestEndpoints.php:625
 msgid "Script Debug Mode Enabled"
 msgstr ""
 
 #. translators: 1. Plugin author name.
-#: ../inc/App/Rest/RestEndpoints.php:647, ../inc/App/Rest/RestEndpoints.php:677
+#: ../inc/App/Rest/RestEndpoints.php:652, ../inc/App/Rest/RestEndpoints.php:682
 msgid "By %s"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:696
+#: ../inc/App/Rest/RestEndpoints.php:707, ../inc/App/Rest/RestEndpoints.php:737
+msgid "Status"
+msgstr ""
+
+#. translators: 1: done count, 2: total count
+#: ../inc/App/Rest/RestEndpoints.php:710
+msgid "Running — %1$d of %2$d images done"
+msgstr ""
+
+#: ../inc/App/Rest/RestEndpoints.php:738
+msgid "No regeneration session recorded."
+msgstr ""
+
+#: ../inc/App/Rest/RestEndpoints.php:724
+msgid "Last Run"
+msgstr ""
+
+#: ../inc/App/Rest/RestEndpoints.php:728
+msgid "Images Processed"
+msgstr ""
+
+#: ../inc/App/Rest/RestEndpoints.php:732
+msgid "Failures"
+msgstr ""
+
+#: ../inc/App/Rest/RestEndpoints.php:755
 msgid "When submitting a support request, kindly include the details generated below in your message. Providing this information will assist us in efficiently diagnosing and addressing the issue you are experiencing."
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:710
+#: ../inc/App/Rest/RestEndpoints.php:769
 msgid "Write permission error"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:716
+#: ../inc/App/Rest/RestEndpoints.php:775
 msgid "No issue"
 msgstr ""
 
@@ -597,6 +626,22 @@ msgstr ""
 
 #: ../inc/Common/Abstracts/ImporterAjax.php:210
 msgid "Invalid demo selection."
+msgstr ""
+
+#. translators: 1: total images, 2: failure count
+#: ../inc/Common/Functions/Actions.php:1029
+msgid "Easy Demo Importer: Background image regen complete — %1$d done, %2$d failed. Check System Status for details."
+msgstr ""
+
+#: ../inc/Common/Functions/Actions.php:1013
+msgid "Easy Demo Importer: %d image regenerated in the background."
+msgid_plural "Easy Demo Importer: %d images regenerated in the background."
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: 1: done count, 2: total count
+#: ../inc/Common/Functions/Actions.php:1057
+msgid "Easy Demo Importer: Image regeneration running in background — %1$d of %2$d done."
 msgstr ""
 
 #. translators: file size
@@ -691,6 +736,16 @@ msgstr ""
 #. translators: %s: file path
 #: ../inc/Common/Utils/Errors.php:72
 msgid "Error source: %s"
+msgstr ""
+
+#. translators: %d: attachment post ID
+#: ../inc/Common/Utils/ImageRegenEngine.php:123
+msgid "File not found for attachment #%d."
+msgstr ""
+
+#. translators: %d: attachment post ID
+#: ../inc/Common/Utils/ImageRegenEngine.php:144
+msgid "No metadata generated for attachment #%d."
 msgstr ""
 
 #: ../inc/App/Ajax/Backend/ActivatePlugins.php:107
@@ -964,24 +1019,28 @@ msgstr ""
 msgid "No widgets import needed."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/ImportXmlChunk.php:67
+#: ../inc/App/Ajax/Backend/ImportXmlChunk.php:68
 msgid "XML file not found."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/ImportXmlChunk.php:88
+#: ../inc/App/Ajax/Backend/ImportXmlChunk.php:89
 msgid "XML content import complete."
 msgstr ""
 
 #: ../inc/App/Ajax/Backend/ImportXmlChunk.php:95
+msgid "Image regeneration deferred — dedicated step ready."
+msgstr ""
+
+#: ../inc/App/Ajax/Backend/ImportXmlChunk.php:102
 msgid "Importing Customizer settings."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/ImportXmlChunk.php:96
+#: ../inc/App/Ajax/Backend/ImportXmlChunk.php:103
 msgid "XML content fully imported."
 msgstr ""
 
 #. translators: 1: first item number, 2: last item number, 3: total
-#: ../inc/App/Ajax/Backend/ImportXmlChunk.php:113
+#: ../inc/App/Ajax/Backend/ImportXmlChunk.php:120
 msgid "Imported items %1$d–%2$d of %3$d."
 msgstr ""
 
@@ -1063,6 +1122,21 @@ msgstr ""
 #. translators: %s: plugin slug or name
 #: ../inc/App/Ajax/Backend/InstallPlugins.php:199
 msgid "Plugin installed: %s"
+msgstr ""
+
+#. translators: 1: total images, 2: failure count
+#: ../inc/App/Ajax/Backend/RegenerateImages.php:158
+msgid "Image regeneration complete: %1$d image processed, %2$d failure."
+msgid_plural "Image regeneration complete: %1$d images processed, %2$d failures."
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../inc/App/Ajax/Backend/RegenerateImages.php:318
+msgid "Security check failed. Please refresh the page."
+msgstr ""
+
+#: ../inc/App/Ajax/Backend/RegenerateImages.php:327
+msgid "Insufficient permissions."
 msgstr ""
 
 #: ../lib/wordpress-importer/class-wp-import.php:218, ../lib/wordpress-importer/class-wp-import.php:226
@@ -1188,26 +1262,26 @@ msgstr ""
 msgid "Right Place"
 msgstr ""
 
-#: ../samples/sample-config.php:104
+#: ../samples/sample-config.php:106
 msgid "Digital Agency"
 msgstr ""
 
-#: ../samples/sample-config.php:109
+#: ../samples/sample-config.php:111
 msgid "Organic Farm"
 msgstr ""
 
-#: ../samples/sample-config.php:114
+#: ../samples/sample-config.php:116
 msgid "Interiors"
 msgstr ""
 
-#: ../samples/sample-config.php:182
+#: ../samples/sample-config.php:184
 msgid "Marketing Agency"
 msgstr ""
 
-#: ../samples/sample-config.php:232
+#: ../samples/sample-config.php:234
 msgid "Sigma Restaurant"
 msgstr ""
 
-#: ../samples/sample-config.php:252
+#: ../samples/sample-config.php:254
 msgid "Copywriter"
 msgstr ""
