@@ -50,6 +50,7 @@ class Setup {
 		set_transient( 'sd_edi_installing', 'yes', MINUTE_IN_SECONDS * 10 );
 
 		self::createTable();
+		self::createImportTables();
 
 		delete_transient( 'sd_edi_installing' );
 
@@ -135,6 +136,63 @@ class Setup {
 		}
 
 		return $table_schema;
+	}
+
+	/**
+	 * Create Phase 2 import tables.
+	 *
+	 * @return void
+	 * @since 1.3.0
+	 */
+	private static function createImportTables() {
+		global $wpdb;
+
+		$wpdb->hide_errors();
+		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+
+		$collate = $wpdb->has_cap( 'collation' ) ? $wpdb->get_charset_collate() : '';
+
+		$log_table   = $wpdb->prefix . 'sd_edi_import_log';
+		$queue_table = $wpdb->prefix . 'sd_edi_import_queue';
+
+		dbDelta( "CREATE TABLE $log_table (
+        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        session_id VARCHAR(36) NOT NULL,
+        timestamp DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        level ENUM('info','success','warning','error') NOT NULL DEFAULT 'info',
+        message TEXT NOT NULL,
+        PRIMARY KEY (id),
+        KEY session_id (session_id),
+        KEY timestamp (timestamp)
+    ) $collate;" );
+
+		dbDelta( "CREATE TABLE $queue_table (
+        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        session_id VARCHAR(36) NOT NULL,
+        item_index INT UNSIGNED NOT NULL,
+        post_id BIGINT UNSIGNED NOT NULL DEFAULT 0,
+        post_type VARCHAR(20) NOT NULL DEFAULT '',
+        post_title TEXT NOT NULL,
+        status ENUM('pending','done','failed') NOT NULL DEFAULT 'pending',
+        PRIMARY KEY (id),
+        KEY session_status (session_id, status)
+    ) $collate;" );
+
+		update_option( 'sd_edi_db_version', '1.3.0' );
+	}
+
+	/**
+	 * Run DB upgrades if plugin was updated without reactivation.
+	 *
+	 * Hook: plugins_loaded
+	 *
+	 * @return void
+	 * @since 1.3.0
+	 */
+	public static function maybeUpgradeDb() {
+		if ( get_option( 'sd_edi_db_version' ) !== '1.3.0' ) {
+			self::createImportTables();
+		}
 	}
 
 	/**

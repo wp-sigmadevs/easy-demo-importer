@@ -33,6 +33,10 @@ $table_name = $wpdb->prefix . 'sd_edi_taxonomy_import'; // phpcs:ignore WordPres
 // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQLPlaceholders.UnquotedComplexPlaceholder
 $wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %1$s', $table_name ) );
 
+$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}sd_edi_import_log" );    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.SchemaChange
+$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}sd_edi_import_queue" );  // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.SchemaChange
+delete_option( 'sd_edi_db_version' );
+
 // Clear any scheduled cron events registered by the plugin.
 // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
 $cron_hooks = [
