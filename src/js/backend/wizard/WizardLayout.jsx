@@ -79,11 +79,9 @@ const WizardShell = () => {
 			<div className="edi-wizard-footer">
 				<span
 					id="edi-wizard-back-slot"
-					style={ { display: 'contents' } }
 				/>
 				<span
 					id="edi-wizard-next-slot"
-					style={ { display: 'contents' } }
 				/>
 			</div>
 		</div>

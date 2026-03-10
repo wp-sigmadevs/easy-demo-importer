@@ -80,16 +80,46 @@ class ImportXmlChunk extends ImporterAjax {
 
 		$total = (int) $cached;
 
+		// Log diagnostic info if offset is 0.
+		if ( 0 === $offset ) {
+			ImportLogger::log(
+				sprintf(
+					/* translators: %d: total items */
+					__( 'Starting XML chunked import: %d items total.', 'easy-demo-importer' ),
+					$total
+				),
+				'info',
+				$this->sessionId
+			);
+		}
+
 		$limit     = XmlChunker::chunkSize();
 		$chunk_tmp = XmlChunker::extractChunk( $xml_path, $offset, $limit );
 
 		if ( ! $chunk_tmp ) {
 			// Offset is past end — import complete.
 			ImportLogger::log(
-				__( 'XML content import complete.', 'easy-demo-importer' ),
-				'success',
+				sprintf(
+					/* translators: %d: offset */
+					__( 'XML chunk extraction complete at offset %d.', 'easy-demo-importer' ),
+					$offset
+				),
+				$offset < $total ? 'warning' : 'success',
 				$this->sessionId
 			);
+
+			if ( $offset < $total ) {
+				ImportLogger::log(
+					sprintf(
+						/* translators: 1: offset, 2: total */
+						__( 'Import reached end of file at item %1$d but expected %2$d. This can happen if the XML file is malformed.', 'easy-demo-importer' ),
+						$offset,
+						$total
+					),
+					'warning',
+					$this->sessionId
+				);
+			}
 
 			ImportLogger::log(
 				__( 'Image regeneration deferred — dedicated step ready.', 'easy-demo-importer' ),
@@ -100,7 +130,14 @@ class ImportXmlChunk extends ImporterAjax {
 			$this->prepareResponse(
 				'sd_edi_import_customizer',
 				esc_html__( 'Importing Customizer settings.', 'easy-demo-importer' ),
-				esc_html__( 'XML content fully imported.', 'easy-demo-importer' )
+				esc_html__( 'XML content fully imported.', 'easy-demo-importer' ),
+				false,
+				'',
+				'',
+				[
+					'done'  => $total,
+					'total' => $total,
+				]
 			);
 			return;
 		}
@@ -147,15 +184,24 @@ class ImportXmlChunk extends ImporterAjax {
 			define( 'SD_EDI_LOAD_IMPORTERS', true );
 		}
 
-		if ( ! class_exists( 'SD_EDI_WP_Import' ) ) {
-			$importer_path = sd_edi()->getPluginPath() . '/lib/wordpress-importer/wordpress-importer.php';
+		$importer_path = sd_edi()->getPluginPath() . '/lib/wordpress-importer/wordpress-importer.php';
 
+		if ( ! class_exists( 'SD_EDI_WP_Import' ) ) {
 			if ( file_exists( $importer_path ) ) {
 				require_once $importer_path;
 			}
 		}
 
 		if ( ! class_exists( 'SD_EDI_WP_Import' ) ) {
+			ImportLogger::log(
+				sprintf(
+					/* translators: %s: importer path */
+					__( 'WP Importer class could not be loaded from %s.', 'easy-demo-importer' ),
+					$importer_path
+				),
+				'error',
+				$this->sessionId
+			);
 			return;
 		}
 
@@ -166,11 +212,12 @@ class ImportXmlChunk extends ImporterAjax {
 		add_filter( 'big_image_size_threshold', '__return_false', 9999 );
 
 		// Track every attachment created in this chunk for the regen step.
-		// SD_EDI_WP_Import::process_attachment() calls wp_insert_attachment() which fires add_attachment.
+		// SD_EDI_WP_Import::process_attachment() fires sd_edi_import_attachment_created.
 		$session_id = $this->sessionId;
 		$tracker    = static function ( int $post_id ) use ( $session_id ): void {
 			ImageRegenEngine::appendAttachment( $session_id, $post_id );
 		};
+		add_action( 'sd_edi_import_attachment_created', $tracker );
 		add_action( 'add_attachment', $tracker );
 
 		$exclude_images               = ! ( 'true' === $this->excludeImages );
@@ -181,6 +228,7 @@ class ImportXmlChunk extends ImporterAjax {
 		$wp_import->import( $chunk_path );
 		ob_end_clean();
 
+		remove_action( 'sd_edi_import_attachment_created', $tracker );
 		remove_action( 'add_attachment', $tracker );
 		remove_filter( 'intermediate_image_sizes_advanced', '__return_empty_array', 9999 );
 		remove_filter( 'wp_generate_attachment_metadata', '__return_empty_array', 9999 );

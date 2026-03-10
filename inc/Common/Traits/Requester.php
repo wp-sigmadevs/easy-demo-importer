@@ -86,9 +86,9 @@ trait Requester {
 	public function verifyPostSubmission() {
 		return (
 			isset( $_POST['action'] ) &&
-			isset( $_POST['demo'] ) &&
+			( isset( $_POST['demo'] ) || isset( $_POST['sessionId'] ) ) &&
 			isset( $_POST[ Helpers::nonceId() ] ) &&
-			check_admin_referer( Helpers::nonceText(), Helpers::nonceId() )
+			check_ajax_referer( Helpers::nonceText(), Helpers::nonceId(), false )
 		);
 	}
 

@@ -178,7 +178,11 @@ class InstallDemo extends ImporterAjax {
 				/* translators: %d: total items */
 				esc_html__( '%d items queued. Starting chunked import…', 'easy-demo-importer' ),
 				$total
-			)
+			),
+			false,
+			'',
+			'',
+			[ 'total' => $total ]
 		);
 	}
 

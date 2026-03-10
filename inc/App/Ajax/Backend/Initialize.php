@@ -99,6 +99,11 @@ class Initialize extends ImporterAjax {
 		// Verifying AJAX call and user role.
 		Helpers::verifyAjaxCall();
 
+		// Optional: Force release lock if requested (e.g. from error state "Start Over" button).
+		if ( isset( $_POST['forceReset'] ) && 'true' === $_POST['forceReset'] ) {
+			SessionManager::forceRelease();
+		}
+
 		// Reject if another import is already running.
 		if ( SessionManager::isLocked() ) {
 			$this->prepareResponse(
@@ -140,7 +145,7 @@ class Initialize extends ImporterAjax {
 
 		if ( ! empty( $this->sessionId ) ) {
 			ImportLogger::log(
-				__( 'Demo files downloaded and extracted.', 'easy-demo-importer' ),
+				__( 'Import session started. Cleanups and environment ready.', 'easy-demo-importer' ),
 				'success',
 				$this->sessionId
 			);

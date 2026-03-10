@@ -1,6 +1,6 @@
 import { Button, Spin } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import PluginList from '../../components/PluginList';
 import useSharedDataStore from '../../utils/sharedDataStore';
 import ReactDOM from 'react-dom';
@@ -10,18 +10,24 @@ import ReactDOM from 'react-dom';
 const PluginInstallerStep = () => {
 	const navigate = useNavigate();
 	const { pluginList, fetchPluginList, loading, setLoading } = useSharedDataStore();
+	const [footer, setFooter] = useState(null);
+	const [back, setBack] = useState(null);
 
 	useEffect( () => {
 		setLoading( true );
 		fetchPluginList( '/sd/edi/v1/plugin/list' );
 	}, [] );
 
+	useEffect(() => {
+		const nextEl = document.getElementById('edi-wizard-next-slot');
+		const backEl = document.getElementById('edi-wizard-back-slot');
+		if (nextEl) setFooter(nextEl);
+		if (backEl) setBack(backEl);
+	}, []);
+
 	const demoPluginData = pluginList.success ? pluginList.data : [];
 	const pluginArray    = Object.entries( demoPluginData ).map( ( [ key, value ] ) => ( { key, ...value } ) );
 	const allActive      = pluginArray.every( ( p ) => p.active );
-
-	const back   = document.getElementById( 'edi-wizard-back-slot' );
-	const footer = document.getElementById( 'edi-wizard-next-slot' );
 
 	return (
 		<>
@@ -32,7 +38,7 @@ const PluginInstallerStep = () => {
 
 			{ loading
 				? <Spin size="large" style={ { display: 'block', margin: '40px auto' } } />
-				: <PluginList pluginData={ pluginArray } />
+				: <PluginList plugins={ pluginArray } />
 			}
 
 			{ back && ReactDOM.createPortal(

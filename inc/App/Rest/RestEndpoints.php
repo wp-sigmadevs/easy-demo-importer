@@ -18,7 +18,9 @@ use WP_REST_Response;
 use SigmaDevs\EasyDemoImporter\Common\{
 	Abstracts\Base,
 	Traits\Singleton,
-	Functions\Helpers
+	Functions\Helpers,
+	Utils\XmlChunker,
+	Utils\ImportLogger
 };
 
 // Do not allow directly accessing this file.
@@ -143,6 +145,8 @@ class RestEndpoints extends Base {
 		$this->addDemoDataEndpoint();
 		$this->addPluginStatusEndpoint();
 		$this->addServerStatusEndpoint();
+		$this->addDemoStatsEndpoint();
+		$this->addImportLogEndpoint();
 	}
 
 	/**
@@ -200,6 +204,59 @@ class RestEndpoints extends Base {
 						'type'              => 'integer',
 						'default'           => 0,
 						'sanitize_callback' => 'absint',
+					],
+				],
+			]
+		);
+	}
+
+	/**
+	 * Add Demo Stats Route.
+	 *
+	 * @return void
+	 * @since 1.3.0
+	 */
+	public function addDemoStatsEndpoint() {
+		register_rest_route(
+			$this->getNamespace(),
+			'/demo-stats',
+			[
+				'methods'             => 'GET',
+				'callback'            => [ $this, 'getStats' ],
+				'permission_callback' => [ $this, 'permission' ],
+				'args'                => [
+					'demo' => [
+						'required'          => false,
+						'sanitize_callback' => 'sanitize_text_field',
+					],
+				],
+			]
+		);
+	}
+
+	/**
+	 * Add Import Log Route.
+	 *
+	 * @return void
+	 * @since 1.3.0
+	 */
+	public function addImportLogEndpoint() {
+		register_rest_route(
+			$this->getNamespace(),
+			'/import-log',
+			[
+				'methods'             => 'GET',
+				'callback'            => [ $this, 'getLog' ],
+				'permission_callback' => [ $this, 'permission' ],
+				'args'                => [
+					'session_id' => [
+						'required'          => true,
+						'sanitize_callback' => 'sanitize_text_field',
+					],
+					'since'      => [
+						'required'          => false,
+						'sanitize_callback' => 'sanitize_text_field',
+						'default'           => '',
 					],
 				],
 			]
@@ -340,6 +397,134 @@ class RestEndpoints extends Base {
 		set_transient( $cache_key, $info, 5 * MINUTE_IN_SECONDS );
 
 		return $this->sendResponse( $info, esc_html__( 'Data is ready to fetch', 'easy-demo-importer' ) );
+	}
+
+	/**
+	 * Return dry-run stats for the requested demo.
+	 *
+	 * @param WP_REST_Request $request Incoming request.
+	 * @return WP_REST_Response
+	 * @since 1.3.0
+	 */
+	public function getStats( WP_REST_Request $request ): WP_REST_Response {
+		$demo_slug = $request->get_param( 'demo' ) ?? '';
+
+		$cache_key = 'sd_edi_stats_' . md5( $demo_slug );
+		$cached    = get_transient( $cache_key );
+
+		if ( false !== $cached ) {
+			return new WP_REST_Response( $cached, 200 );
+		}
+
+		$config = sd_edi()->getDemoConfig();
+
+		if ( empty( $config ) ) {
+			return new WP_REST_Response( [ 'error' => 'Demo config not available.' ], 500 );
+		}
+
+		$xml_path = $this->resolveXmlPath( $config, $demo_slug );
+
+		// If file doesn't exist, return a 200 with a descriptive message instead of a 404.
+		if ( ! $xml_path || ! file_exists( $xml_path ) ) {
+			return new WP_REST_Response( [
+				'unavailable' => true,
+				'message'     => esc_html__( 'Analysis will be available once the import starts and files are downloaded.', 'easy-demo-importer' ),
+			], 200 );
+		}
+
+		$items = XmlChunker::getItems( $xml_path );
+
+		if ( empty( $items ) ) {
+			return new WP_REST_Response( [ 
+				'unavailable' => true,
+				'message'     => esc_html__( 'No items found in the demo content XML.', 'easy-demo-importer' )
+			], 200 );
+		}
+
+		$stats = [
+			'total'       => count( $items ),
+			'by_type'     => [],
+			'attachments' => 0,
+		];
+
+		foreach ( $items as $item ) {
+			$type = $item['post_type'];
+
+			if ( 'attachment' === $type ) {
+				++$stats['attachments'];
+			}
+
+			if ( ! isset( $stats['by_type'][ $type ] ) ) {
+				$stats['by_type'][ $type ] = 0;
+			}
+
+			++$stats['by_type'][ $type ];
+		}
+
+		set_transient( $cache_key, $stats, 5 * MINUTE_IN_SECONDS );
+
+		return new WP_REST_Response( $stats, 200 );
+	}
+
+	/**
+	 * Return log entries.
+	 *
+	 * @param WP_REST_Request $request Incoming request.
+	 * @return WP_REST_Response
+	 * @since 1.3.0
+	 */
+	public function getLog( WP_REST_Request $request ): WP_REST_Response {
+		$session_id = $request->get_param( 'session_id' );
+		$since      = $request->get_param( 'since' ) ?? '';
+
+		if ( empty( $session_id ) ) {
+			return new WP_REST_Response( [], 200 );
+		}
+
+		// Guard against oversized or non-UUID session IDs.
+		if ( strlen( $session_id ) > 64 ) {
+			return new WP_REST_Response( [], 200 );
+		}
+
+		$entries = ImportLogger::fetch( $session_id, $since );
+
+		// Map logged_at to timestamp for frontend compatibility.
+		$entries = array_map( function( $entry ) {
+			$entry['timestamp'] = $entry['logged_at'];
+			return $entry;
+		}, $entries );
+
+		return new WP_REST_Response( $entries, 200 );
+	}
+
+	/**
+	 * Resolve the local XML file path for a demo slug.
+	 *
+	 * @param array  $config    Demo config array.
+	 * @param string $demo_slug Demo slug.
+	 * @return string|null Absolute path, or null if unresolvable.
+	 * @since 1.3.0
+	 */
+	private function resolveXmlPath( array $config, string $demo_slug ): ?string {
+		$upload_dir = wp_get_upload_dir();
+		$base       = $upload_dir['basedir'] . '/easy-demo-importer/';
+
+		$multiple = ! empty( $config['multipleZip'] );
+		$demoZip  = '';
+
+		if ( $multiple && isset( $config['demoData'][ $demo_slug ] ) ) {
+			$demoZip = Helpers::getDemoData( $config['demoData'][ $demo_slug ], 'demoZip' );
+		} elseif ( ! $multiple ) {
+			$demoZip = Helpers::getDemoData( $config, 'demoZip' );
+		}
+
+		if ( ! $demoZip ) {
+			return null;
+		}
+
+		$demoDir = pathinfo( basename( $demoZip ), PATHINFO_FILENAME );
+
+		return $base . $demoDir . '/content.xml';
 	}
 
 	/**

@@ -226,20 +226,23 @@ abstract class ImporterAjax {
 	 * @return void
 	 * @since 1.0.0
 	 */
-	public function prepareResponse( $nextPhase, $nextPhaseMessage, $complete = '', $error = false, $errorMessage = '', $errorHint = '' ) {
-		$this->response = [
-			'demo'                  => $this->demoSlug,
-			'excludeImages'         => $this->excludeImages,
-			'skipImageRegeneration' => $this->skipImageRegeneration,
-			'reset'                 => $this->reset,
-			'sessionId'             => $this->sessionId,
-			'nextPhase'             => $nextPhase,
-			'nextPhaseMessage'      => $nextPhaseMessage,
-			'completedMessage'      => $complete,
-			'error'                 => $error,
-			'errorMessage'          => $errorMessage,
-			'errorHint'             => $errorHint,
-		];
+	public function prepareResponse( $nextPhase, $nextPhaseMessage, $complete = '', $error = false, $errorMessage = '', $errorHint = '', array $extra_data = [] ) {
+		$this->response = array_merge(
+			[
+				'demo'                  => $this->demoSlug,
+				'excludeImages'         => $this->excludeImages,
+				'skipImageRegeneration' => $this->skipImageRegeneration,
+				'reset'                 => $this->reset,
+				'sessionId'             => $this->sessionId,
+				'nextPhase'             => $nextPhase,
+				'nextPhaseMessage'      => $nextPhaseMessage,
+				'completedMessage'      => $complete,
+				'error'                 => $error,
+				'errorMessage'          => $errorMessage,
+				'errorHint'             => $errorHint,
+			],
+			$extra_data
+		);
 
 		$this->sendResponse();
 	}
