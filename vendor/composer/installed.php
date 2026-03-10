@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => 'sigmadevs/easy-demo-importer',
-        'pretty_version' => 'dev-master',
-        'version' => 'dev-master',
-        'reference' => '056d87057d734fbd77ab42cc743573560a7878d1',
+        'pretty_version' => 'dev-develop',
+        'version' => 'dev-develop',
+        'reference' => '8ed5d0f2cd13324fd66ff0d959dd00c4c96298e4',
         'type' => 'wordpress-plugin',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -74,9 +74,9 @@
             'dev_requirement' => true,
         ),
         'sigmadevs/easy-demo-importer' => array(
-            'pretty_version' => 'dev-master',
-            'version' => 'dev-master',
-            'reference' => '056d87057d734fbd77ab42cc743573560a7878d1',
+            'pretty_version' => 'dev-develop',
+            'version' => 'dev-develop',
+            'reference' => '8ed5d0f2cd13324fd66ff0d959dd00c4c96298e4',
             'type' => 'wordpress-plugin',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

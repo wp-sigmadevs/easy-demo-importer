@@ -1,6 +1,7 @@
 import { Button, Switch, Alert } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { useWizard } from '../WizardContext';
+import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 
 const OPTION_GROUPS = [
@@ -32,9 +33,15 @@ const OPTION_GROUPS = [
 const ImportOptionsStep = () => {
 	const navigate = useNavigate();
 	const { importOptions, updateOption } = useWizard();
+	const [footer, setFooter] = useState(null);
+	const [back, setBack] = useState(null);
 
-	const back   = document.getElementById( 'edi-wizard-back-slot' );
-	const footer = document.getElementById( 'edi-wizard-next-slot' );
+	useEffect(() => {
+		const nextEl = document.getElementById('edi-wizard-next-slot');
+		const backEl = document.getElementById('edi-wizard-back-slot');
+		if (nextEl) setFooter(nextEl);
+		if (backEl) setBack(backEl);
+	}, []);
 
 	return (
 		<>

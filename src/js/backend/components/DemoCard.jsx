@@ -63,23 +63,26 @@ const DemoCard = ({ data, showModal }) => {
 				<div className="demo-name">
 					<h2>{data?.name}</h2>
 				</div>
-				<div className="edi-demo-actions">
-					<Button
-						className="edi-modal-button"
-						type="primary"
-						onClick={() =>
-							showModal({
-								id: data.id,
-								data,
-								reset: true,
-								excludeImages: true,
-							})
-						}
-					>
-						<span>{sdEdiAdminParams.btnImport}</span>{' '}
-						<DownloadOutlined />
-					</Button>
-				</div>
+				{typeof showModal === 'function' && (
+					<div className="edi-demo-actions">
+						<Button
+							className="edi-modal-button"
+							type="primary"
+							onClick={(e) => {
+								e.stopPropagation();
+								showModal({
+									id: data.id,
+									data,
+									reset: true,
+									excludeImages: true,
+								});
+							}}
+						>
+							<span>{sdEdiAdminParams.btnImport}</span>{' '}
+							<DownloadOutlined />
+						</Button>
+					</div>
+				)}
 			</div>
 		</div>
 	);

@@ -1,7 +1,7 @@
 import { Button, Input, Tabs, Empty, Tooltip, Tag } from 'antd';
 import { LockOutlined, SearchOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useWizard } from '../WizardContext';
 import DemoCard from '../../components/DemoCard';
 import GridSkeleton from '../../components/GridSkeleton';
@@ -16,12 +16,18 @@ const DemoSelectStep = () => {
 	const { importList, fetchImportList, loading } = useSharedDataStore();
 	const [ search, setSearch ] = useState( '' );
 	const [ activeTab, setActiveTab ] = useState( 'all' );
+	const [ back, setBack ] = useState(null);
 
 	useEffect( () => {
-		fetchImportList( sdEdiAdminParams.restApiUrl + 'sd/edi/v1/demo/list' );
+		fetchImportList( '/sd/edi/v1/import/list' );
 	}, [] );
 
-	const demos      = importList?.data ?? {};
+	useEffect(() => {
+		const backEl = document.getElementById('edi-wizard-back-slot');
+		if (backEl) setBack(backEl);
+	}, []);
+
+	const demos      = importList?.success && importList?.data?.demoData ? importList.data.demoData : {};
 	const demoArray  = Object.entries( demos ).map( ( [ slug, data ] ) => ( { slug, ...data } ) );
 	const categories = [ 'all', ...new Set( demoArray.flatMap( ( d ) => d.categories ?? [] ) ) ];
 
@@ -37,8 +43,6 @@ const DemoSelectStep = () => {
 		sessionStorage.setItem( 'sd_edi_selected_demo', JSON.stringify( demo ) );
 		navigate( '/wizard/options' );
 	};
-
-	const back = document.getElementById( 'edi-wizard-back-slot' );
 
 	return (
 		<>

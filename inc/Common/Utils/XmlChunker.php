@@ -255,29 +255,38 @@ class XmlChunker {
 		$header = '';
 		$found  = false;
 
+		// We read the file line by line with a large buffer (1MB) to handle potentially long lines.
+		// WXR files usually have <item> on its own line, but we must handle minified XML too.
 		while ( ! feof( $handle ) ) {
-			$line = fgets( $handle );
+			// Read up to 1MB or until a newline.
+			$line = fgets( $handle, 1048576 ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fgets
 
 			if ( false === $line ) {
 				break;
 			}
 
-			// Stop accumulating once we hit the first <item> tag.
-			if ( false !== strpos( $line, '<item>' ) || preg_match( '/<item\s/', $line ) ) {
+			// Look for <item tag (case-insensitive) using regex.
+			// We check for <item followed by a space (attributes) or > (no attributes).
+			if ( preg_match( '/<item[\s>]/i', $line, $matches, PREG_OFFSET_CAPTURE ) ) {
+				$offset = $matches[0][1];
+				$header .= substr( $line, 0, $offset );
 				$found = true;
 				break;
 			}
 
-			// Strip closing tags — we'll add them back after the items.
-			if ( trim( $line ) === '</channel>' || trim( $line ) === '</rss>' ) {
-				continue;
-			}
-
+			// Check for closing channel/rss tags — we strip them if they appear before any items.
+			$line = preg_replace( '/<\/channel>\s*<\/rss>/i', '', $line );
 			$header .= $line;
 		}
 
 		fclose( $handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
 
-		return $found ? $header : null;
+		if ( $found ) {
+			return $header;
+		}
+
+		// Fallback for extremely large files/lines where <item> might be missed by fgets logic.
+		// If we've read the whole file and never found <item>, it's not a valid WXR or it's empty.
+		return null;
 	}
 }

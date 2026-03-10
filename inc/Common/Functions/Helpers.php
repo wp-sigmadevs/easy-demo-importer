@@ -450,6 +450,15 @@ class Helpers {
 	 * @return bool
 	 * @since 1.1.0
 	 */
+	/**
+	 * Recursively checks if a multidimensional array has a certain key.
+	 *
+	 * @param array  $array The array to search.
+	 * @param string $key The key to search for.
+	 *
+	 * @return bool
+	 * @since 1.1.0
+	 */
 	public static function searchArrayKey( $array, $key ) {
 		if ( ! is_array( $array ) ) {
 			return false;
@@ -466,5 +475,22 @@ class Helpers {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Check if the current request is a demo import AJAX request.
+	 *
+	 * @return bool
+	 * @since 1.3.0
+	 */
+	public static function isImportRequest(): bool {
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$action = isset( $_POST['action'] ) ? sanitize_text_field( wp_unslash( $_POST['action'] ) ) : '';
+
+		if ( empty( $action ) ) {
+			return false;
+		}
+
+		return 0 === strpos( $action, 'sd_edi_' );
 	}
 }

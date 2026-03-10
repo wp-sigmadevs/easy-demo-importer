@@ -1048,6 +1048,18 @@ class SD_EDI_WP_Import extends WP_Importer {
 
 		// as per wp-admin/includes/upload.php.
 		$post_id = wp_insert_attachment( $post, $upload['file'] );
+
+		/**
+		 * Action Hook: 'sd_edi_import_attachment_created'
+		 *
+		 * Fires after an attachment is created during the import process.
+		 *
+		 * @param int   $post_id Attachment ID.
+		 * @param array $post    Attachment post data.
+		 * @since 1.4.0
+		 */
+		do_action( 'sd_edi_import_attachment_created', $post_id, $post );
+
 		wp_update_attachment_metadata( $post_id, wp_generate_attachment_metadata( $post_id, $upload['file'] ) );
 
 		// remap resized image URLs, works by stripping the extension and remapping the URL stub.

@@ -18,6 +18,7 @@ use RecursiveDirectoryIterator;
 use SigmaDevs\EasyDemoImporter\Common\{
 	Traits\Singleton,
 	Functions\Helpers,
+	Utils\ImportLogger,
 	Abstracts\ImporterAjax
 };
 
@@ -73,6 +74,14 @@ class DownloadFiles extends ImporterAjax {
 			Helpers::getDemoData( $this->config, 'demoZip' );
 		$result  = $this->downloadDemoFiles( $demoZip );
 		$success = $result['success'];
+
+		if ( $success ) {
+			ImportLogger::log(
+				__( 'Demo files downloaded and extracted successfully.', 'easy-demo-importer' ),
+				'success',
+				$this->sessionId
+			);
+		}
 
 		// Response.
 		$this->prepareResponse(
