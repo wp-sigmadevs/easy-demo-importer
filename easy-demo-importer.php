@@ -51,7 +51,7 @@ $sd_edi_autoloader = require plugin_dir_path( SD_EDI_ROOT_FILE ) . 'vendor/autol
 register_activation_hook( SD_EDI_ROOT_FILE, [ Setup::class, 'activation' ] );
 register_deactivation_hook( SD_EDI_ROOT_FILE, [ Setup::class, 'deactivation' ] );
 register_uninstall_hook( SD_EDI_ROOT_FILE, [ Setup::class, 'uninstall' ] );
-add_action( 'plugins_loaded', [ 'SigmaDevs\EasyDemoImporter\Config\Setup', 'maybeUpgradeDb' ] );
+add_action( 'plugins_loaded', [ Setup::class, 'maybeUpgradeDb' ] );
 
 if ( ! class_exists( 'SigmaDevs\EasyDemoImporter\\Bootstrap' ) ) {
 	wp_die( esc_html__( 'Easy Demo Importer is unable to find the Bootstrap class.', 'easy-demo-importer' ) );
