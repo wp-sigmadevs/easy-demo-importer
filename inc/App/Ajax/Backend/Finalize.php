@@ -124,8 +124,11 @@ class Finalize extends ImporterAjax {
 					return false;
 				},
 				'litespeed_cache' => static function () {
-					do_action( 'litespeed_purge_all' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
-					return true;
+					if ( class_exists( 'LiteSpeed\Purge' ) || function_exists( 'litespeed_purge_all' ) ) {
+						do_action( 'litespeed_purge_all' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+						return true;
+					}
+					return false;
 				},
 				'wp_rocket'       => static function () {
 					if ( function_exists( 'rocket_clean_domain' ) ) {

@@ -138,11 +138,13 @@ class Initialize extends ImporterAjax {
 		 */
 		do_action( 'sd/edi/importer_init', $this ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
-		ImportLogger::log(
-			__( 'Demo files downloaded and extracted.', 'easy-demo-importer' ),
-			'success',
-			$this->sessionId
-		);
+		if ( ! empty( $this->sessionId ) ) {
+			ImportLogger::log(
+				__( 'Demo files downloaded and extracted.', 'easy-demo-importer' ),
+				'success',
+				$this->sessionId
+			);
+		}
 
 		// Response.
 		$this->prepareResponse(

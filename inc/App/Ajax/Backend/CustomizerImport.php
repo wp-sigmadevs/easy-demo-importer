@@ -94,11 +94,13 @@ class CustomizerImport extends ImporterAjax {
 			 */
 			do_action( 'sd/edi/after_customizer_import', $customizerFilePath ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
-			ImportLogger::log(
-				__( 'Customizer settings applied.', 'easy-demo-importer' ),
-				'success',
-				$this->sessionId
-			);
+			if ( ! empty( $this->sessionId ) ) {
+				ImportLogger::log(
+					__( 'Customizer settings applied.', 'easy-demo-importer' ),
+					'success',
+					$this->sessionId
+				);
+			}
 		}
 
 		// Response.
