@@ -192,15 +192,17 @@ class InstallPlugins extends ImporterAjax {
 				return;
 			}
 
-			ImportLogger::log(
-				sprintf(
-					/* translators: %s: plugin slug or name */
-					__( 'Plugin installed: %s', 'easy-demo-importer' ),
-					$slug
-				),
-				'success',
-				$this->sessionId
-			);
+			if ( ! empty( $this->sessionId ) ) {
+				ImportLogger::log(
+					sprintf(
+						/* translators: %s: plugin slug or name */
+						__( 'Plugin installed: %s', 'easy-demo-importer' ),
+						$slug
+					),
+					'success',
+					$this->sessionId
+				);
+			}
 
 			++$this->installCount;
 		}

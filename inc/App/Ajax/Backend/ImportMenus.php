@@ -73,11 +73,13 @@ class ImportMenus extends ImporterAjax {
 		if ( $menus ) {
 			$this->setMenu( $menus );
 
-			ImportLogger::log(
-				__( 'Navigation menus imported and assigned.', 'easy-demo-importer' ),
-				'success',
-				$this->sessionId
-			);
+			if ( ! empty( $this->sessionId ) ) {
+				ImportLogger::log(
+					__( 'Navigation menus imported and assigned.', 'easy-demo-importer' ),
+					'success',
+					$this->sessionId
+				);
+			}
 		}
 
 		// Response.

@@ -94,11 +94,13 @@ class ImportWidgets extends ImporterAjax {
 			 */
 			do_action( 'sd/edi/after_widgets_import', $widgetsFilePath ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
-			ImportLogger::log(
-				__( 'Widgets imported.', 'easy-demo-importer' ),
-				'success',
-				$this->sessionId
-			);
+			if ( ! empty( $this->sessionId ) ) {
+				ImportLogger::log(
+					__( 'Widgets imported.', 'easy-demo-importer' ),
+					'success',
+					$this->sessionId
+				);
+			}
 		}
 
 		$slider           = $this->multiple ?
