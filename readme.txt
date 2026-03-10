@@ -4,7 +4,7 @@ Donate link:
 Tags: demo importer, one click demo importer, theme demo importer, WordPress demo importer, content import plugin
 Requires at least: 5.5
 Tested up to: 6.9
-Stable tag: 1.2.0
+Stable tag: 1.3.0
 Requires PHP: 7.4
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -135,6 +135,22 @@ For any inquiries, bug reports, or suggestions, please submit your request [here
 6. Example of how the system status page looks.
 
 == Changelog ==
+
+= 1.3.0 (10-March-2026) =
+* Feature: New full-page wizard replaces the modal-based import flow — guided step-by-step experience.
+* Feature: Chunked XML import via XMLReader — no more server timeouts on large demos.
+* Feature: Live activity log during import, polling the new REST endpoint in real time.
+* Feature: Session-based resumable imports — interrupted imports can recover where they left off.
+* Feature: Dry-run stats on the Confirmation step — see item counts before starting the import.
+* Feature: Conditional demo visibility — demos with unmet plugin requirements are locked in the grid.
+* Feature: Post-import cache flush — automatically clears WP Super Cache, W3 Total Cache, LiteSpeed, WP Rocket, Elementor, and WooCommerce caches.
+* Add: New DB tables `sd_edi_import_log` and `sd_edi_import_queue` with versioned migration guard.
+* Add: `ImportLogger` utility for structured per-session import logging.
+* Add: `XmlChunker` utility for streaming WXR parsing with memory-aware chunk sizing.
+* Add: `DemoStatsEndpoint` REST endpoint for dry-run item counts.
+* Add: `ImportLogEndpoint` REST endpoint for real-time log polling.
+* Add: Ant Design v5 `ConfigProvider` design tokens applied globally (indigo brand color, custom radii).
+* Update: Bumped plugin version to 1.3.0.
 
 = 1.2.0 (10-March-2026) =
 * Feature: Added support for importing LayerSlider slides.
