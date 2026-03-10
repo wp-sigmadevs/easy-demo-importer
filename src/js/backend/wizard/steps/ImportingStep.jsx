@@ -28,12 +28,11 @@ const ImportingStep = () => {
 	const ajaxPost = async ( action, extra = {} ) => {
 		const body = new URLSearchParams( {
 			action,
-			nonce:     sdEdiAdminParams.nonce,
-			sessionId: sessionIdRef.current,
-			demo:      selectedDemo?.slug ?? '',
-			excludeImages:           importOptions.media          ? '' : '1',
-			reset:                   importOptions.resetDb        ? 'true' : 'false',
-			skipImageRegeneration:   'true',
+			sd_edi_nonce: sdEdiAdminParams.sd_edi_nonce,
+			sessionId:    sessionIdRef.current,
+			demo:         selectedDemo?.slug ?? '',
+			excludeImages:  importOptions.media   ? '' : '1',
+			reset:          importOptions.resetDb ? 'true' : 'false',
 			...extra,
 		} );
 
@@ -109,7 +108,7 @@ const ImportingStep = () => {
 
 				setOverallPct( 100 );
 				setDone( true );
-				setTimeout( () => navigate( '/wizard/complete' ), 800 );
+				setTimeout( () => navigate( '/wizard/regen' ), 800 );
 
 			} catch ( err ) {
 				setError( err.message );
