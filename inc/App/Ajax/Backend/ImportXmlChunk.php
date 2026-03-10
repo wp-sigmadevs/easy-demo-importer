@@ -69,13 +69,15 @@ class ImportXmlChunk extends ImporterAjax {
 
 		// Total item count is stored in a session transient to avoid re-scanning.
 		$session_key = 'sd_edi_xml_total_' . $this->sessionId;
-		$total       = (int) get_transient( $session_key );
+		$cached      = get_transient( $session_key );
 
-		if ( ! $total ) {
-			$items = XmlChunker::getItems( $xml_path );
-			$total = count( $items );
-			set_transient( $session_key, $total, HOUR_IN_SECONDS );
+		if ( false === $cached ) {
+			$items  = XmlChunker::getItems( $xml_path );
+			$cached = count( $items );
+			set_transient( $session_key, $cached, HOUR_IN_SECONDS );
 		}
+
+		$total = (int) $cached;
 
 		$limit     = XmlChunker::chunkSize();
 		$chunk_tmp = XmlChunker::extractChunk( $xml_path, $offset, $limit );
@@ -93,12 +95,15 @@ class ImportXmlChunk extends ImporterAjax {
 				esc_html__( 'Importing Customizer settings.', 'easy-demo-importer' ),
 				esc_html__( 'XML content fully imported.', 'easy-demo-importer' )
 			);
+			return;
 		}
 
 		// Run the existing importer on the chunk.
-		$this->importChunkFile( $chunk_tmp );
-
-		@unlink( $chunk_tmp ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.unlink_unlink
+		try {
+			$this->importChunkFile( $chunk_tmp );
+		} finally {
+			@unlink( $chunk_tmp ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.unlink_unlink
+		}
 
 		$done = min( $offset + $limit, $total );
 
