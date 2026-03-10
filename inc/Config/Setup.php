@@ -156,7 +156,8 @@ class Setup {
 		$log_table   = $wpdb->prefix . 'sd_edi_import_log';
 		$queue_table = $wpdb->prefix . 'sd_edi_import_queue';
 
-		dbDelta( "CREATE TABLE $log_table (
+		dbDelta(
+			"CREATE TABLE $log_table (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         session_id VARCHAR(36) NOT NULL,
         logged_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -165,9 +166,11 @@ class Setup {
         PRIMARY KEY (id),
         KEY session_id (session_id),
         KEY logged_at (logged_at)
-    ) $collate;" );
+    ) $collate;"
+		);
 
-		dbDelta( "CREATE TABLE $queue_table (
+		dbDelta(
+			"CREATE TABLE $queue_table (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         session_id VARCHAR(36) NOT NULL,
         item_index INT UNSIGNED NOT NULL,
@@ -177,7 +180,8 @@ class Setup {
         status ENUM('pending','done','failed') NOT NULL DEFAULT 'pending',
         PRIMARY KEY (id),
         KEY session_status (session_id, status)
-    ) $collate;" );
+    ) $collate;"
+		);
 
 		update_option( 'sd_edi_db_version', self::DB_VERSION );
 	}

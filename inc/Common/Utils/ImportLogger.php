@@ -28,7 +28,7 @@ class ImportLogger {
 	 *
 	 * @var string[]
 	 */
-	const LEVELS = array( 'info', 'success', 'warning', 'error' );
+	const LEVELS = [ 'info', 'success', 'warning', 'error' ];
 
 	/**
 	 * Auto-prune logs older than this many days.
@@ -56,13 +56,13 @@ class ImportLogger {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 		$inserted = $wpdb->insert(
 			$wpdb->prefix . 'sd_edi_import_log',
-			array(
+			[
 				'session_id' => sanitize_text_field( $session_id ),
 				'logged_at'  => current_time( 'mysql', true ),
 				'level'      => $level,
 				'message'    => $message,
-			),
-			array( '%s', '%s', '%s', '%s' )
+			],
+			[ '%s', '%s', '%s', '%s' ]
 		);
 
 		if ( false === $inserted ) {
@@ -136,6 +136,6 @@ class ImportLogger {
 			);
 		}
 
-		return is_array( $rows ) ? $rows : array();
+		return is_array( $rows ) ? $rows : [];
 	}
 }

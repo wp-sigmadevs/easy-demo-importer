@@ -41,7 +41,7 @@ class ImportXmlChunk extends ImporterAjax {
 	public function register() {
 		parent::register();
 
-		add_action( 'wp_ajax_sd_edi_import_xml_chunk', array( $this, 'response' ) );
+		add_action( 'wp_ajax_sd_edi_import_xml_chunk', [ $this, 'response' ] );
 	}
 
 	/**
@@ -64,7 +64,7 @@ class ImportXmlChunk extends ImporterAjax {
 		$xml_path = $this->demoUploadDir( $this->demoDir() ) . '/content.xml';
 
 		if ( ! file_exists( $xml_path ) ) {
-			wp_send_json_error( array( 'errorMessage' => __( 'XML file not found.', 'easy-demo-importer' ) ), 404 );
+			wp_send_json_error( [ 'errorMessage' => __( 'XML file not found.', 'easy-demo-importer' ) ], 404 );
 		}
 
 		// Total item count is stored in a session transient to avoid re-scanning.
@@ -120,11 +120,11 @@ class ImportXmlChunk extends ImporterAjax {
 		);
 
 		wp_send_json_success(
-			array(
+			[
 				'done'   => $done,
 				'total'  => $total,
 				'offset' => $done,
-			)
+			]
 		);
 	}
 

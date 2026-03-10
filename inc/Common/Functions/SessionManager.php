@@ -55,11 +55,11 @@ class SessionManager {
 		$session_id = wp_generate_uuid4();
 		$ttl        = (int) apply_filters( 'sd/edi/lock_ttl', 30 * MINUTE_IN_SECONDS ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
-		$session_data = array(
+		$session_data = [
 			'session_id' => $session_id,
 			'user_id'    => get_current_user_id(),
 			'started_at' => time(),
-		);
+		];
 
 		// Store session data in a transient that auto-expires.
 		set_transient( static::SESSION_PREFIX . $session_id, $session_data, $ttl );
@@ -120,7 +120,7 @@ class SessionManager {
 		}
 
 		// Tie sessions to user IDs: only the user who started the import can proceed with it.
-		return (int) $active['user_id'] === get_current_user_id();
+		return get_current_user_id() === (int) $active['user_id'];
 	}
 
 	/**

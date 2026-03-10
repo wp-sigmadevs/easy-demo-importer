@@ -41,7 +41,7 @@ class DemoStatsEndpoint extends Base {
 	 * @since 1.3.0
 	 */
 	public function register() {
-		add_action( 'rest_api_init', array( $this, 'registerRoutes' ) );
+		add_action( 'rest_api_init', [ $this, 'registerRoutes' ] );
 	}
 
 	/**
@@ -54,17 +54,17 @@ class DemoStatsEndpoint extends Base {
 		register_rest_route(
 			'sd/edi/v1',
 			'/demo-stats',
-			array(
+			[
 				'methods'             => 'GET',
-				'callback'            => array( $this, 'getStats' ),
-				'permission_callback' => array( $this, 'permission' ),
-				'args'                => array(
-					'demo' => array(
+				'callback'            => [ $this, 'getStats' ],
+				'permission_callback' => [ $this, 'permission' ],
+				'args'                => [
+					'demo' => [
 						'required'          => false,
 						'sanitize_callback' => 'sanitize_text_field',
-					),
-				),
-			)
+					],
+				],
+			]
 		);
 	}
 
@@ -79,7 +79,7 @@ class DemoStatsEndpoint extends Base {
 			return new WP_Error(
 				'rest_forbidden',
 				esc_html__( 'Sorry, you are not allowed to do that.', 'easy-demo-importer' ),
-				array( 'status' => rest_authorization_required_code() )
+				[ 'status' => rest_authorization_required_code() ]
 			);
 		}
 
@@ -106,22 +106,22 @@ class DemoStatsEndpoint extends Base {
 		$config = sd_edi()->getDemoConfig();
 
 		if ( empty( $config ) ) {
-			return new WP_REST_Response( array( 'error' => 'Demo config not available.' ), 500 );
+			return new WP_REST_Response( [ 'error' => 'Demo config not available.' ], 500 );
 		}
 
 		$xml_path = $this->resolveXmlPath( $config, $demo_slug );
 
 		if ( ! $xml_path || ! file_exists( $xml_path ) ) {
-			return new WP_REST_Response( array( 'error' => 'XML file not found. Run download step first.' ), 404 );
+			return new WP_REST_Response( [ 'error' => 'XML file not found. Run download step first.' ], 404 );
 		}
 
 		$items = XmlChunker::getItems( $xml_path );
 
-		$stats = array(
+		$stats = [
 			'total'       => count( $items ),
-			'by_type'     => array(),
+			'by_type'     => [],
 			'attachments' => 0,
-		);
+		];
 
 		foreach ( $items as $item ) {
 			$type = $item['post_type'];
