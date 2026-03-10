@@ -17,6 +17,7 @@ import DemoSelectStep from './wizard/steps/DemoSelectStep';
 import ImportOptionsStep from './wizard/steps/ImportOptionsStep';
 import ConfirmationStep from './wizard/steps/ConfirmationStep';
 import ImportingStep from './wizard/steps/ImportingStep';
+import ImageRegenStep from './wizard/steps/ImageRegenStep';
 import CompleteStep from './wizard/steps/CompleteStep';
 
 /* global sdEdiAdminParams */
@@ -132,6 +133,7 @@ const routes = [
 			{ path: 'options',      element: <ImportOptionsStep /> },
 			{ path: 'confirm',      element: <ConfirmationStep /> },
 			{ path: 'importing',    element: <ImportingStep /> },
+			{ path: 'regen',        element: <ImageRegenStep /> },
 			{ path: 'complete',     element: <CompleteStep /> },
 		],
 	},

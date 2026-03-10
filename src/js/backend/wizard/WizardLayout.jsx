@@ -14,6 +14,7 @@ const STEPS = [
 	{ key: 'options',      title: 'Options'      },
 	{ key: 'confirm',      title: 'Confirm'      },
 	{ key: 'importing',    title: 'Importing'    },
+	{ key: 'regen',        title: 'Images'       },
 	{ key: 'complete',     title: 'Done'         },
 ];
 

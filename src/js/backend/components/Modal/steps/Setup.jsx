@@ -37,8 +37,6 @@ const Setup = ({ modalData, handleImport, handleReset }) => {
 		setLoading,
 		currentStep,
 		setCurrentStep,
-		skipImageRegeneration,
-		setSkipImageRegeneration,
 	} = useSharedDataStore();
 
 	/**
@@ -172,45 +170,6 @@ const Setup = ({ modalData, handleImport, handleReset }) => {
 									</Tooltip>
 								</div>
 							</div>
-							{!excludeImages && (
-								<div className="import-option new">
-									<div className="choose exclude-images edi-d-flex edi-align-items-center edi-pos-r">
-										<Switch
-											checked={skipImageRegeneration}
-											onChange={(checked) =>
-												setSkipImageRegeneration(
-													checked
-												)
-											}
-										/>
-										<h4
-											className="edi-d-flex edi-align-items-center"
-											style={{ margin: 0 }}
-										>
-											{
-												sdEdiAdminParams.skipImageRegenerationTitle
-											}
-										</h4>
-										<Tooltip
-											title={
-												sdEdiAdminParams.skipImageRegenerationHint
-											}
-										>
-											<span
-												style={{
-													marginLeft: 8,
-													cursor: 'pointer',
-													fontSize: 20,
-													position: 'absolute',
-													right: 0,
-												}}
-											>
-												<QuestionCircleTwoTone />
-											</span>
-										</Tooltip>
-									</div>
-								</div>
-							)}
 							<div className="import-option last">
 								<div className="choose reset-db edi-d-flex edi-align-items-center">
 									<Switch
