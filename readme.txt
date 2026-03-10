@@ -4,7 +4,7 @@ Donate link:
 Tags: demo importer, one click demo importer, theme demo importer, WordPress demo importer, content import plugin
 Requires at least: 5.5
 Tested up to: 6.9
-Stable tag: 1.1.6
+Stable tag: 1.2.0
 Requires PHP: 7.4
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -136,25 +136,33 @@ For any inquiries, bug reports, or suggestions, please submit your request [here
 
 == Changelog ==
 
-= 1.2.0 (05-March-2026) =
-* Feature: Added support for importing LayerSlider Sliders.
-* Feature: Introduced a Session Manager to track and resume import sessions with TTL-based expiry.
-* Fix: Resolved an issue in archive extraction to prevent path traversal attacks.
-* Fix: Added input validation across AJAX handlers for improved request integrity.
-* Fix: Resolved multiple WordPress plugin check compliance errors (code quality & sanitization).
-* Tweak: Improved error handling in AJAX handlers and the JS frontend for clearer failure reporting.
-* Tweak: Enhanced import resume/retry capability via session state.
-* Tweak: Improved uninstall cleanup to properly remove session data.
+= 1.2.0 (10-March-2026) =
+* Feature: Added support for importing LayerSlider slides.
+* Feature: Import can now resume automatically if interrupted, thanks to the new Session Manager.
+* Security: Improved protection against malicious archive extraction (ZipSlip).
+* Security: Added safeguards to prevent unsafe PHP file loading.
+* Security: Improved validation in the plugin installer for safer downloads.
+* Fix: Improved compatibility with Fluent Forms import logic.
+* Fix: Corrected settings validation during import.
+* Fix: Removed redundant error handlers that could cause unexpected behavior in AJAX requests.
+* Fix: Added verification to ensure demo files download correctly before import.
+* Fix: Improved input validation and sanitization across AJAX requests.
+* Fix: Prevented a JavaScript crash when network requests fail or time out.
+* Tweak: Refactored slider import logic to improve reliability and reduce duplicate code.
+* Tweak: Improved Widgets and database search-replace handling.
+* Tweak: Enhanced Customizer data import handling.
+* Tweak: Mapped HTTP status codes (408, 503, etc.) to human-readable messages and hints in the JS frontend.
+* Tweak: Improved uninstall cleanup to properly remove temporary import data.
 * Update: Updated i18n strings and translation template.
 
 = 1.1.6 (28-February-2026) =
 * Add: Full compatibility with WordPress 6.9.
-* Add: Option to skip image regeneration during import — speeds up the process.
+* Add: Option to skip image regeneration during import to speed up the process.
 * Add: Smart scroll indicators on the demo preview image in the import modal.
-* Fix: PHP 8.4 compatibility — wp_register_script() now uses the args array format with deferred loading strategy.
-* Fix: Added null guard in upload directory cleanup to prevent fatal errors on unreadable directories.
+* Fix: PHP 8.4 compatibility improvements for script loading.
+* Fix: Prevented fatal errors when cleaning upload directories that cannot be read.
 * Fix: Added empty check on demo data config to prevent warnings when demoData is absent.
-* Tweak: Refreshed some user-facing strings for more professional and consistent wording.
+* Tweak: Improved wording of some user-facing messages.
 * Update: Updated enshrined/svg-sanitize dependency.
 
 = 1.1.5 (22-July-2025) =
@@ -207,7 +215,7 @@ For any inquiries, bug reports, or suggestions, please submit your request [here
 * Update: Added/renamed various action and filter hooks.
 
 = 1.1.0 (20-February-2024) =
-* Feature: Added support for importing Slider Revolution Sliders.
+* Feature: Added support for importing Slider Revolution Slides.
 * Feature: Introduced tabbed categories in the demo import interface.
 * Feature: Implemented a search functionality for quicker access to specific demos.
 * Add: Included step titles in the demo import process.
