@@ -117,9 +117,10 @@ class XmlChunker {
 	public static function chunkSize(): int {
 		$size = (int) apply_filters( 'sd/edi/xml_chunk_size', self::DEFAULT_CHUNK_SIZE ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
-		$memory_limit = (int) ini_get( 'memory_limit' );
+		$memory_limit_bytes = wp_convert_hr_to_bytes( ini_get( 'memory_limit' ) );
+		$memory_limit_mb    = $memory_limit_bytes > 0 ? (int) ( $memory_limit_bytes / ( 1024 * 1024 ) ) : -1;
 
-		if ( $memory_limit > 0 && $memory_limit < 256 ) {
+		if ( $memory_limit_mb > 0 && $memory_limit_mb < 256 ) {
 			$size = min( $size, 5 );
 		}
 
