@@ -15,6 +15,7 @@ namespace SigmaDevs\EasyDemoImporter\App\Ajax\Backend;
 use SigmaDevs\EasyDemoImporter\Common\{
 	Traits\Singleton,
 	Functions\Helpers,
+	Utils\ImportLogger,
 	Abstracts\ImporterAjax
 };
 
@@ -71,6 +72,12 @@ class ImportMenus extends ImporterAjax {
 
 		if ( $menus ) {
 			$this->setMenu( $menus );
+
+			ImportLogger::log(
+				__( 'Navigation menus imported and assigned.', 'easy-demo-importer' ),
+				'success',
+				$this->sessionId
+			);
 		}
 
 		// Response.

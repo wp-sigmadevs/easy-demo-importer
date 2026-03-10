@@ -50,6 +50,8 @@ class SessionManager {
 		// Clean up any orphaned session from a previous crashed import.
 		static::cleanup();
 
+		\SigmaDevs\EasyDemoImporter\Common\Utils\ImportLogger::prune();
+
 		$session_id = wp_generate_uuid4();
 		$ttl        = (int) apply_filters( 'sd/edi/lock_ttl', 30 * MINUTE_IN_SECONDS ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
