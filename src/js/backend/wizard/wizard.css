@@ -1,0 +1,70 @@
+/* Wizard step slide transitions */
+.edi-wizard-step-enter-forward {
+	animation: ediSlideInRight 0.28s ease-out both;
+}
+.edi-wizard-step-enter-backward {
+	animation: ediSlideInLeft 0.28s ease-out both;
+}
+
+@keyframes ediSlideInRight {
+	from { transform: translateX(40px); opacity: 0; }
+	to   { transform: translateX(0);    opacity: 1; }
+}
+@keyframes ediSlideInLeft {
+	from { transform: translateX(-40px); opacity: 0; }
+	to   { transform: translateX(0);     opacity: 1; }
+}
+
+/* Wizard shell */
+.edi-wizard-shell {
+	max-width: 860px;
+	margin: 24px auto;
+	background: #fff;
+	border-radius: 14px;
+	box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+	overflow: hidden;
+}
+
+.edi-wizard-header {
+	padding: 28px 36px 20px;
+	border-bottom: 1px solid #f0f0f0;
+	background: #fafafa;
+}
+
+.edi-wizard-meta {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 20px;
+}
+
+.edi-wizard-meta h1 {
+	font-size: 20px;
+	font-weight: 700;
+	margin: 0;
+	color: #1a1a2e;
+}
+
+.edi-wizard-counter {
+	font-size: 12px;
+	font-weight: 600;
+	color: #6366f1;
+	background: #eef2ff;
+	padding: 4px 12px;
+	border-radius: 20px;
+	letter-spacing: 0.3px;
+}
+
+.edi-wizard-body {
+	padding: 36px;
+	min-height: 420px;
+}
+
+.edi-wizard-footer {
+	padding: 16px 36px;
+	border-top: 1px solid #f0f0f0;
+	background: #fafafa;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
