@@ -13,6 +13,7 @@ declare( strict_types=1 );
 
 namespace SigmaDevs\EasyDemoImporter\App\Rest;
 
+use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
 use SigmaDevs\EasyDemoImporter\Common\{
@@ -70,11 +71,19 @@ class DemoStatsEndpoint extends Base {
 	/**
 	 * Permission check — requires import capability.
 	 *
-	 * @return bool
+	 * @return true|WP_Error
 	 * @since 1.3.0
 	 */
-	public function permission(): bool {
-		return current_user_can( 'import' );
+	public function permission() {
+		if ( ! current_user_can( 'import' ) ) {
+			return new WP_Error(
+				'rest_forbidden',
+				esc_html__( 'Sorry, you are not allowed to do that.', 'easy-demo-importer' ),
+				[ 'status' => rest_authorization_required_code() ]
+			);
+		}
+
+		return true;
 	}
 
 	/**
