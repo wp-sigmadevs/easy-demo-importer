@@ -23,6 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 1.0.0
  */
 class Setup {
+	private const DB_VERSION = '1.3.0';
 	/**
 	 * Run only once after plugin is activated.
 	 *
@@ -158,12 +159,12 @@ class Setup {
 		dbDelta( "CREATE TABLE $log_table (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         session_id VARCHAR(36) NOT NULL,
-        timestamp DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        logged_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         level ENUM('info','success','warning','error') NOT NULL DEFAULT 'info',
         message TEXT NOT NULL,
         PRIMARY KEY (id),
         KEY session_id (session_id),
-        KEY timestamp (timestamp)
+        KEY logged_at (logged_at)
     ) $collate;" );
 
 		dbDelta( "CREATE TABLE $queue_table (
@@ -178,7 +179,7 @@ class Setup {
         KEY session_status (session_id, status)
     ) $collate;" );
 
-		update_option( 'sd_edi_db_version', '1.3.0' );
+		update_option( 'sd_edi_db_version', self::DB_VERSION );
 	}
 
 	/**
@@ -190,7 +191,7 @@ class Setup {
 	 * @since 1.3.0
 	 */
 	public static function maybeUpgradeDb() {
-		if ( get_option( 'sd_edi_db_version' ) !== '1.3.0' ) {
+		if ( get_option( 'sd_edi_db_version' ) !== self::DB_VERSION ) {
 			self::createImportTables();
 		}
 	}
