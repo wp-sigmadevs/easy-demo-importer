@@ -21,6 +21,7 @@ use RecursiveDirectoryIterator;
 use SigmaDevs\EasyDemoImporter\Common\{
 	Traits\Singleton,
 	Functions\Helpers,
+	Utils\ImportLogger,
 	Abstracts\ImporterAjax
 };
 
@@ -190,6 +191,16 @@ class InstallPlugins extends ImporterAjax {
 				$this->installErrors[] = $slug;
 				return;
 			}
+
+			ImportLogger::log(
+				sprintf(
+					/* translators: %s: plugin slug or name */
+					__( 'Plugin installed: %s', 'easy-demo-importer' ),
+					$slug
+				),
+				'success',
+				$this->sessionId
+			);
 
 			++$this->installCount;
 		}

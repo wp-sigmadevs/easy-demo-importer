@@ -16,6 +16,7 @@ use SigmaDevs\EasyDemoImporter\Common\{
 	Traits\Singleton,
 	Functions\Helpers,
 	Models\Customizer,
+	Utils\ImportLogger,
 	Abstracts\ImporterAjax
 };
 
@@ -92,6 +93,12 @@ class CustomizerImport extends ImporterAjax {
 			 * @since 1.1.5
 			 */
 			do_action( 'sd/edi/after_customizer_import', $customizerFilePath ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+
+			ImportLogger::log(
+				__( 'Customizer settings applied.', 'easy-demo-importer' ),
+				'success',
+				$this->sessionId
+			);
 		}
 
 		// Response.

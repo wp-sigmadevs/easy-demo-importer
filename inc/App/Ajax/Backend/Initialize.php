@@ -17,6 +17,7 @@ use SigmaDevs\EasyDemoImporter\Common\{
 	Traits\Singleton,
 	Functions\Helpers,
 	Functions\SessionManager,
+	Utils\ImportLogger,
 	Abstracts\ImporterAjax
 };
 
@@ -136,6 +137,12 @@ class Initialize extends ImporterAjax {
 		 * @since 1.0.0
 		 */
 		do_action( 'sd/edi/importer_init', $this ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+
+		ImportLogger::log(
+			__( 'Demo files downloaded and extracted.', 'easy-demo-importer' ),
+			'success',
+			$this->sessionId
+		);
 
 		// Response.
 		$this->prepareResponse(

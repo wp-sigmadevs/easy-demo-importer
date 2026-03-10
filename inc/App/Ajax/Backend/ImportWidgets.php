@@ -16,6 +16,7 @@ use SigmaDevs\EasyDemoImporter\Common\{
 	Models\Widgets,
 	Traits\Singleton,
 	Functions\Helpers,
+	Utils\ImportLogger,
 	Abstracts\ImporterAjax
 };
 
@@ -92,6 +93,12 @@ class ImportWidgets extends ImporterAjax {
 			 * @since 1.1.5
 			 */
 			do_action( 'sd/edi/after_widgets_import', $widgetsFilePath ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+
+			ImportLogger::log(
+				__( 'Widgets imported.', 'easy-demo-importer' ),
+				'success',
+				$this->sessionId
+			);
 		}
 
 		$slider           = $this->multiple ?
