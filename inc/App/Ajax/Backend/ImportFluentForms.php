@@ -72,7 +72,7 @@ class ImportFluentForms extends ImporterAjax {
 			Helpers::getDemoData( $this->config['demoData'][ $this->demoSlug ], 'fluentFormsJson' ) :
 			Helpers::getDemoData( $this->config, 'fluentFormsJson' );
 
-		$formsExists = isset( $forms ) || is_plugin_active( 'fluentform/fluentform.php' );
+		$formsExists = ! empty( $forms ) && is_plugin_active( 'fluentform/fluentform.php' );
 
 		if ( $formsExists ) {
 			$this->importFluentForms( $forms );
