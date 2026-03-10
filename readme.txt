@@ -4,7 +4,7 @@ Donate link:
 Tags: demo importer, one click demo importer, theme demo importer, WordPress demo importer, content import plugin
 Requires at least: 5.5
 Tested up to: 6.9
-Stable tag: 1.3.0
+Stable tag: 1.4.0
 Requires PHP: 7.4
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -135,6 +135,21 @@ For any inquiries, bug reports, or suggestions, please submit your request [here
 6. Example of how the system status page looks.
 
 == Changelog ==
+
+= 1.4.0 (10-March-2026) =
+* New: Image regeneration is now always deferred during XML import (never happens silently)
+* New: Dedicated Image Regen wizard step between Importing and Complete
+* New: Regenerate Now mode — real-time per-image progress with size pill tags
+* New: In Background mode — WP-Cron processes images after the wizard completes
+* New: Skip mode — proceed to Complete without regenerating (images can be regenerated later)
+* New: Per-image failure tracking with expandable error list in wizard UI
+* New: Admin notice shows background regen progress and completion
+* New: Image Regeneration tab on System Status page with last-run date, count, and failure count
+* New: big_image_size_threshold filter suppressed during import for cleaner regen
+* Fix: Removed opt-in skipImageRegeneration gate — suppression is now always-on during import
+* Fix: Removed obsolete Skip Image Regeneration toggle from import modal setup step
+* Fix: Nonce field name corrected in wizard AJAX calls (sd_edi_nonce)
+* Filter: sd/edi/regen_batch_size controls images per AJAX call (default 5, auto-reduces to 1 under 256MB)
 
 = 1.3.0 (10-March-2026) =
 * Feature: New full-page wizard replaces the modal-based import flow — guided step-by-step experience.
