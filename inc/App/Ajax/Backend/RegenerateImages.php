@@ -257,7 +257,7 @@ class RegenerateImages {
 			return;
 		}
 
-		$batch_size  = 10;
+		$batch_size  = ImageRegenEngine::batchSize();
 		$slice       = array_slice( $ids, $offset, $batch_size );
 		$batch_fails = 0;
 

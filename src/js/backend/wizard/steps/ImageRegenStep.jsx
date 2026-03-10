@@ -55,6 +55,8 @@ const ImageRegenStep = () => {
 			try {
 				const data = await ajaxPost( 'sd_edi_regen_check' );
 
+				if ( abortRef.current ) return;
+
 				if ( data.total === 0 ) {
 					setTimeout( () => navigate( '/wizard/complete' ), 500 );
 					return;
@@ -64,6 +66,8 @@ const ImageRegenStep = () => {
 				setFirstFilename( data.first_filename || '' );
 				setPhase( 'prompt' );
 			} catch ( err ) {
+				if ( abortRef.current ) return;
+
 				setError( err.message );
 				setPhase( 'prompt' );
 			}
