@@ -3,6 +3,7 @@ import Support from './components/Support';
 import DemoCard from './components/DemoCard';
 import { useShallow } from 'zustand/react/shallow';
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import GridSkeleton from './components/GridSkeleton';
 import ErrorMessage from './components/ErrorMessage';
 import useSharedDataStore from './utils/sharedDataStore';
@@ -21,6 +22,7 @@ const AppDemoImporter = () => {
 	/**
 	 * State hooks and initialization.
 	 */
+	const navigate = useNavigate();
 	const [modalData, setModalData] = useState(null);
 	const [errorMessage, setErrorMessage] = useState(null);
 	const [isModalVisible, setIsModalVisible] = useState(false);
@@ -225,8 +227,8 @@ const AppDemoImporter = () => {
 	 * @param {Object} data - The data to be passed to the modal component.
 	 */
 	const showModal = (data) => {
-		setModalVisible(true);
-		setModalData(data);
+		sessionStorage.setItem( 'sd_edi_selected_demo', JSON.stringify( data ) );
+		navigate( '/wizard/welcome' );
 	};
 
 	/**
