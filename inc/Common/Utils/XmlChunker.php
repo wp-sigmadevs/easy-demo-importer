@@ -47,7 +47,7 @@ class XmlChunker {
 	 * @since 1.3.0
 	 */
 	public static function getItems( string $file_path ): array {
-		$items = [];
+		$items = array();
 
 		if ( ! file_exists( $file_path ) || ! is_readable( $file_path ) ) {
 			return $items;
@@ -93,11 +93,11 @@ class XmlChunker {
 
 			if ( \XMLReader::END_ELEMENT === $reader->nodeType && 'item' === $reader->localName ) {
 				if ( $in_item ) {
-					$items[] = [
+					$items[] = array(
 						'post_id'    => $post_id,
 						'post_type'  => $post_type ?: 'post',
 						'post_title' => $post_title,
-					];
+					);
 					$in_item = false;
 				}
 			}
@@ -153,7 +153,7 @@ class XmlChunker {
 		string $file_path,
 		int $offset,
 		int $limit = 0,
-		array $allowed_ids = []
+		array $allowed_ids = array()
 	): ?string {
 		if ( ! file_exists( $file_path ) || ! is_readable( $file_path ) ) {
 			return null;
@@ -177,7 +177,7 @@ class XmlChunker {
 			return null;
 		}
 
-		$item_xmls = [];
+		$item_xmls = array();
 		$seen      = 0;
 		$collected = 0;
 
@@ -201,14 +201,14 @@ class XmlChunker {
 				}
 			}
 
-			$seen++;
+			++$seen;
 
 			if ( $seen <= $offset ) {
 				continue;
 			}
 
 			$item_xmls[] = $item_xml;
-			$collected++;
+			++$collected;
 
 			if ( $collected >= $limit ) {
 				break;

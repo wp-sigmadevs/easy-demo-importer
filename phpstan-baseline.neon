@@ -49,38 +49,8 @@ parameters:
 			path: inc/App/Ajax/Backend/ImportFluentForms.php
 
 		-
-			message: '#^If condition is always true\.$#'
-			identifier: if.alwaysTrue
-			count: 1
-			path: inc/App/Ajax/Backend/ImportFluentForms.php
-
-		-
 			message: '#^Method SigmaDevs\\EasyDemoImporter\\App\\Ajax\\Backend\\ImportFluentForms\:\:instance\(\) has invalid return type SigmaDevs\\EasyDemoImporter\\Common\\Traits\\Singleton\.$#'
 			identifier: return.trait
-			count: 1
-			path: inc/App/Ajax/Backend/ImportFluentForms.php
-
-		-
-			message: '#^Result of \|\| is always true\.$#'
-			identifier: booleanOr.alwaysTrue
-			count: 1
-			path: inc/App/Ajax/Backend/ImportFluentForms.php
-
-		-
-			message: '#^Ternary operator condition is always true\.$#'
-			identifier: ternary.alwaysTrue
-			count: 1
-			path: inc/App/Ajax/Backend/ImportFluentForms.php
-
-		-
-			message: '#^Variable \$forms in isset\(\) always exists and is not nullable\.$#'
-			identifier: isset.variable
-			count: 1
-			path: inc/App/Ajax/Backend/ImportFluentForms.php
-
-		-
-			message: '#^Variable \$forms might not be defined\.$#'
-			identifier: variable.undefined
 			count: 1
 			path: inc/App/Ajax/Backend/ImportFluentForms.php
 
@@ -91,14 +61,14 @@ parameters:
 			path: inc/App/Ajax/Backend/ImportLayerSlider.php
 
 		-
-			message: '#^Method SigmaDevs\\EasyDemoImporter\\App\\Ajax\\Backend\\ImportLayerSlider\:\:instance\(\) has invalid return type SigmaDevs\\EasyDemoImporter\\Common\\Traits\\Singleton\.$#'
-			identifier: return.trait
+			message: '#^Method SigmaDevs\\EasyDemoImporter\\App\\Ajax\\Backend\\ImportLayerSlider\:\:importLayerSlider\(\) invoked with 2 parameters, 1 required\.$#'
+			identifier: arguments.count
 			count: 1
 			path: inc/App/Ajax/Backend/ImportLayerSlider.php
 
 		-
-			message: '#^Strict comparison using \=\=\= between false and non\-falsy\-string will always evaluate to false\.$#'
-			identifier: identical.alwaysFalse
+			message: '#^Method SigmaDevs\\EasyDemoImporter\\App\\Ajax\\Backend\\ImportLayerSlider\:\:instance\(\) has invalid return type SigmaDevs\\EasyDemoImporter\\Common\\Traits\\Singleton\.$#'
+			identifier: return.trait
 			count: 1
 			path: inc/App/Ajax/Backend/ImportLayerSlider.php
 
@@ -111,12 +81,6 @@ parameters:
 		-
 			message: '#^Method SigmaDevs\\EasyDemoImporter\\App\\Ajax\\Backend\\ImportRevSlider\:\:instance\(\) has invalid return type SigmaDevs\\EasyDemoImporter\\Common\\Traits\\Singleton\.$#'
 			identifier: return.trait
-			count: 1
-			path: inc/App/Ajax/Backend/ImportRevSlider.php
-
-		-
-			message: '#^Strict comparison using \=\=\= between false and non\-falsy\-string will always evaluate to false\.$#'
-			identifier: identical.alwaysFalse
 			count: 1
 			path: inc/App/Ajax/Backend/ImportRevSlider.php
 
@@ -163,6 +127,18 @@ parameters:
 			path: inc/App/Ajax/Backend/ImportWidgets.php
 
 		-
+			message: '#^Function sd_edi not found\.$#'
+			identifier: function.notFound
+			count: 1
+			path: inc/App/Ajax/Backend/ImportXmlChunk.php
+
+		-
+			message: '#^Method SigmaDevs\\EasyDemoImporter\\App\\Ajax\\Backend\\ImportXmlChunk\:\:instance\(\) has invalid return type SigmaDevs\\EasyDemoImporter\\Common\\Traits\\Singleton\.$#'
+			identifier: return.trait
+			count: 1
+			path: inc/App/Ajax/Backend/ImportXmlChunk.php
+
+		-
 			message: '#^Call to function is_array\(\) with string will always evaluate to false\.$#'
 			identifier: function.impossibleType
 			count: 2
@@ -199,6 +175,18 @@ parameters:
 			path: inc/App/Ajax/Backend/InstallDemo.php
 
 		-
+			message: '#^Method SigmaDevs\\EasyDemoImporter\\App\\Ajax\\Backend\\InstallDemo\:\:clearNavMenus\(\) is unused\.$#'
+			identifier: method.unused
+			count: 1
+			path: inc/App/Ajax/Backend/InstallDemo.php
+
+		-
+			message: '#^Method SigmaDevs\\EasyDemoImporter\\App\\Ajax\\Backend\\InstallDemo\:\:importDemoContent\(\) is unused\.$#'
+			identifier: method.unused
+			count: 1
+			path: inc/App/Ajax/Backend/InstallDemo.php
+
+		-
 			message: '#^Method SigmaDevs\\EasyDemoImporter\\App\\Ajax\\Backend\\InstallDemo\:\:instance\(\) has invalid return type SigmaDevs\\EasyDemoImporter\\Common\\Traits\\Singleton\.$#'
 			identifier: return.trait
 			count: 1
@@ -209,12 +197,6 @@ parameters:
 			identifier: deadCode.unreachable
 			count: 1
 			path: inc/App/Ajax/Backend/InstallDemo.php
-
-		-
-			message: '#^Cannot access property \$download_link on array\|object\.$#'
-			identifier: property.nonObject
-			count: 1
-			path: inc/App/Ajax/Backend/InstallPlugins.php
 
 		-
 			message: '#^Method SigmaDevs\\EasyDemoImporter\\App\\Ajax\\Backend\\InstallPlugins\:\:instance\(\) has invalid return type SigmaDevs\\EasyDemoImporter\\Common\\Traits\\Singleton\.$#'
@@ -275,6 +257,30 @@ parameters:
 			identifier: return.trait
 			count: 1
 			path: inc/App/General/Hooks.php
+
+		-
+			message: '#^Function sd_edi not found\.$#'
+			identifier: function.notFound
+			count: 1
+			path: inc/App/Rest/DemoStatsEndpoint.php
+
+		-
+			message: '#^Method SigmaDevs\\EasyDemoImporter\\App\\Rest\\DemoStatsEndpoint\:\:instance\(\) has invalid return type SigmaDevs\\EasyDemoImporter\\Common\\Traits\\Singleton\.$#'
+			identifier: return.trait
+			count: 1
+			path: inc/App/Rest/DemoStatsEndpoint.php
+
+		-
+			message: '#^Method SigmaDevs\\EasyDemoImporter\\App\\Rest\\DemoStatsEndpoint\:\:resolveXmlPath\(\) never returns null so it can be removed from the return type\.$#'
+			identifier: return.unusedType
+			count: 1
+			path: inc/App/Rest/DemoStatsEndpoint.php
+
+		-
+			message: '#^Method SigmaDevs\\EasyDemoImporter\\App\\Rest\\ImportLogEndpoint\:\:instance\(\) has invalid return type SigmaDevs\\EasyDemoImporter\\Common\\Traits\\Singleton\.$#'
+			identifier: return.trait
+			count: 1
+			path: inc/App/Rest/ImportLogEndpoint.php
 
 		-
 			message: '#^Call to function is_array\(\) with non\-empty\-array will always evaluate to true\.$#'
@@ -379,12 +385,6 @@ parameters:
 			path: inc/Common/Abstracts/ImporterAjax.php
 
 		-
-			message: '#^Unreachable statement \- code above always terminates\.$#'
-			identifier: deadCode.unreachable
-			count: 4
-			path: inc/Common/Abstracts/ImporterAjax.php
-
-		-
 			message: '#^Function sd_edi not found\.$#'
 			identifier: function.notFound
 			count: 9
@@ -445,25 +445,13 @@ parameters:
 			path: inc/Common/Models/Customizer.php
 
 		-
-			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
-			identifier: function.alreadyNarrowedType
-			count: 1
-			path: inc/Common/Models/DBSearchReplace.php
-
-		-
 			message: '#^Call to function is_array\(\) with string will always evaluate to false\.$#'
 			identifier: function.impossibleType
 			count: 1
 			path: inc/Common/Models/DBSearchReplace.php
 
 		-
-			message: '#^Call to function is_object\(\) with \*NEVER\* will always evaluate to true\.$#'
-			identifier: function.alreadyNarrowedType
-			count: 1
-			path: inc/Common/Models/DBSearchReplace.php
-
-		-
-			message: '#^Call to function is_string\(\) with array will always evaluate to false\.$#'
+			message: '#^Call to function is_object\(\) with string will always evaluate to false\.$#'
 			identifier: function.impossibleType
 			count: 1
 			path: inc/Common/Models/DBSearchReplace.php
@@ -475,32 +463,26 @@ parameters:
 			path: inc/Common/Models/DBSearchReplace.php
 
 		-
-			message: '#^Default value of the parameter \#3 \$data \(string\) of method SigmaDevs\\EasyDemoImporter\\Common\\Models\\DBSearchReplace\:\:recursive_unserialize_replace\(\) is incompatible with type array\.$#'
-			identifier: parameter.defaultValue
-			count: 1
-			path: inc/Common/Models/DBSearchReplace.php
-
-		-
 			message: '#^Parameter \#1 \$array \(non\-empty\-list\<non\-falsy\-string\>\) to function array_filter does not contain falsy values, the array will always stay the same\.$#'
 			identifier: arrayFilter.same
 			count: 1
 			path: inc/Common/Models/DBSearchReplace.php
 
 		-
-			message: '#^Parameter \#1 \$callback of function array_map expects \(callable\(never\)\: mixed\)\|null, ''SigmaDevs…'' given\.$#'
-			identifier: argument.type
+			message: '#^Strict comparison using \!\=\= between ''__PHP_Incomplete…'' and false will always evaluate to true\.$#'
+			identifier: notIdentical.alwaysTrue
 			count: 1
 			path: inc/Common/Models/DBSearchReplace.php
 
 		-
-			message: '#^Result of && is always false\.$#'
-			identifier: booleanAnd.alwaysFalse
-			count: 2
+			message: '#^Variable \$should_skip in isset\(\) always exists and is not nullable\.$#'
+			identifier: isset.variable
+			count: 1
 			path: inc/Common/Models/DBSearchReplace.php
 
 		-
-			message: '#^Strict comparison using \!\=\= between ''__PHP_Incomplete…'' and false will always evaluate to true\.$#'
-			identifier: notIdentical.alwaysTrue
+			message: '#^Variable \$update_later in isset\(\) always exists and is not nullable\.$#'
+			identifier: isset.variable
 			count: 1
 			path: inc/Common/Models/DBSearchReplace.php
 
@@ -513,18 +495,6 @@ parameters:
 		-
 			message: '#^Negated boolean expression is always true\.$#'
 			identifier: booleanNot.alwaysTrue
-			count: 1
-			path: inc/Common/Models/Widgets.php
-
-		-
-			message: '#^Variable \$widgetMessage might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: inc/Common/Models/Widgets.php
-
-		-
-			message: '#^Variable \$widgetMessageType might not be defined\.$#'
-			identifier: variable.undefined
 			count: 1
 			path: inc/Common/Models/Widgets.php
 
