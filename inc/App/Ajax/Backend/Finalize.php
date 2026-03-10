@@ -54,7 +54,7 @@ class Finalize extends ImporterAjax {
 	public function register() {
 		parent::register();
 
-		add_action( 'wp_ajax_sd_edi_finalize_demo', [ $this, 'response' ] );
+		add_action( 'wp_ajax_sd_edi_finalize_demo', array( $this, 'response' ) );
 	}
 
 	/**
@@ -104,11 +104,11 @@ class Finalize extends ImporterAjax {
 	 * @since 1.3.0
 	 */
 	private function flushCaches(): void {
-		$flushed = [];
+		$flushed = array();
 
 		$handlers = apply_filters( // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 			'sd/edi/flush_caches',
-			[
+			array(
 				'wp_super_cache'  => static function () {
 					if ( function_exists( 'wp_cache_clear_cache' ) ) {
 						wp_cache_clear_cache();
@@ -155,7 +155,7 @@ class Finalize extends ImporterAjax {
 					wp_cache_flush();
 					return true;
 				},
-			]
+			)
 		);
 
 		foreach ( $handlers as $name => $handler ) {
