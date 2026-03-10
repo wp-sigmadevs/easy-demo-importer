@@ -9,6 +9,15 @@ import { useEffect } from 'react';
 import AppServer from './AppServer';
 import AppDemoImporter from './AppDemoImporter';
 import ErrorBoundary from './components/ErrorBoundary';
+import WizardLayout from './wizard/WizardLayout';
+import WelcomeStep from './wizard/steps/WelcomeStep';
+import RequirementsStep from './wizard/steps/RequirementsStep';
+import PluginInstallerStep from './wizard/steps/PluginInstallerStep';
+import DemoSelectStep from './wizard/steps/DemoSelectStep';
+import ImportOptionsStep from './wizard/steps/ImportOptionsStep';
+import ConfirmationStep from './wizard/steps/ConfirmationStep';
+import ImportingStep from './wizard/steps/ImportingStep';
+import CompleteStep from './wizard/steps/CompleteStep';
 
 /* global sdEdiAdminParams */
 
@@ -104,6 +113,27 @@ const routes = [
 				</LayoutWithEffects>
 			</ErrorBoundary>
 		),
+	},
+	{
+		path: '/wizard',
+		element: (
+			<ErrorBoundary>
+				<LayoutWithEffects>
+					<WizardLayout />
+				</LayoutWithEffects>
+			</ErrorBoundary>
+		),
+		children: [
+			{ index: true,          element: <Navigate to="/wizard/welcome" replace /> },
+			{ path: 'welcome',      element: <WelcomeStep /> },
+			{ path: 'requirements', element: <RequirementsStep /> },
+			{ path: 'plugins',      element: <PluginInstallerStep /> },
+			{ path: 'demos',        element: <DemoSelectStep /> },
+			{ path: 'options',      element: <ImportOptionsStep /> },
+			{ path: 'confirm',      element: <ConfirmationStep /> },
+			{ path: 'importing',    element: <ImportingStep /> },
+			{ path: 'complete',     element: <CompleteStep /> },
+		],
 	},
 	{
 		path: '*',
