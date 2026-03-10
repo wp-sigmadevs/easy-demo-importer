@@ -126,4 +126,158 @@ class XmlChunker {
 
 		return max( 1, $size );
 	}
+
+	/**
+	 * Extract N items from a WXR file starting at $offset.
+	 *
+	 * Strategy:
+	 *  1. First pass: capture the WXR header (everything before the first <item>)
+	 *     — this includes authors, categories, tags, terms, and WXR metadata.
+	 *     Terms are in every chunk so the importer can resolve parents.
+	 *  2. Second pass: stream items with XMLReader, skip $offset items,
+	 *     capture the next $limit items as raw XML strings.
+	 *  3. Combine: header XML + item XML strings + closing tags.
+	 *  4. Write to a temp file and return its path.
+	 *     Caller is responsible for deleting the temp file.
+	 *
+	 * @param string $file_path   Absolute path to the source WXR file.
+	 * @param int    $offset      Zero-based index of the first item to include.
+	 * @param int    $limit       Number of items to include. Default: chunkSize().
+	 * @param int[]  $allowed_ids If non-empty, only items whose wp:post_id is in
+	 *                            this list are counted toward $offset and $limit.
+	 *                            (Phase 4 selective import hook-in — pass [] for all.)
+	 * @return string|null Absolute path to the temp WXR file, or null on failure.
+	 * @since 1.3.0
+	 */
+	public static function extractChunk(
+		string $file_path,
+		int $offset,
+		int $limit = 0,
+		array $allowed_ids = []
+	): ?string {
+		if ( ! file_exists( $file_path ) || ! is_readable( $file_path ) ) {
+			return null;
+		}
+
+		if ( $limit <= 0 ) {
+			$limit = self::chunkSize();
+		}
+
+		// ── Pass 1: capture WXR header ────────────────────────────────────────────
+		$header = self::extractHeader( $file_path );
+
+		if ( null === $header ) {
+			return null;
+		}
+
+		// ── Pass 2: collect item XML strings ─────────────────────────────────────
+		$reader = new \XMLReader();
+
+		if ( ! $reader->open( $file_path ) ) {
+			return null;
+		}
+
+		$item_xmls = [];
+		$seen      = 0;
+		$collected = 0;
+
+		while ( $reader->read() ) {
+			if ( \XMLReader::ELEMENT !== $reader->nodeType || 'item' !== $reader->localName ) {
+				continue;
+			}
+
+			// Read the full outer XML of this item once.
+			$item_xml = $reader->readOuterXml();
+
+			// Check allowed_ids filter (Phase 4 hook-in).
+			if ( ! empty( $allowed_ids ) ) {
+				$doc = new \DOMDocument();
+				@$doc->loadXML( $item_xml ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+				$nodes = $doc->getElementsByTagNameNS( '*', 'post_id' );
+				$id    = $nodes->length > 0 ? (int) $nodes->item( 0 )->textContent : 0;
+
+				if ( ! in_array( $id, $allowed_ids, true ) ) {
+					continue;
+				}
+			}
+
+			$seen++;
+
+			if ( $seen <= $offset ) {
+				continue;
+			}
+
+			$item_xmls[] = $item_xml;
+			$collected++;
+
+			if ( $collected >= $limit ) {
+				break;
+			}
+		}
+
+		$reader->close();
+
+		if ( empty( $item_xmls ) ) {
+			return null;
+		}
+
+		// ── Build temp WXR file ───────────────────────────────────────────────────
+		$chunk_xml  = $header;
+		$chunk_xml .= "\n" . implode( "\n", $item_xmls ) . "\n";
+		$chunk_xml .= "  </channel>\n</rss>";
+
+		$tmp_path = wp_tempnam( 'sd-edi-chunk-', get_temp_dir() );
+
+		if ( false === file_put_contents( $tmp_path, $chunk_xml ) ) { // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
+			return null;
+		}
+
+		return $tmp_path;
+	}
+
+	/**
+	 * Extract the WXR header — everything before the first <item>.
+	 *
+	 * Includes: rss open tag, channel metadata, wp:author, wp:category,
+	 * wp:tag, wp:term elements. Excludes the closing </channel></rss>.
+	 *
+	 * @param string $file_path Absolute path to the WXR file.
+	 * @return string|null Header XML string, or null on failure.
+	 * @since 1.3.0
+	 */
+	private static function extractHeader( string $file_path ): ?string {
+		$handle = fopen( $file_path, 'r' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
+
+		if ( ! $handle ) {
+			return null;
+		}
+
+		$header = '';
+		$found  = false;
+
+		while ( ! feof( $handle ) ) {
+			$line = fgets( $handle );
+
+			if ( false === $line ) {
+				break;
+			}
+
+			// Stop accumulating once we hit the first <item> tag.
+			if ( false !== strpos( $line, '<item>' ) || preg_match( '/<item\s/', $line ) ) {
+				$found = true;
+				break;
+			}
+
+			// Strip closing tags — we'll add them back after the items.
+			if ( trim( $line ) === '</channel>' || trim( $line ) === '</rss>' ) {
+				continue;
+			}
+
+			$header .= $line;
+		}
+
+		fclose( $handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
+
+		return $found ? $header : null;
+	}
 }
