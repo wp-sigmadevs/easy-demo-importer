@@ -253,6 +253,18 @@ parameters:
 			path: inc/App/Backend/PluginRowMeta.php
 
 		-
+			message: '#^Method SigmaDevs\\EasyDemoImporter\\App\\Ajax\\Backend\\RegenerateImages\:\:instance\(\) has invalid return type SigmaDevs\\EasyDemoImporter\\Common\\Traits\\Singleton\.$#'
+			identifier: return.trait
+			count: 1
+			path: inc/App/Ajax/Backend/RegenerateImages.php
+
+		-
+			message: '#^Call to method register\(\) on an unknown class SigmaDevs\\EasyDemoImporter\\Common\\Traits\\Singleton\.$#'
+			identifier: class.notFound
+			count: 1
+			path: inc/App/General/Hooks.php
+
+		-
 			message: '#^Method SigmaDevs\\EasyDemoImporter\\App\\General\\Hooks\:\:instance\(\) has invalid return type SigmaDevs\\EasyDemoImporter\\Common\\Traits\\Singleton\.$#'
 			identifier: return.trait
 			count: 1
