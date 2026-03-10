@@ -172,7 +172,7 @@ class InstallPlugins extends ImporterAjax {
 			// Get Plugin Info.
 			$api = $this->callPluginApi( $slug );
 
-			if ( is_wp_error( $api ) ) {
+			if ( is_wp_error( $api ) || ! is_object( $api ) ) {
 				$this->installErrors[] = $slug;
 				return;
 			}
