@@ -6,7 +6,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-03-03 17:17+0000\n"
+"POT-Creation-Date: 2026-03-10 07:12+0000\n"
 "Report-Msgid-Bugs-To: https://github.com/wp-sigmadevs/easy-demo-importer/issues\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -15,7 +15,7 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../easy-demo-importer.php:56
+#: ../easy-demo-importer.php:57
 msgid "Easy Demo Importer is unable to find the Bootstrap class."
 msgstr ""
 
@@ -54,259 +54,259 @@ msgstr ""
 msgid "Action failed. Please refresh the page and try again."
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:153
+#: ../inc/App/Backend/Enqueue.php:155
 msgid "Search demos..."
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:154
+#: ../inc/App/Backend/Enqueue.php:156
 msgid "No demos found. Try a different search term."
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:158
+#: ../inc/App/Backend/Enqueue.php:160
 msgid "Preparing to install demo data. Doing some cleanups first."
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:159
+#: ../inc/App/Backend/Enqueue.php:161
 msgid "Preparing to install demo data. Resetting database first."
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:160
+#: ../inc/App/Backend/Enqueue.php:162
 msgid "All done. Have fun!"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:163
+#: ../inc/App/Backend/Enqueue.php:165
 msgid "Importing Demo:"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:166
+#: ../inc/App/Backend/Enqueue.php:168
 msgid "Before You Proceed"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:173
+#: ../inc/App/Backend/Enqueue.php:175
 msgid "Required Plugins"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:174
+#: ../inc/App/Backend/Enqueue.php:176
 msgid "Configure Your Import"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:176
+#: ../inc/App/Backend/Enqueue.php:178
 msgid "Skip Demo Images"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:177
+#: ../inc/App/Backend/Enqueue.php:179
 msgid "Exclude demo images to speed up the import. Recommended if the import fails repeatedly."
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:178
+#: ../inc/App/Backend/Enqueue.php:180
 msgid "Skip Image Regeneration"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:179
+#: ../inc/App/Backend/Enqueue.php:181
 msgid "Skips image regeneration during import for a faster experience. You can regenerate thumbnails later using a plugin like 'Regenerate Thumbnails'."
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:180
+#: ../inc/App/Backend/Enqueue.php:182
 msgid "Reset Existing Database"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:181
+#: ../inc/App/Backend/Enqueue.php:183
 msgid "Caution: "
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:182
+#: ../inc/App/Backend/Enqueue.php:184
 msgid "This will permanently erase all existing content — posts, pages, images, custom post types, taxonomies, and settings. A full database reset is recommended for the best demo import experience."
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:185
+#: ../inc/App/Backend/Enqueue.php:187
 msgid "Are you sure you want to continue?"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:186
+#: ../inc/App/Backend/Enqueue.php:188
 msgid "This will permanently delete all your existing content."
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:187
+#: ../inc/App/Backend/Enqueue.php:189
 msgid "This will permanently delete all your content, media, and settings. Are you sure you want to continue?"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:188, ../inc/App/Rest/RestEndpoints.php:412, ../inc/App/Rest/RestEndpoints.php:426, ../inc/App/Rest/RestEndpoints.php:479, ../inc/App/Rest/RestEndpoints.php:537, ../inc/App/Rest/RestEndpoints.php:542, ../inc/App/Rest/RestEndpoints.php:572, ../inc/App/Rest/RestEndpoints.php:577
+#: ../inc/App/Backend/Enqueue.php:190, ../inc/App/Rest/RestEndpoints.php:456, ../inc/App/Rest/RestEndpoints.php:470, ../inc/App/Rest/RestEndpoints.php:523, ../inc/App/Rest/RestEndpoints.php:581, ../inc/App/Rest/RestEndpoints.php:586, ../inc/App/Rest/RestEndpoints.php:616, ../inc/App/Rest/RestEndpoints.php:621
 msgid "Yes"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:189, ../inc/App/Rest/RestEndpoints.php:412, ../inc/App/Rest/RestEndpoints.php:426, ../inc/App/Rest/RestEndpoints.php:479, ../inc/App/Rest/RestEndpoints.php:537, ../inc/App/Rest/RestEndpoints.php:542, ../inc/App/Rest/RestEndpoints.php:572, ../inc/App/Rest/RestEndpoints.php:577
+#: ../inc/App/Backend/Enqueue.php:191, ../inc/App/Rest/RestEndpoints.php:456, ../inc/App/Rest/RestEndpoints.php:470, ../inc/App/Rest/RestEndpoints.php:523, ../inc/App/Rest/RestEndpoints.php:581, ../inc/App/Rest/RestEndpoints.php:586, ../inc/App/Rest/RestEndpoints.php:616, ../inc/App/Rest/RestEndpoints.php:621
 msgid "No"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:192, ../inc/App/Backend/PluginRowMeta.php:83
+#: ../inc/App/Backend/Enqueue.php:194, ../inc/App/Backend/PluginRowMeta.php:83
 msgid "System Status"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:194
+#: ../inc/App/Backend/Enqueue.php:196
 msgid "Back to Demo Importer"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:199
+#: ../inc/App/Backend/Enqueue.php:201
 msgid "Live Preview"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:200
+#: ../inc/App/Backend/Enqueue.php:202
 msgid "Import"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:201
+#: ../inc/App/Backend/Enqueue.php:203
 msgid "Cancel"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:202
+#: ../inc/App/Backend/Enqueue.php:204
 msgid "Continue"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:203
+#: ../inc/App/Backend/Enqueue.php:205
 msgid "Previous"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:204
+#: ../inc/App/Backend/Enqueue.php:206
 msgid "Start Import"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:205
+#: ../inc/App/Backend/Enqueue.php:207
 msgid "View Site"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:206
+#: ../inc/App/Backend/Enqueue.php:208
 msgid "Close"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:207
+#: ../inc/App/Backend/Enqueue.php:209
 msgid "Reload & Retry"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:208
+#: ../inc/App/Backend/Enqueue.php:210
 msgid "Resume Import"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:209
+#: ../inc/App/Backend/Enqueue.php:211
 msgid "Start Over"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:210
+#: ../inc/App/Backend/Enqueue.php:212
 msgid "Resuming import from where it left off..."
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:211
+#: ../inc/App/Backend/Enqueue.php:213
 msgid "Import was interrupted."
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:212
+#: ../inc/App/Backend/Enqueue.php:214
 msgid "Your previous import did not complete. Resume from where it left off, or start over to begin fresh."
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:213
+#: ../inc/App/Backend/Enqueue.php:215
 msgid "Click to Enlarge"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:214
+#: ../inc/App/Backend/Enqueue.php:216
 msgid "Contact Us"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:215
+#: ../inc/App/Backend/Enqueue.php:217
 msgid "View Documentation"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:216
+#: ../inc/App/Backend/Enqueue.php:218
 msgid "Need help?"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:217
+#: ../inc/App/Backend/Enqueue.php:219
 msgid "Documentation & FAQ"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:218
+#: ../inc/App/Backend/Enqueue.php:220
 msgid "All Demos"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:221
+#: ../inc/App/Backend/Enqueue.php:223
 msgid "Need Help?"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:222
+#: ../inc/App/Backend/Enqueue.php:224
 msgid "Documentation & FAQs"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:227
+#: ../inc/App/Backend/Enqueue.php:229
 msgid "System status data copied to clipboard."
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:228
+#: ../inc/App/Backend/Enqueue.php:230
 msgid "Could not copy to clipboard. Please try again."
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:231
+#: ../inc/App/Backend/Enqueue.php:233
 msgid "Server Requirements Not Met"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:232
+#: ../inc/App/Backend/Enqueue.php:234
 msgid "Your server does not meet the minimum requirements for demo import. Please review the System Status page for details. Proceeding without meeting these requirements may result in a failed or incomplete import."
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:233
+#: ../inc/App/Backend/Enqueue.php:235
 msgid "Continue Anyway"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:236
+#: ../inc/App/Backend/Enqueue.php:238
 msgid "Not installed"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:237
+#: ../inc/App/Backend/Enqueue.php:239
 msgid "Installed and active"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:238
+#: ../inc/App/Backend/Enqueue.php:240
 msgid "Installed but not active"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:239
+#: ../inc/App/Backend/Enqueue.php:241
 msgid "Installed & active — update available"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:240
+#: ../inc/App/Backend/Enqueue.php:242
 msgid "Installed but inactive — update available"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:256
+#: ../inc/App/Backend/Enqueue.php:258
 msgid "We recommend backing up your site before proceeding. A backup plugin can help you restore your site if anything goes wrong during the import."
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:257
+#: ../inc/App/Backend/Enqueue.php:259
 msgid "This import will install all required plugins and bring in content, media, settings, customizer data, and widgets needed to replicate the demo site. Please review your existing content, as some data may be overwritten."
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:261
+#: ../inc/App/Backend/Enqueue.php:263
 msgid "To replicate the demo site, the following plugins will be automatically installed and activated if not already present. Scroll down to see the full list."
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:263
+#: ../inc/App/Backend/Enqueue.php:265
 msgid "Having trouble? Reach out to us and we'll help you get sorted quickly."
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:264
+#: ../inc/App/Backend/Enqueue.php:266
 msgid "Explore our documentation for step-by-step guides, helpful screenshots, and FAQs to walk you through the demo import process."
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:268
+#: ../inc/App/Backend/Enqueue.php:270
 msgid "Start"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:269
+#: ../inc/App/Backend/Enqueue.php:271
 msgid "Configure"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:270
+#: ../inc/App/Backend/Enqueue.php:272
 msgid "Imports"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:271
+#: ../inc/App/Backend/Enqueue.php:273
 msgid "End"
 msgstr ""
 
@@ -326,244 +326,248 @@ msgstr ""
 msgid "Install Demo Data"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:213
+#: ../inc/App/Rest/DemoStatsEndpoint.php:81, ../inc/App/Rest/ImportLogEndpoint.php:86
+msgid "Sorry, you are not allowed to do that."
+msgstr ""
+
+#: ../inc/App/Rest/RestEndpoints.php:221
 msgid "Sorry, you are not allowed to do that!"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:239
+#: ../inc/App/Rest/RestEndpoints.php:247
 msgid "We apologize for any inconvenience, but it appears that the configuration file for the demo importer is either missing or you are using an unsupported theme. As a result, the installation of the demo content cannot proceed any further at this time. Thank you for your understanding."
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:249, ../inc/App/Rest/RestEndpoints.php:286, ../inc/App/Rest/RestEndpoints.php:298
+#: ../inc/App/Rest/RestEndpoints.php:278, ../inc/App/Rest/RestEndpoints.php:315, ../inc/App/Rest/RestEndpoints.php:334, ../inc/App/Rest/RestEndpoints.php:342
 msgid "Data is ready to fetch"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:263
+#: ../inc/App/Rest/RestEndpoints.php:292
 msgid "Demo data Configuration not found."
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:311
+#: ../inc/App/Rest/RestEndpoints.php:355
 msgid "Server Info"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:316
+#: ../inc/App/Rest/RestEndpoints.php:360
 msgid "WordPress Info"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:321
+#: ../inc/App/Rest/RestEndpoints.php:365
 msgid "Theme Info"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:326
+#: ../inc/App/Rest/RestEndpoints.php:370
 msgid "Active Plugins"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:331
+#: ../inc/App/Rest/RestEndpoints.php:375
 msgid "Inactive Plugins"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:336, ../inc/App/Rest/RestEndpoints.php:653
+#: ../inc/App/Rest/RestEndpoints.php:380, ../inc/App/Rest/RestEndpoints.php:697
 msgid "Copy System Data"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:355
+#: ../inc/App/Rest/RestEndpoints.php:399
 msgid "Operating System"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:360
+#: ../inc/App/Rest/RestEndpoints.php:404
 msgid "Server"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:361
+#: ../inc/App/Rest/RestEndpoints.php:405
 msgid "Detection Error"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:365
+#: ../inc/App/Rest/RestEndpoints.php:409
 msgid "MySQL Version"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:371
+#: ../inc/App/Rest/RestEndpoints.php:415
 msgid "PHP Version"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:376
+#: ../inc/App/Rest/RestEndpoints.php:420
 msgid "PHP Max Execution Time"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:378
+#: ../inc/App/Rest/RestEndpoints.php:422
 msgid "Recommended PHP Max Execution Time is "
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:382
+#: ../inc/App/Rest/RestEndpoints.php:426
 msgid "PHP Max Input Time"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:384
+#: ../inc/App/Rest/RestEndpoints.php:428
 msgid "Recommended PHP Max Input Time is "
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:388
+#: ../inc/App/Rest/RestEndpoints.php:432
 msgid "PHP Max Upload Size"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:390
+#: ../inc/App/Rest/RestEndpoints.php:434
 msgid "Recommended PHP Max Upload Size is "
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:394
+#: ../inc/App/Rest/RestEndpoints.php:438
 msgid "PHP Post Max Size"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:396
+#: ../inc/App/Rest/RestEndpoints.php:440
 msgid "Recommended PHP Post Max Size is "
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:400
+#: ../inc/App/Rest/RestEndpoints.php:444
 msgid "PHP Max Input Vars"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:405
+#: ../inc/App/Rest/RestEndpoints.php:449
 msgid "PHP Memory Limit"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:407
+#: ../inc/App/Rest/RestEndpoints.php:451
 msgid "Recommended PHP Memory Limit is "
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:411
+#: ../inc/App/Rest/RestEndpoints.php:455
 msgid "cURL Installed"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:419
+#: ../inc/App/Rest/RestEndpoints.php:463
 msgid "cURL version"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:425
+#: ../inc/App/Rest/RestEndpoints.php:469
 msgid "GD Installed"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:433
+#: ../inc/App/Rest/RestEndpoints.php:477
 msgid "GD version"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:439
+#: ../inc/App/Rest/RestEndpoints.php:483
 msgid "Write Permission"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:441
+#: ../inc/App/Rest/RestEndpoints.php:485
 msgid "Fix the write permission error in the wp-content directory for successful import."
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:458
+#: ../inc/App/Rest/RestEndpoints.php:502
 msgid "Name"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:463
+#: ../inc/App/Rest/RestEndpoints.php:507
 msgid "Version"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:468
+#: ../inc/App/Rest/RestEndpoints.php:512
 msgid "Author"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:473
+#: ../inc/App/Rest/RestEndpoints.php:517
 msgid "Author URL"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:478
+#: ../inc/App/Rest/RestEndpoints.php:522
 msgid "Child Theme"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:480
+#: ../inc/App/Rest/RestEndpoints.php:524
 msgid "Child theme is recommended if you want to modify or extend the features of the theme"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:485
+#: ../inc/App/Rest/RestEndpoints.php:529
 msgid "Parent Theme Name"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:490
+#: ../inc/App/Rest/RestEndpoints.php:534
 msgid "Parent Theme Version"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:495
+#: ../inc/App/Rest/RestEndpoints.php:539
 msgid "Parent Theme Author"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:500
+#: ../inc/App/Rest/RestEndpoints.php:544
 msgid "Parent Theme Author URL"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:520
+#: ../inc/App/Rest/RestEndpoints.php:564
 msgid "WordPress Version"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:522
+#: ../inc/App/Rest/RestEndpoints.php:566
 msgid "WordPress core is outdated. Please update to the latest version."
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:526
+#: ../inc/App/Rest/RestEndpoints.php:570
 msgid "Site URL"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:531
+#: ../inc/App/Rest/RestEndpoints.php:575
 msgid "Home URL"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:536
+#: ../inc/App/Rest/RestEndpoints.php:580
 msgid "Is this Multisite?"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:541
+#: ../inc/App/Rest/RestEndpoints.php:585
 msgid "Has SSL Enabled?"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:546
+#: ../inc/App/Rest/RestEndpoints.php:590
 msgid "Max Upload Size"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:551
+#: ../inc/App/Rest/RestEndpoints.php:595
 msgid "Memory Limit"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:556
+#: ../inc/App/Rest/RestEndpoints.php:600
 msgid "Max Memory Limit"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:561
+#: ../inc/App/Rest/RestEndpoints.php:605
 msgid "Permalink Structure"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:562
+#: ../inc/App/Rest/RestEndpoints.php:606
 msgid "Plain"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:566
+#: ../inc/App/Rest/RestEndpoints.php:610
 msgid "Language"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:571
+#: ../inc/App/Rest/RestEndpoints.php:615
 msgid "Debug Mode Enabled"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:576
+#: ../inc/App/Rest/RestEndpoints.php:620
 msgid "Script Debug Mode Enabled"
 msgstr ""
 
 #. translators: 1. Plugin author name.
-#: ../inc/App/Rest/RestEndpoints.php:603, ../inc/App/Rest/RestEndpoints.php:633
+#: ../inc/App/Rest/RestEndpoints.php:647, ../inc/App/Rest/RestEndpoints.php:677
 msgid "By %s"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:652
+#: ../inc/App/Rest/RestEndpoints.php:696
 msgid "When submitting a support request, kindly include the details generated below in your message. Providing this information will assist us in efficiently diagnosing and addressing the issue you are experiencing."
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:666
+#: ../inc/App/Rest/RestEndpoints.php:710
 msgid "Write permission error"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:672
+#: ../inc/App/Rest/RestEndpoints.php:716
 msgid "No issue"
 msgstr ""
 
@@ -575,23 +579,23 @@ msgstr ""
 msgid "This can happen if you stayed on the page too long. Refreshing resets the security token."
 msgstr ""
 
-#: ../inc/Common/Abstracts/ImporterAjax.php:147
+#: ../inc/Common/Abstracts/ImporterAjax.php:146
 msgid "Demo configuration is missing or empty."
 msgstr ""
 
-#: ../inc/Common/Abstracts/ImporterAjax.php:148
+#: ../inc/Common/Abstracts/ImporterAjax.php:147
 msgid "Make sure your theme is calling the sd/edi/importer/config filter and returning a valid configuration array."
 msgstr ""
 
-#: ../inc/Common/Abstracts/ImporterAjax.php:171
+#: ../inc/Common/Abstracts/ImporterAjax.php:169
 msgid "The import session is no longer valid."
 msgstr ""
 
-#: ../inc/Common/Abstracts/ImporterAjax.php:172
+#: ../inc/Common/Abstracts/ImporterAjax.php:170
 msgid "This can happen if the import timed out or another import started. Refresh the page and try again."
 msgstr ""
 
-#: ../inc/Common/Abstracts/ImporterAjax.php:213
+#: ../inc/Common/Abstracts/ImporterAjax.php:210
 msgid "Invalid demo selection."
 msgstr ""
 
@@ -604,33 +608,38 @@ msgstr ""
 msgid "This SVG file contains unsafe content and cannot be uploaded."
 msgstr ""
 
-#: ../inc/Common/Functions/Helpers.php:79
+#: ../inc/Common/Functions/Helpers.php:88
 msgid "Security check failed. Access denied."
 msgstr ""
 
-#: ../inc/Common/Functions/Helpers.php:99
+#: ../inc/Common/Functions/Helpers.php:110
 msgid "You don't have permission to perform this action."
 msgstr ""
 
 #. translators: View file name.
-#: ../inc/Common/Functions/Helpers.php:209
+#: ../inc/Common/Functions/Helpers.php:218
+msgid "Invalid view name: %s"
+msgstr ""
+
+#. translators: View file name.
+#: ../inc/Common/Functions/Helpers.php:232
 msgid "%s file not found"
 msgstr ""
 
-#: ../inc/Common/Models/Customizer.php:52
+#: ../inc/Common/Models/Customizer.php:71
 msgid "The customizer import file is invalid. Please ensure you are using the correct export file."
 msgstr ""
 
-#: ../inc/Common/Models/Customizer.php:56
+#: ../inc/Common/Models/Customizer.php:75
 msgid "Settings import failed. Please make sure you uploaded a valid customizer export file."
 msgstr ""
 
-#: ../inc/Common/Models/Customizer.php:60
+#: ../inc/Common/Models/Customizer.php:79
 msgid "This customizer file is not compatible with your current theme. Customizer settings can only be imported for the same theme or a child theme."
 msgstr ""
 
 #. translators: the row number.
-#: ../inc/Common/Models/DBSearchReplace.php:321
+#: ../inc/Common/Models/DBSearchReplace.php:323
 msgid "Error updating row: %d."
 msgstr ""
 
@@ -642,23 +651,23 @@ msgstr ""
 msgid "Sidebar does not exist in theme (moving widget to Inactive)"
 msgstr ""
 
-#: ../inc/Common/Models/Widgets.php:112
+#: ../inc/Common/Models/Widgets.php:114
 msgid "Site does not support widget"
 msgstr ""
 
-#: ../inc/Common/Models/Widgets.php:146
+#: ../inc/Common/Models/Widgets.php:148
 msgid "Widget already exists"
 msgstr ""
 
-#: ../inc/Common/Models/Widgets.php:213
+#: ../inc/Common/Models/Widgets.php:215
 msgid "Imported to Inactive"
 msgstr ""
 
-#: ../inc/Common/Models/Widgets.php:210
+#: ../inc/Common/Models/Widgets.php:212
 msgid "Imported"
 msgstr ""
 
-#: ../inc/Common/Models/Widgets.php:219
+#: ../inc/Common/Models/Widgets.php:221
 msgid "No Title"
 msgstr ""
 
@@ -696,134 +705,179 @@ msgstr ""
 msgid "Plugins are active, ready to rock!"
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/CustomizerImport.php:100
+#: ../inc/App/Ajax/Backend/CustomizerImport.php:99
+msgid "Customizer settings applied."
+msgstr ""
+
+#: ../inc/App/Ajax/Backend/CustomizerImport.php:109
 msgid "Working on the menus, just a sec!"
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/CustomizerImport.php:101
+#: ../inc/App/Ajax/Backend/CustomizerImport.php:110
 msgid "Customizer settings in place – all set!"
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/CustomizerImport.php:101
+#: ../inc/App/Ajax/Backend/CustomizerImport.php:110
 msgid "Skipping the fancy customizer settings import!."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/DownloadFiles.php:77
+#: ../inc/App/Ajax/Backend/DownloadFiles.php:80
 msgid "Importing content, sit back, relax! This might take a while."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/DownloadFiles.php:78
+#: ../inc/App/Ajax/Backend/DownloadFiles.php:81
 msgid "Demo files have landed, we are good to go!"
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/DownloadFiles.php:110
+#: ../inc/App/Ajax/Backend/DownloadFiles.php:113
 msgid "Could not create the demo upload directory."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/DownloadFiles.php:111
+#: ../inc/App/Ajax/Backend/DownloadFiles.php:114
 msgid "Check that your uploads directory is writable. Go to Tools > Site Health for file permission details."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/DownloadFiles.php:134
+#: ../inc/App/Ajax/Backend/DownloadFiles.php:122
+msgid "The demo ZIP URL is not a valid URL."
+msgstr ""
+
+#: ../inc/App/Ajax/Backend/DownloadFiles.php:123, ../inc/App/Ajax/Backend/DownloadFiles.php:132
+msgid "Check the demoZip value in your theme configuration."
+msgstr ""
+
+#: ../inc/App/Ajax/Backend/DownloadFiles.php:131
+msgid "The demo ZIP URL must use http or https."
+msgstr ""
+
+#: ../inc/App/Ajax/Backend/DownloadFiles.php:145
+msgid "The demo ZIP URL is not on an allowed domain."
+msgstr ""
+
+#: ../inc/App/Ajax/Backend/DownloadFiles.php:146
+msgid "The demo file host is not in the sd/edi/allowed_download_domains allowlist. Contact the theme author."
+msgstr ""
+
+#: ../inc/App/Ajax/Backend/DownloadFiles.php:170
 msgid "Could not verify the SSL certificate of the demo file server."
 msgstr ""
 
 #. translators: %s: WordPress filter name
-#: ../inc/App/Ajax/Backend/DownloadFiles.php:137
+#: ../inc/App/Ajax/Backend/DownloadFiles.php:173
 msgid "Your server's SSL/cURL configuration may be outdated. Ask your host to update their CA certificate bundle. As a temporary workaround, add %s to your theme's functions.php — note: this disables SSL certificate verification."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/DownloadFiles.php:145
+#: ../inc/App/Ajax/Backend/DownloadFiles.php:181
 msgid "Lost connection to the demo file server."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/DownloadFiles.php:146
+#: ../inc/App/Ajax/Backend/DownloadFiles.php:182
 msgid "Check that your server has outbound internet access. If you are on a local environment, ensure it can reach external URLs."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/DownloadFiles.php:169
-msgid "Demo files were downloaded but could not be extracted."
-msgstr ""
-
-#: ../inc/App/Ajax/Backend/DownloadFiles.php:170
-msgid "Ensure the ZipArchive PHP extension is enabled. Contact your host if you are unsure."
-msgstr ""
-
-#: ../inc/App/Ajax/Backend/DownloadFiles.php:192
-msgid "Access to the demo file was denied (401 Unauthorized)."
-msgstr ""
-
-#: ../inc/App/Ajax/Backend/DownloadFiles.php:193
-msgid "The demo file URL may require authentication. Contact the theme author to verify the demo file URL is publicly accessible."
-msgstr ""
-
-#: ../inc/App/Ajax/Backend/DownloadFiles.php:196
-msgid "Access to the demo file was forbidden (403 Forbidden)."
-msgstr ""
-
-#: ../inc/App/Ajax/Backend/DownloadFiles.php:197
-msgid "The demo file server is blocking the request. This can happen if your server IP is restricted. Contact the theme author."
+#: ../inc/App/Ajax/Backend/DownloadFiles.php:199
+msgid "Demo files were downloaded but could not be saved to the server."
 msgstr ""
 
 #: ../inc/App/Ajax/Backend/DownloadFiles.php:200
-msgid "The demo file was not found on the server (404 Not Found)."
-msgstr ""
-
-#: ../inc/App/Ajax/Backend/DownloadFiles.php:201
-msgid "The demo ZIP URL in the theme configuration may be incorrect or the file has been moved. Contact the theme author for an updated demo package."
-msgstr ""
-
-#: ../inc/App/Ajax/Backend/DownloadFiles.php:204
-msgid "The demo file server took too long to respond (408 Request Timeout)."
-msgstr ""
-
-#: ../inc/App/Ajax/Backend/DownloadFiles.php:205
-msgid "The file server may be temporarily overloaded. Try again in a few minutes. You can also increase the timeout by adding add_filter('sd/edi/download_timeout', fn() => 300); to your theme's functions.php."
-msgstr ""
-
-#: ../inc/App/Ajax/Backend/DownloadFiles.php:208
-msgid "Too many download requests were made (429 Too Many Requests)."
-msgstr ""
-
-#: ../inc/App/Ajax/Backend/DownloadFiles.php:209
-msgid "Wait a few minutes before trying again. The demo file server may be rate-limiting requests."
-msgstr ""
-
-#: ../inc/App/Ajax/Backend/DownloadFiles.php:212
-msgid "The demo file server encountered an internal error (500 Internal Server Error)."
+msgid "Check your server disk space and file permissions."
 msgstr ""
 
 #: ../inc/App/Ajax/Backend/DownloadFiles.php:213
+msgid "Demo files were downloaded but could not be extracted."
+msgstr ""
+
+#: ../inc/App/Ajax/Backend/DownloadFiles.php:214
+msgid "Ensure the ZipArchive PHP extension is enabled. Contact your host if you are unsure."
+msgstr ""
+
+#: ../inc/App/Ajax/Backend/DownloadFiles.php:236
+msgid "The demo archive contained unsafe file paths and was rejected."
+msgstr ""
+
+#: ../inc/App/Ajax/Backend/DownloadFiles.php:237
+msgid "Contact the theme author — the demo ZIP may be corrupted or tampered with."
+msgstr ""
+
+#: ../inc/App/Ajax/Backend/DownloadFiles.php:261
+msgid "Access to the demo file was denied (401 Unauthorized)."
+msgstr ""
+
+#: ../inc/App/Ajax/Backend/DownloadFiles.php:262
+msgid "The demo file URL may require authentication. Contact the theme author to verify the demo file URL is publicly accessible."
+msgstr ""
+
+#: ../inc/App/Ajax/Backend/DownloadFiles.php:265
+msgid "Access to the demo file was forbidden (403 Forbidden)."
+msgstr ""
+
+#: ../inc/App/Ajax/Backend/DownloadFiles.php:266
+msgid "The demo file server is blocking the request. This can happen if your server IP is restricted. Contact the theme author."
+msgstr ""
+
+#: ../inc/App/Ajax/Backend/DownloadFiles.php:269
+msgid "The demo file was not found on the server (404 Not Found)."
+msgstr ""
+
+#: ../inc/App/Ajax/Backend/DownloadFiles.php:270
+msgid "The demo ZIP URL in the theme configuration may be incorrect or the file has been moved. Contact the theme author for an updated demo package."
+msgstr ""
+
+#: ../inc/App/Ajax/Backend/DownloadFiles.php:273
+msgid "The demo file server took too long to respond (408 Request Timeout)."
+msgstr ""
+
+#: ../inc/App/Ajax/Backend/DownloadFiles.php:274
+msgid "The file server may be temporarily overloaded. Try again in a few minutes. You can also increase the timeout by adding add_filter('sd/edi/download_timeout', fn() => 300); to your theme's functions.php."
+msgstr ""
+
+#: ../inc/App/Ajax/Backend/DownloadFiles.php:277
+msgid "Too many download requests were made (429 Too Many Requests)."
+msgstr ""
+
+#: ../inc/App/Ajax/Backend/DownloadFiles.php:278
+msgid "Wait a few minutes before trying again. The demo file server may be rate-limiting requests."
+msgstr ""
+
+#: ../inc/App/Ajax/Backend/DownloadFiles.php:281
+msgid "The demo file server encountered an internal error (500 Internal Server Error)."
+msgstr ""
+
+#: ../inc/App/Ajax/Backend/DownloadFiles.php:282
 msgid "This is a problem on the demo file server, not your site. Try again later or contact the theme author."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/DownloadFiles.php:216
+#: ../inc/App/Ajax/Backend/DownloadFiles.php:285
 msgid "The demo file server is temporarily unavailable (503 Service Unavailable)."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/DownloadFiles.php:217
+#: ../inc/App/Ajax/Backend/DownloadFiles.php:286
 msgid "The demo server may be undergoing maintenance. Wait a few minutes and try again."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/DownloadFiles.php:220
+#: ../inc/App/Ajax/Backend/DownloadFiles.php:289
 msgid "The demo file server gateway timed out (504 Gateway Timeout)."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/DownloadFiles.php:221
+#: ../inc/App/Ajax/Backend/DownloadFiles.php:290
 msgid "The demo server is temporarily overloaded or unreachable. Try again in a few minutes. If the problem persists, contact the theme author."
 msgstr ""
 
 #. translators: %d: HTTP status code
-#: ../inc/App/Ajax/Backend/DownloadFiles.php:232
+#: ../inc/App/Ajax/Backend/DownloadFiles.php:301
 msgid "The demo file server returned an unexpected response (HTTP %d)."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/DownloadFiles.php:233
+#: ../inc/App/Ajax/Backend/DownloadFiles.php:302
 msgid "Try again later. If the problem persists, note the error code and contact the theme author."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/Finalize.php:92
+#: ../inc/App/Ajax/Backend/Finalize.php:96
 msgid "Hooray! You are all set! Now go out and have a blast!"
+msgstr ""
+
+#. translators: %s: comma-separated list of cache systems flushed
+#: ../inc/App/Ajax/Backend/Finalize.php:171
+msgid "Caches cleared: %s"
 msgstr ""
 
 #: ../inc/App/Ajax/Backend/ImportFluentForms.php:84
@@ -838,79 +892,128 @@ msgstr ""
 msgid "No Fluent Forms found. Skipping."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/ImportMenus.php:79
-msgid "Importing theme settings."
-msgstr ""
-
-#: ../inc/App/Ajax/Backend/ImportMenus.php:80
-msgid "Nav Menus are locked and loaded."
-msgstr ""
-
-#: ../inc/App/Ajax/Backend/ImportMenus.php:80
-msgid "Skipping the nav menus import!."
-msgstr ""
-
-#: ../inc/App/Ajax/Backend/ImportRevSlider.php:80, ../inc/App/Ajax/Backend/ImportWidgets.php:106
+#: ../inc/App/Ajax/Backend/ImportLayerSlider.php:78, ../inc/App/Ajax/Backend/ImportRevSlider.php:86, ../inc/App/Ajax/Backend/ImportWidgets.php:127
 msgid "Finalizing demo data import."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/ImportRevSlider.php:81
+#: ../inc/App/Ajax/Backend/ImportLayerSlider.php:79
+msgid "LayerSlider slides imported."
+msgstr ""
+
+#: ../inc/App/Ajax/Backend/ImportLayerSlider.php:79
+msgid "Skipping LayerSlider import."
+msgstr ""
+
+#: ../inc/App/Ajax/Backend/ImportMenus.php:78
+msgid "Navigation menus imported and assigned."
+msgstr ""
+
+#: ../inc/App/Ajax/Backend/ImportMenus.php:88
+msgid "Importing theme settings."
+msgstr ""
+
+#: ../inc/App/Ajax/Backend/ImportMenus.php:89
+msgid "Nav Menus are locked and loaded."
+msgstr ""
+
+#: ../inc/App/Ajax/Backend/ImportMenus.php:89
+msgid "Skipping the nav menus import!."
+msgstr ""
+
+#: ../inc/App/Ajax/Backend/ImportRevSlider.php:86, ../inc/App/Ajax/Backend/ImportWidgets.php:124
+msgid "Importing LayerSlider layouts."
+msgstr ""
+
+#: ../inc/App/Ajax/Backend/ImportRevSlider.php:87
 msgid "Slider Revolution slides imported."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/ImportRevSlider.php:81
-msgid "Skipping Slider Revolution import!."
+#: ../inc/App/Ajax/Backend/ImportRevSlider.php:87
+msgid "Skipping Slider Revolution import."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/ImportSettings.php:104
+#: ../inc/App/Ajax/Backend/ImportSettings.php:138
 msgid "Importing Fluent Forms."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/ImportSettings.php:104
+#: ../inc/App/Ajax/Backend/ImportSettings.php:138
 msgid "Importing all widgets"
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/ImportSettings.php:105
+#: ../inc/App/Ajax/Backend/ImportSettings.php:139
 msgid "Theme settings are all set."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/ImportSettings.php:105
+#: ../inc/App/Ajax/Backend/ImportSettings.php:139
 msgid "No theme settings import needed."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/ImportWidgets.php:106
-msgid "Importing Slider Revolution Slides."
+#: ../inc/App/Ajax/Backend/ImportWidgets.php:99
+msgid "Widgets imported."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/ImportWidgets.php:107
+#: ../inc/App/Ajax/Backend/ImportWidgets.php:121
+msgid "Importing Slider Revolution slides."
+msgstr ""
+
+#: ../inc/App/Ajax/Backend/ImportWidgets.php:134
 msgid "Widgets successfully imported."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/ImportWidgets.php:107
+#: ../inc/App/Ajax/Backend/ImportWidgets.php:134
 msgid "No widgets import needed."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/Initialize.php:77
+#: ../inc/App/Ajax/Backend/ImportXmlChunk.php:67
+msgid "XML file not found."
+msgstr ""
+
+#: ../inc/App/Ajax/Backend/ImportXmlChunk.php:88
+msgid "XML content import complete."
+msgstr ""
+
+#: ../inc/App/Ajax/Backend/ImportXmlChunk.php:95
+msgid "Importing Customizer settings."
+msgstr ""
+
+#: ../inc/App/Ajax/Backend/ImportXmlChunk.php:96
+msgid "XML content fully imported."
+msgstr ""
+
+#. translators: 1: first item number, 2: last item number, 3: total
+#: ../inc/App/Ajax/Backend/ImportXmlChunk.php:113
+msgid "Imported items %1$d–%2$d of %3$d."
+msgstr ""
+
+#: ../inc/App/Ajax/Backend/Initialize.php:78
 msgid "Missing session ID."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/Initialize.php:102
+#: ../inc/App/Ajax/Backend/Initialize.php:83
+msgid "Session does not belong to you or has expired."
+msgstr ""
+
+#: ../inc/App/Ajax/Backend/Initialize.php:109
 msgid "Another import is already in progress."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/Initialize.php:103
+#: ../inc/App/Ajax/Backend/Initialize.php:110
 msgid "Wait for the current import to finish before starting a new one. If you believe the previous import has crashed, wait 30 minutes for the lock to expire automatically, then try again."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/Initialize.php:137
+#: ../inc/App/Ajax/Backend/Initialize.php:143
+msgid "Demo files downloaded and extracted."
+msgstr ""
+
+#: ../inc/App/Ajax/Backend/Initialize.php:152
 msgid "Let us install the required plugins."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/Initialize.php:138
+#: ../inc/App/Ajax/Backend/Initialize.php:153
 msgid "Database reset completed."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/Initialize.php:138
+#: ../inc/App/Ajax/Backend/Initialize.php:153
 msgid "Minor cleanups done."
 msgstr ""
 
@@ -918,37 +1021,48 @@ msgstr ""
 msgid "Waiting for previous import to finish…"
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/InstallDemo.php:170
-msgid "Importing Customizer settings."
-msgstr ""
-
-#: ../inc/App/Ajax/Backend/InstallDemo.php:171
-msgid "Everything has been imported smoothly."
-msgstr ""
-
-#: ../inc/App/Ajax/Backend/InstallDemo.php:173
+#: ../inc/App/Ajax/Backend/InstallDemo.php:154
 msgid "Demo import process failed. No content file found."
 msgstr ""
 
+#. translators: %d: total number of items
+#: ../inc/App/Ajax/Backend/InstallDemo.php:167
+msgid "XML content ready: %d items queued for import."
+msgstr ""
+
+#: ../inc/App/Ajax/Backend/InstallDemo.php:176
+msgid "Importing XML content."
+msgstr ""
+
+#. translators: %d: total items
+#: ../inc/App/Ajax/Backend/InstallDemo.php:179
+msgid "%d items queued. Starting chunked import…"
+msgstr ""
+
 #. translators: %s: comma-separated list of plugin slugs
-#: ../inc/App/Ajax/Backend/InstallPlugins.php:115
+#: ../inc/App/Ajax/Backend/InstallPlugins.php:119
 msgid "Failed to install required plugin(s): %s."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/InstallPlugins.php:118
+#: ../inc/App/Ajax/Backend/InstallPlugins.php:122
 msgid "Check your server's outbound internet access and ensure WordPress.org is reachable. You can also try installing the plugins manually from Plugins > Add New, then run the import again."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/InstallPlugins.php:126
+#: ../inc/App/Ajax/Backend/InstallPlugins.php:130
 msgid "Activating those plugins."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/InstallPlugins.php:127
+#: ../inc/App/Ajax/Backend/InstallPlugins.php:131
 msgid "Plugins installed, time to get started!"
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/InstallPlugins.php:127
+#: ../inc/App/Ajax/Backend/InstallPlugins.php:131
 msgid "Plugins already installed, all set to go!"
+msgstr ""
+
+#. translators: %s: plugin slug or name
+#: ../inc/App/Ajax/Backend/InstallPlugins.php:199
+msgid "Plugin installed: %s"
 msgstr ""
 
 #: ../lib/wordpress-importer/class-wp-import.php:218, ../lib/wordpress-importer/class-wp-import.php:226
@@ -1074,26 +1188,26 @@ msgstr ""
 msgid "Right Place"
 msgstr ""
 
-#: ../samples/sample-config.php:98
+#: ../samples/sample-config.php:104
 msgid "Digital Agency"
 msgstr ""
 
-#: ../samples/sample-config.php:103
+#: ../samples/sample-config.php:109
 msgid "Organic Farm"
 msgstr ""
 
-#: ../samples/sample-config.php:108
+#: ../samples/sample-config.php:114
 msgid "Interiors"
 msgstr ""
 
-#: ../samples/sample-config.php:176
+#: ../samples/sample-config.php:182
 msgid "Marketing Agency"
 msgstr ""
 
-#: ../samples/sample-config.php:226
+#: ../samples/sample-config.php:232
 msgid "Sigma Restaurant"
 msgstr ""
 
-#: ../samples/sample-config.php:246
+#: ../samples/sample-config.php:252
 msgid "Copywriter"
 msgstr ""
