@@ -93,6 +93,12 @@ class SD_EDI_Demo_Importer {
 					'name'         => esc_html__( 'Right Place', 'easy-demo-importer' ),
 					'previewImage' => 'https://sample.sigmadevs.com/demos/twentytwentyone/right-place/preview-1.jpg',
 					'previewUrl'   => 'https://demoimport4.sigmadevs.com/',
+
+					// Optional: grey out this demo if required plugins are not active.
+					// 'requires' => [
+					//     'woocommerce/woocommerce.php',
+					//     'elementor/elementor.php',
+					// ],
 				],
 				'home-2' => [
 					'name'         => esc_html__( 'Digital Agency', 'easy-demo-importer' ),

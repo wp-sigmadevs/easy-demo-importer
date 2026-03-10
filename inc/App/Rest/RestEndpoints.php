@@ -254,6 +254,27 @@ class RestEndpoints extends Base {
 			return $this->sendError( $errorData );
 		}
 
+		// Annotate each demo with requires_met / requires_missing flags.
+		if ( ! empty( $themeConfig['demoData'] ) ) {
+			require_once ABSPATH . 'wp-admin/includes/plugin.php';
+
+			foreach ( $themeConfig['demoData'] as $slug => &$demo ) {
+				$requires = isset( $demo['requires'] ) && is_array( $demo['requires'] ) ? $demo['requires'] : [];
+				$missing  = [];
+
+				foreach ( $requires as $plugin_file ) {
+					if ( ! is_plugin_active( $plugin_file ) ) {
+						$missing[] = $plugin_file;
+					}
+				}
+
+				$demo['requires_met']     = empty( $missing );
+				$demo['requires_missing'] = $missing;
+			}
+
+			unset( $demo );
+		}
+
 		return $this->sendResponse( $themeConfig, esc_html__( 'Data is ready to fetch', 'easy-demo-importer' ) );
 	}
 
