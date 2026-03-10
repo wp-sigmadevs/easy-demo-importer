@@ -17,7 +17,8 @@ use SigmaDevs\EasyDemoImporter\Common\{
 	Traits\Singleton,
 	Abstracts\ImporterAjax,
 	Utils\XmlChunker,
-	Utils\ImportLogger
+	Utils\ImportLogger,
+	Utils\ImageRegenEngine
 };
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -90,6 +91,12 @@ class ImportXmlChunk extends ImporterAjax {
 				$this->sessionId
 			);
 
+			ImportLogger::log(
+				__( 'Image regeneration deferred — dedicated step ready.', 'easy-demo-importer' ),
+				'info',
+				$this->sessionId
+			);
+
 			$this->prepareResponse(
 				'sd_edi_import_customizer',
 				esc_html__( 'Importing Customizer settings.', 'easy-demo-importer' ),
@@ -152,13 +159,21 @@ class ImportXmlChunk extends ImporterAjax {
 			return;
 		}
 
-		$exclude_images = ! ( 'true' === $this->excludeImages );
+		// Always suppress WP image regeneration during XML import.
+		// The dedicated ImageRegenStep handles regeneration after the import completes.
+		add_filter( 'intermediate_image_sizes_advanced', '__return_empty_array', 9999 );
+		add_filter( 'wp_generate_attachment_metadata', '__return_empty_array', 9999 );
+		add_filter( 'big_image_size_threshold', '__return_false', 9999 );
 
-		if ( $this->skipImageRegeneration ) {
-			add_filter( 'intermediate_image_sizes_advanced', '__return_empty_array', 9999 );
-			add_filter( 'wp_generate_attachment_metadata', '__return_empty_array', 9999 );
-		}
+		// Track every attachment created in this chunk for the regen step.
+		// SD_EDI_WP_Import::process_attachment() calls wp_insert_attachment() which fires add_attachment.
+		$session_id = $this->sessionId;
+		$tracker    = static function ( int $post_id ) use ( $session_id ): void {
+			ImageRegenEngine::appendAttachment( $session_id, $post_id );
+		};
+		add_action( 'add_attachment', $tracker );
 
+		$exclude_images               = ! ( 'true' === $this->excludeImages );
 		$wp_import                    = new \SD_EDI_WP_Import();
 		$wp_import->fetch_attachments = $exclude_images;
 
@@ -166,9 +181,9 @@ class ImportXmlChunk extends ImporterAjax {
 		$wp_import->import( $chunk_path );
 		ob_end_clean();
 
-		if ( $this->skipImageRegeneration ) {
-			remove_filter( 'intermediate_image_sizes_advanced', '__return_empty_array', 9999 );
-			remove_filter( 'wp_generate_attachment_metadata', '__return_empty_array', 9999 );
-		}
+		remove_action( 'add_attachment', $tracker );
+		remove_filter( 'intermediate_image_sizes_advanced', '__return_empty_array', 9999 );
+		remove_filter( 'wp_generate_attachment_metadata', '__return_empty_array', 9999 );
+		remove_filter( 'big_image_size_threshold', '__return_false', 9999 );
 	}
 }
