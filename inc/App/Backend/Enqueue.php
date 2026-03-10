@@ -143,6 +143,8 @@ class Enqueue extends EnqueueBase {
 				// Essentials.
 				'ajaxUrl'                    => esc_url( Helpers::ajaxUrl() ),
 				'homeUrl'                    => esc_url( home_url( '/' ) ),
+				'siteUrl'                    => esc_url( get_site_url() ),
+				'customizeUrl'               => esc_url( admin_url( 'customize.php' ) ),
 				'restApiUrl'                 => esc_url_raw( rest_url() ),
 				'restNonce'                  => wp_create_nonce( 'wp_rest' ),
 				'ediLogo'                    => esc_url( $this->plugin->assetsUri() . '/images/sd-edi-logo.svg' ),
