@@ -7,7 +7,7 @@
  * already released by the time regen runs — validation is nonce + capability.
  *
  * Registration: NOT auto-registered via Classes.php (requires demo POST field).
- * Instead, Hooks::actions() calls RegenerateImages::getInstance()->register()
+ * Instead, Hooks::actions() calls RegenerateImages::instance()->register()
  * on every admin backend request.
  *
  * @package SigmaDevs\EasyDemoImporter
@@ -143,9 +143,15 @@ class RegenerateImages {
 		$done      = min( $offset + $batch, $total );
 		$completed = $done >= $total;
 
-		if ( $completed ) {
-			$fail_count = count( $failed );
+		// Accumulate failures across all batches via a transient.
+		$prior_failures = (int) get_transient( 'sd_edi_regen_progress_' . $session_id );
+		$total_failures = $prior_failures + count( $failed );
 
+		if ( ! $completed ) {
+			set_transient( 'sd_edi_regen_progress_' . $session_id, $total_failures, HOUR_IN_SECONDS );
+		}
+
+		if ( $completed ) {
 			ImportLogger::log(
 				sprintf(
 					/* translators: 1: total images, 2: failure count */
@@ -156,9 +162,9 @@ class RegenerateImages {
 						'easy-demo-importer'
 					),
 					$total,
-					$fail_count
+					$total_failures
 				),
-				0 === $fail_count ? 'success' : 'warning',
+				0 === $total_failures ? 'success' : 'warning',
 				$session_id
 			);
 
@@ -170,11 +176,12 @@ class RegenerateImages {
 				[
 					'date'     => current_time( 'mysql' ),
 					'count'    => $total,
-					'failures' => $fail_count,
+					'failures' => $total_failures,
 				],
 				false
 			);
 			delete_option( 'sd_edi_background_regen_session' );
+			delete_transient( 'sd_edi_regen_progress_' . $session_id );
 		}
 
 		wp_send_json_success(
