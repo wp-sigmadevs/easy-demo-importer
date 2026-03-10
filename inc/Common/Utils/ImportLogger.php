@@ -54,16 +54,21 @@ class ImportLogger {
 		}
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
-		$wpdb->insert(
+		$inserted = $wpdb->insert(
 			$wpdb->prefix . 'sd_edi_import_log',
 			[
 				'session_id' => sanitize_text_field( $session_id ),
-				'logged_at'  => current_time( 'mysql' ),
+				'logged_at'  => current_time( 'mysql', true ),
 				'level'      => $level,
-				'message'    => sanitize_text_field( $message ),
+				'message'    => $message,
 			],
 			[ '%s', '%s', '%s', '%s' ]
 		);
+
+		if ( false === $inserted ) {
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			error_log( sprintf( '[EasyDemoImporter] ImportLogger::log failed: %s', $wpdb->last_error ) );
+		}
 	}
 
 	/**
@@ -98,6 +103,11 @@ class ImportLogger {
 	 */
 	public static function fetch( string $session_id, string $since = '' ): array {
 		global $wpdb;
+
+		// Validate $since is a proper MySQL datetime string to avoid nonsense comparisons.
+		if ( $since && ! preg_match( '/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/', $since ) ) {
+			$since = '';
+		}
 
 		if ( $since ) {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
