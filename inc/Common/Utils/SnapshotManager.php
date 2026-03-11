@@ -92,9 +92,7 @@ class SnapshotManager {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$row = $wpdb->get_row(
 			$wpdb->prepare(
-				// phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnquotedComplexPlaceholder
-				"SELECT * FROM %1\$s WHERE id = %d AND expires_at > %s",
-				$table,
+				"SELECT * FROM {$table} WHERE id = %d AND expires_at > %s",
 				$snapshot_id,
 				current_time( 'mysql' )
 			),
@@ -118,9 +116,7 @@ class SnapshotManager {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$row = $wpdb->get_row(
 			$wpdb->prepare(
-				// phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnquotedComplexPlaceholder
-				"SELECT * FROM %1\$s WHERE expires_at > %s ORDER BY created_at DESC LIMIT 1",
-				$table,
+				"SELECT * FROM {$table} WHERE expires_at > %s ORDER BY created_at DESC LIMIT 1",
 				current_time( 'mysql' )
 			),
 			ARRAY_A
@@ -240,9 +236,7 @@ class SnapshotManager {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 		$wpdb->query(
 			$wpdb->prepare(
-				// phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnquotedComplexPlaceholder
-				"DELETE FROM %1\$s WHERE expires_at < %s",
-				$table,
+				"DELETE FROM {$table} WHERE expires_at < %s",
 				current_time( 'mysql' )
 			)
 		);
