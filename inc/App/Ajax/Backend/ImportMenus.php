@@ -106,7 +106,13 @@ class ImportMenus extends ImporterAjax {
 		$locations = get_theme_mod( 'nav_menu_locations' );
 
 		foreach ( $menus as $menuId => $menuName ) {
+			// Try finding by name (normal).
 			$menuExists = wp_get_nav_menu_object( $menuName );
+
+			// If not found, try finding by slug (sometimes theme uses slug in config).
+			if ( ! $menuExists ) {
+				$menuExists = wp_get_nav_menu_object( sanitize_title( $menuName ) );
+			}
 
 			if ( ! $menuExists ) {
 				$menuTermId = wp_create_nav_menu( $menuName );

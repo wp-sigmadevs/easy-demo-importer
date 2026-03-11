@@ -429,7 +429,7 @@ class RestEndpoints extends Base {
 			return new WP_REST_Response( [ 'error' => 'Demo config not available.' ], 500 );
 		}
 
-		$xml_path = $this->resolveXmlPath( $config, $demo_slug );
+		$xml_path = Helpers::resolveXmlPath( $config, $demo_slug );
 
 		// If file doesn't exist, return a 200 with a descriptive message instead of a 404.
 		if ( ! $xml_path || ! file_exists( $xml_path ) ) {
@@ -502,36 +502,6 @@ class RestEndpoints extends Base {
 		}, $entries );
 
 		return new WP_REST_Response( $entries, 200 );
-	}
-
-	/**
-	 * Resolve the local XML file path for a demo slug.
-	 *
-	 * @param array  $config    Demo config array.
-	 * @param string $demo_slug Demo slug.
-	 * @return string|null Absolute path, or null if unresolvable.
-	 * @since 1.3.0
-	 */
-	private function resolveXmlPath( array $config, string $demo_slug ): ?string {
-		$upload_dir = wp_get_upload_dir();
-		$base       = $upload_dir['basedir'] . '/easy-demo-importer/';
-
-		$multiple = ! empty( $config['multipleZip'] );
-		$demoZip  = '';
-
-		if ( $multiple && isset( $config['demoData'][ $demo_slug ] ) ) {
-			$demoZip = Helpers::getDemoData( $config['demoData'][ $demo_slug ], 'demoZip' );
-		} elseif ( ! $multiple ) {
-			$demoZip = Helpers::getDemoData( $config, 'demoZip' );
-		}
-
-		if ( ! $demoZip ) {
-			return null;
-		}
-
-		$demoDir = pathinfo( basename( $demoZip ), PATHINFO_FILENAME );
-
-		return $base . $demoDir . '/content.xml';
 	}
 
 	/**

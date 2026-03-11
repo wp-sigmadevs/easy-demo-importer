@@ -106,50 +106,20 @@ class ImportXmlChunk extends ImporterAjax {
 		$chunk_tmp = XmlChunker::extractChunk( $xml_path, $offset, $limit, $allowed_ids );
 
 		if ( ! $chunk_tmp ) {
-			// Offset is past end — import complete.
-			ImportLogger::log(
-				sprintf(
-					/* translators: %d: offset */
-					__( 'XML chunk extraction complete at offset %d.', 'easy-demo-importer' ),
-					$offset
-				),
-				$offset < $total ? 'warning' : 'success',
-				$this->sessionId
-			);
-
-			if ( $offset < $total ) {
-				ImportLogger::log(
-					sprintf(
-						/* translators: 1: offset, 2: total */
-						__( 'Import reached end of file at item %1$d but expected %2$d. This can happen if the XML file is malformed.', 'easy-demo-importer' ),
-						$offset,
-						$total
-					),
-					'warning',
-					$this->sessionId
-				);
+			// If we had items but couldn't get a chunk at this offset, we are done.
+			if ( $offset > 0 ) {
+				$this->completeXmlImport( $xml_path, $total );
+				return;
 			}
 
+			// If offset 0 and no chunk, the file might be empty or all items skipped.
 			ImportLogger::log(
-				__( 'Image regeneration deferred — dedicated step ready.', 'easy-demo-importer' ),
-				'info',
+				__( 'No items were found to import in the XML file.', 'easy-demo-importer' ),
+				'warning',
 				$this->sessionId
 			);
 
-			UrlReplacer::run( $xml_path, $this->sessionId );
-
-			$this->prepareResponse(
-				'sd_edi_import_customizer',
-				esc_html__( 'Importing Customizer settings.', 'easy-demo-importer' ),
-				esc_html__( 'XML content fully imported.', 'easy-demo-importer' ),
-				false,
-				'',
-				'',
-				[
-					'done'  => $total,
-					'total' => $total,
-				]
-			);
+			$this->completeXmlImport( $xml_path, $total );
 			return;
 		}
 
@@ -161,6 +131,12 @@ class ImportXmlChunk extends ImporterAjax {
 		}
 
 		$done = min( $offset + $limit, $total );
+
+		// If we've reached or passed the total, complete it.
+		if ( $done >= $total ) {
+			$this->completeXmlImport( $xml_path, $total );
+			return;
+		}
 
 		ImportLogger::log(
 			sprintf(
@@ -179,6 +155,42 @@ class ImportXmlChunk extends ImporterAjax {
 				'done'   => $done,
 				'total'  => $total,
 				'offset' => $done,
+			]
+		);
+	}
+
+	/**
+	 * Complete the XML import phase and move to the next.
+	 *
+	 * @param string $xml_path Path to WXR.
+	 * @param int    $total    Total items.
+	 * @return void
+	 */
+	private function completeXmlImport( string $xml_path, int $total ): void {
+		ImportLogger::log(
+			__( 'XML content fully imported.', 'easy-demo-importer' ),
+			'success',
+			$this->sessionId
+		);
+
+		ImportLogger::log(
+			__( 'Image regeneration deferred — dedicated step ready.', 'easy-demo-importer' ),
+			'info',
+			$this->sessionId
+		);
+
+		UrlReplacer::run( $xml_path, $this->sessionId );
+
+		$this->prepareResponse(
+			'sd_edi_import_customizer',
+			esc_html__( 'Importing Customizer settings.', 'easy-demo-importer' ),
+			esc_html__( 'XML content fully imported.', 'easy-demo-importer' ),
+			false,
+			'',
+			'',
+			[
+				'done'  => $total,
+				'total' => $total,
 			]
 		);
 	}
@@ -233,6 +245,7 @@ class ImportXmlChunk extends ImporterAjax {
 
 		$exclude_images               = ! ( 'true' === $this->excludeImages );
 		$wp_import                    = new \SD_EDI_WP_Import();
+		$wp_import->session_id        = $this->sessionId;
 		$wp_import->fetch_attachments = $exclude_images;
 
 		ob_start();

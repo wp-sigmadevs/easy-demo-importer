@@ -40,10 +40,16 @@ const ConfirmationStep = () => {
 	useEffect( () => {
 		if ( ! selectedDemo || selectedIds.length === 0 ) return;
 		Api.post( '/sd/edi/v1/resolve-deps', {
-			demo:         selectedDemo.slug,
-			selected_ids: selectedIds,
+			demo:           selectedDemo.slug,
+			selected_ids:   selectedIds,
+			import_options: importOptions,
 		} )
 			.then( ( res ) => {
+				const hard = res.data.hard || [];
+				if ( hard.length > 0 ) {
+					setSelectedIds( prev => [ ...new Set( [ ...prev, ...hard ] ) ] );
+				}
+
 				const soft = res.data.soft || [];
 				setSoftDeps( soft );
 				const init = {};
@@ -51,7 +57,7 @@ const ConfirmationStep = () => {
 				setSoftChecked( init );
 			} )
 			.catch( () => {} );
-	}, [ selectedDemo, selectedIds ] ); // eslint-disable-line react-hooks/exhaustive-deps
+	}, [ selectedDemo ] ); // eslint-disable-line react-hooks/exhaustive-deps
 
 	useEffect(() => {
 		const nextEl = document.getElementById('edi-wizard-next-slot');

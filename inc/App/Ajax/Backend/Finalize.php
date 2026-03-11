@@ -81,11 +81,6 @@ class Finalize extends ImporterAjax {
 		// Resetting permalink.
 		flush_rewrite_rules();
 
-		// Release the import session lock.
-		if ( ! empty( $this->sessionId ) ) {
-			SessionManager::release( $this->sessionId );
-		}
-
 		// Flush known caches after import.
 		$this->flushCaches();
 

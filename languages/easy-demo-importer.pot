@@ -6,7 +6,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-03-11 05:19+0000\n"
+"POT-Creation-Date: 2026-03-11 16:09+0000\n"
 "Report-Msgid-Bugs-To: https://github.com/wp-sigmadevs/easy-demo-importer/issues\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -15,7 +15,7 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../easy-demo-importer.php:57
+#: ../easy-demo-importer.php:79
 msgid "Easy Demo Importer is unable to find the Bootstrap class."
 msgstr ""
 
@@ -130,11 +130,11 @@ msgstr ""
 msgid "This will permanently delete all your content, media, and settings. Are you sure you want to continue?"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:190, ../inc/App/Rest/RestEndpoints.php:646, ../inc/App/Rest/RestEndpoints.php:660, ../inc/App/Rest/RestEndpoints.php:713, ../inc/App/Rest/RestEndpoints.php:771, ../inc/App/Rest/RestEndpoints.php:776, ../inc/App/Rest/RestEndpoints.php:806, ../inc/App/Rest/RestEndpoints.php:811
+#: ../inc/App/Backend/Enqueue.php:190, ../inc/App/Rest/RestEndpoints.php:623, ../inc/App/Rest/RestEndpoints.php:637, ../inc/App/Rest/RestEndpoints.php:700, ../inc/App/Rest/RestEndpoints.php:758, ../inc/App/Rest/RestEndpoints.php:763, ../inc/App/Rest/RestEndpoints.php:793, ../inc/App/Rest/RestEndpoints.php:798
 msgid "Yes"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:191, ../inc/App/Rest/RestEndpoints.php:646, ../inc/App/Rest/RestEndpoints.php:660, ../inc/App/Rest/RestEndpoints.php:713, ../inc/App/Rest/RestEndpoints.php:771, ../inc/App/Rest/RestEndpoints.php:776, ../inc/App/Rest/RestEndpoints.php:806, ../inc/App/Rest/RestEndpoints.php:811
+#: ../inc/App/Backend/Enqueue.php:191, ../inc/App/Rest/RestEndpoints.php:623, ../inc/App/Rest/RestEndpoints.php:637, ../inc/App/Rest/RestEndpoints.php:700, ../inc/App/Rest/RestEndpoints.php:758, ../inc/App/Rest/RestEndpoints.php:763, ../inc/App/Rest/RestEndpoints.php:793, ../inc/App/Rest/RestEndpoints.php:798
 msgid "No"
 msgstr ""
 
@@ -326,282 +326,302 @@ msgstr ""
 msgid "Install Demo Data"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:278
+#: ../inc/App/Rest/DemoItems.php:104
+msgid "Demo XML not found."
+msgstr ""
+
+#: ../inc/App/Rest/ResolveDeps.php:88
+msgid "Missing demo slug."
+msgstr ""
+
+#: ../inc/App/Rest/RestEndpoints.php:285
 msgid "Sorry, you are not allowed to do that!"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:304
+#: ../inc/App/Rest/RestEndpoints.php:311
 msgid "We apologize for any inconvenience, but it appears that the configuration file for the demo importer is either missing or you are using an unsupported theme. As a result, the installation of the demo content cannot proceed any further at this time. Thank you for your understanding."
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:335, ../inc/App/Rest/RestEndpoints.php:372, ../inc/App/Rest/RestEndpoints.php:391, ../inc/App/Rest/RestEndpoints.php:399
+#: ../inc/App/Rest/RestEndpoints.php:342, ../inc/App/Rest/RestEndpoints.php:379, ../inc/App/Rest/RestEndpoints.php:398, ../inc/App/Rest/RestEndpoints.php:406
 msgid "Data is ready to fetch"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:349
+#: ../inc/App/Rest/RestEndpoints.php:356
 msgid "Demo data Configuration not found."
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:431
+#: ../inc/App/Rest/RestEndpoints.php:438
 msgid "Analysis will be available once the import starts and files are downloaded."
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:440
+#: ../inc/App/Rest/RestEndpoints.php:447
 msgid "No items found in the demo content XML."
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:540
+#: ../inc/App/Rest/RestEndpoints.php:517
 msgid "Server Info"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:545
+#: ../inc/App/Rest/RestEndpoints.php:522
 msgid "WordPress Info"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:550
+#: ../inc/App/Rest/RestEndpoints.php:527
 msgid "Theme Info"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:555
+#: ../inc/App/Rest/RestEndpoints.php:532
 msgid "Active Plugins"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:560
+#: ../inc/App/Rest/RestEndpoints.php:537
 msgid "Inactive Plugins"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:565
+#: ../inc/App/Rest/RestEndpoints.php:542
 msgid "Image Regeneration"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:570, ../inc/App/Rest/RestEndpoints.php:941
+#: ../inc/App/Rest/RestEndpoints.php:547, ../inc/App/Rest/RestEndpoints.php:928
 msgid "Copy System Data"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:589
+#: ../inc/App/Rest/RestEndpoints.php:566
 msgid "Operating System"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:594
+#: ../inc/App/Rest/RestEndpoints.php:571
 msgid "Server"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:595
+#: ../inc/App/Rest/RestEndpoints.php:572
 msgid "Detection Error"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:599
+#: ../inc/App/Rest/RestEndpoints.php:576
 msgid "MySQL Version"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:605
+#: ../inc/App/Rest/RestEndpoints.php:582
 msgid "PHP Version"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:610
+#: ../inc/App/Rest/RestEndpoints.php:587
 msgid "PHP Max Execution Time"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:612
+#: ../inc/App/Rest/RestEndpoints.php:589
 msgid "Recommended PHP Max Execution Time is "
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:616
+#: ../inc/App/Rest/RestEndpoints.php:593
 msgid "PHP Max Input Time"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:618
+#: ../inc/App/Rest/RestEndpoints.php:595
 msgid "Recommended PHP Max Input Time is "
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:622
+#: ../inc/App/Rest/RestEndpoints.php:599
 msgid "PHP Max Upload Size"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:624
+#: ../inc/App/Rest/RestEndpoints.php:601
 msgid "Recommended PHP Max Upload Size is "
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:628
+#: ../inc/App/Rest/RestEndpoints.php:605
 msgid "PHP Post Max Size"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:630
+#: ../inc/App/Rest/RestEndpoints.php:607
 msgid "Recommended PHP Post Max Size is "
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:634
+#: ../inc/App/Rest/RestEndpoints.php:611
 msgid "PHP Max Input Vars"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:639
+#: ../inc/App/Rest/RestEndpoints.php:616
 msgid "PHP Memory Limit"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:641
+#: ../inc/App/Rest/RestEndpoints.php:618
 msgid "Recommended PHP Memory Limit is "
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:645
+#: ../inc/App/Rest/RestEndpoints.php:622
 msgid "cURL Installed"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:653
+#: ../inc/App/Rest/RestEndpoints.php:630
 msgid "cURL version"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:659
+#: ../inc/App/Rest/RestEndpoints.php:636
 msgid "GD Installed"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:667
+#: ../inc/App/Rest/RestEndpoints.php:644
 msgid "GD version"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:673
+#: ../inc/App/Rest/RestEndpoints.php:650
 msgid "Write Permission"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:675
+#: ../inc/App/Rest/RestEndpoints.php:652
 msgid "Fix the write permission error in the wp-content directory for successful import."
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:692
+#: ../inc/App/Rest/RestEndpoints.php:661
+msgid "Existing Post Count"
+msgstr ""
+
+#: ../inc/App/Rest/RestEndpoints.php:679
 msgid "Name"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:697
+#: ../inc/App/Rest/RestEndpoints.php:684
 msgid "Version"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:702
+#: ../inc/App/Rest/RestEndpoints.php:689
 msgid "Author"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:707
+#: ../inc/App/Rest/RestEndpoints.php:694
 msgid "Author URL"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:712
+#: ../inc/App/Rest/RestEndpoints.php:699
 msgid "Child Theme"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:714
+#: ../inc/App/Rest/RestEndpoints.php:701
 msgid "Child theme is recommended if you want to modify or extend the features of the theme"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:719
+#: ../inc/App/Rest/RestEndpoints.php:706
 msgid "Parent Theme Name"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:724
+#: ../inc/App/Rest/RestEndpoints.php:711
 msgid "Parent Theme Version"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:729
+#: ../inc/App/Rest/RestEndpoints.php:716
 msgid "Parent Theme Author"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:734
+#: ../inc/App/Rest/RestEndpoints.php:721
 msgid "Parent Theme Author URL"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:754
+#: ../inc/App/Rest/RestEndpoints.php:741
 msgid "WordPress Version"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:756
+#: ../inc/App/Rest/RestEndpoints.php:743
 msgid "WordPress core is outdated. Please update to the latest version."
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:760
+#: ../inc/App/Rest/RestEndpoints.php:747
 msgid "Site URL"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:765
+#: ../inc/App/Rest/RestEndpoints.php:752
 msgid "Home URL"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:770
+#: ../inc/App/Rest/RestEndpoints.php:757
 msgid "Is this Multisite?"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:775
+#: ../inc/App/Rest/RestEndpoints.php:762
 msgid "Has SSL Enabled?"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:780
+#: ../inc/App/Rest/RestEndpoints.php:767
 msgid "Max Upload Size"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:785
+#: ../inc/App/Rest/RestEndpoints.php:772
 msgid "Memory Limit"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:790
+#: ../inc/App/Rest/RestEndpoints.php:777
 msgid "Max Memory Limit"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:795
+#: ../inc/App/Rest/RestEndpoints.php:782
 msgid "Permalink Structure"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:796
+#: ../inc/App/Rest/RestEndpoints.php:783
 msgid "Plain"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:800
+#: ../inc/App/Rest/RestEndpoints.php:787
 msgid "Language"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:805
+#: ../inc/App/Rest/RestEndpoints.php:792
 msgid "Debug Mode Enabled"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:810
+#: ../inc/App/Rest/RestEndpoints.php:797
 msgid "Script Debug Mode Enabled"
 msgstr ""
 
 #. translators: 1. Plugin author name.
-#: ../inc/App/Rest/RestEndpoints.php:837, ../inc/App/Rest/RestEndpoints.php:867
+#: ../inc/App/Rest/RestEndpoints.php:824, ../inc/App/Rest/RestEndpoints.php:854
 msgid "By %s"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:892, ../inc/App/Rest/RestEndpoints.php:922
+#: ../inc/App/Rest/RestEndpoints.php:879, ../inc/App/Rest/RestEndpoints.php:909
 msgid "Status"
 msgstr ""
 
 #. translators: 1: done count, 2: total count
-#: ../inc/App/Rest/RestEndpoints.php:895
+#: ../inc/App/Rest/RestEndpoints.php:882
 msgid "Running — %1$d of %2$d images done"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:923
+#: ../inc/App/Rest/RestEndpoints.php:910
 msgid "No regeneration session recorded."
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:909
+#: ../inc/App/Rest/RestEndpoints.php:896
 msgid "Last Run"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:913
+#: ../inc/App/Rest/RestEndpoints.php:900
 msgid "Images Processed"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:917
+#: ../inc/App/Rest/RestEndpoints.php:904
 msgid "Failures"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:940
+#: ../inc/App/Rest/RestEndpoints.php:927
 msgid "When submitting a support request, kindly include the details generated below in your message. Providing this information will assist us in efficiently diagnosing and addressing the issue you are experiencing."
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:954
+#: ../inc/App/Rest/RestEndpoints.php:941
 msgid "Write permission error"
 msgstr ""
 
-#: ../inc/App/Rest/RestEndpoints.php:960
+#: ../inc/App/Rest/RestEndpoints.php:947
 msgid "No issue"
+msgstr ""
+
+#: ../inc/App/Rest/Rollback.php:87
+msgid "Snapshot not found or has expired (24h limit)."
+msgstr ""
+
+#: ../inc/App/Rest/Rollback.php:98
+msgid "You can only undo your own imports."
 msgstr ""
 
 #: ../inc/Common/Abstracts/ImporterAjax.php:133
@@ -620,7 +640,7 @@ msgstr ""
 msgid "Make sure your theme is calling the sd/edi/importer/config filter and returning a valid configuration array."
 msgstr ""
 
-#: ../inc/Common/Abstracts/ImporterAjax.php:169
+#: ../inc/Common/Abstracts/ImporterAjax.php:169, ../inc/App/Ajax/Backend/RegenerateImages.php:70, ../inc/App/Ajax/Backend/RegenerateImages.php:115
 msgid "The import session is no longer valid."
 msgstr ""
 
@@ -713,6 +733,58 @@ msgstr ""
 msgid "Classes are not being correctly requested."
 msgstr ""
 
+#: ../inc/Common/Utils/AiClient.php:61
+msgid "Empty response from Gemini."
+msgstr ""
+
+#: ../inc/Common/Utils/AiClient.php:92
+msgid "Empty embedding from Gemini."
+msgstr ""
+
+#: ../inc/Common/Utils/AiClient.php:106
+msgid "AI features are disabled."
+msgstr ""
+
+#: ../inc/Common/Utils/AiClient.php:110
+msgid "AI proxy is not configured."
+msgstr ""
+
+#: ../inc/Common/Utils/AiClient.php:114
+msgid "AI proxy URL is not configured."
+msgstr ""
+
+#: ../inc/Common/Utils/AiClient.php:139
+msgid "Could not encode request payload."
+msgstr ""
+
+#: ../inc/Common/Utils/AiClient.php:155
+msgid "Could not encode request body."
+msgstr ""
+
+#: ../inc/Common/Utils/AiClient.php:181
+msgid "Could not decode AI proxy response."
+msgstr ""
+
+#: ../inc/Common/Utils/AiClient.php:213
+msgid "Invalid AI request."
+msgstr ""
+
+#: ../inc/Common/Utils/AiClient.php:215
+msgid "AI request expired."
+msgstr ""
+
+#: ../inc/Common/Utils/AiClient.php:217
+msgid "AI authentication failed."
+msgstr ""
+
+#: ../inc/Common/Utils/AiClient.php:219
+msgid "Gemini API error."
+msgstr ""
+
+#: ../inc/Common/Utils/AiClient.php:221
+msgid "AI proxy unavailable."
+msgstr ""
+
 #: ../inc/Common/Utils/Errors.php:68
 msgid "&rsaquo; Fatal Error"
 msgstr ""
@@ -734,6 +806,16 @@ msgstr ""
 #. translators: %d: attachment post ID
 #: ../inc/Common/Utils/ImageRegenEngine.php:144
 msgid "No metadata generated for attachment #%d."
+msgstr ""
+
+#. translators: 1: posts deleted, 2: terms deleted
+#: ../inc/Common/Utils/SnapshotManager.php:212
+msgid "Rollback complete: %1$d posts and %2$d terms deleted; options restored."
+msgstr ""
+
+#. translators: 1: demo URL, 2: site URL, 3: replacement count
+#: ../inc/Common/Utils/UrlReplacer.php:68
+msgid "Auto URL fix: replaced \"%1$s\" → \"%2$s\" in %3$d DB values."
 msgstr ""
 
 #: ../inc/App/Ajax/Backend/ActivatePlugins.php:107
@@ -918,12 +1000,12 @@ msgstr ""
 msgid "Try again later. If the problem persists, note the error code and contact the theme author."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/Finalize.php:96
+#: ../inc/App/Ajax/Backend/Finalize.php:91
 msgid "Hooray! You are all set! Now go out and have a blast!"
 msgstr ""
 
 #. translators: %s: comma-separated list of cache systems flushed
-#: ../inc/App/Ajax/Backend/Finalize.php:171
+#: ../inc/App/Ajax/Backend/Finalize.php:166
 msgid "Caches cleared: %s"
 msgstr ""
 
@@ -1011,76 +1093,70 @@ msgstr ""
 msgid "No widgets import needed."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/ImportXmlChunk.php:68
+#: ../inc/App/Ajax/Backend/ImportXmlChunk.php:75
 msgid "XML file not found."
 msgstr ""
 
 #. translators: %d: total items
-#: ../inc/App/Ajax/Backend/ImportXmlChunk.php:88
+#: ../inc/App/Ajax/Backend/ImportXmlChunk.php:97
 msgid "Starting XML chunked import: %d items total."
 msgstr ""
 
-#. translators: %d: offset
-#: ../inc/App/Ajax/Backend/ImportXmlChunk.php:104
-msgid "XML chunk extraction complete at offset %d."
-msgstr ""
-
-#. translators: 1: offset, 2: total
-#: ../inc/App/Ajax/Backend/ImportXmlChunk.php:115
-msgid "Import reached end of file at item %1$d but expected %2$d. This can happen if the XML file is malformed."
-msgstr ""
-
-#: ../inc/App/Ajax/Backend/ImportXmlChunk.php:125
-msgid "Image regeneration deferred — dedicated step ready."
-msgstr ""
-
-#: ../inc/App/Ajax/Backend/ImportXmlChunk.php:132
-msgid "Importing Customizer settings."
-msgstr ""
-
-#: ../inc/App/Ajax/Backend/ImportXmlChunk.php:133
-msgid "XML content fully imported."
+#: ../inc/App/Ajax/Backend/ImportXmlChunk.php:117
+msgid "No items were found to import in the XML file."
 msgstr ""
 
 #. translators: 1: first item number, 2: last item number, 3: total
-#: ../inc/App/Ajax/Backend/ImportXmlChunk.php:157
+#: ../inc/App/Ajax/Backend/ImportXmlChunk.php:144
 msgid "Imported items %1$d–%2$d of %3$d."
 msgstr ""
 
+#: ../inc/App/Ajax/Backend/ImportXmlChunk.php:171, ../inc/App/Ajax/Backend/ImportXmlChunk.php:187
+msgid "XML content fully imported."
+msgstr ""
+
+#: ../inc/App/Ajax/Backend/ImportXmlChunk.php:177
+msgid "Image regeneration deferred — dedicated step ready."
+msgstr ""
+
+#: ../inc/App/Ajax/Backend/ImportXmlChunk.php:186
+msgid "Importing Customizer settings."
+msgstr ""
+
 #. translators: %s: importer path
-#: ../inc/App/Ajax/Backend/ImportXmlChunk.php:199
+#: ../inc/App/Ajax/Backend/ImportXmlChunk.php:222
 msgid "WP Importer class could not be loaded from %s."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/Initialize.php:78
+#: ../inc/App/Ajax/Backend/Initialize.php:79
 msgid "Missing session ID."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/Initialize.php:83
+#: ../inc/App/Ajax/Backend/Initialize.php:84
 msgid "Session does not belong to you or has expired."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/Initialize.php:114
+#: ../inc/App/Ajax/Backend/Initialize.php:115
 msgid "Another import is already in progress."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/Initialize.php:115
+#: ../inc/App/Ajax/Backend/Initialize.php:116
 msgid "Wait for the current import to finish before starting a new one. If you believe the previous import has crashed, wait 30 minutes for the lock to expire automatically, then try again."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/Initialize.php:148
+#: ../inc/App/Ajax/Backend/Initialize.php:149
 msgid "Import session started. Cleanups and environment ready."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/Initialize.php:157
+#: ../inc/App/Ajax/Backend/Initialize.php:160
 msgid "Let us install the required plugins."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/Initialize.php:158
+#: ../inc/App/Ajax/Backend/Initialize.php:161
 msgid "Database reset completed."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/Initialize.php:158
+#: ../inc/App/Ajax/Backend/Initialize.php:161
 msgid "Minor cleanups done."
 msgstr ""
 
@@ -1133,128 +1209,128 @@ msgid "Plugin installed: %s"
 msgstr ""
 
 #. translators: 1: total images, 2: failure count
-#: ../inc/App/Ajax/Backend/RegenerateImages.php:157
+#: ../inc/App/Ajax/Backend/RegenerateImages.php:176
 msgid "Image regeneration complete: %1$d image processed, %2$d failure."
 msgid_plural "Image regeneration complete: %1$d images processed, %2$d failures."
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../inc/App/Ajax/Backend/RegenerateImages.php:208
+#: ../inc/App/Ajax/Backend/RegenerateImages.php:232
 msgid "Security check failed. Please refresh the page."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/RegenerateImages.php:217
+#: ../inc/App/Ajax/Backend/RegenerateImages.php:241
 msgid "Insufficient permissions."
 msgstr ""
 
-#: ../lib/wordpress-importer/class-wp-import.php:218, ../lib/wordpress-importer/class-wp-import.php:226
+#: ../lib/wordpress-importer/class-wp-import.php:274, ../lib/wordpress-importer/class-wp-import.php:282
 msgid "Sorry, there has been an error."
 msgstr ""
 
-#: ../lib/wordpress-importer/class-wp-import.php:219
+#: ../lib/wordpress-importer/class-wp-import.php:275
 msgid "The file does not exist, please try again."
 msgstr ""
 
-#: ../lib/wordpress-importer/class-wp-import.php:262
+#: ../lib/wordpress-importer/class-wp-import.php:318
 msgid "All done."
 msgstr ""
 
-#: ../lib/wordpress-importer/class-wp-import.php:262
+#: ../lib/wordpress-importer/class-wp-import.php:318
 msgid "Have fun!"
 msgstr ""
 
-#: ../lib/wordpress-importer/class-wp-import.php:263
+#: ../lib/wordpress-importer/class-wp-import.php:319
 msgid "Remember to update the passwords and roles of imported users."
 msgstr ""
 
 #. translators: Post Author
-#: ../lib/wordpress-importer/class-wp-import.php:289
+#: ../lib/wordpress-importer/class-wp-import.php:345
 msgid "Failed to import author %s. Their posts will be attributed to the current user."
 msgstr ""
 
 #. translators: Category Name
-#: ../lib/wordpress-importer/class-wp-import.php:352
+#: ../lib/wordpress-importer/class-wp-import.php:408
 msgid "Failed to import category %s"
 msgstr ""
 
 #. translators: Tag Name
-#: ../lib/wordpress-importer/class-wp-import.php:408
+#: ../lib/wordpress-importer/class-wp-import.php:464
 msgid "Failed to import post tag %s"
 msgstr ""
 
 #. translators: 1. Term Taxonomy, 2. Term Name
 #. translators: 1. Taxonomy, 2. Name
-#: ../lib/wordpress-importer/class-wp-import.php:509, ../lib/wordpress-importer/class-wp-import.php:772
+#: ../lib/wordpress-importer/class-wp-import.php:565, ../lib/wordpress-importer/class-wp-import.php:830
 msgid "Failed to import %1$s %2$s"
 msgstr ""
 
 #. translators: 1. Post Title, 2. Post Type
-#: ../lib/wordpress-importer/class-wp-import.php:603
+#: ../lib/wordpress-importer/class-wp-import.php:659
 msgid "Failed to import &#8220;%1$s&#8221;: Invalid post type %2$s"
 msgstr ""
 
 #. translators: 1. Singular Name, 2. Post Title
-#: ../lib/wordpress-importer/class-wp-import.php:732
+#: ../lib/wordpress-importer/class-wp-import.php:789
 msgid "Failed to import %1$s &#8220;%2$s&#8221;"
 msgstr ""
 
-#: ../lib/wordpress-importer/class-wp-import.php:653
+#: ../lib/wordpress-importer/class-wp-import.php:709
 msgid "%1$s &#8220;%2$s&#8221; already exists."
 msgstr ""
 
-#: ../lib/wordpress-importer/class-wp-import.php:921
+#: ../lib/wordpress-importer/class-wp-import.php:979
 msgid "Menu item skipped due to missing menu slug"
 msgstr ""
 
 #. translators: Menu Slug
-#: ../lib/wordpress-importer/class-wp-import.php:931
+#: ../lib/wordpress-importer/class-wp-import.php:989
 msgid "Menu item skipped due to invalid menu slug: %s"
 msgstr ""
 
-#: ../lib/wordpress-importer/class-wp-import.php:1026
+#: ../lib/wordpress-importer/class-wp-import.php:1085
 msgid "Fetching attachments is not enabled"
 msgstr ""
 
-#: ../lib/wordpress-importer/class-wp-import.php:1044
+#: ../lib/wordpress-importer/class-wp-import.php:1103
 msgid "Invalid file type"
 msgstr ""
 
-#: ../lib/wordpress-importer/class-wp-import.php:1103
+#: ../lib/wordpress-importer/class-wp-import.php:1162
 msgid "Could not create temporary file."
 msgstr ""
 
 #. translators: 1: The WordPress error message. 2: The WordPress error code.
-#: ../lib/wordpress-importer/class-wp-import.php:1126
+#: ../lib/wordpress-importer/class-wp-import.php:1185
 msgid "Request failed due to an error: %1$s (%2$s)"
 msgstr ""
 
 #. translators: 1: The HTTP error message. 2: The HTTP error code.
-#: ../lib/wordpress-importer/class-wp-import.php:1143
+#: ../lib/wordpress-importer/class-wp-import.php:1202
 msgid "Remote server returned the following unexpected result: %1$s (%2$s)"
 msgstr ""
 
-#: ../lib/wordpress-importer/class-wp-import.php:1156
+#: ../lib/wordpress-importer/class-wp-import.php:1215
 msgid "Remote server did not respond"
 msgstr ""
 
-#: ../lib/wordpress-importer/class-wp-import.php:1164
+#: ../lib/wordpress-importer/class-wp-import.php:1223
 msgid "Zero size file downloaded"
 msgstr ""
 
-#: ../lib/wordpress-importer/class-wp-import.php:1170
+#: ../lib/wordpress-importer/class-wp-import.php:1229
 msgid "Downloaded file has incorrect size"
 msgstr ""
 
 #. translators: Max Size
-#: ../lib/wordpress-importer/class-wp-import.php:1181
+#: ../lib/wordpress-importer/class-wp-import.php:1240
 msgid "Remote file is too large, limit is %s"
 msgstr ""
 
-#: ../lib/wordpress-importer/class-wp-import.php:1219
+#: ../lib/wordpress-importer/class-wp-import.php:1278
 msgid "Sorry, this file type is not permitted for security reasons."
 msgstr ""
 
-#: ../lib/wordpress-importer/class-wp-import.php:1235
+#: ../lib/wordpress-importer/class-wp-import.php:1294
 msgid "The uploaded file could not be moved"
 msgstr ""
 

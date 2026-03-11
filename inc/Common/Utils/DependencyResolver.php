@@ -30,12 +30,13 @@ class DependencyResolver {
 	/**
 	 * Analyse selected post IDs and return hard + soft dependency arrays.
 	 *
-	 * @param string  $file_path    Absolute path to WXR file.
-	 * @param int[]   $selected_ids Post IDs the user has selected.
+	 * @param string  $file_path      Absolute path to WXR file.
+	 * @param int[]   $selected_ids   Post IDs the user has selected.
+	 * @param array   $import_options User-selected import options.
 	 * @return array{hard: int[], soft: list<array{id: int, label: string, type: string}>}
 	 * @since 1.5.0
 	 */
-	public static function resolve( string $file_path, array $selected_ids ): array {
+	public static function resolve( string $file_path, array $selected_ids, array $import_options = [] ): array {
 		if ( ! file_exists( $file_path ) || empty( $selected_ids ) ) {
 			return [ 'hard' => [], 'soft' => [] ];
 		}
@@ -44,6 +45,26 @@ class DependencyResolver {
 		$hard      = [];
 		$soft      = [];
 		$added     = array_flip( $selected_ids );
+
+		// If Media option is ON, all attachments are hard dependencies (required for import).
+		if ( ! isset( $import_options['media'] ) || $import_options['media'] ) {
+			foreach ( $all_items as $id => $item ) {
+				if ( 'attachment' === $item['post_type'] && ! isset( $added[ $id ] ) ) {
+					$hard[]           = $id;
+					$added[ $id ]     = true;
+				}
+			}
+		}
+
+		// If Menus option is ON, all nav_menu_item are hard dependencies.
+		if ( ! isset( $import_options['menus'] ) || $import_options['menus'] ) {
+			foreach ( $all_items as $id => $item ) {
+				if ( 'nav_menu_item' === $item['post_type'] && ! isset( $added[ $id ] ) ) {
+					$hard[]           = $id;
+					$added[ $id ]     = true;
+				}
+			}
+		}
 
 		// Hard deps: all ancestor pages not in selection (iterative — resolves grandparents too).
 		$queue = $selected_ids;
@@ -61,20 +82,9 @@ class DependencyResolver {
 			$queue = $next_queue;
 		}
 
-		// Soft deps: nav menu items not in selection.
-		foreach ( $all_items as $id => $item ) {
-			if ( 'nav_menu_item' === $item['post_type'] && ! isset( $added[ $id ] ) ) {
-				$soft[] = [
-					'id'    => $id,
-					'label' => $item['post_title'] ?: "Menu Item #$id",
-					'type'  => 'nav_menu_item',
-				];
-			}
-		}
-
 		return [
 			'hard' => array_values( array_unique( $hard ) ),
-			'soft' => array_slice( $soft, 0, 50 ),
+			'soft' => [],
 		];
 	}
 

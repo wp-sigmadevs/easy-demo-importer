@@ -21,6 +21,7 @@ namespace SigmaDevs\EasyDemoImporter\App\Ajax\Backend;
 use SigmaDevs\EasyDemoImporter\Common\{
 	Traits\Singleton,
 	Functions\Helpers,
+	Functions\SessionManager,
 	Utils\ImageRegenEngine,
 	Utils\ImportLogger
 };
@@ -63,6 +64,15 @@ class RegenerateImages {
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing
 		$session_id = isset( $_POST['sessionId'] ) ? sanitize_text_field( wp_unslash( $_POST['sessionId'] ) ) : '';
 
+		if ( ! empty( $session_id ) && ! SessionManager::isValid( $session_id ) ) {
+			wp_send_json_error(
+				[
+					'errorMessage' => esc_html__( 'The import session is no longer valid.', 'easy-demo-importer' ),
+				],
+				403
+			);
+		}
+
 		$ids   = ImageRegenEngine::getSessionAttachments( $session_id );
 		$total = count( $ids );
 
@@ -98,6 +108,15 @@ class RegenerateImages {
 		$session_id = isset( $_POST['sessionId'] ) ? sanitize_text_field( wp_unslash( $_POST['sessionId'] ) ) : '';
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing
 		$offset = isset( $_POST['offset'] ) ? absint( $_POST['offset'] ) : 0;
+
+		if ( ! empty( $session_id ) && ! SessionManager::isValid( $session_id ) ) {
+			wp_send_json_error(
+				[
+					'errorMessage' => esc_html__( 'The import session is no longer valid.', 'easy-demo-importer' ),
+				],
+				403
+			);
+		}
 
 		$ids   = ImageRegenEngine::getSessionAttachments( $session_id );
 		$total = count( $ids );
@@ -168,6 +187,11 @@ class RegenerateImages {
 			);
 
 			ImageRegenEngine::clearSessionAttachments( $session_id );
+
+			// Release the import session lock.
+			if ( ! empty( $session_id ) ) {
+				SessionManager::release( $session_id );
+			}
 
 			// Store completion record: date, total, and failure count for System Status display.
 			update_option(
