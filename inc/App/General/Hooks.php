@@ -18,7 +18,8 @@ use SigmaDevs\EasyDemoImporter\Common\
 	Abstracts\Base,
 	Traits\Singleton,
 	Functions\Actions,
-	Functions\Filters
+	Functions\Filters,
+	Utils\SnapshotManager
 };
 
 // Do not allow directly accessing this file.
@@ -82,6 +83,9 @@ class Hooks extends Base {
 		// Register regen AJAX actions on every admin request.
 		// NOT auto-registered via Classes.php because regen calls have no 'demo' POST field.
 		RegenerateImages::instance()->register();
+
+		// Daily cron: purge expired snapshot rows.
+		add_action( 'sd_edi_purge_snapshots', [ SnapshotManager::class, 'purgeExpired' ] );
 
 		return $this;
 	}
