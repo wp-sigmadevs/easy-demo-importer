@@ -90,3 +90,7 @@ assets/js
 tmp
 _ext_**
 .fleet
+
+# Cloudflare Wrangler
+##########
+cloudflare/.wrangler/
