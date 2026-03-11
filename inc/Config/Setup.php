@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 1.0.0
  */
 class Setup {
-	private const DB_VERSION = '1.3.0';
+	private const DB_VERSION = '1.5.0';
 	/**
 	 * Run only once after plugin is activated.
 	 *
@@ -52,6 +52,7 @@ class Setup {
 
 		self::createTable();
 		self::createImportTables();
+		self::createSnapshotsTable();
 
 		delete_transient( 'sd_edi_installing' );
 
@@ -187,6 +188,37 @@ class Setup {
 	}
 
 	/**
+	 * Create Phase 4 snapshots table.
+	 *
+	 * @return void
+	 * @since 1.5.0
+	 */
+	private static function createSnapshotsTable() {
+		global $wpdb;
+
+		$wpdb->hide_errors();
+		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+
+		$collate = $wpdb->has_cap( 'collation' ) ? $wpdb->get_charset_collate() : '';
+
+		$table = $wpdb->prefix . 'sd_edi_snapshots';
+
+		dbDelta(
+			"CREATE TABLE $table (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    session_id VARCHAR(36) NOT NULL,
+    demo_slug VARCHAR(200) NOT NULL DEFAULT '',
+    snapshot_data LONGTEXT NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    expires_at DATETIME NOT NULL,
+    PRIMARY KEY (id),
+    KEY session_id (session_id),
+    KEY expires_at (expires_at)
+) $collate;"
+		);
+	}
+
+	/**
 	 * Run DB upgrades if plugin was updated without reactivation.
 	 *
 	 * Hook: plugins_loaded
@@ -197,6 +229,7 @@ class Setup {
 	public static function maybeUpgradeDb() {
 		if ( get_option( 'sd_edi_db_version' ) !== self::DB_VERSION ) {
 			self::createImportTables();
+			self::createSnapshotsTable();
 		}
 	}
 
