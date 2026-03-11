@@ -105,7 +105,14 @@ class DemoItems extends Base {
 			);
 		}
 
-		$all   = XmlChunker::getItems( $xml_path );
+		$cache_key = 'sd_edi_demo_items_' . md5( $xml_path );
+		$all       = get_transient( $cache_key );
+
+		if ( false === $all ) {
+			$all = XmlChunker::getItems( $xml_path );
+			set_transient( $cache_key, $all, 5 * MINUTE_IN_SECONDS );
+		}
+
 		$items = [];
 
 		foreach ( $all as $item ) {
