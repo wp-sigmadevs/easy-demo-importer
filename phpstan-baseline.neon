@@ -515,3 +515,15 @@ parameters:
 			identifier: return.trait
 			count: 1
 			path: inc/Config/Requirements.php
+
+		-
+			message: '#^Constant SD_EDI_AI_PROXY_URL not found\.$#'
+			identifier: constant.notFound
+			count: 2
+			path: inc/Common/Utils/AiClient.php
+
+		-
+			message: '#^Constant SD_EDI_AI_SHARED_SECRET not found\.$#'
+			identifier: constant.notFound
+			count: 2
+			path: inc/Common/Utils/AiClient.php
