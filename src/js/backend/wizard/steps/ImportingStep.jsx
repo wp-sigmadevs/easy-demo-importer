@@ -27,7 +27,7 @@ const phaseWeights = {
 
 const ImportingStep = () => {
 	const navigate    = useNavigate();
-	const { importOptions, selectedDemo } = useWizard();
+	const { importOptions, selectedDemo, selectedIds, setSnapshotId } = useWizard();
 	const regenImages = importOptions.regenImages !== false;
 	const { activeSessionId, setActiveSessionId } = useSharedDataStore();
 
@@ -75,7 +75,11 @@ const ImportingStep = () => {
 		while ( offset < totalItems && ! abortRef.current ) {
 			setStepLabel( `Importing content… ${ offset } / ${ totalItems }` );
 
-			const data = await ajaxPost( 'sd_edi_import_xml_chunk', { offset } );
+			const chunkParams = { offset };
+			if ( selectedIds && selectedIds.length > 0 ) {
+				chunkParams.allowedIds = selectedIds;
+			}
+			const data = await ajaxPost( 'sd_edi_import_xml_chunk', chunkParams );
 
 			// Safeguard: if data doesn't have progress info, we might be done or failed.
 			if ( data.done === undefined || data.total === undefined ) {
@@ -115,6 +119,11 @@ const ImportingStep = () => {
 
 				const response = await ajaxPost( nextAction, ( nextAction === 'sd_edi_install_demo' && forceReset ) ? { forceReset: 'true' } : {} );
 				
+				// Capture snapshotId from init response
+				if ( nextAction === 'sd_edi_install_demo' && response.snapshotId ) {
+					setSnapshotId( response.snapshotId );
+				}
+
 				// Update session ID if returned (usually on first step)
 				if ( response.sessionId ) {
 					sid = response.sessionId;
