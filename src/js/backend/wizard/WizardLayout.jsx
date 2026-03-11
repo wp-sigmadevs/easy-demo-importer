@@ -12,6 +12,7 @@ const STEPS = [
 	{ key: 'plugins',      title: 'Plugins'      },
 	{ key: 'demos',        title: 'Select Demo'  },
 	{ key: 'options',      title: 'Options'      },
+	{ key: 'select-items', title: 'Items'        },
 	{ key: 'confirm',      title: 'Confirm'      },
 	{ key: 'importing',    title: 'Importing'    },
 	{ key: 'regen',        title: 'Images'       },
