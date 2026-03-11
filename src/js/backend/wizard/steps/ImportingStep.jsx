@@ -28,6 +28,7 @@ const phaseWeights = {
 const ImportingStep = () => {
 	const navigate    = useNavigate();
 	const { importOptions, selectedDemo } = useWizard();
+	const regenImages = importOptions.regenImages !== false;
 	const { activeSessionId, setActiveSessionId } = useSharedDataStore();
 
 	const [ stepLabel,   setStepLabel   ] = useState( 'Starting…' );
@@ -112,17 +113,6 @@ const ImportingStep = () => {
 					}
 				}
 
-				if ( nextAction === 'sd_edi_import_xml_chunk' ) {
-					// We need the total count from the previous sd_edi_import_xml step
-					// This should have been stored in a transient on the server,
-					// but the frontend needs it to run the loop.
-					// If we don't have it, we'll try to get it from the last response if available.
-					// But usually sd_edi_import_xml returns { total: X }
-					// Handled inside the previous step's response.
-					nextAction = null; // stop the while loop, runChunkLoop will take over
-					break;
-				}
-
 				const response = await ajaxPost( nextAction, ( nextAction === 'sd_edi_install_demo' && forceReset ) ? { forceReset: 'true' } : {} );
 				
 				// Update session ID if returned (usually on first step)
@@ -154,13 +144,20 @@ const ImportingStep = () => {
 			if ( ! abortRef.current ) {
 				setOverallPct( 100 );
 				setDone( true );
-				setTimeout( () => navigate( '/wizard/regen' ), 800 );
+				setTimeout( () => navigate( regenImages ? '/wizard/regen' : '/wizard/complete' ), 800 );
 			}
 
 		} catch ( err ) {
 			setError( err.message );
 			if ( err.message.includes( 'already in progress' ) ) {
 				setIsLocked( true );
+			} else if ( sessionIdRef.current ) {
+				// Release the lock so normal retry works without "Force Start Over".
+				try {
+					await ajaxPost( 'sd_edi_cancel_session', {} );
+				} catch ( _ ) {
+					// If cancel fails the lock will expire after 30 min.
+				}
 			}
 		}
 	};

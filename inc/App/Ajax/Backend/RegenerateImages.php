@@ -47,7 +47,6 @@ class RegenerateImages {
 	public function register(): void {
 		add_action( 'wp_ajax_sd_edi_regen_check', [ $this, 'regenCheck' ] );
 		add_action( 'wp_ajax_sd_edi_regenerate_images', [ $this, 'regenerateImages' ] );
-		add_action( 'wp_ajax_sd_edi_background_regen', [ $this, 'scheduleBackground' ] );
 	}
 
 	/**
@@ -194,115 +193,6 @@ class RegenerateImages {
 				'completed'        => $completed,
 			]
 		);
-	}
-
-	/**
-	 * Schedule a WP-Cron event to regenerate images in the background.
-	 *
-	 * POST params: sd_edi_nonce, sessionId
-	 *
-	 * @return void
-	 * @since 1.4.0
-	 */
-	public function scheduleBackground(): void {
-		$this->verifyRequest();
-
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$session_id = isset( $_POST['sessionId'] ) ? sanitize_text_field( wp_unslash( $_POST['sessionId'] ) ) : '';
-
-		$ids = ImageRegenEngine::getSessionAttachments( $session_id );
-
-		if ( empty( $ids ) ) {
-			wp_send_json_success(
-				[
-					'scheduled' => false,
-					'total'     => 0,
-				]
-			);
-			// @phpstan-ignore deadCode.unreachable
-			return;
-		}
-
-		// Store session ID so admin_notices can show progress.
-		update_option( 'sd_edi_background_regen_session', $session_id, false );
-
-		// Schedule one cron event firing as soon as possible.
-		wp_schedule_single_event( time(), 'sd_edi_background_regen', [ $session_id, 0 ] );
-
-		wp_send_json_success(
-			[
-				'scheduled' => true,
-				'total'     => count( $ids ),
-			]
-		);
-	}
-
-	/**
-	 * WP-Cron callback: process one batch of background image regeneration.
-	 * Registered in Hooks::actions() via add_action('sd_edi_background_regen', ...).
-	 *
-	 * Schedules itself again until all attachments are processed.
-	 *
-	 * @param string $session_id Import session UUID.
-	 * @param int    $offset     Current offset into the attachment list.
-	 * @return void
-	 * @since 1.4.0
-	 */
-	public static function cronRegen( string $session_id, int $offset ): void {
-		$ids   = ImageRegenEngine::getSessionAttachments( $session_id );
-		$total = count( $ids );
-
-		if ( 0 === $total ) {
-			delete_option( 'sd_edi_background_regen_session' );
-			return;
-		}
-
-		$batch_size  = ImageRegenEngine::batchSize();
-		$slice       = array_slice( $ids, $offset, $batch_size );
-		$batch_fails = 0;
-
-		foreach ( $slice as $attachment_id ) {
-			$result = ImageRegenEngine::regen( $attachment_id );
-			if ( ! empty( $result['error'] ) ) {
-				++$batch_fails;
-			}
-		}
-
-		$done = min( $offset + $batch_size, $total );
-
-		// Read prior progress (which also carries accumulated failure count across batches).
-		$prior    = get_transient( 'sd_edi_background_regen_progress_' . $session_id );
-		$failures = ( is_array( $prior ) ? (int) ( $prior['failures'] ?? 0 ) : 0 ) + $batch_fails;
-
-		// Store progress + accumulated failures for admin notice and final record.
-		set_transient(
-			'sd_edi_background_regen_progress_' . $session_id,
-			[
-				'done'     => $done,
-				'total'    => $total,
-				'failures' => $failures,
-			],
-			HOUR_IN_SECONDS
-		);
-
-		if ( $done >= $total ) {
-			ImageRegenEngine::clearSessionAttachments( $session_id );
-			delete_option( 'sd_edi_background_regen_session' );
-			delete_transient( 'sd_edi_background_regen_progress_' . $session_id );
-
-			// Store completion record: date, total, and accumulated failure count for System Status display.
-			update_option(
-				'sd_edi_last_regen',
-				[
-					'date'     => current_time( 'mysql' ),
-					'count'    => $done,
-					'failures' => $failures,
-				],
-				false
-			);
-		} else {
-			wp_schedule_single_event( time(), 'sd_edi_background_regen', [ $session_id, $done ] );
-		}
 	}
 
 	/**

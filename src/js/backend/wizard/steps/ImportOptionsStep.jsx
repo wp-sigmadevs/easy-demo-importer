@@ -22,6 +22,13 @@ const OPTION_GROUPS = [
 		],
 	},
 	{
+		label: 'After Import',
+		options: [
+			{ key: 'regenImages', label: 'Regenerate Image Thumbnails',
+			  desc: 'Rebuild all image sizes after import completes. Disable to skip (faster, but thumbnails may be missing).' },
+		],
+	},
+	{
 		label: 'Database',
 		options: [
 			{ key: 'resetDb',        label: 'Reset Database Before Import',

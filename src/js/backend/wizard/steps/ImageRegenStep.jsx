@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Progress, Space, Collapse, Alert, Typography, Spin } from 'antd';
-import { PictureOutlined, WarningOutlined } from '@ant-design/icons';
+import { Progress, Collapse, Alert, Typography } from 'antd';
+import { WarningOutlined } from '@ant-design/icons';
 import useSharedDataStore from '../../utils/sharedDataStore';
 
 /* global sdEdiAdminParams, ajaxurl */
@@ -15,17 +15,15 @@ const ImageRegenStep = () => {
 
 	const [ phase,           setPhase           ] = useState( 'checking' );
 	const [ total,           setTotal           ] = useState( 0 );
-	const [ firstFilename,   setFirstFilename   ] = useState( '' );
 	const [ done,            setDone            ] = useState( 0 );
 	const [ currentFilename, setCurrentFilename ] = useState( '' );
-	const [ totalSizes,      setTotalSizes      ] = useState( 0 );  // cumulative sizes generated
+	const [ totalSizes,      setTotalSizes      ] = useState( 0 );
 	const [ failures,        setFailures        ] = useState( [] );
 	const [ error,           setError           ] = useState( null );
 
 	const abortRef = useRef( false );
 
 	// ── AJAX helper ──────────────────────────────────────────────────────────
-	// Nonce key is 'sd_edi_nonce' (Helpers::nonceId()), value at sdEdiAdminParams.sd_edi_nonce.
 	const ajaxPost = async ( action, extra = {} ) => {
 		const body = new URLSearchParams( {
 			action,
@@ -44,7 +42,7 @@ const ImageRegenStep = () => {
 		return json.data;
 	};
 
-	// On mount: check how many attachments need regen.
+	// On mount: check count then auto-start regen without prompting.
 	useEffect( () => {
 		if ( ! sessionId ) {
 			navigate( '/wizard/complete' );
@@ -53,109 +51,55 @@ const ImageRegenStep = () => {
 
 		( async () => {
 			try {
-				const data = await ajaxPost( 'sd_edi_regen_check' );
-
+				const checkData = await ajaxPost( 'sd_edi_regen_check' );
 				if ( abortRef.current ) return;
 
-				if ( data.total === 0 ) {
+				if ( checkData.total === 0 ) {
 					setTimeout( () => navigate( '/wizard/complete' ), 500 );
 					return;
 				}
 
-				setTotal( data.total );
-				setFirstFilename( data.first_filename || '' );
-				setPhase( 'prompt' );
+				setTotal( checkData.total );
+				setPhase( 'running' );
+
+				let offset   = 0;
+				let allFails = [];
+
+				while ( ! abortRef.current ) {
+					const data = await ajaxPost( 'sd_edi_regenerate_images', { offset } );
+
+					setDone( data.done );
+					setCurrentFilename( data.current_filename || '' );
+					setTotalSizes( ( prev ) => prev + ( data.sizes_generated?.length ?? 0 ) );
+
+					if ( data.failed?.length ) {
+						allFails = [ ...allFails, ...data.failed ];
+						setFailures( [ ...allFails ] );
+					}
+
+					if ( data.completed ) break;
+
+					offset = data.done;
+				}
+
+				setPhase( 'done' );
+				setTimeout( () => navigate( '/wizard/complete' ), 1200 );
 			} catch ( err ) {
 				if ( abortRef.current ) return;
-
 				setError( err.message );
-				setPhase( 'prompt' );
+				setPhase( 'done' );
 			}
 		} )();
 
 		return () => { abortRef.current = true; };
 	}, [] ); // eslint-disable-line react-hooks/exhaustive-deps
 
-	const handleSkip = () => navigate( '/wizard/complete' );
-
-	const handleBackground = async () => {
-		try {
-			await ajaxPost( 'sd_edi_background_regen' );
-		} catch {
-			// Non-fatal — still proceed to complete.
-		}
-		navigate( '/wizard/complete' );
-	};
-
-	const handleRegenNow = async () => {
-		setPhase( 'running' );
-		let offset   = 0;
-		let allFails = [];
-
-		try {
-			while ( ! abortRef.current ) {
-				const data = await ajaxPost( 'sd_edi_regenerate_images', { offset } );
-
-				setDone( data.done );
-				setCurrentFilename( data.current_filename || '' );
-				// Accumulate total sizes generated (cumulative counter, not per-image pills).
-				setTotalSizes( ( prev ) => prev + ( data.sizes_generated?.length ?? 0 ) );
-
-				if ( data.failed?.length ) {
-					allFails = [ ...allFails, ...data.failed ];
-					setFailures( [ ...allFails ] );
-				}
-
-				if ( data.completed ) break;
-
-				offset = data.done;
-			}
-
-			setPhase( 'done' );
-			setTimeout( () => navigate( '/wizard/complete' ), 1200 );
-		} catch ( err ) {
-			setError( err.message );
-			setPhase( 'done' );
-		}
-	};
-
 	const pct = total > 0 ? Math.round( ( done / total ) * 100 ) : 0;
 
 	if ( 'checking' === phase ) {
 		return (
 			<div style={ { textAlign: 'center', padding: '40px 0' } }>
-				<Spin size="large" />
 				<div style={ { marginTop: 16, color: '#595959' } }>Checking images…</div>
-			</div>
-		);
-	}
-
-	if ( 'prompt' === phase ) {
-		return (
-			<div style={ { textAlign: 'center', padding: '24px 0' } }>
-				<PictureOutlined style={ { fontSize: 48, color: '#6366f1', marginBottom: 16 } } />
-				<div style={ { fontSize: 20, fontWeight: 600, marginBottom: 8 } }>
-					{ `${ total } image${ total !== 1 ? 's' : '' } found — ready to regenerate` }
-				</div>
-				{ firstFilename && (
-					<div style={ { color: '#8c8c8c', marginBottom: 24, fontSize: 13 } }>
-						Starting with { firstFilename }
-					</div>
-				) }
-				{ error && (
-					<Alert type="warning" message={ error } style={ { marginBottom: 24, textAlign: 'left' } } />
-				) }
-				<Space size="middle" wrap>
-					<Button type="primary" size="large" onClick={ handleRegenNow }>
-						Regenerate Now
-					</Button>
-					<Button size="large" onClick={ handleBackground }>
-						In Background
-					</Button>
-					<Button type="link" size="large" onClick={ handleSkip }>
-						Skip — I'll handle this manually
-					</Button>
-				</Space>
 			</div>
 		);
 	}
@@ -166,7 +110,7 @@ const ImageRegenStep = () => {
 				<div style={ { fontSize: 14, color: '#595959', marginBottom: 8 } }>
 					{ 'done' === phase
 						? `Regeneration complete — ${ done } / ${ total } images`
-						: `Regenerating — ${ currentFilename || '…' }` }
+						: `Regenerating images — ${ currentFilename || '…' }` }
 				</div>
 				<Progress
 					percent={ pct }
