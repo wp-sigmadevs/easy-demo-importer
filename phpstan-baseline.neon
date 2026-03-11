@@ -511,6 +511,18 @@ parameters:
 			path: inc/Config/Plugin.php
 
 		-
+			message: '#^Constant SD_EDI_AI_PROXY_URL not found\.$#'
+			identifier: constant.notFound
+			count: 2
+			path: inc/Common/Utils/AiClient.php
+
+		-
+			message: '#^Constant SD_EDI_AI_SHARED_SECRET not found\.$#'
+			identifier: constant.notFound
+			count: 2
+			path: inc/Common/Utils/AiClient.php
+
+		-
 			message: '#^Method SigmaDevs\\EasyDemoImporter\\Config\\Requirements\:\:instance\(\) has invalid return type SigmaDevs\\EasyDemoImporter\\Common\\Traits\\Singleton\.$#'
 			identifier: return.trait
 			count: 1
