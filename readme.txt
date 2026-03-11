@@ -4,7 +4,7 @@ Donate link:
 Tags: demo importer, one click demo importer, theme demo importer, WordPress demo importer, content import plugin
 Requires at least: 5.5
 Tested up to: 6.9
-Stable tag: 1.4.0
+Stable tag: 1.5.0
 Requires PHP: 7.4
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -135,6 +135,15 @@ For any inquiries, bug reports, or suggestions, please submit your request [here
 6. Example of how the system status page looks.
 
 == Changelog ==
+
+= 1.5.0 (11-March-2026) =
+* New: Selective item picking — choose specific pages, posts, and products before importing
+* New: Dependency resolver — hard deps (parent pages) auto-included; soft deps (nav menus) shown as optional checkboxes
+* New: Import rollback — "Undo Import" button on the Complete step, available for 24 hours after import
+* New: Auto URL fix — demo domain automatically replaced with site URL after import (filter: sd/edi/auto_url_fix)
+* New: Pre-import conflict detection — hard blocks for low PHP memory; soft warnings for tight execution time, cache plugins, and DB reset
+* New: wp_sd_edi_snapshots DB table for import rollback state
+* New REST endpoints: GET /demo-items, POST /resolve-deps, POST /rollback/{id}
 
 = 1.4.0 (10-March-2026) =
 * New: Image regeneration is now always deferred during XML import (never happens silently)
