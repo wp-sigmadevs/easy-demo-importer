@@ -14,7 +14,7 @@ import ReactDOM from 'react-dom';
 
 const ConfirmationStep = () => {
 	const navigate = useNavigate();
-	const { selectedDemo, dryRunStats, setDryRunStats, importOptions, selectedIds } =
+	const { selectedDemo, dryRunStats, setDryRunStats, importOptions, selectedIds, setSelectedIds } =
 		useWizard();
 	const [footer, setFooter] = useState(null);
 	const [back, setBack] = useState(null);
@@ -221,7 +221,15 @@ const ConfirmationStep = () => {
 						type="primary"
 						icon={<ThunderboltOutlined />}
 						disabled={!dryRunStats}
-						onClick={() => navigate('/wizard/importing')}
+						onClick={() => {
+						const checkedSoftIds = Object.entries( softChecked )
+							.filter( ( [, checked] ) => checked )
+							.map( ( [id] ) => Number( id ) );
+						if ( checkedSoftIds.length > 0 ) {
+							setSelectedIds( prev => [ ...new Set( [ ...prev, ...checkedSoftIds ] ) ] );
+						}
+						navigate( '/wizard/importing' );
+					}}
 					>
 						Start Import
 					</Button>,
