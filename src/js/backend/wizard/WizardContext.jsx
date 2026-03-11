@@ -9,6 +9,7 @@ const DEFAULT_OPTIONS = {
 	widgets:        true,
 	menus:          true,
 	pluginSettings: true,
+	regenImages:    true,
 	resetDb:        false,
 };
 

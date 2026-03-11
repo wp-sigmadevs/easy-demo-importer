@@ -182,7 +182,7 @@ class XmlChunker {
 		$collected = 0;
 
 		while ( $reader->read() ) {
-			if ( \XMLReader::ELEMENT !== $reader->nodeType || 'item' !== $reader->localName ) {
+			if ( \XMLReader::ELEMENT !== $reader->nodeType || 'item' !== $reader->localName || 2 !== $reader->depth ) {
 				continue;
 			}
 

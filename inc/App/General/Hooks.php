@@ -79,11 +79,9 @@ class Hooks extends Base {
 		// Actions after import.
 		add_action( 'sd/edi/after_import', [ Actions::class, 'afterImportActions' ] );
 
-		// Register regen AJAX actions and cron callback on every admin request.
+		// Register regen AJAX actions on every admin request.
 		// NOT auto-registered via Classes.php because regen calls have no 'demo' POST field.
 		RegenerateImages::instance()->register();
-		add_action( 'sd_edi_background_regen', [ RegenerateImages::class, 'cronRegen' ], 10, 2 );
-		add_action( 'admin_notices', [ Actions::class, 'backgroundRegenNotice' ] );
 
 		return $this;
 	}
