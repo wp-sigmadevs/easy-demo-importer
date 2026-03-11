@@ -682,6 +682,16 @@ class RestEndpoints extends Base {
 			'error' => 'No issue' !== $this->checkWritePermission() ? esc_html__( 'Fix the write permission error in the wp-content directory for successful import.', 'easy-demo-importer' ) : '',
 		];
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$post_count = (int) $wpdb->get_var(
+			"SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_status NOT IN ('auto-draft','trash')"
+		);
+
+		$fields['post_count'] = [
+			'label' => esc_html__( 'Existing Post Count', 'easy-demo-importer' ),
+			'value' => $post_count,
+		];
+
 		return $fields;
 	}
 
