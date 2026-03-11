@@ -56,6 +56,10 @@ class Setup {
 
 		delete_transient( 'sd_edi_installing' );
 
+		if ( ! wp_next_scheduled( 'sd_edi_purge_snapshots' ) ) {
+			wp_schedule_event( time(), 'daily', 'sd_edi_purge_snapshots' );
+		}
+
 		self::createDemoDir();
 
 		// Clear the permalinks.
@@ -73,6 +77,8 @@ class Setup {
 		if ( ! current_user_can( 'activate_plugins' ) ) {
 			return;
 		}
+
+		wp_clear_scheduled_hook( 'sd_edi_purge_snapshots' );
 
 		// Clear the permalinks.
 		flush_rewrite_rules();
