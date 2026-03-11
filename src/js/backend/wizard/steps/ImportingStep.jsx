@@ -43,7 +43,7 @@ const ImportingStep = () => {
 	const sessionIdRef = useRef( activeSessionId || '' );
 
 	// ── AJAX helper ─────────────────────────────────────────────────────────
-	const ajaxPost = async ( action, extra = {} ) => {
+	const ajaxPost = async ( action, extra = {}, appendFn = null ) => {
 		const body = new URLSearchParams( {
 			action,
 			sd_edi_nonce: sdEdiAdminParams.sd_edi_nonce,
@@ -53,6 +53,7 @@ const ImportingStep = () => {
 			reset:          importOptions.resetDb ? 'true' : 'false',
 			...extra,
 		} );
+		if ( appendFn ) appendFn( body );
 
 		const res  = await fetch( ajaxurl, { method: 'POST', body } );
 		const json = await res.json();
@@ -76,10 +77,10 @@ const ImportingStep = () => {
 			setStepLabel( `Importing content… ${ offset } / ${ totalItems }` );
 
 			const chunkParams = { offset };
-			if ( selectedIds && selectedIds.length > 0 ) {
-				chunkParams.allowedIds = selectedIds;
-			}
-			const data = await ajaxPost( 'sd_edi_import_xml_chunk', chunkParams );
+			const appendAllowedIds = ( selectedIds && selectedIds.length > 0 )
+				? ( params ) => { selectedIds.forEach( id => params.append( 'allowedIds[]', id ) ); }
+				: null;
+			const data = await ajaxPost( 'sd_edi_import_xml_chunk', chunkParams, appendAllowedIds );
 
 			// Safeguard: if data doesn't have progress info, we might be done or failed.
 			if ( data.done === undefined || data.total === undefined ) {
