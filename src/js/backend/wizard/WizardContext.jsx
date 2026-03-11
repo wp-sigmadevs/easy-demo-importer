@@ -23,6 +23,8 @@ export const WizardProvider = ( { children } ) => {
 	const [ dryRunStats,   setDryRunStats   ] = useState( null );
 	const [ importProgress, setImportProgress ] = useState( { done: 0, total: 0, currentTitle: '' } );
 	const [ direction, setDirection ] = useState( 'forward' );
+	const [ selectedIds,  setSelectedIds  ] = useState( [] );
+	const [ snapshotId,   setSnapshotId   ] = useState( null );
 
 	const updateOption = useCallback( ( key, value ) => {
 		setImportOptions( ( prev ) => ( { ...prev, [ key ]: value } ) );
@@ -34,6 +36,8 @@ export const WizardProvider = ( { children } ) => {
 		setDryRunStats( null );
 		setImportProgress( { done: 0, total: 0, currentTitle: '' } );
 		setDirection( 'forward' );
+		setSelectedIds( [] );
+		setSnapshotId( null );
 	}, [] );
 
 	return (
@@ -43,6 +47,8 @@ export const WizardProvider = ( { children } ) => {
 			dryRunStats,   setDryRunStats,
 			importProgress, setImportProgress,
 			direction,     setDirection,
+			selectedIds,  setSelectedIds,
+			snapshotId,   setSnapshotId,
 			resetWizard,
 		} }>
 			{ children }
