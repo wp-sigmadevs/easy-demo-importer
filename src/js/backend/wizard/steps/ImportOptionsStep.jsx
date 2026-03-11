@@ -100,7 +100,7 @@ const ImportOptionsStep = () => {
 			) }
 
 			{ footer && ReactDOM.createPortal(
-				<Button type="primary" onClick={ () => navigate( '/wizard/confirm' ) }>
+				<Button type="primary" onClick={ () => navigate( importOptions.content ? '/wizard/select-items' : '/wizard/confirm' ) }>
 					Review & Confirm
 				</Button>,
 				footer
