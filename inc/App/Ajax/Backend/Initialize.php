@@ -18,6 +18,7 @@ use SigmaDevs\EasyDemoImporter\Common\{
 	Functions\Helpers,
 	Functions\SessionManager,
 	Utils\ImportLogger,
+	Utils\SnapshotManager,
 	Abstracts\ImporterAjax
 };
 
@@ -151,11 +152,17 @@ class Initialize extends ImporterAjax {
 			);
 		}
 
+		$snapshot_id = SnapshotManager::create( $this->sessionId, $this->demo ?? '' );
+
 		// Response.
 		$this->prepareResponse(
 			'sd_edi_install_plugins',
 			esc_html__( 'Let us install the required plugins.', 'easy-demo-importer' ),
-			( $this->reset ) ? esc_html__( 'Database reset completed.', 'easy-demo-importer' ) : esc_html__( 'Minor cleanups done.', 'easy-demo-importer' )
+			( $this->reset ) ? esc_html__( 'Database reset completed.', 'easy-demo-importer' ) : esc_html__( 'Minor cleanups done.', 'easy-demo-importer' ),
+			false,
+			'',
+			'',
+			[ 'snapshotId' => $snapshot_id ]
 		);
 	}
 
