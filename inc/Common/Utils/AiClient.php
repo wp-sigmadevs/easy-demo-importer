@@ -7,7 +7,7 @@
  *
  * Feature flag: return false from `sd/edi/ai_enabled` to disable all AI calls.
  * Constants (defined in easy-demo-importer.php, override in wp-config.php):
- *   SD_EDI_AI_PROXY_URL      — Cloudflare Worker endpoint URL (default '').
+ *   SD_EDI_AI_PROXY_URL      — Cloudflare Worker endpoint URL; empty = AI disabled (default '').
  *   SD_EDI_AI_SHARED_SECRET  — HMAC secret; empty = AI disabled (default '').
  *
  * @package SigmaDevs\EasyDemoImporter

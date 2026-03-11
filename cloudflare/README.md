@@ -45,9 +45,9 @@ wrangler secret put GEMINI_API_KEY
 wrangler secret put SHARED_SECRET
 ```
 
-> ⚠️ **Warning:** If `SHARED_SECRET` is not set via `wrangler secret put`, the Worker will sign
-> with the literal string `"undefined"` as the key, making it trivially forgeable. Always verify
-> both secrets are set before deploying.
+> ⚠️ **Warning:** If `SHARED_SECRET` is not set via `wrangler secret put`, the Worker has no key
+> to import — `crypto.subtle.importKey` will throw on every request and the Worker will return 500
+> errors for all calls. Always verify both secrets are set before deploying (`wrangler secret list`).
 
 To confirm the secrets exist:
 
