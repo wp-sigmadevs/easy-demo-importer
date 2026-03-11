@@ -14,10 +14,12 @@ import ReactDOM from 'react-dom';
 
 const ConfirmationStep = () => {
 	const navigate = useNavigate();
-	const { selectedDemo, dryRunStats, setDryRunStats, importOptions } =
+	const { selectedDemo, dryRunStats, setDryRunStats, importOptions, selectedIds } =
 		useWizard();
 	const [footer, setFooter] = useState(null);
 	const [back, setBack] = useState(null);
+	const [ softDeps,    setSoftDeps    ] = useState( [] );
+	const [ softChecked, setSoftChecked ] = useState( {} );
 
 	useEffect(() => {
 		if (!selectedDemo || dryRunStats) {
@@ -34,6 +36,22 @@ const ConfirmationStep = () => {
 				});
 			});
 	}, [selectedDemo, dryRunStats, setDryRunStats]);
+
+	useEffect( () => {
+		if ( ! selectedDemo || selectedIds.length === 0 ) return;
+		Api.post( '/sd/edi/v1/resolve-deps', {
+			demo:         selectedDemo.slug,
+			selected_ids: selectedIds,
+		} )
+			.then( ( res ) => {
+				const soft = res.data.soft || [];
+				setSoftDeps( soft );
+				const init = {};
+				soft.forEach( ( d ) => { init[ d.id ] = false; } );
+				setSoftChecked( init );
+			} )
+			.catch( () => {} );
+	}, [ selectedDemo, selectedIds ] ); // eslint-disable-line react-hooks/exhaustive-deps
 
 	useEffect(() => {
 		const nextEl = document.getElementById('edi-wizard-next-slot');
@@ -164,9 +182,34 @@ const ConfirmationStep = () => {
 				</>
 			)}
 
+			{ softDeps.length > 0 && (
+				<div style={ {
+					marginTop: 16, background: '#fffbe6',
+					border: '1px solid #ffe58f', borderRadius: 8, padding: '12px 16px',
+				} }>
+					<div style={ { fontWeight: 600, marginBottom: 8, fontSize: 13 } }>
+						Also include related content? (optional)
+					</div>
+					{ softDeps.slice( 0, 20 ).map( ( dep ) => (
+						<div key={ dep.id } style={ { marginBottom: 4, fontSize: 13 } }>
+							<label style={ { cursor: 'pointer' } }>
+								<input
+									type="checkbox"
+									checked={ !! softChecked[ dep.id ] }
+									onChange={ ( e ) => setSoftChecked( ( p ) => ( { ...p, [ dep.id ]: e.target.checked } ) ) }
+									style={ { marginRight: 6 } }
+								/>
+								{ dep.label }
+								<span style={ { color: '#8c8c8c', fontSize: 11, marginLeft: 4 } }>({ dep.type })</span>
+							</label>
+						</div>
+					) ) }
+				</div>
+			) }
+
 			{back &&
 				ReactDOM.createPortal(
-					<Button onClick={() => navigate('/wizard/options')}>
+					<Button onClick={ () => navigate( importOptions.content ? '/wizard/select-items' : '/wizard/options' ) }>
 						Back
 					</Button>,
 					back
