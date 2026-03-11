@@ -493,4 +493,34 @@ class Helpers {
 
 		return 0 === strpos( $action, 'sd_edi_' );
 	}
+
+	/**
+	 * Resolve the local XML file path for a demo slug.
+	 *
+	 * @param array  $config    Demo config array.
+	 * @param string $demo_slug Demo slug.
+	 * @return string|null Absolute path, or null if unresolvable.
+	 * @since 1.5.0
+	 */
+	public static function resolveXmlPath( array $config, string $demo_slug ): ?string {
+		$upload_dir = wp_get_upload_dir();
+		$base       = $upload_dir['basedir'] . '/easy-demo-importer/';
+
+		$multiple = ! empty( $config['multipleZip'] );
+		$demoZip  = '';
+
+		if ( $multiple && isset( $config['demoData'][ $demo_slug ] ) ) {
+			$demoZip = self::getDemoData( $config['demoData'][ $demo_slug ], 'demoZip' );
+		} elseif ( ! $multiple ) {
+			$demoZip = self::getDemoData( $config, 'demoZip' );
+		}
+
+		if ( ! $demoZip ) {
+			return null;
+		}
+
+		$demoDir = pathinfo( basename( $demoZip ), PATHINFO_FILENAME );
+
+		return $base . $demoDir . '/content.xml';
+	}
 }

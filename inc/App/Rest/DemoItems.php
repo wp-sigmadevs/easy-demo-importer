@@ -17,6 +17,7 @@ namespace SigmaDevs\EasyDemoImporter\App\Rest;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
+use SigmaDevs\EasyDemoImporter\Common\Functions\Helpers;
 use SigmaDevs\EasyDemoImporter\Common\{
 	Abstracts\Base,
 	Traits\Singleton,
@@ -95,11 +96,11 @@ class DemoItems extends Base {
 	public function getItems( WP_REST_Request $request ): WP_REST_Response|WP_Error {
 		$demo_slug = $request->get_param( 'demo' );
 		$post_type = $request->get_param( 'post_type' );
-		$xml_path  = $this->resolveXmlPath( $demo_slug );
+		$xml_path  = Helpers::resolveXmlPath( sd_edi()->getDemoConfig(), $demo_slug );
 
-		if ( ! $xml_path ) {
+		if ( ! $xml_path || ! file_exists( $xml_path ) ) {
 			return new WP_Error(
-				'demo_not_found',
+				'demo_not_downloaded',
 				__( 'Demo XML not found.', 'easy-demo-importer' ),
 				[ 'status' => 404 ]
 			);
@@ -132,19 +133,5 @@ class DemoItems extends Base {
 		sort( $types );
 
 		return rest_ensure_response( [ 'items' => $items, 'types' => $types ] );
-	}
-
-	/**
-	 * Resolve the absolute path to the demo's content.xml.
-	 *
-	 * @param string $demo_slug Demo slug.
-	 * @return string|null Absolute path, or null if not found.
-	 * @since 1.5.0
-	 */
-	private function resolveXmlPath( string $demo_slug ): ?string {
-		$uploads = wp_get_upload_dir();
-		$path    = $uploads['basedir'] . '/easy-demo-importer/' . $demo_slug . '/content.xml';
-
-		return file_exists( $path ) ? $path : null;
 	}
 }

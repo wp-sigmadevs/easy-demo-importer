@@ -254,39 +254,40 @@ class XmlChunker {
 
 		$header = '';
 		$found  = false;
+		$buffer = '';
 
-		// We read the file line by line with a large buffer (1MB) to handle potentially long lines.
-		// WXR files usually have <item> on its own line, but we must handle minified XML too.
+		// We read the file in chunks to find the first <item tag.
+		// We want everything BEFORE the first <item>.
 		while ( ! feof( $handle ) ) {
-			// Read up to 1MB or until a newline.
-			$line = fgets( $handle, 1048576 ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fgets
-
-			if ( false === $line ) {
+			$chunk = fread( $handle, 65536 ); // 64KB chunks
+			if ( false === $chunk ) {
 				break;
 			}
+			$buffer .= $chunk;
 
-			// Look for <item tag (case-insensitive) using regex.
-			// We check for <item followed by a space (attributes) or > (no attributes).
-			if ( preg_match( '/<item[\s>]/i', $line, $matches, PREG_OFFSET_CAPTURE ) ) {
+			if ( preg_match( '/<item[\s>]/i', $buffer, $matches, PREG_OFFSET_CAPTURE ) ) {
 				$offset = $matches[0][1];
-				$header .= substr( $line, 0, $offset );
+				$header .= substr( $buffer, 0, $offset );
 				$found = true;
 				break;
 			}
 
-			// Check for closing channel/rss tags — we strip them if they appear before any items.
-			$line = preg_replace( '/<\/channel>\s*<\/rss>/i', '', $line );
-			$header .= $line;
+			// If buffer gets too large without finding <item>, keep the part we've confirmed is header.
+			// Keep the last 10 characters in case <item> was split between chunks.
+			if ( strlen( $buffer ) > 128000 ) {
+				$header .= substr( $buffer, 0, -10 );
+				$buffer = substr( $buffer, -10 );
+			}
 		}
 
 		fclose( $handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
 
 		if ( $found ) {
+			// Strip closing tags if they leaked into the header before items.
+			$header = preg_replace( '/<\/channel>\s*<\/rss>/i', '', $header );
 			return $header;
 		}
 
-		// Fallback for extremely large files/lines where <item> might be missed by fgets logic.
-		// If we've read the whole file and never found <item>, it's not a valid WXR or it's empty.
 		return null;
 	}
 }

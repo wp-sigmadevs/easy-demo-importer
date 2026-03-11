@@ -1,10 +1,13 @@
 import { Button, Tabs, Checkbox, Input, Spin, Alert, Badge } from 'antd';
-import { SearchOutlined } from '@ant-design/icons';
+import { SearchOutlined, LoadingOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import React, { useState, useEffect, useCallback } from 'react';
 import ReactDOM from 'react-dom';
+import Axios from 'axios';
 import { useWizard } from '../WizardContext';
 import { Api } from '../../utils/Api';
+
+/* global sdEdiAdminParams */
 
 const SelectItemsStep = () => {
 	const navigate = useNavigate();
@@ -19,6 +22,7 @@ const SelectItemsStep = () => {
 	const [ fetched,   setFetched   ] = useState( {} );    // { post_type: bool }
 	const [ error,     setError     ] = useState( null );
 	const [ activeTab, setActiveTab ] = useState( null );
+	const [ preparing, setPreparing ] = useState( false );
 
 	useEffect( () => {
 		const nextEl = document.getElementById( 'edi-wizard-next-slot' );
@@ -27,43 +31,82 @@ const SelectItemsStep = () => {
 		if ( backEl ) setBack( backEl );
 	}, [] );
 
-	// Fetch type list on mount.
+	// Fetch all items on mount.
 	useEffect( () => {
-		if ( ! selectedDemo ) { navigate( '/wizard/demos' ); return; }
-		Api.get( `/sd/edi/v1/demo-items?demo=${ selectedDemo.slug }` )
-			.then( ( res ) => {
-				const postTypes = ( res.data.types || [] ).filter(
-					( t ) => ! [ 'attachment', 'nav_menu_item' ].includes( t )
-				);
-				setTypes( postTypes );
-				if ( postTypes.length > 0 ) setActiveTab( postTypes[ 0 ] );
-			} )
-			.catch( () => setError( 'Could not load demo items. Check that the demo has been downloaded.' ) );
+		if ( ! selectedDemo ) {
+			navigate( '/wizard/demos' ); return;
+		}
+
+		const fetchItems = () => {
+			Api.get( `/sd/edi/v1/demo-items?demo=${ selectedDemo.slug }` )
+				.then( ( res ) => {
+					const allItems  = res.data.items || [];
+					const postTypes = ( res.data.types || [] ).filter(
+						( t ) => ! [ 'attachment', 'nav_menu_item' ].includes( t )
+					);
+
+					// Group items by type and initialize checked state (everything selected by default).
+					const groupedItems = {};
+					const checkedMap   = {};
+					const fetchedMap   = {};
+
+					postTypes.forEach( ( type ) => {
+						const typeItems = allItems.filter( ( i ) => i.post_type === type );
+						groupedItems[ type ] = typeItems;
+						checkedMap[ type ]   = new Set( typeItems.map( ( i ) => i.id ) );
+						fetchedMap[ type ]   = true;
+					} );
+
+					setTypes( postTypes );
+					setItems( groupedItems );
+					setChecked( checkedMap );
+					setFetched( fetchedMap );
+
+					if ( postTypes.length > 0 ) {
+						setActiveTab( postTypes[ 0 ] );
+					}
+					setPreparing( false );
+				} )
+				.catch( ( err ) => {
+					if ( err.response?.data?.code === 'demo_not_downloaded' ) {
+						setPreparing( true );
+
+						const params = new FormData();
+						params.append( 'action', 'sd_edi_download_demo_files' );
+						params.append( 'demo', selectedDemo.slug );
+						params.append( 'sd_edi_nonce', sdEdiAdminParams.sd_edi_nonce );
+
+						Axios.post( sdEdiAdminParams.ajaxUrl, params )
+							.then( () => fetchItems() )
+							.catch( () => {
+								setPreparing( false );
+								setError( 'Could not download demo files. Check your internet connection.' );
+							} );
+					} else {
+						setError( 'Could not load demo items. Check that the demo has been downloaded.' );
+					}
+				} );
+		};
+
+		fetchItems();
 	}, [ selectedDemo ] ); // eslint-disable-line react-hooks/exhaustive-deps
 
-	// Lazy-load items for a tab when first activated.
+	// Tab switching only updates UI state now.
 	const loadTab = useCallback( ( postType ) => {
-		if ( fetched[ postType ] ) return;
-		setLoading( ( prev ) => ( { ...prev, [ postType ]: true } ) );
-		Api.get( `/sd/edi/v1/demo-items?demo=${ selectedDemo.slug }&post_type=${ postType }` )
-			.then( ( res ) => {
-				const tabItems = res.data.items || [];
-				setItems(   ( prev ) => ( { ...prev, [ postType ]: tabItems } ) );
-				setChecked( ( prev ) => ( { ...prev, [ postType ]: new Set( tabItems.map( ( i ) => i.id ) ) } ) );
-				setFetched( ( prev ) => ( { ...prev, [ postType ]: true } ) );
-			} )
-			.catch( () => {} )
-			.finally( () => setLoading( ( prev ) => ( { ...prev, [ postType ]: false } ) ) );
-	}, [ fetched, selectedDemo ] ); // eslint-disable-line react-hooks/exhaustive-deps
-
-	useEffect( () => {
-		if ( activeTab ) loadTab( activeTab );
-	}, [ activeTab, loadTab ] );
+		setActiveTab( postType );
+	}, [] );
 
 	const handleNext = () => {
-		const ids = [];
-		Object.values( checked ).forEach( ( s ) => s.forEach( ( id ) => ids.push( id ) ) );
-		setSelectedIds( ids );
+		const allIds = [];
+		// Use items state to get IDs for all post types, but only if they were fetched/checked
+		Object.keys( items ).forEach( ( postType ) => {
+			const sel = checked[ postType ];
+			if ( sel ) {
+				sel.forEach( ( id ) => allIds.push( id ) );
+			}
+		} );
+
+		setSelectedIds( allIds );
 		navigate( '/wizard/confirm' );
 	};
 
@@ -145,8 +188,13 @@ const SelectItemsStep = () => {
 
 			{ error && <Alert type="error" message={ error } style={ { marginBottom: 16 } } /> }
 
-			{ types.length === 0 && ! error ? (
-				<div style={ { textAlign: 'center', padding: 40 } }><Spin size="large" /></div>
+			{ ( types.length === 0 || preparing ) && ! error ? (
+				<div style={ { textAlign: 'center', padding: 40 } }>
+					<Spin
+						indicator={ <LoadingOutlined style={ { fontSize: 24 } } spin /> }
+						tip={ preparing ? 'Preparing demo content (downloading)…' : 'Loading items…' }
+					/>
+				</div>
 			) : (
 				<Tabs
 					activeKey={ activeTab }

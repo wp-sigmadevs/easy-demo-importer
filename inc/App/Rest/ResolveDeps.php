@@ -17,6 +17,7 @@ namespace SigmaDevs\EasyDemoImporter\App\Rest;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
+use SigmaDevs\EasyDemoImporter\Common\Functions\Helpers;
 use SigmaDevs\EasyDemoImporter\Common\{
 	Abstracts\Base,
 	Traits\Singleton,
@@ -72,10 +73,13 @@ class ResolveDeps extends Base {
 	 * @since 1.5.0
 	 */
 	public function resolve( WP_REST_Request $request ): WP_REST_Response|WP_Error {
-		$body      = $request->get_json_params();
-		$demo_slug = isset( $body['demo'] ) ? sanitize_text_field( $body['demo'] ) : '';
-		$ids       = isset( $body['selected_ids'] ) && is_array( $body['selected_ids'] )
+		$body           = $request->get_json_params();
+		$demo_slug      = isset( $body['demo'] ) ? sanitize_text_field( $body['demo'] ) : '';
+		$ids            = isset( $body['selected_ids'] ) && is_array( $body['selected_ids'] )
 			? array_map( 'absint', $body['selected_ids'] )
+			: [];
+		$import_options = isset( $body['import_options'] ) && is_array( $body['import_options'] )
+			? $body['import_options']
 			: [];
 
 		if ( ! $demo_slug ) {
@@ -86,14 +90,13 @@ class ResolveDeps extends Base {
 			);
 		}
 
-		$uploads  = wp_get_upload_dir();
-		$xml_path = $uploads['basedir'] . '/easy-demo-importer/' . $demo_slug . '/content.xml';
+		$xml_path = Helpers::resolveXmlPath( sd_edi()->getDemoConfig(), $demo_slug );
 
-		if ( ! file_exists( $xml_path ) ) {
+		if ( ! $xml_path || ! file_exists( $xml_path ) ) {
 			return rest_ensure_response( [ 'hard' => [], 'soft' => [] ] );
 		}
 
-		$result = DependencyResolver::resolve( $xml_path, $ids );
+		$result = DependencyResolver::resolve( $xml_path, $ids, $import_options );
 
 		return rest_ensure_response( $result );
 	}

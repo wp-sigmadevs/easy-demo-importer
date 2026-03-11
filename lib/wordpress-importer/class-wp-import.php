@@ -12,6 +12,24 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit( 'This script cannot be accessed directly.' );
 }
 
+if ( ! function_exists( 'sd_edi_get_new_id' ) ) {
+	/**
+	 * Helper to get new ID from persistent storage.
+	 */
+	function sd_edi_get_new_id( $old_id ) {
+		return sd_edi()->getNewID( $old_id );
+	}
+}
+
+if ( ! function_exists( 'sd_edi_create_entry' ) ) {
+	/**
+	 * Helper to create persistent mapping entry.
+	 */
+	function sd_edi_create_entry( $old_id, $new_id, $slug = '' ) {
+		sd_edi()->createEntry( $old_id, $new_id, $slug );
+	}
+}
+
 /**
  * WordPress importer class.
  */
@@ -31,6 +49,13 @@ class SD_EDI_WP_Import extends WP_Importer {
 	 * @since 1.0.0
 	 */
 	public $id;
+
+	/**
+	 * Import session ID for Phase 4 persistent storage.
+	 *
+	 * @var string
+	 */
+	public $session_id = '';
 
 	/**
 	 * Version
@@ -190,6 +215,32 @@ class SD_EDI_WP_Import extends WP_Importer {
 
 		$this->import_start( $file );
 
+		// ── Phase 4: Persistent ID recovery ─────────────────────────────────────
+		global $wpdb;
+		$table = sd_edi()->getImportTable();
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$mappings = $wpdb->get_results( "SELECT original_id, new_id FROM $table" );
+		if ( $mappings ) {
+			foreach ( $mappings as $m ) {
+				$oid = (int) $m->original_id;
+				$nid = (int) $m->new_id;
+				$this->processed_posts[ $oid ]      = $nid;
+				$this->processed_terms[ $oid ]      = $nid;
+				$this->processed_menu_items[ $oid ] = $nid;
+			}
+		}
+
+		if ( ! empty( $this->session_id ) ) {
+			$orphans = get_transient( 'sd_edi_menu_orphans_' . $this->session_id );
+			if ( is_array( $orphans ) ) {
+				$this->menu_item_orphans = $orphans;
+			}
+			$missing = get_transient( 'sd_edi_menu_missing_' . $this->session_id );
+			if ( is_array( $missing ) ) {
+				$this->missing_menu_items = $missing;
+			}
+		}
+
 		wp_suspend_cache_invalidation( true );
 		$this->process_categories();
 		$this->process_tags();
@@ -201,6 +252,11 @@ class SD_EDI_WP_Import extends WP_Importer {
 		$this->backfill_parents();
 		$this->backfill_attachment_urls();
 		$this->remap_featured_images();
+
+		if ( ! empty( $this->session_id ) ) {
+			set_transient( 'sd_edi_menu_orphans_' . $this->session_id, $this->menu_item_orphans, HOUR_IN_SECONDS );
+			set_transient( 'sd_edi_menu_missing_' . $this->session_id, $this->missing_menu_items, HOUR_IN_SECONDS );
+		}
 
 		$this->import_end();
 	}
@@ -655,6 +711,7 @@ class SD_EDI_WP_Import extends WP_Importer {
 				$comment_post_id = $post_exists;
 				$post_id         = $post_exists;
 				$this->processed_posts[ intval( $post['post_id'] ) ] = intval( $post_exists );
+				sd_edi_create_entry( $post['post_id'], $post_id, $post['post_name'] );
 			} else {
 				$post_parent = (int) $post['post_parent'];
 				if ( $post_parent ) {
@@ -745,6 +802,7 @@ class SD_EDI_WP_Import extends WP_Importer {
 			if ( ! $this->is_non_unique_post_type( $post['post_type'] ) ) {
 				// Map pre-import ID to local ID.
 				$this->processed_posts[ intval( $post['post_id'] ) ] = (int) $post_id;
+				sd_edi_create_entry( $post['post_id'], $post_id, $post['post_name'] );
 			}
 
 			if ( ! isset( $post['terms'] ) ) {
@@ -984,6 +1042,7 @@ class SD_EDI_WP_Import extends WP_Importer {
 
 		if ( $id && ! is_wp_error( $id ) ) {
 			$this->processed_menu_items[ intval( $item['post_id'] ) ] = (int) $id;
+			sd_edi_create_entry( $item['post_id'], $id );
 
 			// List of core WP menu item meta-keys to exclude.
 			$core_meta_keys = [
@@ -1292,14 +1351,18 @@ class SD_EDI_WP_Import extends WP_Importer {
 		}
 
 		// all other posts/terms are imported, retry menu items with missing associated object.
-		$missing_menu_items = $this->missing_menu_items;
+		$missing_menu_items       = $this->missing_menu_items;
+		$this->missing_menu_items = [];
 
 		foreach ( $missing_menu_items as $item ) {
 			$this->process_menu_item( $item );
 		}
 
 		// find parents for menu item orphans.
-		foreach ( $this->menu_item_orphans as $child_id => $parent_id ) {
+		$menu_item_orphans       = $this->menu_item_orphans;
+		$this->menu_item_orphans = [];
+
+		foreach ( $menu_item_orphans as $child_id => $parent_id ) {
 			$local_child_id  = 0;
 			$local_parent_id = 0;
 
@@ -1313,6 +1376,14 @@ class SD_EDI_WP_Import extends WP_Importer {
 
 			if ( $local_child_id && $local_parent_id ) {
 				update_post_meta( $local_child_id, '_menu_item_menu_item_parent', (int) $local_parent_id );
+
+				// IMPORTANT: Also update post_parent column in wp_posts for correct hierarchy in some themes/plugins.
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+				$wpdb->update( $wpdb->posts, [ 'post_parent' => $local_parent_id ], [ 'ID' => $local_child_id ], '%d', '%d' );
+				clean_post_cache( $local_child_id );
+			} else {
+				// Keep it orphaned for next chunk.
+				$this->menu_item_orphans[ $child_id ] = $parent_id;
 			}
 		}
 	}
