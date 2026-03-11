@@ -22,6 +22,9 @@ use SigmaDevs\EasyDemoImporter\Common\{
 	Utils\XmlChunker,
 	Utils\ImportLogger
 };
+use SigmaDevs\EasyDemoImporter\App\Rest\DemoItems;
+use SigmaDevs\EasyDemoImporter\App\Rest\ResolveDeps;
+use SigmaDevs\EasyDemoImporter\App\Rest\Rollback;
 
 // Do not allow directly accessing this file.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -74,6 +77,10 @@ class RestEndpoints extends Base {
 		}
 
 		$this->pluginList();
+
+		DemoItems::instance()->register();
+		ResolveDeps::instance()->register();
+		Rollback::instance()->register();
 	}
 
 	/**
