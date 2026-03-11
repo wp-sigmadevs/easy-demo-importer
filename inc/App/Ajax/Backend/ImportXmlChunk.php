@@ -18,7 +18,8 @@ use SigmaDevs\EasyDemoImporter\Common\{
 	Abstracts\ImporterAjax,
 	Utils\XmlChunker,
 	Utils\ImportLogger,
-	Utils\ImageRegenEngine
+	Utils\ImageRegenEngine,
+	Utils\UrlReplacer
 };
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -62,23 +63,31 @@ class ImportXmlChunk extends ImporterAjax {
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing
 		$offset = isset( $_POST['offset'] ) ? absint( $_POST['offset'] ) : 0;
 
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$raw_ids     = isset( $_POST['allowedIds'] ) && is_array( $_POST['allowedIds'] )
+			? array_map( 'absint', $_POST['allowedIds'] )
+			: [];
+		$allowed_ids = array_values( array_filter( $raw_ids ) );
+
 		$xml_path = $this->demoUploadDir( $this->demoDir() ) . '/content.xml';
 
 		if ( ! file_exists( $xml_path ) ) {
 			wp_send_json_error( [ 'errorMessage' => __( 'XML file not found.', 'easy-demo-importer' ) ], 404 );
 		}
 
-		// Total item count is stored in a session transient to avoid re-scanning.
-		$session_key = 'sd_edi_xml_total_' . $this->sessionId;
-		$cached      = get_transient( $session_key );
-
-		if ( false === $cached ) {
-			$items  = XmlChunker::getItems( $xml_path );
-			$cached = count( $items );
-			set_transient( $session_key, $cached, HOUR_IN_SECONDS );
+		// Total item count: use allowed_ids count when filtering, else scan/cache full XML.
+		if ( ! empty( $allowed_ids ) ) {
+			$total = count( $allowed_ids );
+		} else {
+			$session_key = 'sd_edi_xml_total_' . $this->sessionId;
+			$cached      = get_transient( $session_key );
+			if ( false === $cached ) {
+				$items  = XmlChunker::getItems( $xml_path );
+				$cached = count( $items );
+				set_transient( $session_key, $cached, HOUR_IN_SECONDS );
+			}
+			$total = (int) $cached;
 		}
-
-		$total = (int) $cached;
 
 		// Log diagnostic info if offset is 0.
 		if ( 0 === $offset ) {
@@ -94,7 +103,7 @@ class ImportXmlChunk extends ImporterAjax {
 		}
 
 		$limit     = XmlChunker::chunkSize();
-		$chunk_tmp = XmlChunker::extractChunk( $xml_path, $offset, $limit );
+		$chunk_tmp = XmlChunker::extractChunk( $xml_path, $offset, $limit, $allowed_ids );
 
 		if ( ! $chunk_tmp ) {
 			// Offset is past end — import complete.
@@ -126,6 +135,8 @@ class ImportXmlChunk extends ImporterAjax {
 				'info',
 				$this->sessionId
 			);
+
+			UrlReplacer::run( $xml_path, $this->sessionId );
 
 			$this->prepareResponse(
 				'sd_edi_import_customizer',
