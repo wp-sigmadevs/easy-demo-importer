@@ -11,7 +11,7 @@
  * Text Domain: easy-demo-importer
  * Domain Path: /languages
  * Requires at least: 5.5
- * Requires PHP: 7.4
+ * Requires PHP: 8.0
  * Namespace: SigmaDevs\EasyDemoImporter
  *
  * @package SigmaDevs\EasyDemoImporter
@@ -35,6 +35,28 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 1.0.0
  */
 define( 'SD_EDI_ROOT_FILE', __FILE__ );
+
+/**
+ * Cloudflare Worker endpoint URL for the AI proxy.
+ * Override in wp-config.php: define( 'SD_EDI_AI_PROXY_URL', 'https://...' );
+ *
+ * @since 1.6.0
+ */
+if ( ! defined( 'SD_EDI_AI_PROXY_URL' ) ) {
+	define( 'SD_EDI_AI_PROXY_URL', '' );
+}
+
+/**
+ * Shared HMAC secret — must match SHARED_SECRET env var in the Cloudflare Worker.
+ * Generate with: openssl rand -hex 32
+ * Empty string = AI features disabled (AiClient returns WP_Error('ai_misconfigured')).
+ * Override in wp-config.php: define( 'SD_EDI_AI_SHARED_SECRET', 'your-secret' );
+ *
+ * @since 1.6.0
+ */
+if ( ! defined( 'SD_EDI_AI_SHARED_SECRET' ) ) {
+	define( 'SD_EDI_AI_SHARED_SECRET', '' );
+}
 
 /**
  * Load PSR4 autoloader.
