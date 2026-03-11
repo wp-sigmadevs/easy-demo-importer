@@ -147,15 +147,16 @@ class UrlReplacer {
 			$pairs[ $http_from ] = $http_to;
 		}
 
-		// Tables and columns to search.
+		// Tables, columns, and their known primary key columns.
 		$targets = [
-			$wpdb->posts    => [ 'post_content', 'post_excerpt', 'guid' ],
-			$wpdb->postmeta => [ 'meta_value' ],
-			$wpdb->options  => [ 'option_value' ],
+			$wpdb->posts    => [ 'columns' => [ 'post_content', 'post_excerpt', 'guid' ], 'pk' => 'ID' ],
+			$wpdb->postmeta => [ 'columns' => [ 'meta_value' ], 'pk' => 'meta_id' ],
+			$wpdb->options  => [ 'columns' => [ 'option_value' ], 'pk' => 'option_id' ],
 		];
 
-		foreach ( $targets as $table => $columns ) {
-			foreach ( $columns as $col ) {
+		foreach ( $targets as $table => $config ) {
+			$pk_col = $config['pk'];
+			foreach ( $config['columns'] as $col ) {
 				foreach ( $pairs as $search => $replace ) {
 					if ( $search === $replace ) {
 						continue;
@@ -176,13 +177,12 @@ class UrlReplacer {
 					}
 
 					foreach ( $rows as $row ) {
-						$pk  = array_key_first( $row );
 						$old = $row[ $col ];
 						$new = self::replaceInValue( $old, $search, $replace );
 
 						if ( $new !== $old ) {
 							// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
-							$wpdb->update( $table, [ $col => $new ], [ $pk => $row[ $pk ] ] );
+							$wpdb->update( $table, [ $col => $new ], [ $pk_col => $row[ $pk_col ] ] );
 							++$count;
 						}
 					}
