@@ -45,15 +45,20 @@ class DependencyResolver {
 		$soft      = [];
 		$added     = array_flip( $selected_ids );
 
-		// Hard deps: parent pages not in selection.
-		foreach ( $selected_ids as $id ) {
-			$item   = $all_items[ $id ] ?? null;
-			$parent = $item ? (int) $item['post_parent'] : 0;
-
-			if ( $parent > 0 && ! isset( $added[ $parent ] ) && isset( $all_items[ $parent ] ) ) {
-				$hard[]         = $parent;
-				$added[ $parent ] = true;
+		// Hard deps: all ancestor pages not in selection (iterative — resolves grandparents too).
+		$queue = $selected_ids;
+		while ( ! empty( $queue ) ) {
+			$next_queue = [];
+			foreach ( $queue as $id ) {
+				$item   = $all_items[ $id ] ?? null;
+				$parent = $item ? (int) $item['post_parent'] : 0;
+				if ( $parent > 0 && ! isset( $added[ $parent ] ) && isset( $all_items[ $parent ] ) ) {
+					$hard[]           = $parent;
+					$added[ $parent ] = true;
+					$next_queue[]     = $parent;
+				}
 			}
+			$queue = $next_queue;
 		}
 
 		// Soft deps: nav menu items not in selection.
