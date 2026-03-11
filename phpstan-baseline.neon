@@ -271,30 +271,6 @@ parameters:
 			path: inc/App/General/Hooks.php
 
 		-
-			message: '#^Function sd_edi not found\.$#'
-			identifier: function.notFound
-			count: 1
-			path: inc/App/Rest/DemoStatsEndpoint.php
-
-		-
-			message: '#^Method SigmaDevs\\EasyDemoImporter\\App\\Rest\\DemoStatsEndpoint\:\:instance\(\) has invalid return type SigmaDevs\\EasyDemoImporter\\Common\\Traits\\Singleton\.$#'
-			identifier: return.trait
-			count: 1
-			path: inc/App/Rest/DemoStatsEndpoint.php
-
-		-
-			message: '#^Method SigmaDevs\\EasyDemoImporter\\App\\Rest\\DemoStatsEndpoint\:\:resolveXmlPath\(\) never returns null so it can be removed from the return type\.$#'
-			identifier: return.unusedType
-			count: 1
-			path: inc/App/Rest/DemoStatsEndpoint.php
-
-		-
-			message: '#^Method SigmaDevs\\EasyDemoImporter\\App\\Rest\\ImportLogEndpoint\:\:instance\(\) has invalid return type SigmaDevs\\EasyDemoImporter\\Common\\Traits\\Singleton\.$#'
-			identifier: return.trait
-			count: 1
-			path: inc/App/Rest/ImportLogEndpoint.php
-
-		-
 			message: '#^Call to function is_array\(\) with non\-empty\-array will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
 			count: 1
