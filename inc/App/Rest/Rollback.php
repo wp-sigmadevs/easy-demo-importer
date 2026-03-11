@@ -89,6 +89,17 @@ class Rollback extends Base {
 			);
 		}
 
+		$snap_data = json_decode( $row['snapshot_data'], true );
+		$owner_id  = (int) ( $snap_data['user_id'] ?? 0 );
+
+		if ( $owner_id > 0 && $owner_id !== get_current_user_id() ) {
+			return new WP_Error(
+				'forbidden',
+				__( 'You can only undo your own imports.', 'easy-demo-importer' ),
+				[ 'status' => 403 ]
+			);
+		}
+
 		$result = SnapshotManager::restore( $snapshot_id, $row['session_id'] );
 
 		if ( isset( $result['error'] ) ) {

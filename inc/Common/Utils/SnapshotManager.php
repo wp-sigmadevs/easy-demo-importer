@@ -52,6 +52,7 @@ class SnapshotManager {
 		$options[ $theme_mods_key ] = get_option( $theme_mods_key );
 
 		$snapshot = [
+			'user_id'       => get_current_user_id(),
 			'max_post_id'   => $max_post_id,
 			'max_term_id'   => $max_term_id,
 			'options'       => $options,
