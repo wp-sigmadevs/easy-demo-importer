@@ -178,10 +178,8 @@ class Initialize extends ImporterAjax {
 
 		// Check if the table exists before truncation.
 		if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $tableName ) ) === $tableName ) {
-			$wpdb->query(
-				// phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnquotedComplexPlaceholder
-				$wpdb->prepare( 'TRUNCATE TABLE %1$s', $tableName )
-			);
+			// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->query( "TRUNCATE TABLE {$tableName}" );
 		}
 	}
 
