@@ -18,8 +18,9 @@ const ConfirmationStep = () => {
 		useWizard();
 	const [footer, setFooter] = useState(null);
 	const [back, setBack] = useState(null);
-	const [ softDeps,    setSoftDeps    ] = useState( [] );
-	const [ softChecked, setSoftChecked ] = useState( {} );
+	const [ softDeps,      setSoftDeps      ] = useState( [] );
+	const [ softChecked,   setSoftChecked   ] = useState( {} );
+	const [ depsResolving, setDepsResolving ] = useState( false );
 
 	useEffect(() => {
 		if (!selectedDemo || dryRunStats) {
@@ -39,6 +40,7 @@ const ConfirmationStep = () => {
 
 	useEffect( () => {
 		if ( ! selectedDemo || selectedIds.length === 0 ) return;
+		setDepsResolving( true );
 		Api.post( '/sd/edi/v1/resolve-deps', {
 			demo:           selectedDemo.slug,
 			selected_ids:   selectedIds,
@@ -56,7 +58,8 @@ const ConfirmationStep = () => {
 				soft.forEach( ( d ) => { init[ d.id ] = false; } );
 				setSoftChecked( init );
 			} )
-			.catch( () => {} );
+			.catch( () => {} )
+		.finally( () => setDepsResolving( false ) );
 	}, [ selectedDemo ] ); // eslint-disable-line react-hooks/exhaustive-deps
 
 	useEffect(() => {
@@ -226,7 +229,7 @@ const ConfirmationStep = () => {
 					<Button
 						type="primary"
 						icon={<ThunderboltOutlined />}
-						disabled={!dryRunStats}
+						disabled={!dryRunStats || depsResolving}
 						onClick={() => {
 						const checkedSoftIds = Object.entries( softChecked )
 							.filter( ( [, checked] ) => checked )

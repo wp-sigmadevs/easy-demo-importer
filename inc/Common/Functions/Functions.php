@@ -128,12 +128,10 @@ class Functions extends Base {
 
 		$tableName = $this->getImportTable();
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$newID = $wpdb->get_var(
 			$wpdb->prepare(
-				// phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnquotedComplexPlaceholder
-				'SELECT new_id FROM %1$s WHERE original_id = %2$d',
-				$tableName,
+				"SELECT new_id FROM {$tableName} WHERE original_id = %d",
 				intval( $originalID )
 			)
 		);
@@ -161,12 +159,10 @@ class Functions extends Base {
 		$newID      = intval( $newID );
 		$slug       = sanitize_text_field( $slug );
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$existingEntry = $wpdb->get_row(
 			$wpdb->prepare(
-				// phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnquotedComplexPlaceholder
-				'SELECT * FROM %1$s WHERE original_id = %2$d',
-				$tableName,
+				"SELECT * FROM {$tableName} WHERE original_id = %d",
 				$originalID
 			)
 		);
