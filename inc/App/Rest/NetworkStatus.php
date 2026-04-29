@@ -29,7 +29,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 final class NetworkStatus {
 	/**
-	 * Namespace.
+	 * REST namespace. Deliberately hyphenated (`sd-edi/v1`) and distinct
+	 * from the legacy class's slashed namespace (`sd/edi/v1`) so Network
+	 * Admin endpoints are visibly partitioned in URLs and routing tables.
 	 *
 	 * @var string
 	 * @since 1.2.0
@@ -109,6 +111,7 @@ final class NetworkStatus {
 	 *
 	 * @return WP_REST_Response
 	 * @since 1.2.0
+	 * TODO(perf): cache the result in a 60s site-transient when networks grow large.
 	 */
 	public function getStatus(): WP_REST_Response {
 		$ids = get_sites(
@@ -165,12 +168,18 @@ final class NetworkStatus {
 		$enabled = (bool) $req->get_param( 'enabled' );
 		$config  = (array) $req->get_param( 'config' );
 
-		if ( $enabled && ! $this->validateConfigShape( $config ) ) {
-			return new WP_Error(
-				'sd_edi_invalid_config',
-				__( 'Network config must include themeName, themeSlug, and demoData.', 'easy-demo-importer' ),
-				[ 'status' => 400 ]
-			);
+		if ( $enabled ) {
+			if ( ! $this->validateConfigShape( $config ) ) {
+				return new WP_Error(
+					'sd_edi_invalid_config',
+					__( 'Network config must include themeName, themeSlug, and demoData.', 'easy-demo-importer' ),
+					[ 'status' => 400 ]
+				);
+			}
+			$config = $this->sanitizeConfigDeep( $config );
+		} else {
+			// Disabled override — store an empty array, ignore submitted config.
+			$config = [];
 		}
 
 		update_site_option( 'sd_edi_network_override_enabled', $enabled );
@@ -195,43 +204,60 @@ final class NetworkStatus {
 			return new WP_Error( 'sd_edi_bad_slug', __( 'Plugin slug is required.', 'easy-demo-importer' ), [ 'status' => 400 ] );
 		}
 
-		require_once ABSPATH . 'wp-admin/includes/plugin.php';
-		require_once ABSPATH . 'wp-admin/includes/plugin-install.php';
-		require_once ABSPATH . 'wp-admin/includes/file.php';
-		require_once ABSPATH . 'wp-admin/includes/misc.php';
-		require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
-
-		$api = plugins_api(
-			'plugin_information',
-			[ 'slug' => $slug, 'fields' => [ 'sections' => false ] ]
-		);
-		if ( is_wp_error( $api ) ) {
-			return new WP_Error( 'sd_edi_api', $api->get_error_message(), [ 'status' => 500 ] );
+		$lockKey = 'sd_edi_install_lock_' . $slug;
+		if ( get_site_transient( $lockKey ) ) {
+			return new WP_Error( 'sd_edi_install_locked', __( 'Another installation of this plugin is in progress. Please wait.', 'easy-demo-importer' ), [ 'status' => 429 ] );
 		}
+		set_site_transient( $lockKey, 1, MINUTE_IN_SECONDS * 5 );
 
-		$skin     = new \WP_Ajax_Upgrader_Skin();
-		$upgrader = new \Plugin_Upgrader( $skin );
+		try {
+			require_once ABSPATH . 'wp-admin/includes/plugin.php';
+			require_once ABSPATH . 'wp-admin/includes/plugin-install.php';
+			require_once ABSPATH . 'wp-admin/includes/file.php';
+			require_once ABSPATH . 'wp-admin/includes/misc.php';
+			require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
 
-		$downloadLink = is_object( $api ) ? ( $api->download_link ?? '' ) : ( $api['download_link'] ?? '' );
-		if ( '' === $downloadLink ) {
-			return new WP_Error( 'sd_edi_api', __( 'Could not resolve plugin download URL.', 'easy-demo-importer' ), [ 'status' => 500 ] );
+			if ( ! WP_Filesystem() ) {
+				return new WP_Error( 'sd_edi_filesystem', __( 'Filesystem credentials are required to install plugins.', 'easy-demo-importer' ), [ 'status' => 500 ] );
+			}
+
+			$api = plugins_api(
+				'plugin_information',
+				[ 'slug' => $slug, 'fields' => [ 'sections' => false ] ]
+			);
+			if ( is_wp_error( $api ) ) {
+				return new WP_Error( 'sd_edi_api', $api->get_error_message(), [ 'status' => 500 ] );
+			}
+
+			$skin     = new \WP_Ajax_Upgrader_Skin();
+			$upgrader = new \Plugin_Upgrader( $skin );
+
+			$downloadLink = is_object( $api ) ? ( $api->download_link ?? '' ) : ( $api['download_link'] ?? '' );
+			if ( '' === $downloadLink ) {
+				return new WP_Error( 'sd_edi_api', __( 'Could not resolve plugin download URL.', 'easy-demo-importer' ), [ 'status' => 500 ] );
+			}
+
+			$result = $upgrader->install( $downloadLink );
+			if ( is_wp_error( $result ) ) {
+				return new WP_Error( 'sd_edi_install', $result->get_error_message(), [ 'status' => 500 ] );
+			}
+
+			$pluginFile = $upgrader->plugin_info();
+			if ( ! $pluginFile ) {
+				return new WP_Error( 'sd_edi_install_no_file', __( 'Plugin installed but file path could not be resolved.', 'easy-demo-importer' ), [ 'status' => 500 ] );
+			}
+
+			$activate = activate_plugin( $pluginFile, '', true, true ); // network=true, silent=true
+			if ( is_wp_error( $activate ) ) {
+				return new WP_Error( 'sd_edi_activate', $activate->get_error_message(), [ 'status' => 500 ] );
+			}
+
+			wp_clean_plugins_cache( true );
+
+			return new WP_REST_Response( [ 'ok' => true, 'plugin_file' => $pluginFile ], 200 );
+		} finally {
+			delete_site_transient( $lockKey );
 		}
-		$result   = $upgrader->install( $downloadLink );
-		if ( is_wp_error( $result ) ) {
-			return new WP_Error( 'sd_edi_install', $result->get_error_message(), [ 'status' => 500 ] );
-		}
-
-		$pluginFile = $upgrader->plugin_info();
-		if ( ! $pluginFile ) {
-			return new WP_Error( 'sd_edi_install_no_file', __( 'Plugin installed but file path could not be resolved.', 'easy-demo-importer' ), [ 'status' => 500 ] );
-		}
-
-		$activate = activate_plugin( $pluginFile, '', true ); // network=true
-		if ( is_wp_error( $activate ) ) {
-			return new WP_Error( 'sd_edi_activate', $activate->get_error_message(), [ 'status' => 500 ] );
-		}
-
-		return new WP_REST_Response( [ 'ok' => true, 'plugin_file' => $pluginFile ], 200 );
 	}
 
 	/**
@@ -245,6 +271,26 @@ final class NetworkStatus {
 		$table = $wpdb->prefix . 'sd_edi_taxonomy_import';
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		return $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) ) === $table;
+	}
+
+	/**
+	 * Recursively sanitize string leaves of a config array.
+	 *
+	 * @param array $config Raw config.
+	 *
+	 * @return array Sanitized config.
+	 * @since 1.2.0
+	 */
+	private function sanitizeConfigDeep( array $config ): array {
+		array_walk_recursive(
+			$config,
+			static function ( &$value ) {
+				if ( is_string( $value ) ) {
+					$value = sanitize_text_field( $value );
+				}
+			}
+		);
+		return $config;
 	}
 
 	/**
