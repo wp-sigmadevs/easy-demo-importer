@@ -52,10 +52,21 @@ class Setup {
 		set_transient( 'sd_edi_installing', 'yes', MINUTE_IN_SECONDS * 10 );
 
 		if ( function_exists( 'is_multisite' ) && is_multisite() ) {
-			// Network-active and per-site activation both land here.
-			// Network-active: WP calls activation hook once (current blog == main).
-			// Cover other blogs by enumerating sites.
-			NetworkInstaller::createTablesForAllBlogs();
+			// Detect network-active vs per-site activation. is_plugin_active_for_network()
+			// requires wp-admin/includes/plugin.php which may not be loaded.
+			if ( ! function_exists( 'is_plugin_active_for_network' ) ) {
+				require_once ABSPATH . 'wp-admin/includes/plugin.php';
+			}
+
+			$pluginFile = defined( 'SD_EDI_ROOT_FILE' ) ? plugin_basename( SD_EDI_ROOT_FILE ) : '';
+
+			if ( $pluginFile && is_plugin_active_for_network( $pluginFile ) ) {
+				// Network-activated: provision every blog (chunked).
+				NetworkInstaller::createTablesForAllBlogs();
+			} else {
+				// Per-subsite activation: provision only the current blog.
+				NetworkInstaller::createTableForBlog( (int) get_current_blog_id() );
+			}
 		} else {
 			self::createTable();
 			self::createDemoDir();
