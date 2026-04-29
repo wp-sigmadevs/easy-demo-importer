@@ -30,7 +30,7 @@ final class ContextResolver {
 	 * @return bool
 	 * @since 1.2.0
 	 */
-	public static function isMultisite() {
+	public static function isMultisite(): bool {
 		return function_exists( 'is_multisite' ) && is_multisite();
 	}
 
@@ -40,7 +40,7 @@ final class ContextResolver {
 	 * @return bool
 	 * @since 1.2.0
 	 */
-	public static function isNetworkContext() {
+	public static function isNetworkContext(): bool {
 		return self::isMultisite() && function_exists( 'is_network_admin' ) && is_network_admin();
 	}
 
@@ -50,17 +50,24 @@ final class ContextResolver {
 	 * @return int
 	 * @since 1.2.0
 	 */
-	public static function currentBlogId() {
+	public static function currentBlogId(): int {
 		return self::isMultisite() ? (int) get_current_blog_id() : 1;
 	}
 
 	/**
 	 * Whether the current user can run an import on the current blog.
 	 *
+	 * NOTE: this is a screen-context check. `is_network_admin()` returns false
+	 * during REST/AJAX/cron requests even if the originating screen was Network
+	 * Admin. Callers in REST/AJAX endpoints that need the network-admin gate
+	 * should additionally check `is_super_admin()` directly, OR resolve the
+	 * target via `targetBlogId()` and gate on that. Do not rely on this method
+	 * alone for cross-blog operations.
+	 *
 	 * @return bool
 	 * @since 1.2.0
 	 */
-	public static function canRunImport() {
+	public static function canRunImport(): bool {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			return false;
 		}
@@ -79,7 +86,7 @@ final class ContextResolver {
 	 * @return bool
 	 * @since 1.2.0
 	 */
-	public static function canInstallPlugins() {
+	public static function canInstallPlugins(): bool {
 		if ( self::isMultisite() ) {
 			return is_super_admin();
 		}
@@ -94,7 +101,7 @@ final class ContextResolver {
 	 * @return bool
 	 * @since 1.2.0
 	 */
-	public static function canUnfilteredUpload() {
+	public static function canUnfilteredUpload(): bool {
 		if ( self::isMultisite() ) {
 			return is_super_admin();
 		}
@@ -109,11 +116,14 @@ final class ContextResolver {
 	 * @return int
 	 * @since 1.2.0
 	 */
-	public static function targetBlogId() {
+	public static function targetBlogId(): int {
 		if ( self::isMultisite() && self::canInstallPlugins() && isset( $_GET['blog'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			$candidate = absint( wp_unslash( $_GET['blog'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			if ( $candidate > 0 ) {
-				return $candidate;
+				$details = get_blog_details( $candidate );
+				if ( $details && empty( $details->archived ) && empty( $details->spam ) && empty( $details->deleted ) ) {
+					return $candidate;
+				}
 			}
 		}
 
@@ -127,7 +137,7 @@ final class ContextResolver {
 	 * @return string
 	 * @since 1.2.0
 	 */
-	public static function currentBlogLabel() {
+	public static function currentBlogLabel(): string {
 		$id = self::currentBlogId();
 
 		if ( ! self::isMultisite() ) {
