@@ -13,6 +13,7 @@ declare( strict_types=1 );
 namespace SigmaDevs\EasyDemoImporter\Common\Functions;
 
 use SigmaDevs\EasyDemoImporter\Common\Abstracts\Base;
+use SigmaDevs\EasyDemoImporter\Common\Utils\NetworkInstaller;
 
 // Do not allow directly accessing this file.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -71,10 +72,25 @@ class Functions extends Base {
 	/**
 	 * Get Theme demo config.
 	 *
+	 * Resolution order (multisite):
+	 *   1) Network override (site_option 'sd_edi_network_config')
+	 *      ONLY applied when 'sd_edi_network_override_enabled' site_option is true.
+	 *   2) Per-subsite theme filter ('sd/edi/importer/config').
+	 *   3) Empty array.
+	 *
 	 * @return array
 	 * @since 1.0.0
 	 */
 	public function getDemoConfig() {
+		if ( function_exists( 'is_multisite' ) && is_multisite() ) {
+			$enabled = (bool) get_site_option( 'sd_edi_network_override_enabled', false );
+			$network = get_site_option( 'sd_edi_network_config', [] );
+
+			if ( $enabled && is_array( $network ) && ! empty( $network ) ) {
+				return apply_filters( 'sd/edi/importer/config', $network ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+			}
+		}
+
 		return apply_filters( 'sd/edi/importer/config', [] ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 	}
 
@@ -104,7 +120,8 @@ class Functions extends Base {
 	}
 
 	/**
-	 * Get the import table name.
+	 * Get the import table name. Lazy-creates the table if missing on the
+	 * current blog (covers multisite blogs created before plugin activation).
 	 *
 	 * @return string
 	 * @since 1.0.0
@@ -112,7 +129,15 @@ class Functions extends Base {
 	public function getImportTable() {
 		global $wpdb;
 
-		return sanitize_key( $wpdb->prefix . 'sd_edi_taxonomy_import' );
+		$tableName = sanitize_key( $wpdb->prefix . 'sd_edi_taxonomy_import' );
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$exists = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $tableName ) );
+		if ( $exists !== $tableName ) {
+			NetworkInstaller::createTableForBlog( (int) get_current_blog_id() );
+		}
+
+		return $tableName;
 	}
 
 	/**
