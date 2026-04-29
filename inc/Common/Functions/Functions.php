@@ -87,7 +87,7 @@ class Functions extends Base {
 			$network = get_site_option( 'sd_edi_network_config', [] );
 
 			if ( $enabled && is_array( $network ) && ! empty( $network ) ) {
-				return apply_filters( 'sd/edi/importer/config', $network ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+				return $network;
 			}
 		}
 
@@ -121,7 +121,8 @@ class Functions extends Base {
 
 	/**
 	 * Get the import table name. Lazy-creates the table if missing on the
-	 * current blog (covers multisite blogs created before plugin activation).
+	 * current blog (covers single-site after manual drop AND multisite blogs
+	 * created before plugin activation).
 	 *
 	 * @return string
 	 * @since 1.0.0
@@ -134,7 +135,7 @@ class Functions extends Base {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$exists = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $tableName ) );
 		if ( $exists !== $tableName ) {
-			NetworkInstaller::createTableForBlog( (int) get_current_blog_id() );
+			NetworkInstaller::ensureTableForCurrentBlog();
 		}
 
 		return $tableName;
