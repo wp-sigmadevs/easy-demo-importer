@@ -39,6 +39,13 @@ final class NetworkInstaller {
 	const CHUNK_SIZE = 50;
 
 	/**
+	 * Per-blog taxonomy-import working table suffix.
+	 *
+	 * @since 1.2.0
+	 */
+	private const TABLE_SUFFIX = 'sd_edi_taxonomy_import';
+
+	/**
 	 * Create the plugin's per-blog table on a given blog.
 	 *
 	 * @param int $blogId Target blog ID.
@@ -46,8 +53,12 @@ final class NetworkInstaller {
 	 * @return void
 	 * @since 1.2.0
 	 */
-	public static function createTableForBlog( int $blogId ) {
+	public static function createTableForBlog( int $blogId ): void {
 		if ( ! function_exists( 'is_multisite' ) || ! is_multisite() ) {
+			return;
+		}
+
+		if ( ! get_site( $blogId ) ) {
 			return;
 		}
 
@@ -63,20 +74,31 @@ final class NetworkInstaller {
 	/**
 	 * Drop the plugin's per-blog table on a given blog and clean per-blog options.
 	 *
+	 * Deletes ALL options matching `sd_edi_%` in that blog's options table.
+	 * This is the documented contract: any option name starting with `sd_edi_`
+	 * is considered per-blog state owned by this plugin and is purged on
+	 * subsite delete / plugin uninstall. Cross-blog or network-wide state
+	 * MUST be stored as site_options (which use a different prefix and key
+	 * space) to avoid being swept here.
+	 *
 	 * @param int $blogId Target blog ID.
 	 *
 	 * @return void
 	 * @since 1.2.0
 	 */
-	public static function dropTableForBlog( int $blogId ) {
+	public static function dropTableForBlog( int $blogId ): void {
 		if ( ! function_exists( 'is_multisite' ) || ! is_multisite() ) {
+			return;
+		}
+
+		if ( ! get_site( $blogId ) ) {
 			return;
 		}
 
 		switch_to_blog( $blogId );
 		try {
 			global $wpdb;
-			$table = $wpdb->prefix . 'sd_edi_taxonomy_import';
+			$table = $wpdb->prefix . self::TABLE_SUFFIX;
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 			$wpdb->query( "DROP TABLE IF EXISTS `{$table}`" );
 
@@ -97,7 +119,7 @@ final class NetworkInstaller {
 	 * @return void
 	 * @since 1.2.0
 	 */
-	public static function createTablesForAllBlogs() {
+	public static function createTablesForAllBlogs(): void {
 		if ( ! function_exists( 'is_multisite' ) || ! is_multisite() ) {
 			return;
 		}
@@ -136,7 +158,7 @@ final class NetworkInstaller {
 	 * @return void
 	 * @since 1.2.0
 	 */
-	public static function processChunk( array $blogIds ) {
+	public static function processChunk( array $blogIds ): void {
 		if ( empty( $blogIds ) ) {
 			return;
 		}
@@ -159,12 +181,12 @@ final class NetworkInstaller {
 	 * @return void
 	 * @since 1.2.0
 	 */
-	private static function runCreateTable() {
+	private static function runCreateTable(): void {
 		global $wpdb;
 
 		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 
-		$tableName = sanitize_key( $wpdb->prefix . 'sd_edi_taxonomy_import' );
+		$tableName = sanitize_key( $wpdb->prefix . self::TABLE_SUFFIX );
 		$collate   = $wpdb->has_cap( 'collation' ) ? $wpdb->get_charset_collate() : '';
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
@@ -189,7 +211,7 @@ final class NetworkInstaller {
 	 * @return void
 	 * @since 1.2.0
 	 */
-	private static function runCreateDir() {
+	private static function runCreateDir(): void {
 		$uploads = wp_get_upload_dir();
 		$dir     = trailingslashit( $uploads['basedir'] ) . 'easy-demo-importer';
 		if ( ! is_dir( $dir ) ) {
