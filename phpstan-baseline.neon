@@ -217,6 +217,12 @@ parameters:
 			path: inc/App/Ajax/Backend/InstallPlugins.php
 
 		-
+			message: '#^Cannot access property \$download_link on array\|object\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: inc/App/Rest/NetworkStatus.php
+
+		-
 			message: '#^Method SigmaDevs\\EasyDemoImporter\\App\\Ajax\\Backend\\InstallPlugins\:\:instance\(\) has invalid return type SigmaDevs\\EasyDemoImporter\\Common\\Traits\\Singleton\.$#'
 			identifier: return.trait
 			count: 1
