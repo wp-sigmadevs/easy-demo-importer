@@ -112,6 +112,22 @@ final class NetworkInstaller {
 	}
 
 	/**
+	 * Ensure the per-blog table and demo dir exist on the current blog.
+	 *
+	 * Unlike createTableForBlog(), this method does NOT switch blogs and
+	 * does NOT gate on is_multisite(). It is safe to call from request
+	 * context on either single-site or multisite installs to lazily
+	 * provision the working table when a caller discovers it is missing.
+	 *
+	 * @return void
+	 * @since 1.2.0
+	 */
+	public static function ensureTableForCurrentBlog(): void {
+		self::runCreateTable();
+		self::runCreateDir();
+	}
+
+	/**
 	 * Create tables on all current blogs in a network. Chunked.
 	 * The first chunk runs synchronously; remaining blog IDs are processed
 	 * by a single-shot WP-Cron event to avoid activation timeouts.
