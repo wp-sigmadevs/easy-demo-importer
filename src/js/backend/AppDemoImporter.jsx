@@ -1,5 +1,6 @@
 import Header from './Layouts/Header';
 import Support from './components/Support';
+import SubsiteBanner from './components/SubsiteBanner';
 import DemoCard from './components/DemoCard';
 import { useShallow } from 'zustand/react/shallow';
 import React, { useState, useEffect } from 'react';
@@ -351,6 +352,7 @@ const AppDemoImporter = () => {
 	return (
 		<>
 			<div className="wrap edi-demo-importer-wrapper">
+				<SubsiteBanner />
 				<Header
 					logo={sdEdiAdminParams.ediLogo}
 					heading="Demo Importer"
