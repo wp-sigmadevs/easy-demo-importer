@@ -3,7 +3,8 @@
 - **Date:** 2026-04-29
 - **Branch:** `multi-site`
 - **Base:** `master` (independent of `alpha` / Phase 4)
-- **Target version:** next release after current master (confirm version number from `easy-demo-importer.php` plugin header before tagging — header currently reads `1.1.6`, project memory references `1.4.0`)
+- **Current released version:** `1.1.6` (per `easy-demo-importer.php` plugin header on master)
+- **Target version:** `1.2.0` (minor bump — additive feature, no breaking changes for single-site users)
 - **Status:** Approved, ready for implementation plan
 
 ---
@@ -442,8 +443,8 @@ No automated test suite in repo today. QA verifies via the matrix above; results
 ```
 Branch:   multi-site (current, already checked out)
 Base:     master  (independent of alpha / Phase 4)
-Version:  next release after current master (confirm exact number from
-          easy-demo-importer.php header before tagging)
+Current:  1.1.6  (master)
+Target:   1.2.0  (minor bump — additive, no breaking changes for single-site)
 Phase 4 (alpha): out of scope here; independent track; decision deferred.
 
 Beta: 2 weeks on a real multisite (5+ subsites) before tagging.
@@ -467,8 +468,7 @@ Deferred to a later release:
 
 ## 13. Open items to confirm before implementation
 
-1. Exact target version number — header reads `1.1.6`, memory references `1.4.0`. Confirm and align both.
-2. Beta multisite test environment availability (subsite count, themes used).
-3. Whether to ship the Network Config JSON editor in v1 or replace it with a guided form (JSON editor accepted as v1 baseline; can be revisited).
+1. Beta multisite test environment availability (subsite count, themes used).
+2. Whether to ship the Network Config JSON editor in v1 or replace it with a guided form (JSON editor accepted as v1 baseline; can be revisited).
 
 ---
