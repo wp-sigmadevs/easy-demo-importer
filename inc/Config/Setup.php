@@ -12,6 +12,8 @@ declare( strict_types=1 );
 
 namespace SigmaDevs\EasyDemoImporter\Config;
 
+use SigmaDevs\EasyDemoImporter\Common\Utils\NetworkInstaller;
+
 // Do not allow directly accessing this file.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit( 'This script cannot be accessed directly.' );
@@ -49,11 +51,17 @@ class Setup {
 		// If we made it till here nothing is running yet, lets set the transient now.
 		set_transient( 'sd_edi_installing', 'yes', MINUTE_IN_SECONDS * 10 );
 
-		self::createTable();
+		if ( function_exists( 'is_multisite' ) && is_multisite() ) {
+			// Network-active and per-site activation both land here.
+			// Network-active: WP calls activation hook once (current blog == main).
+			// Cover other blogs by enumerating sites.
+			NetworkInstaller::createTablesForAllBlogs();
+		} else {
+			self::createTable();
+			self::createDemoDir();
+		}
 
 		delete_transient( 'sd_edi_installing' );
-
-		self::createDemoDir();
 
 		// Clear the permalinks.
 		flush_rewrite_rules();
