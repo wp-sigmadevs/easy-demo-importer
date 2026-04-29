@@ -17,6 +17,7 @@ use SigmaDevs\EasyDemoImporter\Common\{
 	Functions\Helpers,
 	Abstracts\Enqueue as EnqueueBase
 };
+use SigmaDevs\EasyDemoImporter\Common\Utils\ContextResolver;
 
 // Do not allow directly accessing this file.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -145,6 +146,25 @@ class Enqueue extends EnqueueBase {
 				'homeUrl'                    => esc_url( home_url( '/' ) ),
 				'restApiUrl'                 => esc_url_raw( rest_url() ),
 				'restNonce'                  => wp_create_nonce( 'wp_rest' ),
+
+				// Multisite context.
+				'isMultisite'                => ContextResolver::isMultisite(),
+				'isNetworkContext'           => ContextResolver::isNetworkContext(),
+				'currentBlogId'              => ContextResolver::currentBlogId(),
+				'currentBlogLabel'           => ContextResolver::currentBlogLabel(),
+				'currentBlogUrl'             => esc_url( home_url() ),
+				'isSuperAdmin'               => function_exists( 'is_super_admin' ) && is_super_admin(),
+				'canInstallPlugins'          => ContextResolver::canInstallPlugins(),
+				'canUnfilteredUpload'        => ContextResolver::canUnfilteredUpload(),
+				'subsiteBannerLabel'         => sprintf(
+					/* translators: %s: subsite label like "subsite-2 (https://sub2.example.com)" */
+					esc_html__( 'Importing into: %s', 'easy-demo-importer' ),
+					ContextResolver::currentBlogLabel()
+				),
+				'networkContactSubject'      => esc_html__( 'Easy Demo Importer — required plugins missing', 'easy-demo-importer' ),
+				'networkContactBody'         => esc_html__( "Hello,\n\nI need the following plugins installed network-wide for the demo importer to run:\n\n", 'easy-demo-importer' ),
+				'networkRequiredPluginsMissing' => [],
+
 				'ediLogo'                    => esc_url( $this->plugin->assetsUri() . '/images/sd-edi-logo.svg' ),
 				'numberOfDemos'              => ! empty( sd_edi()->getDemoConfig()['demoData'] ) ? count( sd_edi()->getDemoConfig()['demoData'] ) : 0,
 				'hasTabCategories'           => ! empty( sd_edi()->getDemoConfig()['demoData'] ) ? Helpers::searchArrayKey( sd_edi()->getDemoConfig(), 'category' ) : 'no',
