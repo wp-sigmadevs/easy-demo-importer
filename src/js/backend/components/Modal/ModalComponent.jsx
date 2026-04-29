@@ -8,6 +8,7 @@ import { doAxios } from '../../utils/Api';
 import { Modal, Row, Col, Steps } from 'antd';
 import useSharedDataStore from '../../utils/sharedDataStore';
 import { getCurrentStatus, progressSteps } from '../../utils/helpers';
+import DomainEchoConfirm from '../DomainEchoConfirm';
 
 /* global sdEdiAdminParams */
 
@@ -49,6 +50,8 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 	const [importStatus, setImportStatus] = useState('');
 	const [showImportProgress, setShowImportProgress] = useState(false);
 	const [importProgress, setImportProgress] = useState([]);
+	const [domainEchoVisible, setDomainEchoVisible] = useState(false);
+	const [pendingImport, setPendingImport] = useState(null);
 
 	/**
 	 * When the modal opens and there is a saved resume request (from a previous interrupted
@@ -106,46 +109,55 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 			importInitMessage = sdEdiAdminParams.resetDatabase;
 		}
 
+		const runImport = () => {
+			const request = {
+				demo: id,
+				reset,
+				excludeImages,
+				skipImageRegeneration,
+				nextPhase: 'sd_edi_install_demo',
+				nextPhaseMessage: resetMessage,
+			};
+
+			try {
+				setCurrentStep(3);
+				setShowImportProgress(true);
+
+				const initialProgress = [{ message: importInitMessage }];
+				setImportProgress(initialProgress);
+
+				setTimeout(function () {
+					doAxios(
+						request,
+						setImportProgress,
+						setCurrentStep,
+						handleImportResponse,
+						setMessage,
+						setHint,
+						setResumeRequest
+					);
+				}, 2000);
+			} catch (error) {
+				console.error('Error:', error);
+				setImportStatus('error');
+			}
+		};
+
+		// Multisite + reset → require domain-echo input.
+		if (sdEdiAdminParams.isMultisite && reset) {
+			setPendingImport(() => runImport);
+			setDomainEchoVisible(true);
+			return;
+		}
+
+		// Single-site or non-reset → existing Modal.confirm flow.
 		Modal.confirm({
 			title: confirmMessage,
 			centered: true,
 			className: 'confirmation-modal',
 			okText: sdEdiAdminParams.confirmYes,
 			cancelText: sdEdiAdminParams.confirmNo,
-			onOk: async () => {
-				const request = {
-					demo: id,
-					reset,
-					excludeImages,
-					skipImageRegeneration,
-					nextPhase: 'sd_edi_install_demo',
-					nextPhaseMessage: resetMessage,
-				};
-
-				try {
-					setCurrentStep(3);
-					setShowImportProgress(true);
-
-					// Start the import process
-					const initialProgress = [{ message: importInitMessage }];
-					setImportProgress(initialProgress);
-
-					setTimeout(function () {
-						doAxios(
-							request,
-							setImportProgress,
-							setCurrentStep,
-							handleImportResponse,
-							setMessage,
-							setHint,
-							setResumeRequest
-						);
-					}, 2000);
-				} catch (error) {
-					console.error('Error:', error);
-					setImportStatus('error');
-				}
-			},
+			onOk: runImport,
 		});
 	};
 
@@ -347,6 +359,23 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 					</Row>
 				)}
 			</Modal>
+			<DomainEchoConfirm
+				visible={domainEchoVisible}
+				title={sdEdiAdminParams.confirmationModalWithReset || 'Confirm reset'}
+				description={sdEdiAdminParams.resetDatabaseHint || ''}
+				onConfirm={() => {
+					setDomainEchoVisible(false);
+					if (pendingImport) {
+						const fn = pendingImport;
+						setPendingImport(null);
+						fn();
+					}
+				}}
+				onCancel={() => {
+					setDomainEchoVisible(false);
+					setPendingImport(null);
+				}}
+			/>
 		</>
 	);
 };
