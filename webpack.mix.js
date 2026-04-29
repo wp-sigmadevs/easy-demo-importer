@@ -107,6 +107,7 @@ if (
 	 * JS
 	 */
 	mix.js('src/js/backend.js', 'assets/js/backend.min.js').react();
+	mix.js('src/js/network.js', 'assets/js/network.min.js').react();
 
 	/**
 	 * CSS
