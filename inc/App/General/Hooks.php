@@ -19,6 +19,7 @@ use SigmaDevs\EasyDemoImporter\Common\
 	Functions\Actions,
 	Functions\Filters
 };
+use SigmaDevs\EasyDemoImporter\Common\Utils\NetworkInstaller;
 
 // Do not allow directly accessing this file.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -78,6 +79,11 @@ class Hooks extends Base {
 		// Actions after import.
 		add_action( 'sd/edi/after_import', [ Actions::class, 'afterImportActions' ] );
 
+		// Multisite lifecycle.
+		add_action( 'wp_initialize_site', [ $this, 'onSiteCreate' ], 10, 2 );
+		add_action( 'wp_uninitialize_site', [ $this, 'onSiteDelete' ], 10, 1 );
+		add_action( NetworkInstaller::CRON_HOOK, [ NetworkInstaller::class, 'processChunk' ], 10, 1 );
+
 		return $this;
 	}
 
@@ -95,5 +101,36 @@ class Hooks extends Base {
 
 		// Fix WordPress MIME type detection for SVG files.
 		add_filter( 'wp_check_filetype_and_ext', [ Filters::class, 'fixSVGDetection' ], 10, 3 );
+	}
+
+	/**
+	 * Create the plugin's per-blog table when a new subsite is created.
+	 *
+	 * @param \WP_Site $newSite The new site object.
+	 * @param array    $args    Initialization arguments (unused).
+	 *
+	 * @return void
+	 * @since 1.2.0
+	 */
+	public function onSiteCreate( $newSite, $args = [] ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
+		if ( ! function_exists( 'is_multisite' ) || ! is_multisite() ) {
+			return;
+		}
+		NetworkInstaller::createTableForBlog( (int) $newSite->blog_id );
+	}
+
+	/**
+	 * Drop the plugin's per-blog table when a subsite is removed.
+	 *
+	 * @param \WP_Site $oldSite The site being removed.
+	 *
+	 * @return void
+	 * @since 1.2.0
+	 */
+	public function onSiteDelete( $oldSite ) {
+		if ( ! function_exists( 'is_multisite' ) || ! is_multisite() ) {
+			return;
+		}
+		NetworkInstaller::dropTableForBlog( (int) $oldSite->blog_id );
 	}
 }
