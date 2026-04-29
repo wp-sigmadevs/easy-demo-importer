@@ -1,6 +1,7 @@
 import ModalHeader from '../ModalHeader';
 import React, { useEffect } from 'react';
 import PluginList from '../../PluginList';
+import MultisitePluginNotice from '../../MultisitePluginNotice';
 import { Button, Col, Row, Skeleton, Switch, Tooltip } from 'antd';
 import useSharedDataStore from '../../../utils/sharedDataStore';
 import {
@@ -125,7 +126,10 @@ const Setup = ({ modalData, handleImport, handleReset }) => {
 									/>
 								</div>
 							) : (
-								<PluginList plugins={filteredPluginDataArray} />
+								<>
+									<MultisitePluginNotice plugins={filteredPluginDataArray} />
+									<PluginList plugins={filteredPluginDataArray} />
+								</>
 							)}
 						</div>
 					</Col>
