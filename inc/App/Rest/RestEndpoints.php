@@ -143,6 +143,7 @@ class RestEndpoints extends Base {
 		$this->addDemoDataEndpoint();
 		$this->addPluginStatusEndpoint();
 		$this->addServerStatusEndpoint();
+		( new NetworkStatus() )->registerRoutes();
 	}
 
 	/**
