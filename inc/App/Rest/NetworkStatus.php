@@ -211,7 +211,12 @@ final class NetworkStatus {
 
 		$skin     = new \WP_Ajax_Upgrader_Skin();
 		$upgrader = new \Plugin_Upgrader( $skin );
-		$result   = $upgrader->install( $api->download_link );
+
+		$downloadLink = is_object( $api ) ? ( $api->download_link ?? '' ) : ( $api['download_link'] ?? '' );
+		if ( '' === $downloadLink ) {
+			return new WP_Error( 'sd_edi_api', __( 'Could not resolve plugin download URL.', 'easy-demo-importer' ), [ 'status' => 500 ] );
+		}
+		$result   = $upgrader->install( $downloadLink );
 		if ( is_wp_error( $result ) ) {
 			return new WP_Error( 'sd_edi_install', $result->get_error_message(), [ 'status' => 500 ] );
 		}
