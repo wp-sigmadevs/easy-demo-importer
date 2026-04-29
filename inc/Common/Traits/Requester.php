@@ -44,6 +44,8 @@ trait Requester {
 				return $this->isAdminBackend();
 			case 'cron':
 				return $this->isCron();
+			case 'networkBackend':
+				return $this->isNetworkBackend();
 			default:
 				wp_die(
 					sprintf(
@@ -100,6 +102,18 @@ trait Requester {
 	 */
 	public function isAdminBackend() {
 		return is_user_logged_in() && is_admin();
+	}
+
+	/**
+	 * Is it the network admin?
+	 *
+	 * @return bool
+	 * @since 1.2.0
+	 */
+	public function isNetworkBackend(): bool {
+		return is_user_logged_in()
+			&& function_exists( 'is_multisite' ) && is_multisite()
+			&& function_exists( 'is_network_admin' ) && is_network_admin();
 	}
 
 	/**
