@@ -45,9 +45,12 @@ function sd_edi_uninstall_current_blog() {
 		if ( ! function_exists( 'WP_Filesystem' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/file.php';
 		}
-		WP_Filesystem();
-		global $wp_filesystem;
-		$wp_filesystem->rmdir( $edi_dir, true );
+		if ( WP_Filesystem() ) {
+			global $wp_filesystem;
+			if ( ! empty( $wp_filesystem ) && is_object( $wp_filesystem ) ) {
+				$wp_filesystem->rmdir( $edi_dir, true );
+			}
+		}
 	}
 
 	// Per-blog cron.
@@ -63,11 +66,8 @@ function sd_edi_uninstall_current_blog() {
 if ( defined( 'MULTISITE' ) && MULTISITE ) { // @phpstan-ignore-line phpstanWP.wpConstant.fetch
 	$ids = get_sites(
 		[
-			'fields'   => 'ids',
-			'number'   => 0,
-			'archived' => 0,
-			'spam'     => 0,
-			'deleted'  => 0,
+			'fields' => 'ids',
+			'number' => 0,
 		]
 	);
 	foreach ( $ids as $blog_id ) {
