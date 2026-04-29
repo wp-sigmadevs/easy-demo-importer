@@ -466,9 +466,10 @@ Deferred to a later release:
 
 ---
 
-## 13. Open items to confirm before implementation
+## 13. Confirmed decisions (all open items resolved)
 
-1. Beta multisite test environment availability (subsite count, themes used).
-2. Whether to ship the Network Config JSON editor in v1 or replace it with a guided form (JSON editor accepted as v1 baseline; can be revisited).
+1. **Target version:** `1.2.0`.
+2. **Beta multisite environment:** to be provisioned by maintainer prior to release. No automated CI multisite at this stage.
+3. **Network Config UI:** JSON editor for v1.2.0; guided form is a v1.3.0+ candidate.
 
 ---
