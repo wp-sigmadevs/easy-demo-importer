@@ -68,15 +68,17 @@ final class ContextResolver {
 	 * @since 1.2.0
 	 */
 	public static function canRunImport(): bool {
-		if ( ! current_user_can( 'manage_options' ) ) {
-			return false;
+		// Super Admin can always run an import (any blog, any context).
+		if ( function_exists( 'is_super_admin' ) && is_super_admin() ) {
+			return true;
 		}
 
-		if ( self::isNetworkContext() && ! is_super_admin() ) {
-			return false;
+		// Outside Network Admin, manage_options is the per-blog gate.
+		if ( current_user_can( 'manage_options' ) && ! self::isNetworkContext() ) {
+			return true;
 		}
 
-		return true;
+		return false;
 	}
 
 	/**

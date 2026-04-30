@@ -99,8 +99,9 @@ class Initialize extends ImporterAjax {
 		// Verifying AJAX call and user role.
 		Helpers::verifyAjaxCall();
 
-		// Clear any prior attachment-skip counter so this import starts at zero.
+		// Clear any prior attachment-skip counter and start observing.
 		UploadSkipCounter::reset();
+		UploadSkipCounter::start();
 
 		// Reject if another import is already running.
 		if ( SessionManager::isLocked() ) {
