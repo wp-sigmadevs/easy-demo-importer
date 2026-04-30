@@ -52,6 +52,7 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 	const [importProgress, setImportProgress] = useState([]);
 	const [domainEchoVisible, setDomainEchoVisible] = useState(false);
 	const [pendingImport, setPendingImport] = useState(null);
+	const [skippedUploads, setSkippedUploads] = useState(0);
 
 	/**
 	 * When the modal opens and there is a saved resume request (from a previous interrupted
@@ -178,6 +179,7 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 				setImportComplete(false);
 			} else {
 				setMessage(response.data.completedMessage);
+				setSkippedUploads(Number(response.data.skippedUploads) || 0);
 				setImportComplete(true);
 				// Import finished cleanly — clear session tracking and any saved resume state.
 				setActiveSessionId('');
@@ -215,6 +217,7 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 		setReset(true);
 		setImportProgress([]);
 		setImportComplete(false);
+		setSkippedUploads(0);
 	};
 
 	/**
@@ -352,6 +355,7 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 										canResume={!!resumeRequest}
 										message={message}
 										hint={hint}
+										skippedUploads={skippedUploads}
 									/>
 								)}
 							</div>

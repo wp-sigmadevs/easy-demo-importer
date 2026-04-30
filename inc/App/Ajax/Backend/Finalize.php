@@ -16,6 +16,7 @@ use SigmaDevs\EasyDemoImporter\Common\{
 	Traits\Singleton,
 	Functions\Helpers,
 	Functions\SessionManager,
+	Utils\UploadSkipCounter,
 	Abstracts\ImporterAjax
 };
 
@@ -85,11 +86,19 @@ class Finalize extends ImporterAjax {
 			SessionManager::release( $this->sessionId );
 		}
 
+		// Pull and clear the WXR attachment skip counter so the wizard can show it.
+		$skippedUploads = UploadSkipCounter::get();
+		UploadSkipCounter::reset();
+
 		// Response.
 		$this->prepareResponse(
 			'',
 			'',
-			esc_html__( 'Hooray! You are all set! Now go out and have a blast!', 'easy-demo-importer' )
+			esc_html__( 'Hooray! You are all set! Now go out and have a blast!', 'easy-demo-importer' ),
+			false,
+			'',
+			'',
+			[ 'skippedUploads' => $skippedUploads ]
 		);
 	}
 }
