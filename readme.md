@@ -3,7 +3,8 @@
 ![Requires PHP_>_7.4](https://img.shields.io/badge/Requires-PHP_>_7.4-2d74d5)
 ![Tested up to PHP_8.4](https://img.shields.io/badge/Tested-Up_to_PHP_8.4-2d74d5)
 ![Tested up to WordPress 6.9](https://img.shields.io/badge/Tested-Up_to_WordPress_6.9-2d74d5)
-![Stable_Tag 1.1.6](https://img.shields.io/badge/Stable_Tag-1.1.6-2d74d5)
+![Stable_Tag 1.2.0](https://img.shields.io/badge/Stable_Tag-1.2.0-2d74d5)
+![Multisite Yes](https://img.shields.io/badge/Multisite-Yes-2d74d5)
 ![License GPLv3 or later](https://img.shields.io/badge/License-GPLv3_or_later-2d74d5)
 
 <hr />
@@ -32,6 +33,10 @@ The Easy Demo Importer is your go-to solution for effortlessly bringing your Wor
 -   Automatic URL and Commenter Email Replacement
 -   Elementor Taxonomy Data Fix
 -   Developer Hooks for Custom Actions
+-   Full WordPress Multisite Support (per-subsite or network-active)
+-   Network Admin screen with cross-subsite status and JSON config override
+-   Tiered plugin install: Network Admin install path for Super Admins, "ask Network Admin" guidance for subsite admins
+-   Domain-echo confirmation on multisite database reset
 
 ### Requirement
 - Composer [HERE](https://getcomposer.org/doc/00-intro.md#installation-linux-unix-macos)
