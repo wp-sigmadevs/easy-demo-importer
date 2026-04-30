@@ -165,6 +165,22 @@ class Enqueue extends EnqueueBase {
 				'networkContactBody'         => esc_html__( "Hello,\n\nI need the following plugins installed network-wide for the demo importer to run:\n\n", 'easy-demo-importer' ),
 				'networkRequiredPluginsMissing' => [],
 
+				// Multisite UI strings.
+				'i18nNetworkBlockTitle'      => esc_html__( 'Network Admin must install the following plugins network-wide:', 'easy-demo-importer' ),
+				'i18nNetworkSuperTitle'      => esc_html__( 'Required plugins are missing on this network. As Super Admin you can install them network-wide:', 'easy-demo-importer' ),
+				'i18nNotifyNetworkAdmin'     => esc_html__( 'Notify Network Admin', 'easy-demo-importer' ),
+				'i18nRefresh'                => esc_html__( 'Refresh', 'easy-demo-importer' ),
+				'i18nInstallAllOnNetwork'    => esc_html__( 'Install all on network', 'easy-demo-importer' ),
+				'i18nInstalling'             => esc_html__( 'Installing…', 'easy-demo-importer' ),
+				/* translators: 1: plugin name, 2: current count, 3: total count */
+				'i18nInstallingProgress'     => esc_html__( 'Installing %1$s (%2$d/%3$d)…', 'easy-demo-importer' ),
+				'i18nRestUnavailable'        => esc_html__( 'REST API not available.', 'easy-demo-importer' ),
+				'i18nDomainEchoIntro'        => esc_html__( 'Type the host below to confirm:', 'easy-demo-importer' ),
+				'i18nDomainEchoCancel'       => esc_html__( 'Cancel', 'easy-demo-importer' ),
+				/* translators: %s: subsite host like "sub2.example.com" */
+				'i18nDomainEchoConfirm'      => esc_html__( 'I understand — reset %s', 'easy-demo-importer' ),
+				'i18nDomainEchoTitleFallback' => esc_html__( 'Confirm reset', 'easy-demo-importer' ),
+
 				'ediLogo'                    => esc_url( $this->plugin->assetsUri() . '/images/sd-edi-logo.svg' ),
 				'numberOfDemos'              => ! empty( sd_edi()->getDemoConfig()['demoData'] ) ? count( sd_edi()->getDemoConfig()['demoData'] ) : 0,
 				'hasTabCategories'           => ! empty( sd_edi()->getDemoConfig()['demoData'] ) ? Helpers::searchArrayKey( sd_edi()->getDemoConfig(), 'category' ) : 'no',
