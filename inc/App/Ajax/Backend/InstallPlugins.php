@@ -103,6 +103,17 @@ class InstallPlugins extends ImporterAjax {
 		// Verifying AJAX call and user role.
 		Helpers::verifyAjaxCall();
 
+		// On multisite, plugin installation is restricted to Super Admins (matches WP core).
+		// Subsite admins are guided to the Network Admin via the wizard's MultisitePluginNotice.
+		if ( function_exists( 'is_multisite' ) && is_multisite() && ! is_super_admin() ) {
+			wp_send_json_error(
+				[
+					'errorMessage' => esc_html__( 'On a multisite network, only the Network Admin (Super Admin) can install plugins. Please contact your Network Admin.', 'easy-demo-importer' ),
+				],
+				403
+			);
+		}
+
 		// Install Required Plugins.
 		$this->installPlugins();
 
