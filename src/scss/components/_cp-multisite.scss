@@ -1,0 +1,215 @@
+// ================================
+//	Multisite Components.
+// ================================
+
+// Subsite banner — sticky notice on the importer page.
+.sd-edi-subsite-banner {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	flex-wrap: wrap;
+	padding: 10px 16px;
+	margin: 12px 0;
+	background: #f0f6fc;
+	border-left: 4px solid #2271b1;
+	border-radius: 3px;
+	color: #1d2327;
+	font-size: 13px;
+	line-height: 1.5;
+
+	&__text {
+		font-weight: 600;
+	}
+
+	&__link {
+		color: #2271b1;
+		text-decoration: none;
+
+		&:hover,
+		&:focus {
+			text-decoration: underline;
+		}
+	}
+}
+
+// Multisite plugin notice — block / install-on-network.
+.sd-edi-multisite-notice {
+	margin: 0 0 16px;
+	padding: 14px 16px;
+	border-radius: 4px;
+	border: 1px solid;
+	font-size: 13px;
+	line-height: 1.5;
+
+	p {
+		margin: 0 0 10px;
+	}
+
+	ul {
+		margin: 0 0 12px 18px;
+		padding: 0;
+		list-style: disc;
+	}
+
+	&__actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+		align-items: center;
+	}
+
+	&__error {
+		margin-top: 10px;
+		padding: 8px 10px;
+		background: #fcf0f1;
+		border-left: 3px solid #d63638;
+		color: #d63638;
+		font-size: 12px;
+		word-break: break-word;
+	}
+
+	&--blocked {
+		background: #fcf0f1;
+		border-color: #d63638;
+		color: #1d2327;
+	}
+
+	&--super {
+		background: #fff8e5;
+		border-color: #dba617;
+		color: #1d2327;
+	}
+}
+
+// Domain-echo confirmation modal — Ant Design Modal extension.
+.sd-edi-domain-echo {
+	.ant-modal-body {
+		font-size: 14px;
+
+		code {
+			padding: 1px 6px;
+			background: #f6f7f7;
+			border: 1px solid #dcdcde;
+			border-radius: 2px;
+			font-size: 13px;
+			font-family: SFMono-Regular, Menlo, Consolas, monospace;
+		}
+
+		.ant-input {
+			margin-top: 6px;
+		}
+	}
+}
+
+// Network Admin app — header, tabs, tables, JSON editor, error/loading states.
+.sd-edi-network {
+	&__header {
+		display: flex;
+		align-items: center;
+		gap: 18px;
+		padding: 12px 0 16px;
+		border-bottom: 1px solid #dcdcde;
+		margin-bottom: 18px;
+	}
+
+	&__logo {
+		max-height: 32px;
+		width: auto;
+	}
+
+	&__tabs {
+		display: flex;
+		gap: 4px;
+
+		button {
+			background: transparent;
+			border: none;
+			padding: 8px 14px;
+			cursor: pointer;
+			font-size: 14px;
+			color: #50575e;
+			border-bottom: 2px solid transparent;
+			border-radius: 0;
+
+			&:hover {
+				color: #2271b1;
+			}
+
+			&.is-active {
+				color: #2271b1;
+				border-bottom-color: #2271b1;
+				font-weight: 600;
+			}
+		}
+	}
+
+	&__body {
+		min-height: 240px;
+	}
+
+	&__config {
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+		max-width: 900px;
+	}
+
+	&__json {
+		width: 100%;
+		font-family: SFMono-Regular, Menlo, Consolas, monospace;
+		font-size: 12px;
+		padding: 10px;
+		border: 1px solid #dcdcde;
+		border-radius: 3px;
+		resize: vertical;
+	}
+
+	&__actions {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+	}
+
+	&__msg {
+		font-size: 13px;
+		color: #50575e;
+	}
+
+	&__error {
+		padding: 14px 16px;
+		background: #fcf0f1;
+		border-left: 4px solid #d63638;
+		border-radius: 3px;
+		font-size: 13px;
+		line-height: 1.5;
+
+		code {
+			display: inline-block;
+			margin: 4px 0;
+			padding: 2px 6px;
+			background: #fff;
+			border: 1px solid #dcdcde;
+			border-radius: 2px;
+			font-family: SFMono-Regular, Menlo, Consolas, monospace;
+			font-size: 12px;
+			word-break: break-all;
+		}
+
+		.button {
+			margin-top: 8px;
+		}
+	}
+}
+
+// Subsite-toggle label, used on the Network Config tab.
+.sd-edi-toggle {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-size: 13px;
+	color: #1d2327;
+
+	input[type='checkbox'] {
+		margin: 0;
+	}
+}
