@@ -1,10 +1,11 @@
 === Easy Demo Importer - A Modern One-Click Demo Import Solution ===
 Contributors: sigmadevs
 Donate link:
-Tags: demo importer, one click demo importer, theme demo importer, WordPress demo importer, content import plugin
+Tags: demo importer, one click demo importer, theme demo importer, WordPress demo importer, multisite demo importer
 Requires at least: 5.5
 Tested up to: 6.9
 Stable tag: 1.2.0
+Network: false
 Requires PHP: 7.4
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -48,6 +49,18 @@ Experience the ultimate convenience of importing demo data with the Easy Demo Im
 > **Important Note:** Please be aware that this plugin does not provide a feature to import authors from the demo import file in your WordPress site. When you import demo content, all content will be attributed to the current user account.
 
 For any bugs or suggestions, please email us at: service.sigmadevs@gmail.com
+
+== Multisite Support ==
+
+Easy Demo Importer is fully compatible with WordPress Multisite from version 1.2.0:
+
+* **Per-subsite activation** — each subsite admin can run the importer independently for their own site. Per-blog tables are created on demand.
+* **Network activation** — Super Admins get an additional screen under *Network Admin → Themes → Easy Demo Importer* for cross-network status, JSON-editable demo config overrides, and one-click network-wide plugin installation.
+* **Tiered plugin install** — subsite admins lacking install permissions see a "Notify Network Admin" block; Super Admins see an inline "Install on network" button.
+* **Domain-echo reset confirmation** — destructive database resets require typing the exact subsite host, preventing accidental cross-subsite damage.
+* **Plugin slug contract** — when configuring required plugins for a demo, theme authors should use the WordPress.org plugin slug as the array key (e.g., `'elementor' => [...]`); this is what the network-install endpoint resolves against `plugins_api`.
+
+On multisite, plugin install on subsites is gated to Super Admin per WordPress core. Subsite admins lacking `unfiltered_upload` may have certain attachment mime types skipped during WXR import — this matches WP core's standard behavior and does not abort the rest of the import.
 
 = Requirements =
 * **WordPress version:** >= 5.5
@@ -136,7 +149,12 @@ For any inquiries, bug reports, or suggestions, please submit your request [here
 
 == Changelog ==
 
-= 1.2.0 (10-March-2026) =
+= 1.2.0 (29-April-2026) =
+* Feature: Full WordPress Multisite support — works in single-site, per-subsite, or network-active mode with zero behavior change for single-site users.
+* Feature: Network Admin screen under Network → Themes with per-subsite status overview and JSON network-wide demo config override.
+* Feature: Tiered plugin install — subsite admins are guided to ask Network Admin when required plugins are missing; Super Admins can install network-wide directly from the wizard.
+* Feature: Sticky subsite banner across the importer so admins always know which site they are about to modify.
+* Feature: Domain-echo confirmation on the multisite database reset — typed subsite host must match before destructive action runs.
 * Feature: Added support for importing LayerSlider slides.
 * Feature: Import can now resume automatically if interrupted, thanks to the new Session Manager.
 * Security: Improved protection against malicious archive extraction (ZipSlip).
@@ -152,7 +170,9 @@ For any inquiries, bug reports, or suggestions, please submit your request [here
 * Tweak: Improved Widgets and database search-replace handling.
 * Tweak: Enhanced Customizer data import handling.
 * Tweak: Mapped HTTP status codes (408, 503, etc.) to human-readable messages and hints in the JS frontend.
-* Tweak: Improved uninstall cleanup to properly remove temporary import data.
+* Tweak: Improved uninstall cleanup to properly remove temporary import data; on multisite, every subsite is cleaned and network-wide options removed on plugin deletion.
+* Tweak: getDemoConfig now resolves a network-wide override (when enabled) before the per-subsite theme filter; behavior unchanged on single-site.
+* Tweak: Per-blog tables created automatically on subsite create and cleaned on subsite delete.
 * Update: Updated i18n strings and translation template.
 
 = 1.1.6 (28-February-2026) =
