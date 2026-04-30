@@ -5,8 +5,13 @@ import React, { useState } from 'react';
 /**
  * Returns the names of plugins that have status 'install' (missing on disk).
  */
+// Strip CR/LF from plugin names before they end up in mailto headers.
+const sanitizeName = (n) => String(n || '').replace(/[\r\n]/g, ' ');
+
 const collectMissing = (plugins) =>
-	plugins.filter((p) => p && p.status === 'install').map((p) => ({ name: p.name, key: p.key }));
+	plugins
+		.filter((p) => p && p.status === 'install')
+		.map((p) => ({ name: sanitizeName(p.name), key: p.key }));
 
 /**
  * Multisite-aware notice rendered above the plugin list in the Setup step.
