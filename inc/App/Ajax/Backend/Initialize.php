@@ -17,6 +17,7 @@ use SigmaDevs\EasyDemoImporter\Common\{
 	Traits\Singleton,
 	Functions\Helpers,
 	Functions\SessionManager,
+	Utils\UploadSkipCounter,
 	Abstracts\ImporterAjax
 };
 
@@ -97,6 +98,9 @@ class Initialize extends ImporterAjax {
 	public function response() {
 		// Verifying AJAX call and user role.
 		Helpers::verifyAjaxCall();
+
+		// Clear any prior attachment-skip counter so this import starts at zero.
+		UploadSkipCounter::reset();
 
 		// Reject if another import is already running.
 		if ( SessionManager::isLocked() ) {

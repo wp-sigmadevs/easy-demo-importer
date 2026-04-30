@@ -20,6 +20,7 @@ use SigmaDevs\EasyDemoImporter\Common\
 	Functions\Filters
 };
 use SigmaDevs\EasyDemoImporter\Common\Utils\NetworkInstaller;
+use SigmaDevs\EasyDemoImporter\Common\Utils\UploadSkipCounter;
 
 // Do not allow directly accessing this file.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -83,6 +84,9 @@ class Hooks extends Base {
 		add_action( 'wp_initialize_site', [ $this, 'onSiteCreate' ], 10, 2 );
 		add_action( 'wp_uninitialize_site', [ $this, 'onSiteDelete' ], 10, 1 );
 		add_action( NetworkInstaller::CRON_HOOK, [ NetworkInstaller::class, 'processChunk' ], 10, 1 );
+
+		// Observe attachments skipped by WordPress's MIME guard during WXR import.
+		add_action( 'init', [ UploadSkipCounter::class, 'register' ] );
 
 		return $this;
 	}

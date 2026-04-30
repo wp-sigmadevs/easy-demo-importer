@@ -14,8 +14,9 @@ import { ExportOutlined, CloseOutlined, RedoOutlined, RollbackOutlined } from '@
  * @param {boolean}  canResume       - Whether a resumable request is available.
  * @param {string}   message         - Import message.
  * @param {string}   hint            - Actionable hint for error resolution.
+ * @param {number}   skippedUploads  - Count of attachments WordPress refused to import (multisite cap).
  */
-const Success = ({ importComplete, handleReset, handleResume, handleStartOver, canResume, message, hint }) => {
+const Success = ({ importComplete, handleReset, handleResume, handleStartOver, canResume, message, hint, skippedUploads = 0 }) => {
 	if (importComplete) {
 		/**
 		 * Handle 'View Site' button behavior.
@@ -56,6 +57,11 @@ const Success = ({ importComplete, handleReset, handleResume, handleStartOver, c
 					</div>
 					<div className="ant-result-title">
 						<h3>{message}</h3>
+						{skippedUploads > 0 && (
+							<p className="edi-skipped-uploads-notice">
+								{(sdEdiAdminParams.skippedUploadsNotice || '%d attachments were skipped due to upload restrictions on this site.').replace('%d', skippedUploads)}
+							</p>
+						)}
 					</div>
 					<div className="ant-result-extra edi-d-flex edi-justify-content-center">
 						<Button key="close" onClick={handleReset}>

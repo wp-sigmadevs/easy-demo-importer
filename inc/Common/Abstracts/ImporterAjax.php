@@ -222,12 +222,13 @@ abstract class ImporterAjax {
 	 * @param bool   $error Error.
 	 * @param string $errorMessage Error message.
 	 * @param string $errorHint Error hint.
+	 * @param array  $extra Extra keys to merge into the response payload.
 	 *
 	 * @return void
 	 * @since 1.0.0
 	 */
-	public function prepareResponse( $nextPhase, $nextPhaseMessage, $complete = '', $error = false, $errorMessage = '', $errorHint = '' ) {
-		$this->response = [
+	public function prepareResponse( $nextPhase, $nextPhaseMessage, $complete = '', $error = false, $errorMessage = '', $errorHint = '', $extra = [] ) {
+		$base = [
 			'demo'                  => $this->demoSlug,
 			'excludeImages'         => $this->excludeImages,
 			'skipImageRegeneration' => $this->skipImageRegeneration,
@@ -240,6 +241,8 @@ abstract class ImporterAjax {
 			'errorMessage'          => $errorMessage,
 			'errorHint'             => $errorHint,
 		];
+
+		$this->response = ! empty( $extra ) ? array_merge( $base, $extra ) : $base;
 
 		$this->sendResponse();
 	}

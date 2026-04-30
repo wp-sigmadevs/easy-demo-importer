@@ -244,6 +244,8 @@ class Enqueue extends EnqueueBase {
 				'btnResume'                  => esc_html__( 'Resume Import', 'easy-demo-importer' ),
 				'btnStartOver'               => esc_html__( 'Start Over', 'easy-demo-importer' ),
 				'resumingImport'             => esc_html__( 'Resuming import from where it left off...', 'easy-demo-importer' ),
+				/* translators: %d: number of attachments WordPress refused to import. */
+				'skippedUploadsNotice'       => esc_html__( '%d attachments were skipped due to upload restrictions on this site.', 'easy-demo-importer' ),
 				'importInterruptedTitle'     => esc_html__( 'Import was interrupted.', 'easy-demo-importer' ),
 				'importInterruptedHint'      => esc_html__( 'Your previous import did not complete. Resume from where it left off, or start over to begin fresh.', 'easy-demo-importer' ),
 				'clickEnlarge'               => esc_html__( 'Click to Enlarge', 'easy-demo-importer' ),
