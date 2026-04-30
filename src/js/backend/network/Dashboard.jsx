@@ -12,9 +12,18 @@ export default function Dashboard() {
 		fetch(params.restUrl + 'network/status', {
 			headers: { 'X-WP-Nonce': params.restNonce },
 		})
-			.then((r) => r.json())
+			.then(async (r) => {
+				const data = await r.json().catch(() => ({}));
+				if (!r.ok) {
+					throw new Error(
+						(data && data.message) ||
+							`HTTP ${r.status} ${r.statusText || ''}`.trim()
+					);
+				}
+				return data;
+			})
 			.then((d) => setSites(d.sites || []))
-			.catch((e) => setErr(String(e)))
+			.catch((e) => setErr(String(e.message || e)))
 			.finally(() => setLoading(false));
 	}, []);
 
