@@ -15,6 +15,7 @@ namespace SigmaDevs\EasyDemoImporter\Common\Functions;
 use WP_Post;
 use WP_Error;
 use WP_Query;
+use SigmaDevs\EasyDemoImporter\Common\Utils\ContextResolver;
 
 // Do not allow directly accessing this file.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -98,13 +99,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 	}
 
 	/**
-	 * Verify if the current user has the 'manage_options' capability.
+	 * Verify the current user can run an import on the current blog.
+	 *
+	 * Delegates to ContextResolver::canRunImport() which centralizes the
+	 * single-site (manage_options) and multisite (manage_options + super-admin
+	 * gate when in network admin) capability rules. Sends a JSON 403 and
+	 * terminates if the check fails.
 	 *
 	 * @return void
 	 * @since 1.0.0
 	 */
 	public static function verifyUserRole() {
-		if ( ! current_user_can( 'manage_options' ) ) {
+		if ( ! ContextResolver::canRunImport() ) {
 			wp_send_json_error(
 				[
 					'errorMessage' => esc_html__( 'You don\'t have permission to perform this action.', 'easy-demo-importer' ),
