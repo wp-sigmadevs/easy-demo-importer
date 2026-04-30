@@ -28,11 +28,22 @@ class Setup {
 	/**
 	 * Run only once after plugin is activated.
 	 *
+	 * The `$network_wide` parameter is supplied by WordPress when the plugin
+	 * is network-activated. Using this argument is the correct way to detect
+	 * network activation inside `register_activation_hook` callbacks; calling
+	 * `is_plugin_active_for_network()` here races with WP's own write to the
+	 * `active_sitewide_plugins` site_option (the option is updated AFTER the
+	 * activation callback runs). See:
+	 *   - https://developer.wordpress.org/reference/functions/register_activation_hook/
+	 *   - https://developer.wordpress.org/reference/functions/activate_plugin/
+	 *
 	 * @static
+	 * @param bool $network_wide True when the plugin is being network-activated.
+	 *
 	 * @return void
 	 * @since 1.0.0
 	 */
-	public static function activation() {
+	public static function activation( $network_wide = false ) {
 		if ( ! current_user_can( 'activate_plugins' ) ) {
 			return;
 		}
@@ -52,15 +63,7 @@ class Setup {
 		set_transient( 'sd_edi_installing', 'yes', MINUTE_IN_SECONDS * 10 );
 
 		if ( function_exists( 'is_multisite' ) && is_multisite() ) {
-			// Detect network-active vs per-site activation. is_plugin_active_for_network()
-			// requires wp-admin/includes/plugin.php which may not be loaded.
-			if ( ! function_exists( 'is_plugin_active_for_network' ) ) {
-				require_once ABSPATH . 'wp-admin/includes/plugin.php';
-			}
-
-			$pluginFile = defined( 'SD_EDI_ROOT_FILE' ) ? plugin_basename( SD_EDI_ROOT_FILE ) : '';
-
-			if ( $pluginFile && is_plugin_active_for_network( $pluginFile ) ) {
+			if ( $network_wide ) {
 				// Network-activated: provision every blog (chunked).
 				NetworkInstaller::createTablesForAllBlogs();
 			} else {
