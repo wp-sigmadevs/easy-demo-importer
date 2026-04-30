@@ -100,7 +100,7 @@ final class NetworkStatus {
 		if ( ! ContextResolver::isMultisite() ) {
 			return new WP_Error( 'sd_edi_not_multisite', __( 'Endpoint only available on multisite.', 'easy-demo-importer' ), [ 'status' => 404 ] );
 		}
-		if ( ! is_super_admin() ) {
+		if ( ! ContextResolver::canInstallPlugins() ) {
 			return new WP_Error( 'sd_edi_forbidden', __( 'Super Admin only.', 'easy-demo-importer' ), [ 'status' => 403 ] );
 		}
 		return true;
@@ -221,7 +221,11 @@ final class NetworkStatus {
 			require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
 
 			if ( ! WP_Filesystem() ) {
-				return new WP_Error( 'sd_edi_filesystem', __( 'Filesystem credentials are required to install plugins.', 'easy-demo-importer' ), [ 'status' => 500 ] );
+				return new WP_Error(
+					'sd_edi_filesystem',
+					__( 'This host requires SFTP/FTP credentials to install plugins. Please install the plugin from Network Admin → Plugins → Add New, then return here to retry.', 'easy-demo-importer' ),
+					[ 'status' => 500 ]
+				);
 			}
 
 			$api = plugins_api(

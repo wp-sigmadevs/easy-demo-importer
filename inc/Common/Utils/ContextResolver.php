@@ -146,11 +146,8 @@ final class ContextResolver {
 			return (string) $id;
 		}
 
-		$details = get_blog_details( $id );
-		if ( ! $details ) {
-			return (string) $id;
-		}
-
-		return sprintf( 'subsite-%d (%s)', $id, untrailingslashit( $details->siteurl ) );
+		// Use home_url() so the label matches what DomainEchoConfirm expects
+		// (which is also derived from home_url via Backend\Enqueue localizeData).
+		return sprintf( 'subsite-%d (%s)', $id, untrailingslashit( home_url() ) );
 	}
 }
