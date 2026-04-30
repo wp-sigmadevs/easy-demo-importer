@@ -51,7 +51,7 @@ final class NetworkStatus {
 			[
 				'methods'             => 'GET',
 				'callback'            => [ $this, 'getStatus' ],
-				'permission_callback' => [ $this, 'permSuperAdmin' ],
+				'permission_callback' => [ $this, 'permNetworkOptions' ],
 			]
 		);
 
@@ -62,12 +62,12 @@ final class NetworkStatus {
 				[
 					'methods'             => 'GET',
 					'callback'            => [ $this, 'getConfig' ],
-					'permission_callback' => [ $this, 'permSuperAdmin' ],
+					'permission_callback' => [ $this, 'permNetworkOptions' ],
 				],
 				[
 					'methods'             => 'POST',
 					'callback'            => [ $this, 'saveConfig' ],
-					'permission_callback' => [ $this, 'permSuperAdmin' ],
+					'permission_callback' => [ $this, 'permNetworkOptions' ],
 					'args'                => [
 						'enabled' => [ 'type' => 'boolean', 'required' => true ],
 						'config'  => [ 'type' => 'object', 'required' => true ],
@@ -82,7 +82,7 @@ final class NetworkStatus {
 			[
 				'methods'             => 'POST',
 				'callback'            => [ $this, 'installPlugin' ],
-				'permission_callback' => [ $this, 'permSuperAdmin' ],
+				'permission_callback' => [ $this, 'permInstallPlugin' ],
 				'args'                => [
 					'slug' => [ 'type' => 'string', 'required' => true ],
 				],
@@ -96,7 +96,24 @@ final class NetworkStatus {
 	 * @return bool|WP_Error
 	 * @since 1.2.0
 	 */
-	public function permSuperAdmin() {
+	public function permNetworkOptions() {
+		if ( ! ContextResolver::isMultisite() ) {
+			return new WP_Error( 'sd_edi_not_multisite', __( 'Endpoint only available on multisite.', 'easy-demo-importer' ), [ 'status' => 404 ] );
+		}
+		if ( ! current_user_can( 'manage_network_options' ) ) {
+			return new WP_Error( 'sd_edi_forbidden', __( 'You need the manage_network_options capability to access this endpoint.', 'easy-demo-importer' ), [ 'status' => 403 ] );
+		}
+		return true;
+	}
+
+	/**
+	 * Permission callback for the install-plugin endpoint.
+	 * Gated on Super Admin (matches WP core's gate on `install_plugins` for multisite).
+	 *
+	 * @return bool|WP_Error
+	 * @since 1.2.0
+	 */
+	public function permInstallPlugin() {
 		if ( ! ContextResolver::isMultisite() ) {
 			return new WP_Error( 'sd_edi_not_multisite', __( 'Endpoint only available on multisite.', 'easy-demo-importer' ), [ 'status' => 404 ] );
 		}
@@ -219,6 +236,7 @@ final class NetworkStatus {
 			require_once ABSPATH . 'wp-admin/includes/file.php';
 			require_once ABSPATH . 'wp-admin/includes/misc.php';
 			require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
+			require_once ABSPATH . 'wp-admin/includes/class-automatic-upgrader-skin.php';
 
 			if ( ! WP_Filesystem() ) {
 				return new WP_Error(
@@ -236,7 +254,10 @@ final class NetworkStatus {
 				return new WP_Error( 'sd_edi_api', $api->get_error_message(), [ 'status' => 500 ] );
 			}
 
-			$skin     = new \WP_Ajax_Upgrader_Skin();
+			// Automatic_Upgrader_Skin is REST-safe (non-interactive, no echo'd HTML).
+			// WP_Ajax_Upgrader_Skin is intended for admin-ajax.php flows and may
+			// emit output that breaks the JSON response.
+			$skin     = new \Automatic_Upgrader_Skin();
 			$upgrader = new \Plugin_Upgrader( $skin );
 
 			$downloadLink = is_object( $api ) ? ( $api->download_link ?? '' ) : ( $api['download_link'] ?? '' );
