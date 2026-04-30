@@ -86,8 +86,9 @@ class Finalize extends ImporterAjax {
 			SessionManager::release( $this->sessionId );
 		}
 
-		// Pull and clear the WXR attachment skip counter so the wizard can show it.
+		// Pull the WXR attachment skip counter, stop observing, and clear it.
 		$skippedUploads = UploadSkipCounter::get();
+		UploadSkipCounter::stop();
 		UploadSkipCounter::reset();
 
 		// Response.

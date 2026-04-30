@@ -109,9 +109,12 @@ final class NetworkStatus {
 	/**
 	 * GET /network/status — returns blog list with last-import metadata.
 	 *
+	 * Performance note: enumerates `get_sites()` and runs a SHOW TABLES probe per blog.
+	 * On networks beyond a few hundred subsites, wrap in a 60s site-transient. Tracked
+	 * as a v1.3 candidate; not blocking for v1.2.0.
+	 *
 	 * @return WP_REST_Response
 	 * @since 1.2.0
-	 * TODO(perf): cache the result in a 60s site-transient when networks grow large.
 	 */
 	public function getStatus(): WP_REST_Response {
 		$ids = get_sites(

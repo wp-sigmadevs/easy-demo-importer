@@ -36,17 +36,53 @@ final class UploadSkipCounter {
 	public const KEY = 'sd_edi_skipped_uploads';
 
 	/**
-	 * Register the observer filter.
+	 * Whether the observer filter is currently attached.
 	 *
-	 * Hooked at priority 99 so it runs after WordPress's own
-	 * `wp_check_filetype_and_ext` adjustments (and after the plugin's SVG
-	 * detection fix at priority 10).
+	 * Set/cleared by start()/stop() so the filter runs only during an active
+	 * import, not on every admin request that touches the Media Library.
+	 *
+	 * @var bool
+	 * @since 1.2.0
+	 */
+	private static $active = false;
+
+	/**
+	 * No-op kept for backwards compatibility with the original wiring on
+	 * `init`. The filter is now attached on demand via start()/stop().
 	 *
 	 * @return void
 	 * @since 1.2.0
 	 */
 	public static function register(): void {
+		// Intentionally empty. See start() / stop().
+	}
+
+	/**
+	 * Begin observing rejections. Called at import start.
+	 *
+	 * @return void
+	 * @since 1.2.0
+	 */
+	public static function start(): void {
+		if ( self::$active ) {
+			return;
+		}
 		add_filter( 'wp_check_filetype_and_ext', [ __CLASS__, 'count' ], 99, 5 );
+		self::$active = true;
+	}
+
+	/**
+	 * Stop observing rejections. Called when the import completes.
+	 *
+	 * @return void
+	 * @since 1.2.0
+	 */
+	public static function stop(): void {
+		if ( ! self::$active ) {
+			return;
+		}
+		remove_filter( 'wp_check_filetype_and_ext', [ __CLASS__, 'count' ], 99 );
+		self::$active = false;
 	}
 
 	/**
