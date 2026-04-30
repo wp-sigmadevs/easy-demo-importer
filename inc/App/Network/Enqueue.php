@@ -85,6 +85,9 @@ final class Enqueue extends Base {
 					'openInSubsite'   => esc_html__( 'Open in subsite', 'easy-demo-importer' ),
 					'lastImport'      => esc_html__( 'Last import', 'easy-demo-importer' ),
 					'noImport'        => esc_html__( 'Not yet imported', 'easy-demo-importer' ),
+					'loading'         => esc_html__( 'Loading…', 'easy-demo-importer' ),
+					'loadError'       => esc_html__( 'Could not load network config:', 'easy-demo-importer' ),
+					'retry'           => esc_html__( 'Retry', 'easy-demo-importer' ),
 				],
 			]
 		);
