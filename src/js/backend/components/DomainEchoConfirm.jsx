@@ -30,19 +30,23 @@ const DomainEchoConfirm = ({ visible, title, description, onConfirm, onCancel })
 		}
 	}, [visible]);
 
+	const okTpl = params.i18nDomainEchoConfirm || 'I understand — reset %s';
+	const okText = okTpl.replace('%s', expected);
+	const introText = params.i18nDomainEchoIntro || 'Type the host below to confirm:';
+
 	return (
 		<Modal
 			open={visible}
-			title={title}
+			title={title || params.i18nDomainEchoTitleFallback}
 			onCancel={onCancel}
 			onOk={() => {
 				if (matches) {
 					onConfirm();
 				}
 			}}
-			okText={`I understand — reset ${expected}`}
+			okText={okText}
 			okButtonProps={{ disabled: !matches, danger: true }}
-			cancelText="Cancel"
+			cancelText={params.i18nDomainEchoCancel || 'Cancel'}
 			centered
 			className="confirmation-modal sd-edi-domain-echo"
 		>
@@ -53,7 +57,7 @@ const DomainEchoConfirm = ({ visible, title, description, onConfirm, onCancel })
 				style={{ marginBottom: 12 }}
 			/>
 			<p>
-				Type <code>{expected}</code> to confirm:
+				{introText} <code>{expected}</code>
 			</p>
 			<Input
 				autoFocus

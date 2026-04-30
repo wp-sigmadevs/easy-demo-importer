@@ -44,7 +44,7 @@ const MultisitePluginNotice = ({ plugins }) => {
 		return (
 			<div className="sd-edi-multisite-notice sd-edi-multisite-notice--blocked">
 				<p>
-					<strong>Network Admin must install the following plugins network-wide:</strong>
+					<strong>{params.i18nNetworkBlockTitle}</strong>
 				</p>
 				<ul>
 					{missing.map((p) => (
@@ -56,14 +56,14 @@ const MultisitePluginNotice = ({ plugins }) => {
 						className="ant-btn ant-btn-primary"
 						href={`mailto:?subject=${subject}&body=${body}`}
 					>
-						Notify Network Admin
+						{params.i18nNotifyNetworkAdmin}
 					</a>
 					<button
 						className="ant-btn"
 						type="button"
 						onClick={() => window.location.reload()}
 					>
-						Refresh
+						{params.i18nRefresh}
 					</button>
 				</div>
 			</div>
@@ -72,16 +72,22 @@ const MultisitePluginNotice = ({ plugins }) => {
 
 	const installAll = async () => {
 		if (!params.restApiUrl || !params.restNonce) {
-			setErrorMsg('REST API not available.');
+			setErrorMsg(params.i18nRestUnavailable || 'REST API not available.');
 			return;
 		}
 		setInstalling(true);
 		setErrorMsg('');
 		const networkBase = params.restApiUrl.replace(/\/$/, '') + '/sd-edi/v1';
 		const failures = [];
+		const tpl = params.i18nInstallingProgress || 'Installing %1$s (%2$d/%3$d)…';
 		for (let i = 0; i < missing.length; i++) {
 			const item = missing[i];
-			setProgress(`Installing ${item.name} (${i + 1}/${missing.length})…`);
+			setProgress(
+				tpl
+					.replace('%1$s', item.name)
+					.replace('%2$d', String(i + 1))
+					.replace('%3$d', String(missing.length))
+			);
 			try {
 				const resp = await fetch(networkBase + '/network/install-plugin', {
 					method: 'POST',
@@ -111,7 +117,7 @@ const MultisitePluginNotice = ({ plugins }) => {
 	return (
 		<div className="sd-edi-multisite-notice sd-edi-multisite-notice--super">
 			<p>
-				<strong>Required plugins are missing on this network.</strong> As Super Admin you can install them network-wide:
+				<strong>{params.i18nNetworkSuperTitle}</strong>
 			</p>
 			<ul>
 				{missing.map((p) => (
@@ -125,7 +131,9 @@ const MultisitePluginNotice = ({ plugins }) => {
 					onClick={installAll}
 					disabled={installing}
 				>
-					{installing ? progress || 'Installing…' : 'Install all on network'}
+					{installing
+						? progress || params.i18nInstalling || 'Installing…'
+						: params.i18nInstallAllOnNetwork || 'Install all on network'}
 				</button>
 			</div>
 			{errorMsg && (
