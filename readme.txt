@@ -136,7 +136,9 @@ For any inquiries, bug reports, or suggestions, please submit your request [here
 
 == Changelog ==
 
-= 1.2.0 (10-March-2026) =
+= 1.2.0 (08-July-2026) =
+* Feature: Resumable, chunked WXR content import — large WooCommerce demos no longer fail with 524/503 gateway timeouts on Cloudflare or under strict PHP-FPM execution limits. The import now runs in time-boxed batches that survive across requests.
+* Feature: Determinate content-import progress bar, with automatic resume after transient connection drops or gateway timeouts during the import.
 * Feature: Added support for importing LayerSlider slides.
 * Feature: Import can now resume automatically if interrupted, thanks to the new Session Manager.
 * Security: Improved protection against malicious archive extraction (ZipSlip).

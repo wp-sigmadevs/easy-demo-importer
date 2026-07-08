@@ -2,8 +2,8 @@
 
 - **Date:** 2026-07-08
 - **Branch:** `wxr-chunking` (branched from `master`, **independent of `multi-site`**)
-- **Target release:** v1.1.7 — ships without multisite. Multisite (`multi-site`, v1.2.0) is a separate track; nothing here depends on it.
-- **Status:** 🟡 Plan written, no code yet.
+- **Target release:** **v1.2.0** — folded into the pending (unshipped) 1.2.0 already staged on `master` (LayerSlider, Session Manager). Decided 2026-07-08 after finding `master` already stages 1.2.0 with the header still at 1.1.6. Ships without multisite; the `multi-site` branch is renumbered to **v1.3.0**.
+- **Status:** 🟢 Stages A–D code-complete on `wxr-chunking`. Pending: manual QA matrix (§7) on a real WooCommerce demo behind Cloudflare, then merge to `master` + tag v1.2.0.
 
 ---
 
@@ -27,7 +27,7 @@ Options #1–#4 from the diagnosis (bypass Cloudflare, raise FPM timeouts, cut p
 
 **Non-goals (this release):**
 - Multisite / per-blog anything — out of scope, lives on `multi-site`.
-- Streaming XML parser (constant-memory parse) — deferred; parse-once-and-persist is enough for v1.1.7.
+- Streaming XML parser (constant-memory parse) — deferred; parse-once-and-persist is enough for v1.2.0.
 - The WC per-item cost reduction (#3) — complementary but shipped separately so this branch stays focused. Noted in §9.
 
 ---
@@ -141,7 +141,7 @@ Replace the single `sd_edi_import_xml` body with a chain that reuses the existin
 
 ### Stage D — Safety & QA
 - D1. `sd/edi/enable_chunked_import` fallback flag + single-shot fallback on `prepare()` failure.
-- D2. Bump `easy-demo-importer.php` 1.1.6 → **1.1.7**.
+- D2. Bump `easy-demo-importer.php` 1.1.6 → **1.2.0**.
 - D3. QA matrix (§7).
 
 ---
@@ -176,6 +176,9 @@ Replace the single `sd_edi_import_xml` body with a chain that reuses the existin
 | 7 | Parent/child posts + nav menus + featured images span a batch boundary | `finalize()` backfills correctly (parents, menu hierarchy, `_thumbnail_id`) |
 | 8 | Reset + re-import (existing `reset` flow) | Clean slate; `clearNavMenus` still runs; store recreated |
 | 9 | Cancel mid-import (`sd_edi_cancel_session`) | Store + mutex deleted; no orphan state |
+| 10 | Corrupt / unparseable `content.xml` | `prepare()` throws → caught → single-shot fallback runs (no fatal AJAX death); state file cleaned |
+| 11 | Repeated 524/503 during batch (simulate flaky gateway) | Auto-resumes up to 5× with backoff, progress bar advances; after 5 fails, drops to manual Resume screen |
+| 12 | Determinate progress bar | Advances 0→100% across batches; resets to hidden on Start Over / Resume |
 
 *(No PHPUnit harness in this codebase — QA is manual per project convention.)*
 
@@ -204,5 +207,5 @@ Replace the single `sd_edi_import_xml` body with a chain that reuses the existin
 
 1. Land Stages A–D on `wxr-chunking`.
 2. Run §7 QA matrix on a WooCommerce demo behind Cloudflare.
-3. Merge to `master`, tag **v1.1.7**. Independent of `multi-site` — can ship before it.
+3. Merge to `master`, tag **v1.2.0**. Independent of `multi-site` (now v1.3.0) — ships as the folded 1.2.0.
 4. Rebase `multi-site` on the new `master` afterward (multisite's InstallDemo already shares the mutex scaffolding, so conflict surface is small).
