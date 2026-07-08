@@ -1363,7 +1363,7 @@ class SD_EDI_WP_Import extends WP_Importer {
 	 *
 	 * @param string $file Path to WXR file for parsing.
 	 *
-	 * @return array Information gathered from the WXR file
+	 * @return array|\WP_Error Information gathered from the WXR file, or an error on failure.
 	 * @since 1.0.0
 	 */
 	public function parse( $file ) {
