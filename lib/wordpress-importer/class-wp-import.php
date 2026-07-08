@@ -1109,17 +1109,34 @@ class SD_EDI_WP_Import extends WP_Importer {
 		}
 
 		// Fetch the remote URL and write it to the placeholder file.
-		$remote_response = wp_safe_remote_get(
-			$url,
+		//
+		// Some demo-image hosts run bot-mitigation (e.g. Cloudflare) that rejects
+		// WordPress's default HTTP client signature with a 418/403 even though the
+		// same image loads fine in a browser. The user-agent and Referer (set to
+		// the WXR's own base_url — genuinely where these images were referenced
+		// from) are filterable so a theme author whose host does this can adjust
+		// them without patching the importer. Divergence from the vendored
+		// importer — keep it minimal for future upstream syncs.
+		$request_args = apply_filters( // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+			'sd/edi/importer/attachment_request_args',
 			[
-				'timeout'  => 300,
-				'stream'   => true,
-				'filename' => $tmp_file_name,
-				'headers'  => [
+				'timeout'    => 300,
+				'stream'     => true,
+				'filename'   => $tmp_file_name,
+				'user-agent' => apply_filters( // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+					'sd/edi/importer/attachment_user_agent',
+					'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36'
+				),
+				'headers'    => [
 					'Accept-Encoding' => 'identity',
+					'Referer'         => apply_filters( 'sd/edi/importer/attachment_referer', $this->base_url ), // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 				],
-			]
+			],
+			$url,
+			$post
 		);
+
+		$remote_response = wp_safe_remote_get( $url, $request_args );
 
 		if ( is_wp_error( $remote_response ) ) {
 			@unlink( $tmp_file_name ); // phpcs:ignore WordPress.WP.AlternativeFunctions.unlink_unlink
