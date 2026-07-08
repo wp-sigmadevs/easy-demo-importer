@@ -92,6 +92,12 @@ final class ChunkedImportIntegrationTest extends WP_UnitTestCase {
 
 		// State file is cleaned up once the import finalizes.
 		$this->assertFalse( $state->exists() );
+
+		// Term counting is deferred across batches and recomputed authoritatively
+		// in finalize(); the shared 'EDI Sample' category must reflect both posts.
+		$category = get_term_by( 'slug', 'edi-sample', 'category' );
+		$this->assertInstanceOf( \WP_Term::class, $category );
+		$this->assertSame( 2, (int) $category->count, 'Deferred term counts must be reconciled in finalize().' );
 	}
 
 	public function test_resuming_a_batch_does_not_duplicate_posts(): void {
