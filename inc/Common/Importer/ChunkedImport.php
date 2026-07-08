@@ -120,8 +120,11 @@ class ChunkedImport extends SD_EDI_WP_Import {
 		$this->process_terms();
 		wp_suspend_cache_invalidation( false );
 
-		// Flush the counts import_start() deferred. Batches count inline (see
-		// processBatch) so that per-request deferral never strands a count.
+		// import_start() deferred term & comment counting for the taxonomy pass
+		// above; flush it now (counts are trivial here — no posts are assigned
+		// yet). Batches re-defer term counting per request and finalize()
+		// recomputes every taxonomy authoritatively, so the expensive per-post
+		// term counting never runs live during the post loop.
 		wp_defer_term_counting( false );
 		wp_defer_comment_counting( false );
 
@@ -192,6 +195,14 @@ class ChunkedImport extends SD_EDI_WP_Import {
 
 		$this->addImportFilters();
 
+		// Defer term counting for this request. Each post assignment would
+		// otherwise trigger a live COUNT+UPDATE per taxonomy — the dominant cost
+		// on WooCommerce demos (product_cat, product_tag, pa_* attributes). The
+		// deferred queue is a per-process static that dies with this request; it
+		// is never flushed here on purpose. finalize() recounts authoritatively
+		// from DB state, so a batch that times out mid-loop still ends correct.
+		wp_defer_term_counting( true );
+
 		$total  = count( $this->posts );
 		$budget = (float) apply_filters( 'sd/edi/import_chunk_seconds', 45 ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 		$step   = max( 1, (int) apply_filters( 'sd/edi/import_chunk_posts', 5 ) ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
@@ -243,11 +254,42 @@ class ChunkedImport extends SD_EDI_WP_Import {
 		$this->backfill_attachment_urls();
 		$this->remap_featured_images();
 
+		$this->recountTerms();
+
 		$this->import_end();
 
 		$this->state->delete();
 
 		return true;
+	}
+
+	/**
+	 * Authoritatively recomputes term counts for every taxonomy.
+	 *
+	 * Batches defer term counting (see processBatch), and that deferred queue
+	 * cannot survive between the separate batch requests — so rather than relying
+	 * on it flushing, this recounts from actual DB state once, at the end. It is
+	 * correct regardless of what any batch flushed, so a batch that died and was
+	 * re-issued still leaves accurate counts. Each taxonomy's registered
+	 * update_count_callback is honored (e.g. WooCommerce product attributes).
+	 *
+	 * @return void
+	 * @since 1.2.0
+	 */
+	private function recountTerms(): void {
+		foreach ( get_taxonomies() as $taxonomy ) {
+			$term_ids = get_terms(
+				[
+					'taxonomy'   => $taxonomy,
+					'hide_empty' => false,
+					'fields'     => 'ids',
+				]
+			);
+
+			if ( ! empty( $term_ids ) && ! is_wp_error( $term_ids ) ) {
+				wp_update_term_count_now( $term_ids, $taxonomy );
+			}
+		}
 	}
 
 	/**
