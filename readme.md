@@ -5,6 +5,7 @@
 ![Tested up to WordPress 6.9](https://img.shields.io/badge/Tested-Up_to_WordPress_6.9-2d74d5)
 ![Stable_Tag 1.2.0](https://img.shields.io/badge/Stable_Tag-1.2.0-2d74d5)
 ![License GPLv3 or later](https://img.shields.io/badge/License-GPLv3_or_later-2d74d5)
+[![Unit Tests](https://github.com/wp-sigmadevs/easy-demo-importer/actions/workflows/unit-tests.yml/badge.svg)](https://github.com/wp-sigmadevs/easy-demo-importer/actions/workflows/unit-tests.yml)
 
 <hr />
 
