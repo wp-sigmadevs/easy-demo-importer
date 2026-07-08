@@ -127,8 +127,11 @@ final class ImportState {
 			return null;
 		}
 
-		// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.serialize_unserialize
-		$data = unserialize( $payload, [ 'allowed_classes' => false ] );
+		// Silenced: a truncated/corrupt state file is expected to fail here and is
+		// handled by returning null (the caller then re-runs prepare or falls back).
+		// unserialize() would otherwise emit an E_WARNING into the error log.
+		// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.serialize_unserialize, WordPress.PHP.NoSilencedErrors.Discouraged
+		$data = @unserialize( $payload, [ 'allowed_classes' => false ] );
 
 		return is_array( $data ) ? $data : null;
 	}
