@@ -62,10 +62,11 @@ final class Enqueue extends Base {
 			return;
 		}
 
-		$base = $this->plugin->assetsUri();
-		$ver  = $this->plugin->version();
+		$base   = $this->plugin->assetsUri();
+		$ver    = $this->plugin->version();
+		$suffix = is_rtl() ? '-rtl.min' : '.min';
 
-		wp_enqueue_style( 'sd-edi-network-styles', esc_url( $base . '/css/backend.css' ), [], $ver );
+		wp_enqueue_style( 'sd-edi-network-styles', esc_url( $base . '/css/backend' . $suffix . '.css' ), [], $ver );
 		wp_enqueue_script( 'sd-edi-network-script', esc_url( $base . '/js/network.min.js' ), [ 'wp-element', 'wp-i18n' ], $ver, true );
 
 		wp_localize_script(
