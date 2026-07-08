@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Timeline } from 'antd';
+import { Button, Timeline, Progress } from 'antd';
 import { ProgressMessage } from '../../ProgressMessage';
 
 /* global sdEdiAdminParams */
@@ -9,12 +9,14 @@ import { ProgressMessage } from '../../ProgressMessage';
  *
  * @param {string}   importStatus       - The import status.
  * @param {Array}    importProgress     - The progress of the import.
+ * @param {?number}  importPercent      - Determinate content-import progress (0-100), or null to hide the bar.
  * @param {boolean}  showImportProgress - Flag indicating whether to show the import progress.
  * @param {Function} handleImport       - Function to handle the import process.
  */
 const Imports = ({
 	importStatus,
 	importProgress,
+	importPercent = null,
 	showImportProgress,
 	handleImport,
 }) => {
@@ -43,7 +45,16 @@ const Imports = ({
 	return (
 		<div className={`import-progress ${importStatus}`}>
 			{showImportProgress ? (
-				renderImportProgress()
+				<>
+					{importPercent !== null && (
+						<Progress
+							percent={importPercent}
+							status="active"
+							className="sd-edi-import-bar"
+						/>
+					)}
+					{renderImportProgress()}
+				</>
 			) : (
 				<Button type="primary" onClick={handleImport}>
 					{sdEdiAdminParams.btnImport}
