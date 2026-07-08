@@ -18,7 +18,8 @@ use WP_REST_Response;
 use SigmaDevs\EasyDemoImporter\Common\{
 	Abstracts\Base,
 	Traits\Singleton,
-	Functions\Helpers
+	Functions\Helpers,
+	Functions\ImportLogger
 };
 
 // Do not allow directly accessing this file.
@@ -143,6 +144,7 @@ class RestEndpoints extends Base {
 		$this->addDemoDataEndpoint();
 		$this->addPluginStatusEndpoint();
 		$this->addServerStatusEndpoint();
+		$this->addImportLogEndpoint();
 	}
 
 	/**
@@ -204,6 +206,53 @@ class RestEndpoints extends Base {
 				],
 			]
 		);
+	}
+
+	/**
+	 * Add Import Log Route.
+	 *
+	 * @return void
+	 * @since 1.2.0
+	 */
+	public function addImportLogEndpoint() {
+		register_rest_route(
+			$this->getNamespace(),
+			'/import/log',
+			[
+				'methods'             => 'GET',
+				'callback'            => [ $this, 'importLog' ],
+				'permission_callback' => [ $this, 'permission' ],
+				'args'                => [
+					'session_id' => [
+						'type'              => 'string',
+						'default'           => '',
+						'sanitize_callback' => 'sanitize_text_field',
+					],
+					'limit'      => [
+						'type'              => 'integer',
+						'default'           => 500,
+						'sanitize_callback' => 'absint',
+					],
+				],
+			]
+		);
+	}
+
+	/**
+	 * Returns activity-log entries, newest first.
+	 *
+	 * @param WP_REST_Request $request REST request.
+	 *
+	 * @return WP_REST_Response
+	 * @since 1.2.0
+	 */
+	public function importLog( WP_REST_Request $request ) {
+		$sessionId = (string) $request->get_param( 'session_id' );
+		$limit     = (int) $request->get_param( 'limit' );
+
+		$entries = ImportLogger::get( $sessionId, $limit > 0 ? $limit : 500 );
+
+		return $this->sendResponse( $entries, esc_html__( 'Import log fetched.', 'easy-demo-importer' ) );
 	}
 
 	/**

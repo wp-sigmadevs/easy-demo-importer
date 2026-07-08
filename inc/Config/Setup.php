@@ -12,6 +12,8 @@ declare( strict_types=1 );
 
 namespace SigmaDevs\EasyDemoImporter\Config;
 
+use SigmaDevs\EasyDemoImporter\Common\Functions\ImportLogger;
+
 // Do not allow directly accessing this file.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit( 'This script cannot be accessed directly.' );
@@ -103,6 +105,9 @@ class Setup {
 
 		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 		dbDelta( self::getTableSchema() );
+
+		// Activity log table (also lazily ensured on import start for existing installs).
+		ImportLogger::install();
 	}
 
 	/**

@@ -16,6 +16,7 @@ use SD_EDI_WP_Import;
 use SigmaDevs\EasyDemoImporter\Common\{
 	Traits\Singleton,
 	Functions\Helpers,
+	Functions\ImportLogger,
 	Abstracts\ImporterAjax,
 	Importer\ChunkedImport,
 	Importer\ImportState
@@ -88,6 +89,19 @@ class InstallDemo extends ImporterAjax {
 			return;
 		}
 
+		// Activity log: ensure the table exists (covers existing installs that
+		// pre-date the log), prune old entries, and record the start of this run.
+		ImportLogger::maybeInstall();
+		ImportLogger::prune();
+		ImportLogger::info(
+			sprintf(
+				/* translators: %s: demo name. */
+				esc_html__( 'Content import started for “%s”.', 'easy-demo-importer' ),
+				$this->demoSlug
+			),
+			$this->sessionId
+		);
+
 		/**
 		 * Action Hook: 'sd/edi/before_import'
 		 *
@@ -128,13 +142,22 @@ class InstallDemo extends ImporterAjax {
 
 			ob_start();
 			$total = $importer->prepare( $xmlFile );
-			ob_end_clean();
+			$this->logImporterOutput( ob_get_clean() );
 		} catch ( \Throwable $e ) {
 			// Parsing/preparation failed — fall back to the single-shot importer so
 			// the import still runs (just without resumability).
 			if ( isset( $importer ) ) {
 				$importer->state()->delete();
 			}
+
+			ImportLogger::error(
+				sprintf(
+					/* translators: %s: error message. */
+					esc_html__( 'Chunked import could not start (%s). Falling back to single-shot import.', 'easy-demo-importer' ),
+					$e->getMessage()
+				),
+				$this->sessionId
+			);
 
 			$this->importDemoContent( $xmlFile, $this->excludeImages, $this->skipImageRegeneration );
 
@@ -148,6 +171,15 @@ class InstallDemo extends ImporterAjax {
 			);
 			return;
 		}
+
+		ImportLogger::info(
+			sprintf(
+				/* translators: %d: number of items queued. */
+				esc_html__( 'WXR parsed — %d items queued for import.', 'easy-demo-importer' ),
+				(int) $total
+			),
+			$this->sessionId
+		);
 
 		wp_send_json(
 			$this->chunkPayload(
@@ -191,7 +223,7 @@ class InstallDemo extends ImporterAjax {
 
 		ob_start();
 		$result = $this->chunkedImporter()->processBatch();
-		ob_end_clean();
+		$this->logImporterOutput( ob_get_clean() );
 
 		$progress = [
 			'processed' => (int) $result['processed'],
@@ -246,12 +278,17 @@ class InstallDemo extends ImporterAjax {
 
 		ob_start();
 		$this->chunkedImporter()->finalize();
-		ob_end_clean();
+		$this->logImporterOutput( ob_get_clean() );
 
 		// When images were excluded, strip the now-dangling featured-image links.
 		if ( 'true' === $this->excludeImages ) {
 			$this->unsetThumbnails();
 		}
+
+		ImportLogger::success(
+			esc_html__( 'Content import completed.', 'easy-demo-importer' ),
+			$this->sessionId
+		);
 
 		/**
 		 * Action Hook: 'sd/edi/after_content_import'
@@ -319,6 +356,36 @@ class InstallDemo extends ImporterAjax {
 		if ( $this->skipImageRegeneration ) {
 			add_filter( 'intermediate_image_sizes_advanced', '__return_empty_array', 9999 );
 			add_filter( 'wp_generate_attachment_metadata', '__return_empty_array', 9999 );
+		}
+	}
+
+	/**
+	 * Records the bundled importer's printed output to the activity log.
+	 *
+	 * The vendored WXR importer reports per-item failures (e.g. an image that
+	 * could not be downloaded) by printing HTML rather than returning them, and
+	 * those prints are otherwise captured and discarded to keep the AJAX JSON
+	 * response clean. Each printed line is surfaced here as a warning so the
+	 * reason a post or attachment was skipped is visible to the user.
+	 *
+	 * @param string|false $output Captured output buffer contents.
+	 *
+	 * @return void
+	 * @since 1.2.0
+	 */
+	private function logImporterOutput( $output ): void {
+		if ( ! is_string( $output ) || '' === trim( $output ) ) {
+			return;
+		}
+
+		$lines = preg_split( '/<br\s*\/?>|\r\n|\r|\n/i', $output );
+
+		foreach ( (array) $lines as $line ) {
+			$line = trim( wp_strip_all_tags( $line ) );
+
+			if ( '' !== $line ) {
+				ImportLogger::warning( $line, $this->sessionId );
+			}
 		}
 	}
 
@@ -460,7 +527,7 @@ class InstallDemo extends ImporterAjax {
 				// Import XML.
 				ob_start();
 				$wp_import->import( $xmlFilePath );
-				ob_end_clean();
+				$this->logImporterOutput( ob_get_clean() );
 
 				if ( ! $excludeImages ) {
 					$this->unsetThumbnails();
