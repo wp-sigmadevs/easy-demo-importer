@@ -16,7 +16,7 @@
  *                       delete the state file.
  *
  * @package SigmaDevs\EasyDemoImporter
- * @since   1.1.7
+ * @since   1.2.0
  */
 
 declare( strict_types=1 );
@@ -33,7 +33,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Importer Class: ChunkedImport
  *
- * @since 1.1.7
+ * @since 1.2.0
  */
 class ChunkedImport extends SD_EDI_WP_Import {
 	/**
@@ -44,7 +44,7 @@ class ChunkedImport extends SD_EDI_WP_Import {
 	 * URL remapping to resolve correctly at finalize().
 	 *
 	 * @var string[]
-	 * @since 1.1.7
+	 * @since 1.2.0
 	 */
 	private const STATE_PROPS = [
 		'id',
@@ -72,7 +72,7 @@ class ChunkedImport extends SD_EDI_WP_Import {
 	 * State store.
 	 *
 	 * @var ImportState
-	 * @since 1.1.7
+	 * @since 1.2.0
 	 */
 	private $state;
 
@@ -80,7 +80,7 @@ class ChunkedImport extends SD_EDI_WP_Import {
 	 * Index of the next post to process within $this->posts.
 	 *
 	 * @var int
-	 * @since 1.1.7
+	 * @since 1.2.0
 	 */
 	private $offset = 0;
 
@@ -89,7 +89,7 @@ class ChunkedImport extends SD_EDI_WP_Import {
 	 *
 	 * @param ImportState $state State store for this import session.
 	 *
-	 * @since 1.1.7
+	 * @since 1.2.0
 	 */
 	public function __construct( ImportState $state ) {
 		$this->state = $state;
@@ -105,7 +105,7 @@ class ChunkedImport extends SD_EDI_WP_Import {
 	 * @param string $file Absolute path to the WXR file.
 	 *
 	 * @return int Total number of posts queued for the batch stage.
-	 * @since 1.1.7
+	 * @since 1.2.0
 	 */
 	public function prepare( string $file ): int {
 		$this->addImportFilters();
@@ -132,6 +132,45 @@ class ChunkedImport extends SD_EDI_WP_Import {
 	}
 
 	/**
+	 * Parses the WXR and seeds the importer state.
+	 *
+	 * Overrides the parent, which echoes an error and calls die() on a missing or
+	 * unparseable file — that would kill the AJAX request and bypass the caller's
+	 * single-shot fallback. Throwing instead lets InstallDemo catch the failure
+	 * and fall back gracefully.
+	 *
+	 * @param string $file Absolute path to the WXR file.
+	 *
+	 * @return void
+	 * @throws \RuntimeException When the file is missing or cannot be parsed.
+	 * @since 1.2.0
+	 */
+	public function import_start( $file ) {
+		if ( ! is_file( $file ) ) {
+			throw new \RuntimeException( 'WXR file not found.' );
+		}
+
+		$import_data = $this->parse( $file );
+
+		if ( is_wp_error( $import_data ) ) {
+			throw new \RuntimeException( 'WXR could not be parsed: ' . esc_html( $import_data->get_error_message() ) );
+		}
+
+		$this->version = $import_data['version'];
+		$this->get_authors_from_import( $import_data );
+		$this->posts      = $import_data['posts'];
+		$this->terms      = $import_data['terms'];
+		$this->categories = $import_data['categories'];
+		$this->tags       = $import_data['tags'];
+		$this->base_url   = esc_url( $import_data['base_url'] );
+
+		wp_defer_term_counting( true );
+		wp_defer_comment_counting( true );
+
+		do_action( 'import_start' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+	}
+
+	/**
 	 * Stage 2: process a time-boxed slice of posts.
 	 *
 	 * Hydrates state, processes posts in small steps until the per-request time
@@ -140,7 +179,7 @@ class ChunkedImport extends SD_EDI_WP_Import {
 	 * checks prevent duplicates if a request is retried after a timeout.
 	 *
 	 * @return array{processed:int,total:int,done:bool} Progress snapshot.
-	 * @since 1.1.7
+	 * @since 1.2.0
 	 */
 	public function processBatch(): array {
 		if ( ! $this->hydrate() ) {
@@ -191,7 +230,7 @@ class ChunkedImport extends SD_EDI_WP_Import {
 	 * recalculation), then deletes the state file.
 	 *
 	 * @return bool True if finalization ran; false if no state was found.
-	 * @since 1.1.7
+	 * @since 1.2.0
 	 */
 	public function finalize(): bool {
 		if ( ! $this->hydrate() ) {
@@ -215,7 +254,7 @@ class ChunkedImport extends SD_EDI_WP_Import {
 	 * The state store backing this import.
 	 *
 	 * @return ImportState
-	 * @since 1.1.7
+	 * @since 1.2.0
 	 */
 	public function state(): ImportState {
 		return $this->state;
@@ -228,7 +267,7 @@ class ChunkedImport extends SD_EDI_WP_Import {
 	 * filters do not survive between AJAX calls.
 	 *
 	 * @return void
-	 * @since 1.1.7
+	 * @since 1.2.0
 	 */
 	private function addImportFilters(): void {
 		add_filter( 'import_post_meta_key', [ $this, 'is_valid_meta_key' ] ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
@@ -239,7 +278,7 @@ class ChunkedImport extends SD_EDI_WP_Import {
 	 * Serializes the current cross-request state to the store.
 	 *
 	 * @return void
-	 * @since 1.1.7
+	 * @since 1.2.0
 	 */
 	private function persist(): void {
 		$data = [ 'offset' => $this->offset ];
@@ -255,7 +294,7 @@ class ChunkedImport extends SD_EDI_WP_Import {
 	 * Restores cross-request state from the store onto this instance.
 	 *
 	 * @return bool True if state was found and applied; false otherwise.
-	 * @since 1.1.7
+	 * @since 1.2.0
 	 */
 	private function hydrate(): bool {
 		$data = $this->state->load();

@@ -8,7 +8,7 @@
  * deleted when the import finalizes or the session is cancelled.
  *
  * @package SigmaDevs\EasyDemoImporter
- * @since   1.1.7
+ * @since   1.2.0
  */
 
 declare( strict_types=1 );
@@ -23,14 +23,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Importer Utility: ImportState
  *
- * @since 1.1.7
+ * @since 1.2.0
  */
 final class ImportState {
 	/**
 	 * Absolute path to the state file.
 	 *
 	 * @var string
-	 * @since 1.1.7
+	 * @since 1.2.0
 	 */
 	private $path;
 
@@ -39,7 +39,7 @@ final class ImportState {
 	 *
 	 * @param string $path Absolute path to the state file.
 	 *
-	 * @since 1.1.7
+	 * @since 1.2.0
 	 */
 	public function __construct( string $path ) {
 		$this->path = $path;
@@ -56,7 +56,7 @@ final class ImportState {
 	 * @param string $sessionId Import session identifier.
 	 *
 	 * @return ImportState
-	 * @since 1.1.7
+	 * @since 1.2.0
 	 */
 	public static function forSession( string $baseDir, string $sessionId ): ImportState {
 		$slug = $sessionId ? md5( $sessionId ) : 'default';
@@ -68,7 +68,7 @@ final class ImportState {
 	 * Absolute path to the backing file.
 	 *
 	 * @return string
-	 * @since 1.1.7
+	 * @since 1.2.0
 	 */
 	public function path(): string {
 		return $this->path;
@@ -78,7 +78,7 @@ final class ImportState {
 	 * Whether a persisted state file currently exists.
 	 *
 	 * @return bool
-	 * @since 1.1.7
+	 * @since 1.2.0
 	 */
 	public function exists(): bool {
 		return is_file( $this->path );
@@ -95,7 +95,7 @@ final class ImportState {
 	 * @param array $data State to persist.
 	 *
 	 * @return bool True on success.
-	 * @since 1.1.7
+	 * @since 1.2.0
 	 */
 	public function save( array $data ): bool {
 		// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.serialize_serialize
@@ -113,7 +113,7 @@ final class ImportState {
 	 * scalars written by save().
 	 *
 	 * @return array|null Decoded state, or null if absent/unreadable/corrupt.
-	 * @since 1.1.7
+	 * @since 1.2.0
 	 */
 	public function load(): ?array {
 		if ( ! is_file( $this->path ) ) {
@@ -137,7 +137,7 @@ final class ImportState {
 	 * Deletes the state file if present.
 	 *
 	 * @return void
-	 * @since 1.1.7
+	 * @since 1.2.0
 	 */
 	public function delete(): void {
 		if ( is_file( $this->path ) ) {
