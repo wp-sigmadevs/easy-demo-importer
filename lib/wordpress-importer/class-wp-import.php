@@ -734,11 +734,16 @@ class SD_EDI_WP_Import extends WP_Importer {
 				}
 
 				if ( is_wp_error( $post_id ) ) {
+					// Include the WP_Error reason (e.g. a failed image download) so the
+					// plugin's activity log can surface *why* the item was skipped, not
+					// just that it was. Divergence from the vendored importer — keep it
+					// minimal for future upstream syncs.
 					printf(
-						/* translators: 1. Singular Name, 2. Post Title */
-						esc_html__( 'Failed to import %1$s &#8220;%2$s&#8221;', 'easy-demo-importer' ),
+						/* translators: 1. Singular Name, 2. Post Title, 3. Error reason */
+						esc_html__( 'Failed to import %1$s &#8220;%2$s&#8221;: %3$s', 'easy-demo-importer' ),
 						esc_html( $post_type_object->labels->singular_name ),
-						esc_html( $post['post_title'] )
+						esc_html( $post['post_title'] ),
+						esc_html( $post_id->get_error_message() )
 					);
 					echo '<br />';
 					continue;

@@ -89,6 +89,15 @@ class Pages extends Base {
 			'callback'    => [ Callbacks::class, 'renderDemoImportPage' ],
 		];
 
+		$subPages[] = [
+			'parent_slug' => 'themes.php',
+			'page_title'  => esc_html__( 'Import Log', 'easy-demo-importer' ),
+			'menu_title'  => apply_filters( 'sd/edi/log_menu_title', esc_html__( 'Easy Import Log', 'easy-demo-importer' ) ), // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+			'capability'  => 'manage_options',
+			'menu_slug'   => 'sd-edi-import-log',
+			'callback'    => [ Callbacks::class, 'renderImportLogPage' ],
+		];
+
 		$themeConfig     = sd_edi()->getDemoConfig();
 		$activeTheme     = sd_edi()->activeTheme();
 		$supportedThemes = sd_edi()->supportedThemes();
@@ -124,7 +133,7 @@ class Pages extends Base {
 		$page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : '';
 
 		// Conditionally removing all notices.
-		if ( 'themes.php' === $pagenow && ( 'sd-easy-demo-importer' === $page || 'sd-edi-demo-importer-status' === $page ) ) {
+		if ( 'themes.php' === $pagenow && ( 'sd-easy-demo-importer' === $page || 'sd-edi-demo-importer-status' === $page || 'sd-edi-import-log' === $page ) ) {
 			add_action( 'admin_init', [ $this, 'removeAllNotices' ], 99 );
 		}
 	}
