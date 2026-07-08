@@ -49,6 +49,7 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 	const [importStatus, setImportStatus] = useState('');
 	const [showImportProgress, setShowImportProgress] = useState(false);
 	const [importProgress, setImportProgress] = useState([]);
+	const [importPercent, setImportPercent] = useState(null);
 
 	/**
 	 * When the modal opens and there is a saved resume request (from a previous interrupted
@@ -59,7 +60,8 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 	useEffect(() => {
 		if (visible && resumeRequest && resumeRequest.demo === modalData?.id) {
 			setMessage(
-				sdEdiAdminParams.importInterruptedTitle || 'Import was interrupted.'
+				sdEdiAdminParams.importInterruptedTitle ||
+					'Import was interrupted.'
 			);
 			setHint(
 				sdEdiAdminParams.importInterruptedHint ||
@@ -129,6 +131,7 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 					// Start the import process
 					const initialProgress = [{ message: importInitMessage }];
 					setImportProgress(initialProgress);
+					setImportPercent(null);
 
 					setTimeout(function () {
 						doAxios(
@@ -138,7 +141,8 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 							handleImportResponse,
 							setMessage,
 							setHint,
-							setResumeRequest
+							setResumeRequest,
+							setImportPercent
 						);
 					}, 2000);
 				} catch (error) {
@@ -202,6 +206,7 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 		setExcludeImages(false);
 		setReset(true);
 		setImportProgress([]);
+		setImportPercent(null);
 		setImportComplete(false);
 	};
 
@@ -214,7 +219,13 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 
 		setCurrentStep(3);
 		setShowImportProgress(true);
-		setImportProgress([{ message: sdEdiAdminParams.resumingImport || 'Resuming import...' }]);
+		setImportProgress([
+			{
+				message:
+					sdEdiAdminParams.resumingImport || 'Resuming import...',
+			},
+		]);
+		setImportPercent(null);
 
 		doAxios(
 			resumeRequest,
@@ -223,7 +234,8 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 			handleImportResponse,
 			setMessage,
 			setHint,
-			setResumeRequest
+			setResumeRequest,
+			setImportPercent
 		);
 	};
 
@@ -321,6 +333,7 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 									<Imports
 										importStatus={importStatus}
 										importProgress={importProgress}
+										importPercent={importPercent}
 										showImportProgress={showImportProgress}
 										handleImport={handleImport}
 									/>

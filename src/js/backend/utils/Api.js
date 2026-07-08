@@ -75,6 +75,32 @@ const httpErrorInfo = (code) => {
 };
 
 /**
+ * Import phases that are safe to auto-resume after a transient failure.
+ * The batch stage is idempotent server-side (cursor + mutex + post_exists),
+ * so re-issuing the same request simply continues where it left off.
+ *
+ * @type {string[]}
+ */
+const AUTO_RESUME_PHASES = ['sd_edi_import_xml_batch'];
+
+/**
+ * Maximum consecutive automatic resume attempts before surfacing the manual
+ * Resume screen.
+ *
+ * @type {number}
+ */
+const MAX_AUTO_RESUME = 5;
+
+/**
+ * HTTP statuses treated as transient (gateway/server overload or timeout),
+ * including Cloudflare's 52x family. A dropped connection (no response) is
+ * treated the same way.
+ *
+ * @type {number[]}
+ */
+const TRANSIENT_STATUSES = [408, 429, 500, 502, 503, 504, 520, 522, 524];
+
+/**
  * Perform Axios request for import process.
  *
  * @param {Object}   request              - The import request data.
@@ -84,6 +110,8 @@ const httpErrorInfo = (code) => {
  * @param {Function} setMessage           - Set import message.
  * @param {Function} setHint              - Set import error hint.
  * @param {Function} setResumeRequest     - Save the failed request so Resume can retry it.
+ * @param {Function} setImportPercent     - Set the determinate progress percentage (0-100), or null.
+ * @param {number}   attempt              - Current auto-resume attempt (internal; starts at 0).
  */
 export const doAxios = async (
 	request,
@@ -92,7 +120,9 @@ export const doAxios = async (
 	handleImportResponse,
 	setMessage,
 	setHint = () => {},
-	setResumeRequest = () => {}
+	setResumeRequest = () => {},
+	setImportPercent = () => {},
+	attempt = 0
 ) => {
 	if (request.nextPhase) {
 		const params = new FormData();
@@ -112,11 +142,61 @@ export const doAxios = async (
 
 		const requestUrl = sdEdiAdminParams.ajaxUrl;
 
+		// Re-issues the current request after a transient failure, with capped
+		// exponential backoff. Only used for idempotent phases (see caller gate).
+		const scheduleAutoResume = () => {
+			const nextAttempt = attempt + 1;
+			const delaySec = Math.min(30, 2 ** attempt); // 1, 2, 4, 8, 16, 30…
+
+			setImportProgress((prevProgress) => [
+				...prevProgress,
+				{
+					message: `Connection interrupted — resuming automatically (attempt ${nextAttempt}/${MAX_AUTO_RESUME})…`,
+					fade: true,
+				},
+			]);
+
+			setTimeout(() => {
+				doAxios(
+					request,
+					setImportProgress,
+					setCurrentStep,
+					handleImportResponse,
+					setMessage,
+					setHint,
+					setResumeRequest,
+					setImportPercent,
+					nextAttempt
+				);
+			}, delaySec * 1000);
+		};
+
+		// Whether a failure on this request should be auto-resumed rather than
+		// surfaced immediately. Gated to the idempotent batch phase + an active
+		// session, capped at MAX_AUTO_RESUME.
+		const canAutoResume = (status) =>
+			AUTO_RESUME_PHASES.includes(request.nextPhase) &&
+			request.sessionId &&
+			attempt < MAX_AUTO_RESUME &&
+			(status === 0 || TRANSIENT_STATUSES.includes(status));
+
 		try {
 			const response = await Axios.post(requestUrl, params);
 
 			if (response.status === 200) {
 				if (!response.data.error) {
+					// Update the determinate progress bar whenever the server
+					// reports batch progress (0-100).
+					if (
+						response.data.progress &&
+						response.data.progress.total > 0
+					) {
+						const { processed, total } = response.data.progress;
+						setImportPercent(
+							Math.min(100, Math.round((processed / total) * 100))
+						);
+					}
+
 					// retry:true means the PHP mutex was held by a background import.
 					// Re-send the same original request after retryAfter seconds — do NOT
 					// advance the pipeline or touch the progress list.
@@ -130,7 +210,8 @@ export const doAxios = async (
 									handleImportResponse,
 									setMessage,
 									setHint,
-									setResumeRequest
+									setResumeRequest,
+									setImportPercent
 								);
 							},
 							(response.data.retryAfter ?? 5) * 1000
@@ -170,7 +251,8 @@ export const doAxios = async (
 									handleImportResponse,
 									setMessage,
 									setHint,
-									setResumeRequest
+									setResumeRequest,
+									setImportPercent
 								);
 							} else {
 								setCurrentStep(4);
@@ -192,6 +274,11 @@ export const doAxios = async (
 					setCurrentStep(4);
 				}
 			} else {
+				if (canAutoResume(response.status)) {
+					scheduleAutoResume();
+					return;
+				}
+
 				const { message, hint } = httpErrorInfo(response.status);
 				setMessage(message);
 				setHint(hint);
@@ -201,6 +288,12 @@ export const doAxios = async (
 				setCurrentStep(4);
 			}
 		} catch (error) {
+			const status = error.response ? error.response.status : 0;
+			if (canAutoResume(status)) {
+				scheduleAutoResume();
+				return;
+			}
+
 			// error.response is undefined on network timeouts or dropped connections.
 			if (error.response) {
 				// Prefer specific messages from the PHP response body (e.g. nonce failure, session invalid).
