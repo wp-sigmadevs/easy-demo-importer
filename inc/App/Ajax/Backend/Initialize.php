@@ -17,6 +17,7 @@ use SigmaDevs\EasyDemoImporter\Common\{
 	Traits\Singleton,
 	Functions\Helpers,
 	Functions\SessionManager,
+	Importer\ImportState,
 	Abstracts\ImporterAjax
 };
 
@@ -83,6 +84,10 @@ class Initialize extends ImporterAjax {
 			// @phpstan-ignore deadCode.unreachable
 			return;
 		}
+
+		// Discard any resumable chunked-import state for this session so a
+		// cancelled import cannot be resumed with stale content.
+		ImportState::forSession( $this->demoUploadDir( $this->demoDir() ), $session_id )->delete();
 
 		SessionManager::release( $session_id );
 		wp_send_json_success();
