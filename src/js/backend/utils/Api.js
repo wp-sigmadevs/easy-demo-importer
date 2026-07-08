@@ -27,7 +27,8 @@ export const Api = Axios.create({
 const httpErrorInfo = (code) => {
 	const map = {
 		401: {
-			message: 'The request was rejected by the server (401 Unauthorized).',
+			message:
+				'The request was rejected by the server (401 Unauthorized).',
 			hint: 'Your WordPress admin session may have expired. Log out and back in, then try again.',
 		},
 		403: {
@@ -39,7 +40,8 @@ const httpErrorInfo = (code) => {
 			hint: 'The demo configuration may point to a missing file. Contact theme support.',
 		},
 		408: {
-			message: 'The server took too long to respond (408 Request Timeout).',
+			message:
+				'The server took too long to respond (408 Request Timeout).',
 			hint: 'Your server may be under load or PHP max_execution_time is too low. Try again, or ask your host to increase the execution time limit.',
 		},
 		429: {
@@ -47,11 +49,13 @@ const httpErrorInfo = (code) => {
 			hint: 'Wait a few minutes before trying again.',
 		},
 		500: {
-			message: 'The server encountered an internal error (500 Internal Server Error).',
+			message:
+				'The server encountered an internal error (500 Internal Server Error).',
 			hint: 'Check your PHP error log for details. This is usually a server configuration issue unrelated to the import.',
 		},
 		503: {
-			message: 'The server is temporarily unavailable (503 Service Unavailable).',
+			message:
+				'The server is temporarily unavailable (503 Service Unavailable).',
 			hint: 'The server may be under maintenance. Wait a few minutes and try again.',
 		},
 		504: {
@@ -117,17 +121,20 @@ export const doAxios = async (
 					// Re-send the same original request after retryAfter seconds — do NOT
 					// advance the pipeline or touch the progress list.
 					if (response.data.retry) {
-						setTimeout(() => {
-							doAxios(
-								request,
-								setImportProgress,
-								setCurrentStep,
-								handleImportResponse,
-								setMessage,
-								setHint,
-								setResumeRequest
-							);
-						}, (response.data.retryAfter || 5) * 1000);
+						setTimeout(
+							() => {
+								doAxios(
+									request,
+									setImportProgress,
+									setCurrentStep,
+									handleImportResponse,
+									setMessage,
+									setHint,
+									setResumeRequest
+								);
+							},
+							(response.data.retryAfter ?? 5) * 1000
+						);
 						return;
 					}
 
@@ -148,7 +155,7 @@ export const doAxios = async (
 											message:
 												response.data.completedMessage,
 											fade: true,
-									  }
+										}
 									: progress
 							)
 						);
@@ -173,17 +180,24 @@ export const doAxios = async (
 						setCurrentStep(4);
 					}
 				} else {
-					setMessage(response.data.errorMessage || 'An error occurred during import.');
+					setMessage(
+						response.data.errorMessage ||
+							'An error occurred during import.'
+					);
 					setHint(response.data.errorHint || '');
 					// Only allow resume if a session was already started (i.e. not a lock-conflict on Initialize).
-					if (request.sessionId) { setResumeRequest(request); }
+					if (request.sessionId) {
+						setResumeRequest(request);
+					}
 					setCurrentStep(4);
 				}
 			} else {
 				const { message, hint } = httpErrorInfo(response.status);
 				setMessage(message);
 				setHint(hint);
-				if (request.sessionId) { setResumeRequest(request); }
+				if (request.sessionId) {
+					setResumeRequest(request);
+				}
 				setCurrentStep(4);
 			}
 		} catch (error) {
@@ -195,15 +209,21 @@ export const doAxios = async (
 					setMessage(data.data.errorMessage);
 					setHint(data.data.errorHint || '');
 				} else {
-					const { message, hint } = httpErrorInfo(error.response.status);
+					const { message, hint } = httpErrorInfo(
+						error.response.status
+					);
 					setMessage(message);
 					setHint(hint);
 				}
 			} else {
 				setMessage('Lost connection to the server.');
-				setHint('Check your internet connection. If you are on a local server, ensure it is running correctly. Try refreshing the page.');
+				setHint(
+					'Check your internet connection. If you are on a local server, ensure it is running correctly. Try refreshing the page.'
+				);
 			}
-			if (request.sessionId) { setResumeRequest(request); }
+			if (request.sessionId) {
+				setResumeRequest(request);
+			}
 			setCurrentStep(4);
 		}
 	} else {
