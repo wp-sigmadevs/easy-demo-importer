@@ -591,10 +591,17 @@ class SD_EDI_WP_Import extends WP_Importer {
 	 * @return void
 	 * @since 1.0.0
 	 */
-	public function process_posts() {
+	public function process_posts( $offset = 0, $limit = 0 ) {
 		$this->posts = apply_filters( 'wp_import_posts', $this->posts );
 
-		foreach ( $this->posts as $post ) {
+		// Chunked import: operate on a slice so the post loop can resume across
+		// separate requests. $limit === 0 preserves the original single-shot
+		// behavior exactly (process every post, in order).
+		$posts = ( $limit > 0 )
+			? array_slice( $this->posts, $offset, $limit, true )
+			: $this->posts;
+
+		foreach ( $posts as $post ) {
 			$post = apply_filters( 'wp_import_post_data_raw', $post );
 
 			if ( ! post_type_exists( $post['post_type'] ) ) {
@@ -882,7 +889,12 @@ class SD_EDI_WP_Import extends WP_Importer {
 			}
 		}
 
-		unset( $this->posts );
+		// Only release the parsed posts in single-shot mode. Chunked mode needs
+		// them preserved across batches (state is re-hydrated each request), and
+		// releases them when the session state file is deleted in finalize().
+		if ( 0 === $limit ) {
+			unset( $this->posts );
+		}
 	}
 
 	/**
