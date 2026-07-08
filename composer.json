@@ -20,11 +20,19 @@
       "SigmaDevs\\EasyDemoImporter\\": "./inc"
     }
   },
+  "autoload-dev": {
+    "psr-4": {
+      "SigmaDevs\\EasyDemoImporter\\Tests\\": "./tests"
+    }
+  },
   "scripts": {
     "cs": "vendor/bin/phpcs --standard=phpcs.xml --report-full=error-report.txt --report-summary=error-summary.txt .",
     "cbf": "vendor/bin/phpcbf --standard=phpcs.xml .",
     "phpcs": "vendor/bin/phpcs --standard=phpcs.xml",
-    "phpstan": "vendor/bin/phpstan analyse --memory-limit=1G"
+    "phpstan": "vendor/bin/phpstan analyse --memory-limit=1G",
+    "test": "vendor/bin/phpunit",
+    "test:unit": "vendor/bin/phpunit",
+    "test:integration": "vendor/bin/phpunit --configuration phpunit-integration.xml.dist"
   },
   "require": {
     "php": ">=7.4",
@@ -51,6 +59,10 @@
     "squizlabs/php_codesniffer": "^3.13.4",
     "wp-coding-standards/wpcs": "^3.3.0",
     "phpstan/phpstan": "^2.1",
-    "szepeviktor/phpstan-wordpress": "^2.0"
+    "szepeviktor/phpstan-wordpress": "^2.0",
+    "phpunit/phpunit": "^9.6",
+    "brain/monkey": "^2.6",
+    "mockery/mockery": "^1.6",
+    "yoast/phpunit-polyfills": "^2.0"
   }
 }
