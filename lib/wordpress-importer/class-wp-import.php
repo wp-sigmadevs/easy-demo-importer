@@ -1127,7 +1127,7 @@ class SD_EDI_WP_Import extends WP_Importer {
 				// reverse-proxy / FPM wall-clock limit and abort the import. Keep it
 				// short so a bad image fails fast and the import skips it and moves
 				// on. Filterable for hosts that legitimately serve large media.
-				'timeout'    => (int) apply_filters( 'sd/edi/importer/attachment_timeout', 25 ), // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+				'timeout'    => (int) apply_filters( 'sd/edi/importer/attachment_timeout', 40 ), // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 				'stream'     => true,
 				'filename'   => $tmp_file_name,
 				'user-agent' => apply_filters( // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
