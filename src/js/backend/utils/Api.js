@@ -221,42 +221,46 @@ export const doAxios = async (
 
 					handleImportResponse(response);
 
-					if (response.data.nextPhaseMessage) {
-						// Update import progress with next phase message
-						setImportProgress((prevProgress) => [
-							...prevProgress,
-							{ message: response.data.nextPhaseMessage },
-						]);
+					// Advance whenever the server names a next phase — even if it
+					// did not include a progress message. Gating advancement on the
+					// message (the previous behavior) silently halted the pipeline
+					// at the result screen whenever a phase legitimately skipped its
+					// work and returned an empty nextPhaseMessage.
+					if (response.data.nextPhase) {
+						if (response.data.nextPhaseMessage) {
+							// Show the next-phase message, then fade in the
+							// completed message for the phase that just finished.
+							setImportProgress((prevProgress) => [
+								...prevProgress,
+								{ message: response.data.nextPhaseMessage },
+							]);
 
-						// Replace the loading message with the completed message
-						setImportProgress((prevProgress) =>
-							prevProgress.map((progress, index) =>
-								index === prevProgress.length - 2
-									? {
-											message:
-												response.data.completedMessage,
-											fade: true,
-										}
-									: progress
-							)
-						);
+							setImportProgress((prevProgress) =>
+								prevProgress.map((progress, index) =>
+									index === prevProgress.length - 2
+										? {
+												message:
+													response.data
+														.completedMessage,
+												fade: true,
+											}
+										: progress
+								)
+							);
+						}
 
-						// Recursive call to continue the import process
+						// Continue the import process.
 						setTimeout(() => {
-							if (response.data.nextPhase) {
-								doAxios(
-									response.data,
-									setImportProgress,
-									setCurrentStep,
-									handleImportResponse,
-									setMessage,
-									setHint,
-									setResumeRequest,
-									setImportPercent
-								);
-							} else {
-								setCurrentStep(4);
-							}
+							doAxios(
+								response.data,
+								setImportProgress,
+								setCurrentStep,
+								handleImportResponse,
+								setMessage,
+								setHint,
+								setResumeRequest,
+								setImportPercent
+							);
 						}, 3000);
 					} else {
 						setCurrentStep(4);
