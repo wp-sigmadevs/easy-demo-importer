@@ -133,7 +133,7 @@ class Pages extends Base {
 		$page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : '';
 
 		// Conditionally removing all notices.
-		if ( 'themes.php' === $pagenow && ( 'sd-easy-demo-importer' === $page || 'sd-edi-demo-importer-status' === $page || 'sd-edi-import-log' === $page ) ) {
+		if ( 'themes.php' === $pagenow && ( 'sd-easy-demo-importer' === $page || 'sd-edi-demo-importer-status' === $page ) ) {
 			add_action( 'admin_init', [ $this, 'removeAllNotices' ], 99 );
 		}
 	}
