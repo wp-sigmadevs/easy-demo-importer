@@ -81,7 +81,10 @@ const httpErrorInfo = (code) => {
  *
  * @type {string[]}
  */
-const AUTO_RESUME_PHASES = ['sd_edi_import_xml_batch'];
+const AUTO_RESUME_PHASES = [
+	'sd_edi_import_xml_batch',
+	'sd_edi_regenerate_images',
+];
 
 /**
  * Maximum consecutive automatic resume attempts before surfacing the manual

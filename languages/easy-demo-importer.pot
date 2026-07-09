@@ -6,7 +6,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-07-09 05:06+0000\n"
+"POT-Creation-Date: 2026-07-09 09:04+0000\n"
 "Report-Msgid-Bugs-To: https://github.com/wp-sigmadevs/easy-demo-importer/issues\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -170,7 +170,7 @@ msgstr ""
 msgid "Import"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:203, ../inc/Common/Functions/Callbacks.php:75
+#: ../inc/App/Backend/Enqueue.php:203
 msgid "No import activity has been logged yet."
 msgstr ""
 
@@ -603,52 +603,32 @@ msgstr ""
 msgid "No issue"
 msgstr ""
 
-#: ../inc/Common/Abstracts/ImporterAjax.php:133
+#: ../inc/Common/Abstracts/ImporterAjax.php:134
 msgid "Security check failed. Please refresh the page and try again."
 msgstr ""
 
-#: ../inc/Common/Abstracts/ImporterAjax.php:134
+#: ../inc/Common/Abstracts/ImporterAjax.php:135
 msgid "This can happen if you stayed on the page too long. Refreshing resets the security token."
 msgstr ""
 
-#: ../inc/Common/Abstracts/ImporterAjax.php:146
+#: ../inc/Common/Abstracts/ImporterAjax.php:146, ../inc/Common/Abstracts/ImporterAjax.php:153
 msgid "Demo configuration is missing or empty."
 msgstr ""
 
-#: ../inc/Common/Abstracts/ImporterAjax.php:147
+#: ../inc/Common/Abstracts/ImporterAjax.php:154
 msgid "Make sure your theme is calling the sd/edi/importer/config filter and returning a valid configuration array."
 msgstr ""
 
-#: ../inc/Common/Abstracts/ImporterAjax.php:169
+#: ../inc/Common/Abstracts/ImporterAjax.php:175, ../inc/Common/Abstracts/ImporterAjax.php:182
 msgid "The import session is no longer valid."
 msgstr ""
 
-#: ../inc/Common/Abstracts/ImporterAjax.php:170
+#: ../inc/Common/Abstracts/ImporterAjax.php:183
 msgid "This can happen if the import timed out or another import started. Refresh the page and try again."
 msgstr ""
 
-#: ../inc/Common/Abstracts/ImporterAjax.php:210
+#: ../inc/Common/Abstracts/ImporterAjax.php:223
 msgid "Invalid demo selection."
-msgstr ""
-
-#: ../inc/Common/Functions/Callbacks.php:69
-msgid "Easy Demo Importer — Import Log"
-msgstr ""
-
-#: ../inc/Common/Functions/Callbacks.php:71
-msgid "The 500 most recent import events, newest first. Warnings and errors are also written to your server error log."
-msgstr ""
-
-#: ../inc/Common/Functions/Callbacks.php:80
-msgid "Time"
-msgstr ""
-
-#: ../inc/Common/Functions/Callbacks.php:81
-msgid "Level"
-msgstr ""
-
-#: ../inc/Common/Functions/Callbacks.php:82
-msgid "Message"
 msgstr ""
 
 #. translators: file size
@@ -757,15 +737,15 @@ msgstr ""
 msgid "Plugins are active, ready to rock!"
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/CustomizerImport.php:100
+#: ../inc/App/Ajax/Backend/CustomizerImport.php:105
 msgid "Working on the menus, just a sec!"
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/CustomizerImport.php:101
+#: ../inc/App/Ajax/Backend/CustomizerImport.php:106
 msgid "Customizer settings in place – all set!"
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/CustomizerImport.php:101
+#: ../inc/App/Ajax/Backend/CustomizerImport.php:106
 msgid "Skipping the fancy customizer settings import!."
 msgstr ""
 
@@ -1027,46 +1007,59 @@ msgstr ""
 msgid "Minor cleanups done."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/InstallDemo.php:87
+#: ../inc/App/Ajax/Backend/InstallDemo.php:88
 msgid "Demo import process failed. No content file found."
 msgstr ""
 
 #. translators: %s: demo name.
-#: ../inc/App/Ajax/Backend/InstallDemo.php:99
+#: ../inc/App/Ajax/Backend/InstallDemo.php:100
 msgid "Content import started for “%s”."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/InstallDemo.php:133, ../inc/App/Ajax/Backend/InstallDemo.php:171, ../inc/App/Ajax/Backend/InstallDemo.php:308
+#: ../inc/App/Ajax/Backend/InstallDemo.php:134, ../inc/App/Ajax/Backend/InstallDemo.php:172, ../inc/App/Ajax/Backend/InstallDemo.php:335, ../inc/App/Ajax/Backend/InstallDemo.php:377, ../inc/App/Ajax/Backend/InstallDemo.php:451
 msgid "Importing Customizer settings."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/InstallDemo.php:134, ../inc/App/Ajax/Backend/InstallDemo.php:172, ../inc/App/Ajax/Backend/InstallDemo.php:309
+#: ../inc/App/Ajax/Backend/InstallDemo.php:135, ../inc/App/Ajax/Backend/InstallDemo.php:173, ../inc/App/Ajax/Backend/InstallDemo.php:336, ../inc/App/Ajax/Backend/InstallDemo.php:378, ../inc/App/Ajax/Backend/InstallDemo.php:452
 msgid "Everything has been imported smoothly."
 msgstr ""
 
 #. translators: %s: error message.
-#: ../inc/App/Ajax/Backend/InstallDemo.php:157
+#: ../inc/App/Ajax/Backend/InstallDemo.php:158
 msgid "Chunked import could not start (%s). Falling back to single-shot import."
 msgstr ""
 
 #. translators: %d: number of items queued.
-#: ../inc/App/Ajax/Backend/InstallDemo.php:180
+#: ../inc/App/Ajax/Backend/InstallDemo.php:181
 msgid "WXR parsed — %d items queued for import."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/InstallDemo.php:191
+#: ../inc/App/Ajax/Backend/InstallDemo.php:192
 msgid "Importing content…"
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/InstallDemo.php:256
+#: ../inc/App/Ajax/Backend/InstallDemo.php:258
 msgid "Finalizing content…"
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/InstallDemo.php:292
+#: ../inc/App/Ajax/Backend/InstallDemo.php:296
 msgid "Content import completed."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/InstallDemo.php:461
+#: ../inc/App/Ajax/Backend/InstallDemo.php:327
+msgid "Regenerating images…"
+msgstr ""
+
+#: ../inc/App/Ajax/Backend/InstallDemo.php:328
+msgid "Content imported."
+msgstr ""
+
+#. translators: %d: number of attachments.
+#: ../inc/App/Ajax/Backend/InstallDemo.php:442
+msgid "Regenerated images for %d attachments."
+msgstr ""
+
+#: ../inc/App/Ajax/Backend/InstallDemo.php:618
 msgid "Waiting for previous import to finish…"
 msgstr ""
 
@@ -1168,37 +1161,37 @@ msgid "Could not create temporary file."
 msgstr ""
 
 #. translators: 1: The WordPress error message. 2: The WordPress error code.
-#: ../lib/wordpress-importer/class-wp-import.php:1148
+#: ../lib/wordpress-importer/class-wp-import.php:1155
 msgid "Request failed due to an error: %1$s (%2$s)"
 msgstr ""
 
 #. translators: 1: The HTTP error message. 2: The HTTP error code.
-#: ../lib/wordpress-importer/class-wp-import.php:1165
+#: ../lib/wordpress-importer/class-wp-import.php:1172
 msgid "Remote server returned the following unexpected result: %1$s (%2$s)"
 msgstr ""
 
-#: ../lib/wordpress-importer/class-wp-import.php:1178
+#: ../lib/wordpress-importer/class-wp-import.php:1185
 msgid "Remote server did not respond"
 msgstr ""
 
-#: ../lib/wordpress-importer/class-wp-import.php:1186
+#: ../lib/wordpress-importer/class-wp-import.php:1193
 msgid "Zero size file downloaded"
 msgstr ""
 
-#: ../lib/wordpress-importer/class-wp-import.php:1192
+#: ../lib/wordpress-importer/class-wp-import.php:1199
 msgid "Downloaded file has incorrect size"
 msgstr ""
 
 #. translators: Max Size
-#: ../lib/wordpress-importer/class-wp-import.php:1203
+#: ../lib/wordpress-importer/class-wp-import.php:1210
 msgid "Remote file is too large, limit is %s"
 msgstr ""
 
-#: ../lib/wordpress-importer/class-wp-import.php:1241
+#: ../lib/wordpress-importer/class-wp-import.php:1248
 msgid "Sorry, this file type is not permitted for security reasons."
 msgstr ""
 
-#: ../lib/wordpress-importer/class-wp-import.php:1257
+#: ../lib/wordpress-importer/class-wp-import.php:1264
 msgid "The uploaded file could not be moved"
 msgstr ""
 

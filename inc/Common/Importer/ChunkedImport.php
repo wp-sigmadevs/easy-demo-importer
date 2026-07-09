@@ -303,6 +303,39 @@ class ChunkedImport extends SD_EDI_WP_Import {
 	}
 
 	/**
+	 * Attachment post IDs created by this import run.
+	 *
+	 * Filters the importer's old-to-new post map down to the rows that are
+	 * actually attachments, in a single query. Used to drive the dedicated
+	 * image-regeneration phase so it only touches media imported by this run and
+	 * never a site's pre-existing attachments. Read from in-memory state, so it
+	 * remains valid after finalize() has deleted the state file.
+	 *
+	 * @return int[] New attachment post IDs.
+	 * @since 1.2.0
+	 */
+	public function importedAttachmentIds(): array {
+		if ( empty( $this->processed_posts ) ) {
+			return [];
+		}
+
+		$ids = array_values( array_filter( array_map( 'intval', (array) $this->processed_posts ) ) );
+
+		if ( empty( $ids ) ) {
+			return [];
+		}
+
+		global $wpdb;
+
+		$in = implode( ',', $ids );
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$found = $wpdb->get_col( "SELECT ID FROM {$wpdb->posts} WHERE post_type = 'attachment' AND ID IN ({$in})" );
+
+		return array_map( 'intval', (array) $found );
+	}
+
+	/**
 	 * Registers the import filters that import() normally adds up-front.
 	 *
 	 * Must run at the start of every request that touches importer logic, since
