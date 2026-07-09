@@ -16,6 +16,7 @@ use WP_Filesystem_Direct;
 use SigmaDevs\EasyDemoImporter\Common\{
 	Traits\Singleton,
 	Functions\Helpers,
+	Functions\ImportLogger,
 	Functions\SessionManager,
 	Importer\ImportState,
 	Abstracts\ImporterAjax
@@ -72,24 +73,24 @@ class Initialize extends ImporterAjax {
 		Helpers::verifyAjaxCall();
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$session_id = ! empty( $_POST['sessionId'] ) ? sanitize_text_field( wp_unslash( $_POST['sessionId'] ) ) : '';
+		$posted_session_id = ! empty( $_POST['sessionId'] ) ? sanitize_text_field( wp_unslash( $_POST['sessionId'] ) ) : '';
 
-		if ( empty( $session_id ) ) {
-			wp_send_json_error( [ 'errorMessage' => __( 'Missing session ID.', 'easy-demo-importer' ) ], 400 );
-			return;
+		// The client's copy of the session ID can be stale or missing entirely —
+		// e.g. the page's own request was rejected by the lock check before a
+		// session ever existed for it, so it has nothing valid to send. The
+		// server always knows the actual locked session regardless of what the
+		// client sent, so resolve it from there and force-release it: this
+		// handler exists specifically for the user to break out of a stuck lock.
+		$active     = SessionManager::get();
+		$session_id = $active['session_id'] ?? $posted_session_id;
+
+		if ( '' !== $session_id ) {
+			// Discard any resumable chunked-import state for this session so a
+			// cancelled import cannot be resumed with stale content.
+			ImportState::forSession( $this->demoUploadDir( $this->demoDir() ), $session_id )->delete();
 		}
 
-		if ( ! SessionManager::isValid( $session_id ) ) {
-			wp_send_json_error( [ 'errorMessage' => __( 'Session does not belong to you or has expired.', 'easy-demo-importer' ) ], 403 );
-			// @phpstan-ignore deadCode.unreachable
-			return;
-		}
-
-		// Discard any resumable chunked-import state for this session so a
-		// cancelled import cannot be resumed with stale content.
-		ImportState::forSession( $this->demoUploadDir( $this->demoDir() ), $session_id )->delete();
-
-		SessionManager::release( $session_id );
+		SessionManager::forceRelease();
 		wp_send_json_success();
 	}
 
@@ -102,6 +103,12 @@ class Initialize extends ImporterAjax {
 	public function response() {
 		// Verifying AJAX call and user role.
 		Helpers::verifyAjaxCall();
+
+		// Ensure the activity-log table exists before anything below can log to
+		// it — this is the earliest point in the pipeline a message can be
+		// logged (e.g. the lock rejection just below), so it can't wait for
+		// InstallDemo's lazy install on installs that never re-ran activation.
+		ImportLogger::maybeInstall();
 
 		// Reject if another import is already running.
 		if ( SessionManager::isLocked() ) {
