@@ -1120,7 +1120,14 @@ class SD_EDI_WP_Import extends WP_Importer {
 		$request_args = apply_filters( // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 			'sd/edi/importer/attachment_request_args',
 			[
-				'timeout'    => 300,
+				// A blocked/tarpitted image (e.g. behind a Cloudflare challenge)
+				// can hold the connection open until this timeout. A chunked batch
+				// cannot interrupt a blocking wp_safe_remote_get(), so a long
+				// timeout lets one bad image run the whole request past the
+				// reverse-proxy / FPM wall-clock limit and abort the import. Keep it
+				// short so a bad image fails fast and the import skips it and moves
+				// on. Filterable for hosts that legitimately serve large media.
+				'timeout'    => (int) apply_filters( 'sd/edi/importer/attachment_timeout', 25 ), // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 				'stream'     => true,
 				'filename'   => $tmp_file_name,
 				'user-agent' => apply_filters( // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
