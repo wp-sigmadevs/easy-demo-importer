@@ -14,6 +14,7 @@ namespace SigmaDevs\EasyDemoImporter\Common\Abstracts;
 
 use SigmaDevs\EasyDemoImporter\Common\Functions\{
 	Helpers,
+	ImportLogger,
 	SessionManager
 };
 
@@ -141,6 +142,12 @@ abstract class ImporterAjax {
 		$this->config = sd_edi()->getDemoConfig();
 
 		if ( empty( $this->config ) ) {
+			ImportLogger::error(
+				esc_html__( 'Demo configuration is missing or empty.', 'easy-demo-importer' ),
+				$this->sessionId,
+				$this->demoSlug
+			);
+
 			wp_send_json_error(
 				[
 					'errorMessage' => esc_html__( 'Demo configuration is missing or empty.', 'easy-demo-importer' ),
@@ -164,6 +171,12 @@ abstract class ImporterAjax {
 
 		if ( ! empty( $posted_session_id ) ) {
 			if ( ! SessionManager::isValid( $posted_session_id ) ) {
+				ImportLogger::error(
+					esc_html__( 'The import session is no longer valid.', 'easy-demo-importer' ),
+					$posted_session_id,
+					$this->demoSlug
+				);
+
 				wp_send_json_error(
 					[
 						'errorMessage' => esc_html__( 'The import session is no longer valid.', 'easy-demo-importer' ),
@@ -240,6 +253,21 @@ abstract class ImporterAjax {
 			'errorMessage'          => $errorMessage,
 			'errorHint'             => $errorHint,
 		];
+
+		// Mirror every phase outcome to the activity log — one place covers all
+		// wizard phases. Errors log as error; the terminal completion (no next
+		// phase) logs as success; every other completed step logs as info.
+		if ( $error ) {
+			if ( '' !== $errorMessage ) {
+				ImportLogger::error( $errorMessage, $this->sessionId, $this->demoSlug );
+			}
+		} elseif ( '' !== $complete ) {
+			if ( '' === $nextPhase ) {
+				ImportLogger::success( $complete, $this->sessionId, $this->demoSlug );
+			} else {
+				ImportLogger::info( $complete, $this->sessionId, $this->demoSlug );
+			}
+		}
 
 		$this->sendResponse();
 	}
