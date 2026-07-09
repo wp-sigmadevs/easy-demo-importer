@@ -94,8 +94,8 @@ class Pages extends Base {
 			'page_title'  => esc_html__( 'Import Log', 'easy-demo-importer' ),
 			'menu_title'  => apply_filters( 'sd/edi/log_menu_title', esc_html__( 'Easy Import Log', 'easy-demo-importer' ) ), // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 			'capability'  => 'manage_options',
-			'menu_slug'   => 'sd-edi-import-log',
-			'callback'    => [ Callbacks::class, 'renderImportLogPage' ],
+			'menu_slug'   => esc_url( $this->plugin->data()['import_log_page'] ),
+			'callback'    => '',
 		];
 
 		$themeConfig     = sd_edi()->getDemoConfig();

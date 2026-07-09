@@ -50,7 +50,7 @@ final class ImportLogger {
 	 * @var string
 	 * @since 1.2.0
 	 */
-	const DB_VERSION = '1';
+	const DB_VERSION = '2';
 
 	/**
 	 * Days of history to keep; older entries are pruned on import start.
@@ -143,6 +143,7 @@ final class ImportLogger {
 			"CREATE TABLE {$table} (
   id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   session_id varchar(64) NOT NULL DEFAULT '',
+  demo_slug varchar(191) NOT NULL DEFAULT '',
   logged_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   level varchar(20) NOT NULL DEFAULT 'info',
   message text NOT NULL,
@@ -166,11 +167,12 @@ final class ImportLogger {
 	 * @param string $message    Human-readable message.
 	 * @param string $level      One of the level constants.
 	 * @param string $session_id Import session this entry belongs to.
+	 * @param string $demo_slug  Demo this run is importing (for grouping).
 	 *
 	 * @return void
 	 * @since 1.2.0
 	 */
-	public static function log( string $message, string $level = self::INFO, string $session_id = '' ): void {
+	public static function log( string $message, string $level = self::INFO, string $session_id = '', string $demo_slug = '' ): void {
 		$message = trim( wp_strip_all_tags( $message ) );
 
 		if ( '' === $message ) {
@@ -181,16 +183,19 @@ final class ImportLogger {
 
 		global $wpdb;
 
+		// Stored in GMT so the retention cutoff in prune() (also GMT) compares
+		// like-for-like regardless of the site timezone.
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->insert(
 			self::tableName(),
 			[
 				'session_id' => $session_id,
-				'logged_at'  => current_time( 'mysql' ),
+				'demo_slug'  => $demo_slug,
+				'logged_at'  => current_time( 'mysql', true ),
 				'level'      => $level,
 				'message'    => $message,
 			],
-			[ '%s', '%s', '%s', '%s' ]
+			[ '%s', '%s', '%s', '%s', '%s' ]
 		);
 
 		if ( self::ERROR === $level || self::WARNING === $level ) {
@@ -204,12 +209,13 @@ final class ImportLogger {
 	 *
 	 * @param string $message    Message.
 	 * @param string $session_id Session id.
+	 * @param string $demo_slug  Demo slug.
 	 *
 	 * @return void
 	 * @since 1.2.0
 	 */
-	public static function info( string $message, string $session_id = '' ): void {
-		self::log( $message, self::INFO, $session_id );
+	public static function info( string $message, string $session_id = '', string $demo_slug = '' ): void {
+		self::log( $message, self::INFO, $session_id, $demo_slug );
 	}
 
 	/**
@@ -217,12 +223,13 @@ final class ImportLogger {
 	 *
 	 * @param string $message    Message.
 	 * @param string $session_id Session id.
+	 * @param string $demo_slug  Demo slug.
 	 *
 	 * @return void
 	 * @since 1.2.0
 	 */
-	public static function success( string $message, string $session_id = '' ): void {
-		self::log( $message, self::SUCCESS, $session_id );
+	public static function success( string $message, string $session_id = '', string $demo_slug = '' ): void {
+		self::log( $message, self::SUCCESS, $session_id, $demo_slug );
 	}
 
 	/**
@@ -230,12 +237,13 @@ final class ImportLogger {
 	 *
 	 * @param string $message    Message.
 	 * @param string $session_id Session id.
+	 * @param string $demo_slug  Demo slug.
 	 *
 	 * @return void
 	 * @since 1.2.0
 	 */
-	public static function warning( string $message, string $session_id = '' ): void {
-		self::log( $message, self::WARNING, $session_id );
+	public static function warning( string $message, string $session_id = '', string $demo_slug = '' ): void {
+		self::log( $message, self::WARNING, $session_id, $demo_slug );
 	}
 
 	/**
@@ -243,12 +251,13 @@ final class ImportLogger {
 	 *
 	 * @param string $message    Message.
 	 * @param string $session_id Session id.
+	 * @param string $demo_slug  Demo slug.
 	 *
 	 * @return void
 	 * @since 1.2.0
 	 */
-	public static function error( string $message, string $session_id = '' ): void {
-		self::log( $message, self::ERROR, $session_id );
+	public static function error( string $message, string $session_id = '', string $demo_slug = '' ): void {
+		self::log( $message, self::ERROR, $session_id, $demo_slug );
 	}
 
 	/**
@@ -257,7 +266,7 @@ final class ImportLogger {
 	 * @param string $session_id Restrict to one session, or '' for all.
 	 * @param int    $limit      Maximum rows to return.
 	 *
-	 * @return array<int,array{id:int,session_id:string,logged_at:string,level:string,message:string}>
+	 * @return array<int,array{id:int,session_id:string,demo_slug:string,logged_at:string,level:string,message:string}>
 	 * @since 1.2.0
 	 */
 	public static function get( string $session_id = '', int $limit = 500 ): array {
@@ -267,20 +276,22 @@ final class ImportLogger {
 		$limit = max( 1, $limit );
 
 		if ( '' !== $session_id ) {
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQLPlaceholders.UnquotedComplexPlaceholder
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQLPlaceholders.UnquotedComplexPlaceholder, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 			$rows = $wpdb->get_results(
 				$wpdb->prepare(
-					"SELECT id, session_id, logged_at, level, message FROM {$table} WHERE session_id = %s ORDER BY id DESC LIMIT %d",
+					// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+					"SELECT id, session_id, demo_slug, logged_at, level, message FROM {$table} WHERE session_id = %s ORDER BY id DESC LIMIT %d",
 					$session_id,
 					$limit
 				),
 				ARRAY_A
 			);
 		} else {
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQLPlaceholders.UnquotedComplexPlaceholder
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQLPlaceholders.UnquotedComplexPlaceholder, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 			$rows = $wpdb->get_results(
 				$wpdb->prepare(
-					"SELECT id, session_id, logged_at, level, message FROM {$table} ORDER BY id DESC LIMIT %d",
+					// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+					"SELECT id, session_id, demo_slug, logged_at, level, message FROM {$table} ORDER BY id DESC LIMIT %d",
 					$limit
 				),
 				ARRAY_A
@@ -288,6 +299,71 @@ final class ImportLogger {
 		}
 
 		return is_array( $rows ) ? $rows : [];
+	}
+
+	/**
+	 * Fetches log entries grouped into import runs (one per session), newest run
+	 * first, each run carrying its derived demo label, start time and pass/fail
+	 * status.
+	 *
+	 * @param int $limit Maximum entries to scan.
+	 *
+	 * @return array<int,array{session_id:string,demo_slug:string,started_at:string,status:string,count:int,entries:array<int,array{logged_at:string,level:string,message:string}>}>
+	 * @since 1.2.0
+	 */
+	public static function getRuns( int $limit = 1000 ): array {
+		// Pull entries oldest-first within the scanned window so each run's
+		// timeline reads top-to-bottom in the order things happened.
+		return self::groupRows( array_reverse( self::get( '', $limit ) ) );
+	}
+
+	/**
+	 * Groups flat, oldest-first log rows into runs. Pure — no DB access.
+	 *
+	 * @param array<int,array{session_id:string,demo_slug:string,logged_at:string,level:string,message:string}> $rows Oldest-first rows.
+	 *
+	 * @return array<int,array{session_id:string,demo_slug:string,started_at:string,status:string,count:int,entries:array<int,array{logged_at:string,level:string,message:string}>}>
+	 * @since 1.2.0
+	 */
+	public static function groupRows( array $rows ): array {
+		$runs = [];
+
+		foreach ( $rows as $row ) {
+			$sid = (string) $row['session_id'];
+
+			if ( ! isset( $runs[ $sid ] ) ) {
+				$runs[ $sid ] = [
+					'session_id' => $sid,
+					'demo_slug'  => (string) $row['demo_slug'],
+					'started_at' => (string) $row['logged_at'],
+					'status'     => self::INFO,
+					'count'      => 0,
+					'entries'    => [],
+				];
+			}
+
+			if ( '' === $runs[ $sid ]['demo_slug'] && '' !== (string) $row['demo_slug'] ) {
+				$runs[ $sid ]['demo_slug'] = (string) $row['demo_slug'];
+			}
+
+			$runs[ $sid ]['entries'][] = [
+				'logged_at' => (string) $row['logged_at'],
+				'level'     => (string) $row['level'],
+				'message'   => (string) $row['message'],
+			];
+			++$runs[ $sid ]['count'];
+
+			// Status precedence: any error → failed; otherwise a success entry
+			// marks a clean finish; otherwise it stays informational/in-progress.
+			if ( self::ERROR === $row['level'] ) {
+				$runs[ $sid ]['status'] = self::ERROR;
+			} elseif ( self::SUCCESS === $row['level'] && self::ERROR !== $runs[ $sid ]['status'] ) {
+				$runs[ $sid ]['status'] = self::SUCCESS;
+			}
+		}
+
+		// Newest run first.
+		return array_values( array_reverse( $runs, true ) );
 	}
 
 	/**
@@ -305,8 +381,9 @@ final class ImportLogger {
 		$days   = max( 1, $days );
 		$cutoff = gmdate( 'Y-m-d H:i:s', time() - ( $days * DAY_IN_SECONDS ) );
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQLPlaceholders.UnquotedComplexPlaceholder
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQLPlaceholders.UnquotedComplexPlaceholder, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$wpdb->query(
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 			$wpdb->prepare( "DELETE FROM {$table} WHERE logged_at < %s", $cutoff )
 		);
 	}

@@ -83,6 +83,7 @@ const useSharedDataStore = create((set) => ({
 	importList: {},
 	pluginList: {},
 	serverData: {},
+	logData: {},
 	loading: true,
 	currentStep: 1,
 	modalVisible: false,
@@ -117,6 +118,14 @@ const useSharedDataStore = create((set) => ({
 		try {
 			const response = await Api.get(endpoint, {});
 			set({ serverData: response.data, loading: false });
+		} catch (error) {
+			console.error(error);
+		}
+	},
+	fetchLogData: async (endpoint) => {
+		try {
+			const response = await Api.get(endpoint, {});
+			set({ logData: response.data, loading: false });
 		} catch (error) {
 			console.error(error);
 		}

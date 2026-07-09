@@ -7,6 +7,7 @@ import {
 import { useEffect } from 'react';
 
 import AppServer from './AppServer';
+import AppLog from './AppLog';
 import AppDemoImporter from './AppDemoImporter';
 import ErrorBoundary from './components/ErrorBoundary';
 
@@ -59,6 +60,15 @@ const LayoutWithEffects = ({ children }) => {
 						.closest('li')
 						.classList.add('current', 'current_page_item');
 				}
+			} else if (activeHash.includes('import_log')) {
+				const logMenu = document.querySelector(
+					`a[href="${sdEdiAdminParams.logPageUrl}"]`
+				);
+				if (logMenu) {
+					logMenu
+						.closest('li')
+						.classList.add('current', 'current_page_item');
+				}
 			} else if (demoImporterLink) {
 				demoImporterLink
 					.closest('li')
@@ -101,6 +111,16 @@ const routes = [
 			<ErrorBoundary>
 				<LayoutWithEffects>
 					<AppServer />
+				</LayoutWithEffects>
+			</ErrorBoundary>
+		),
+	},
+	{
+		path: '/import_log',
+		element: (
+			<ErrorBoundary>
+				<LayoutWithEffects>
+					<AppLog />
 				</LayoutWithEffects>
 			</ErrorBoundary>
 		),

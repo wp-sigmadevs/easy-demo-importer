@@ -99,7 +99,8 @@ class InstallDemo extends ImporterAjax {
 				esc_html__( 'Content import started for “%s”.', 'easy-demo-importer' ),
 				$this->demoSlug
 			),
-			$this->sessionId
+			$this->sessionId,
+			$this->demoSlug
 		);
 
 		/**
@@ -156,7 +157,8 @@ class InstallDemo extends ImporterAjax {
 					esc_html__( 'Chunked import could not start (%s). Falling back to single-shot import.', 'easy-demo-importer' ),
 					$e->getMessage()
 				),
-				$this->sessionId
+				$this->sessionId,
+				$this->demoSlug
 			);
 
 			$this->importDemoContent( $xmlFile, $this->excludeImages, $this->skipImageRegeneration );
@@ -178,7 +180,8 @@ class InstallDemo extends ImporterAjax {
 				esc_html__( 'WXR parsed — %d items queued for import.', 'easy-demo-importer' ),
 				(int) $total
 			),
-			$this->sessionId
+			$this->sessionId,
+			$this->demoSlug
 		);
 
 		wp_send_json(
@@ -287,7 +290,8 @@ class InstallDemo extends ImporterAjax {
 
 		ImportLogger::success(
 			esc_html__( 'Content import completed.', 'easy-demo-importer' ),
-			$this->sessionId
+			$this->sessionId,
+			$this->demoSlug
 		);
 
 		/**
@@ -384,7 +388,7 @@ class InstallDemo extends ImporterAjax {
 			$line = trim( wp_strip_all_tags( $line ) );
 
 			if ( '' !== $line ) {
-				ImportLogger::warning( $line, $this->sessionId );
+				ImportLogger::warning( $line, $this->sessionId, $this->demoSlug );
 			}
 		}
 	}
