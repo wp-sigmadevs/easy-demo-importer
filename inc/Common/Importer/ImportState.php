@@ -54,14 +54,17 @@ final class ImportState {
 	 *
 	 * @param string $baseDir   Directory that holds the demo's working files.
 	 * @param string $sessionId Import session identifier.
+	 * @param string $kind      State kind, e.g. 'import' (content) or 'regen'
+	 *                          (image regeneration). Lets one session hold more
+	 *                          than one independent state file without colliding.
 	 *
 	 * @return ImportState
 	 * @since 1.2.0
 	 */
-	public static function forSession( string $baseDir, string $sessionId ): ImportState {
+	public static function forSession( string $baseDir, string $sessionId, string $kind = 'import' ): ImportState {
 		$slug = $sessionId ? md5( $sessionId ) : 'default';
 
-		return new self( trailingslashit( $baseDir ) . '.sd-edi-import-state-' . $slug . '.dat' );
+		return new self( trailingslashit( $baseDir ) . '.sd-edi-' . $kind . '-state-' . $slug . '.dat' );
 	}
 
 	/**

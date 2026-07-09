@@ -59,6 +59,7 @@ class InstallDemo extends ImporterAjax {
 		add_action( 'wp_ajax_sd_edi_import_xml', [ $this, 'response' ] );
 		add_action( 'wp_ajax_sd_edi_import_xml_batch', [ $this, 'importBatch' ] );
 		add_action( 'wp_ajax_sd_edi_import_xml_finalize', [ $this, 'finalizeImport' ] );
+		add_action( 'wp_ajax_sd_edi_regenerate_images', [ $this, 'regenerateImages' ] );
 	}
 
 	/**
@@ -220,9 +221,10 @@ class InstallDemo extends ImporterAjax {
 		/** This action is documented in response(); re-applies the per-request resource boost. */
 		do_action( 'sd/edi/before_import', $xmlFile, $this ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
-		// Attachment downloads happen in this stage, so the skip-regeneration
-		// filters must be active here (not in prepare).
-		$this->maybeSkipImageRegeneration();
+		// Attachment downloads happen in this stage. Chunked imports always land
+		// originals only and defer intermediate sizes to the dedicated
+		// regeneration phase, keeping each batch well under the gateway limit.
+		$this->deferThumbnailGeneration();
 
 		ob_start();
 		$result = $this->chunkedImporter()->processBatch();
@@ -279,8 +281,10 @@ class InstallDemo extends ImporterAjax {
 		/** This action is documented in response(); re-applies the per-request resource boost. */
 		do_action( 'sd/edi/before_import', $xmlFile, $this ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
+		$importer = $this->chunkedImporter();
+
 		ob_start();
-		$this->chunkedImporter()->finalize();
+		$importer->finalize();
 		$this->logImporterOutput( ob_get_clean() );
 
 		// When images were excluded, strip the now-dangling featured-image links.
@@ -303,11 +307,163 @@ class InstallDemo extends ImporterAjax {
 		 */
 		do_action( 'sd/edi/after_content_import', $xmlFile, $this ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
+		// The batch loop imported originals only. If regeneration wasn't skipped
+		// and this run actually imported media, hand the new attachment IDs to the
+		// dedicated, resumable regeneration phase before moving on to customizer.
+		$attachmentIds = ( $this->skipImageRegeneration || 'true' === $this->excludeImages )
+			? []
+			: $importer->importedAttachmentIds();
+
+		if ( ! empty( $attachmentIds ) ) {
+			$this->regenState()->save(
+				[
+					'ids'    => $attachmentIds,
+					'cursor' => 0,
+				]
+			);
+
+			$this->prepareResponse(
+				'sd_edi_regenerate_images',
+				esc_html__( 'Regenerating images…', 'easy-demo-importer' ),
+				esc_html__( 'Content imported.', 'easy-demo-importer' )
+			);
+			return;
+		}
+
 		$this->prepareResponse(
 			'sd_edi_import_customizer',
 			esc_html__( 'Importing Customizer settings.', 'easy-demo-importer' ),
 			esc_html__( 'Everything has been imported smoothly.', 'easy-demo-importer' )
 		);
+	}
+
+	/**
+	 * Ajax response: dedicated image-regeneration phase.
+	 *
+	 * Runs after content import (which imported originals only), before the
+	 * customizer phase. Rebuilds the intermediate image sizes for the attachments
+	 * imported by this run, in time-boxed, resumable slices driven by the same
+	 * cursor + retry/progress protocol as the batch phase — so a large media
+	 * library never overruns the gateway wall-clock limit. Only touches this
+	 * run's attachment IDs; a site's pre-existing media is never regenerated.
+	 * Idempotent: re-running metadata generation for an already-processed
+	 * attachment is safe, so a re-issued request simply continues.
+	 *
+	 * @return void
+	 * @since 1.2.0
+	 */
+	public function regenerateImages() {
+		Helpers::verifyAjaxCall();
+
+		if ( ! $this->acquireMutex() ) {
+			$this->respondWaiting( 'sd_edi_regenerate_images' );
+			return;
+		}
+
+		// wp_generate_attachment_metadata() lives in wp-admin/includes/image.php,
+		// which is not guaranteed to be loaded during an AJAX request.
+		if ( ! function_exists( 'wp_generate_attachment_metadata' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/image.php';
+		}
+
+		$state = $this->regenState();
+		$data  = $state->load();
+
+		// No IDs to process (missing/stale state) — nothing to do, move on.
+		if ( null === $data || empty( $data['ids'] ) ) {
+			$state->delete();
+			$this->prepareResponse(
+				'sd_edi_import_customizer',
+				esc_html__( 'Importing Customizer settings.', 'easy-demo-importer' ),
+				esc_html__( 'Everything has been imported smoothly.', 'easy-demo-importer' )
+			);
+			return;
+		}
+
+		$ids    = array_values( array_map( 'intval', (array) $data['ids'] ) );
+		$total  = count( $ids );
+		$cursor = isset( $data['cursor'] ) ? (int) $data['cursor'] : 0;
+
+		$budget = (float) apply_filters( 'sd/edi/regen_chunk_seconds', 40 ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+		$start  = microtime( true );
+
+		while ( $cursor < $total ) {
+			$id   = $ids[ $cursor ];
+			$file = get_attached_file( $id );
+
+			if ( $file && file_exists( $file ) ) {
+				$meta = wp_generate_attachment_metadata( $id, $file );
+
+				if ( ! empty( $meta ) ) {
+					wp_update_attachment_metadata( $id, $meta );
+				}
+			}
+
+			++$cursor;
+
+			// Finish the current attachment, then stop once over budget.
+			if ( ( microtime( true ) - $start ) >= $budget ) {
+				break;
+			}
+		}
+
+		$progress = [
+			'processed' => $cursor,
+			'total'     => $total,
+		];
+
+		if ( $cursor < $total ) {
+			$state->save(
+				[
+					'ids'    => $ids,
+					'cursor' => $cursor,
+				]
+			);
+
+			// Not finished: re-fire this same phase immediately.
+			wp_send_json(
+				$this->chunkPayload(
+					[
+						'nextPhase'  => 'sd_edi_regenerate_images',
+						'retry'      => true,
+						'retryAfter' => 0,
+						'progress'   => $progress,
+					]
+				)
+			);
+			return;
+		}
+
+		$state->delete();
+
+		ImportLogger::info(
+			sprintf(
+				/* translators: %d: number of attachments. */
+				esc_html__( 'Regenerated images for %d attachments.', 'easy-demo-importer' ),
+				$total
+			),
+			$this->sessionId,
+			$this->demoSlug
+		);
+
+		$this->prepareResponse(
+			'sd_edi_import_customizer',
+			esc_html__( 'Importing Customizer settings.', 'easy-demo-importer' ),
+			esc_html__( 'Everything has been imported smoothly.', 'easy-demo-importer' )
+		);
+	}
+
+	/**
+	 * State store for the image-regeneration phase of this session.
+	 *
+	 * Separate from the content-import state so both can coexist for one session
+	 * without colliding.
+	 *
+	 * @return ImportState
+	 * @since 1.2.0
+	 */
+	private function regenState(): ImportState {
+		return ImportState::forSession( $this->demoUploadDir( $this->demoDir() ), $this->sessionId, 'regen' );
 	}
 
 	/**
@@ -348,19 +504,20 @@ class InstallDemo extends ImporterAjax {
 	}
 
 	/**
-	 * Adds the filters that skip intermediate image generation, when requested.
+	 * Suppresses inline intermediate-size generation during the batch loop.
 	 *
-	 * Request-scoped: filters vanish at request end, so this runs on every batch
-	 * request that may download attachments.
+	 * Chunked imports download originals only and (re)build the resized sub-sizes
+	 * in the dedicated regeneration phase, so each attachment stays cheap and no
+	 * batch overruns the gateway wall-clock limit. Only the sub-sizes are
+	 * deferred — base attachment metadata (dimensions, file) is still written, so
+	 * every image works at full size between phases. Request-scoped: filters
+	 * vanish at request end, so this runs on every batch that downloads media.
 	 *
 	 * @return void
 	 * @since 1.2.0
 	 */
-	private function maybeSkipImageRegeneration(): void {
-		if ( $this->skipImageRegeneration ) {
-			add_filter( 'intermediate_image_sizes_advanced', '__return_empty_array', 9999 );
-			add_filter( 'wp_generate_attachment_metadata', '__return_empty_array', 9999 );
-		}
+	private function deferThumbnailGeneration(): void {
+		add_filter( 'intermediate_image_sizes_advanced', '__return_empty_array', 9999 );
 	}
 
 	/**
