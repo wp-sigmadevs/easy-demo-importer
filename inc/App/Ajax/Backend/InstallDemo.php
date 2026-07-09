@@ -19,7 +19,8 @@ use SigmaDevs\EasyDemoImporter\Common\{
 	Functions\ImportLogger,
 	Abstracts\ImporterAjax,
 	Importer\ChunkedImport,
-	Importer\ImportState
+	Importer\ImportState,
+	Importer\ThumbnailRegenerator
 };
 
 // Do not allow directly accessing this file.
@@ -409,15 +410,10 @@ class InstallDemo extends ImporterAjax {
 		$start  = microtime( true );
 
 		while ( $cursor < $total ) {
-			$id   = $ids[ $cursor ];
-			$file = get_attached_file( $id );
+			$regenerator = ThumbnailRegenerator::forAttachment( $ids[ $cursor ] );
 
-			if ( $file && file_exists( $file ) ) {
-				$meta = wp_generate_attachment_metadata( $id, $file );
-
-				if ( ! empty( $meta ) ) {
-					wp_update_attachment_metadata( $id, $meta );
-				}
+			if ( null !== $regenerator ) {
+				$regenerator->regenerate();
 			}
 
 			++$cursor;
