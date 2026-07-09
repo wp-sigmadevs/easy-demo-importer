@@ -62,10 +62,38 @@ Keep the change minimal and documented — same discipline as the existing UA di
 - Add a public `$bundled_media_dir = ''` property to `SD_EDI_WP_Import`, add it to `ChunkedImport::STATE_PROPS` so it persists/hydrates across batch requests.
 - `InstallDemo::response()` (prepare stage) sets `$importer->bundled_media_dir = {demoDir}/uploads` when that folder exists (and bundled mode isn't disabled), before `prepare()`.
 
-### 4.3 Intermediate image sizes
-Two options (filter-selectable):
-- **Regenerate (default):** bundle only originals; WP regenerates thumbnails on import (existing behavior; respects `skipImageRegeneration`).
-- **Bundle-all:** if the author ships the `-WxH` variants too, skip regeneration and register the existing files as metadata. Faster; larger zip. Deferred to a follow-up unless trivial.
+### 4.3 Intermediate image sizes — a dedicated, resumable regeneration phase
+
+Today thumbnails are generated **inline** during attachment import (WP's normal `wp_generate_attachment_metadata` on each attachment). That is the wrong place for a chunked importer: it makes every attachment far heavier, competes with the tight batch budget, and — for bundled originals — has to run anyway. Move it out into its **own pipeline phase after content import**, built on the same resumable machinery as the WXR batch loop.
+
+**During content import:** *always* suppress inline size generation (the existing
+`intermediate_image_sizes_advanced` / `wp_generate_attachment_metadata` → `__return_empty_array`
+filters), so attachments land as **originals only** — fast, keeps batches well under the gateway
+limit. This applies whether media is bundled or remote.
+
+**New phase `sd_edi_regenerate_images`** — inserted between content import and customizer:
+
+| Phase | Does |
+|---|---|
+| `sd_edi_import_xml_finalize` | ends content import (originals only) |
+| **`sd_edi_regenerate_images`** (new) | time-boxed, resumable thumbnail generation |
+| `sd_edi_import_customizer` | (unchanged) |
+
+- Operates only on the **attachments imported this run** — collect their new IDs during content
+  import (the importer already maps attachment post IDs in `processed_posts`) and persist the list,
+  so a site's pre-existing media is never touched.
+- Processes them in slices with a cursor (last processed ID), time-boxed (~40s), persisted via the
+  existing `ImportState`; re-fires through the same `retry` / `progress:{processed,total}` protocol
+  as the batch phase → determinate progress bar, auto-resume on 524.
+- Per attachment: `wp_update_attachment_metadata( $id, wp_generate_attachment_metadata( $id, get_attached_file( $id ) ) )`.
+- Logs a summary via `ImportLogger` ("regenerated N of M attachments").
+
+**`skipImageRegeneration`** becomes "skip this phase" — the pipeline jumps straight to customizer,
+leaving originals only. Clean, explicit, and no inline cost either way.
+
+**Bundle-all (optional):** if an author ships the `-WxH` variants too, the regen phase can register
+the existing files instead of regenerating. Deferred follow-up; the default is bundle-originals +
+regenerate.
 
 ## 5. Interaction with existing options
 - `excludeImages`: still honored — when images are excluded, neither remote nor bundled files are imported.
@@ -85,9 +113,12 @@ Two options (filter-selectable):
 ## 7. Tasks
 - A. Resolver + local-import helpers in the importer (pure-ish, unit-testable on path mapping).
 - B. `fetch_remote_file` short-circuit + `$bundled_media_dir` property + `STATE_PROPS`.
-- C. `InstallDemo` detection/wiring + activity-log summary.
-- D. Unit tests for `resolve_bundled_media()` URL→path mapping (primary/fallback/miss).
-- E. Docs: demo-package format note for theme authors.
+- C. `InstallDemo` detection/wiring + activity-log summary. Suppress inline size generation during content import (originals only, always).
+- D. **New `sd_edi_regenerate_images` AJAX phase** (`inc/App/Ajax/Backend/RegenerateImages.php`): collect imported attachment IDs during content import + persist; resumable time-boxed regen loop reusing `ImportState` + the retry/progress protocol; wire it between `import_xml_finalize` and `import_customizer`; honor `skipImageRegeneration` (skip phase).
+- E. Unit tests: `resolve_bundled_media()` URL→path mapping (primary/fallback/miss); regen cursor/slice logic (pure part).
+- F. Docs: demo-package format note for theme authors.
+
+**Note:** Task D (dedicated regeneration phase) is valuable independently of bundling — it lightens the content-import batches for *every* import, bundled or remote. It can ship first, on its own.
 
 ## 8. QA (manual)
 | # | Case | Expect |
