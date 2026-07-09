@@ -161,6 +161,27 @@ class SD_EDI_WP_Import extends WP_Importer {
 	public $fetch_attachments = false;
 
 	/**
+	 * Absolute path to the demo package's bundled `uploads/` folder, when the
+	 * package shipped its media on disk. Empty disables bundled-media mode and
+	 * every attachment is fetched over HTTP as before. Persisted across chunked
+	 * batches via ChunkedImport::STATE_PROPS.
+	 *
+	 * @var string
+	 * @since 1.2.0
+	 */
+	public $bundled_media_dir = '';
+
+	/**
+	 * Count of attachments installed from the bundled `uploads/` folder (rather
+	 * than fetched remotely). Persisted across batches and surfaced in the
+	 * activity log.
+	 *
+	 * @var int
+	 * @since 1.2.0
+	 */
+	public $bundled_media_imported = 0;
+
+	/**
 	 * URL Remap
 	 *
 	 * @var array
@@ -1091,6 +1112,21 @@ class SD_EDI_WP_Import extends WP_Importer {
 	 * @since 1.0.0
 	 */
 	public function fetch_remote_file( $url, $post ) {
+		// Bundled-media short-circuit: when the demo package shipped this file on
+		// disk, install it from the local copy instead of fetching over HTTP —
+		// Cloudflare-proof and far faster. Falls through to the remote fetch below
+		// when the file is not bundled or the local copy fails. Divergence from the
+		// vendored importer — kept minimal for future upstream syncs.
+		$bundled_file = $this->resolve_bundled_media( $url );
+
+		if ( $bundled_file ) {
+			$local = $this->import_local_file( $bundled_file, $url, $post );
+
+			if ( ! is_wp_error( $local ) ) {
+				return $local;
+			}
+		}
+
 		// Extract the file name from the URL.
 		$path      = wp_parse_url( $url, PHP_URL_PATH );
 		$file_name = '';
@@ -1283,6 +1319,101 @@ class SD_EDI_WP_Import extends WP_Importer {
 		if ( isset( $headers['x-final-location'] ) && $headers['x-final-location'] != $url ) {
 			$this->url_remap[ $headers['x-final-location'] ] = $upload['url'];
 		}
+
+		return $upload;
+	}
+
+	/**
+	 * Resolve an attachment URL to a bundled file on disk, if present.
+	 *
+	 * Uses the pure URL→path mapping in BundledMedia to build uploads-relative
+	 * candidates, then returns the first that exists under $bundled_media_dir.
+	 * Filterable via 'sd/edi/importer/bundled_media_path' so a theme author can
+	 * override resolution (e.g. a basename fallback) for edge cases.
+	 *
+	 * @param string $url Attachment URL from the WXR file.
+	 *
+	 * @return string|null Absolute path to the bundled file, or null.
+	 * @since 1.2.0
+	 */
+	public function resolve_bundled_media( $url ) {
+		if ( empty( $this->bundled_media_dir ) || ! is_dir( $this->bundled_media_dir ) ) {
+			return null;
+		}
+
+		$base  = trailingslashit( $this->bundled_media_dir );
+		$found = null;
+
+		foreach ( \SigmaDevs\EasyDemoImporter\Common\Importer\BundledMedia::candidates( $url ) as $relative ) {
+			$candidate = $base . $relative;
+
+			if ( is_file( $candidate ) ) {
+				$found = $candidate;
+				break;
+			}
+		}
+
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+		return apply_filters( 'sd/edi/importer/bundled_media_path', $found, $url, $this->bundled_media_dir );
+	}
+
+	/**
+	 * Install a bundled file into the uploads directory.
+	 *
+	 * Mirrors the success contract of fetch_remote_file() — copies the file into
+	 * WP's uploads dir, returns the same ['file','url','type','error'] shape, and
+	 * records the old→new URL remaps so post content is rewritten to the local
+	 * URL. No HTTP, no timeout, no bot challenge.
+	 *
+	 * @param string $source Absolute path to the bundled file.
+	 * @param string $url    Original attachment URL (for URL remapping).
+	 * @param array  $post   Attachment details.
+	 *
+	 * @return array|WP_Error Upload details on success, WP_Error otherwise.
+	 * @since 1.2.0
+	 */
+	public function import_local_file( $source, $url, $post ) {
+		if ( ! is_file( $source ) ) {
+			return new WP_Error( 'import_file_error', esc_html__( 'Bundled media file not found.', 'easy-demo-importer' ) );
+		}
+
+		$upload_date = isset( $post['upload_date'] ) ? $post['upload_date'] : null;
+		$uploads     = wp_upload_dir( $upload_date );
+
+		if ( ! ( $uploads && false === $uploads['error'] ) ) {
+			return new WP_Error( 'upload_dir_error', $uploads['error'] );
+		}
+
+		$file_name = wp_unique_filename( $uploads['path'], wp_basename( $source ) );
+		$new_file  = $uploads['path'] . "/$file_name";
+
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_copy
+		if ( ! copy( $source, $new_file ) ) {
+			return new WP_Error( 'import_file_error', esc_html__( 'The bundled file could not be copied into the uploads directory.', 'easy-demo-importer' ) );
+		}
+
+		// Match the surrounding uploads' permissions, as fetch_remote_file() does.
+		$stat  = stat( dirname( $new_file ) );
+		$perms = $stat['mode'] & 0000666;
+		chmod( $new_file, $perms ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_chmod
+
+		$wp_filetype = wp_check_filetype( $file_name );
+
+		$upload = [
+			'file'  => $new_file,
+			'url'   => $uploads['url'] . "/$file_name",
+			'type'  => empty( $wp_filetype['type'] ) ? '' : $wp_filetype['type'],
+			'error' => false,
+		];
+
+		// Keep track of the old and new URLs so we can substitute them later.
+		$this->url_remap[ $url ] = $upload['url'];
+
+		if ( ! empty( $post['guid'] ) ) {
+			$this->url_remap[ $post['guid'] ] = $upload['url'];
+		}
+
+		++$this->bundled_media_imported;
 
 		return $upload;
 	}

@@ -6,7 +6,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-07-09 09:04+0000\n"
+"POT-Creation-Date: 2026-07-09 09:16+0000\n"
 "Report-Msgid-Bugs-To: https://github.com/wp-sigmadevs/easy-demo-importer/issues\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -1016,50 +1016,59 @@ msgstr ""
 msgid "Content import started for “%s”."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/InstallDemo.php:134, ../inc/App/Ajax/Backend/InstallDemo.php:172, ../inc/App/Ajax/Backend/InstallDemo.php:335, ../inc/App/Ajax/Backend/InstallDemo.php:377, ../inc/App/Ajax/Backend/InstallDemo.php:451
+#: ../inc/App/Ajax/Backend/InstallDemo.php:134, ../inc/App/Ajax/Backend/InstallDemo.php:181, ../inc/App/Ajax/Backend/InstallDemo.php:356, ../inc/App/Ajax/Backend/InstallDemo.php:398, ../inc/App/Ajax/Backend/InstallDemo.php:472
 msgid "Importing Customizer settings."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/InstallDemo.php:135, ../inc/App/Ajax/Backend/InstallDemo.php:173, ../inc/App/Ajax/Backend/InstallDemo.php:336, ../inc/App/Ajax/Backend/InstallDemo.php:378, ../inc/App/Ajax/Backend/InstallDemo.php:452
+#: ../inc/App/Ajax/Backend/InstallDemo.php:135, ../inc/App/Ajax/Backend/InstallDemo.php:182, ../inc/App/Ajax/Backend/InstallDemo.php:357, ../inc/App/Ajax/Backend/InstallDemo.php:399, ../inc/App/Ajax/Backend/InstallDemo.php:473
 msgid "Everything has been imported smoothly."
 msgstr ""
 
+#: ../inc/App/Ajax/Backend/InstallDemo.php:148
+msgid "Bundled media detected — images will be imported from the demo package instead of downloaded."
+msgstr ""
+
 #. translators: %s: error message.
-#: ../inc/App/Ajax/Backend/InstallDemo.php:158
+#: ../inc/App/Ajax/Backend/InstallDemo.php:167
 msgid "Chunked import could not start (%s). Falling back to single-shot import."
 msgstr ""
 
 #. translators: %d: number of items queued.
-#: ../inc/App/Ajax/Backend/InstallDemo.php:181
+#: ../inc/App/Ajax/Backend/InstallDemo.php:190
 msgid "WXR parsed — %d items queued for import."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/InstallDemo.php:192
+#: ../inc/App/Ajax/Backend/InstallDemo.php:201
 msgid "Importing content…"
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/InstallDemo.php:258
+#: ../inc/App/Ajax/Backend/InstallDemo.php:267
 msgid "Finalizing content…"
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/InstallDemo.php:296
+#: ../inc/App/Ajax/Backend/InstallDemo.php:305
 msgid "Content import completed."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/InstallDemo.php:327
+#. translators: %d: number of media files.
+#: ../inc/App/Ajax/Backend/InstallDemo.php:314
+msgid "%d media files imported from the demo package."
+msgstr ""
+
+#: ../inc/App/Ajax/Backend/InstallDemo.php:348
 msgid "Regenerating images…"
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/InstallDemo.php:328
+#: ../inc/App/Ajax/Backend/InstallDemo.php:349
 msgid "Content imported."
 msgstr ""
 
 #. translators: %d: number of attachments.
-#: ../inc/App/Ajax/Backend/InstallDemo.php:442
+#: ../inc/App/Ajax/Backend/InstallDemo.php:463
 msgid "Regenerated images for %d attachments."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/InstallDemo.php:618
+#: ../inc/App/Ajax/Backend/InstallDemo.php:658
 msgid "Waiting for previous import to finish…"
 msgstr ""
 
@@ -1084,115 +1093,123 @@ msgstr ""
 msgid "Plugins already installed, all set to go!"
 msgstr ""
 
-#: ../lib/wordpress-importer/class-wp-import.php:218, ../lib/wordpress-importer/class-wp-import.php:226
+#: ../lib/wordpress-importer/class-wp-import.php:239, ../lib/wordpress-importer/class-wp-import.php:247
 msgid "Sorry, there has been an error."
 msgstr ""
 
-#: ../lib/wordpress-importer/class-wp-import.php:219
+#: ../lib/wordpress-importer/class-wp-import.php:240
 msgid "The file does not exist, please try again."
 msgstr ""
 
-#: ../lib/wordpress-importer/class-wp-import.php:262
+#: ../lib/wordpress-importer/class-wp-import.php:283
 msgid "All done."
 msgstr ""
 
-#: ../lib/wordpress-importer/class-wp-import.php:262
+#: ../lib/wordpress-importer/class-wp-import.php:283
 msgid "Have fun!"
 msgstr ""
 
-#: ../lib/wordpress-importer/class-wp-import.php:263
+#: ../lib/wordpress-importer/class-wp-import.php:284
 msgid "Remember to update the passwords and roles of imported users."
 msgstr ""
 
 #. translators: Post Author
-#: ../lib/wordpress-importer/class-wp-import.php:289
+#: ../lib/wordpress-importer/class-wp-import.php:310
 msgid "Failed to import author %s. Their posts will be attributed to the current user."
 msgstr ""
 
 #. translators: Category Name
-#: ../lib/wordpress-importer/class-wp-import.php:352
+#: ../lib/wordpress-importer/class-wp-import.php:373
 msgid "Failed to import category %s"
 msgstr ""
 
 #. translators: Tag Name
-#: ../lib/wordpress-importer/class-wp-import.php:408
+#: ../lib/wordpress-importer/class-wp-import.php:429
 msgid "Failed to import post tag %s"
 msgstr ""
 
 #. translators: 1. Term Taxonomy, 2. Term Name
 #. translators: 1. Taxonomy, 2. Name
-#: ../lib/wordpress-importer/class-wp-import.php:509, ../lib/wordpress-importer/class-wp-import.php:784
+#: ../lib/wordpress-importer/class-wp-import.php:530, ../lib/wordpress-importer/class-wp-import.php:805
 msgid "Failed to import %1$s %2$s"
 msgstr ""
 
 #. translators: 1. Post Title, 2. Post Type
-#: ../lib/wordpress-importer/class-wp-import.php:610
+#: ../lib/wordpress-importer/class-wp-import.php:631
 msgid "Failed to import &#8220;%1$s&#8221;: Invalid post type %2$s"
 msgstr ""
 
 #. translators: 1. Singular Name, 2. Post Title, 3. Error reason
-#: ../lib/wordpress-importer/class-wp-import.php:743
+#: ../lib/wordpress-importer/class-wp-import.php:764
 msgid "Failed to import %1$s &#8220;%2$s&#8221;: %3$s"
 msgstr ""
 
-#: ../lib/wordpress-importer/class-wp-import.php:660
+#: ../lib/wordpress-importer/class-wp-import.php:681
 msgid "%1$s &#8220;%2$s&#8221; already exists."
 msgstr ""
 
-#: ../lib/wordpress-importer/class-wp-import.php:938
+#: ../lib/wordpress-importer/class-wp-import.php:959
 msgid "Menu item skipped due to missing menu slug"
 msgstr ""
 
 #. translators: Menu Slug
-#: ../lib/wordpress-importer/class-wp-import.php:948
+#: ../lib/wordpress-importer/class-wp-import.php:969
 msgid "Menu item skipped due to invalid menu slug: %s"
 msgstr ""
 
-#: ../lib/wordpress-importer/class-wp-import.php:1043
+#: ../lib/wordpress-importer/class-wp-import.php:1064
 msgid "Fetching attachments is not enabled"
 msgstr ""
 
-#: ../lib/wordpress-importer/class-wp-import.php:1061
+#: ../lib/wordpress-importer/class-wp-import.php:1082
 msgid "Invalid file type"
 msgstr ""
 
-#: ../lib/wordpress-importer/class-wp-import.php:1108
+#: ../lib/wordpress-importer/class-wp-import.php:1144
 msgid "Could not create temporary file."
 msgstr ""
 
 #. translators: 1: The WordPress error message. 2: The WordPress error code.
-#: ../lib/wordpress-importer/class-wp-import.php:1155
+#: ../lib/wordpress-importer/class-wp-import.php:1191
 msgid "Request failed due to an error: %1$s (%2$s)"
 msgstr ""
 
 #. translators: 1: The HTTP error message. 2: The HTTP error code.
-#: ../lib/wordpress-importer/class-wp-import.php:1172
+#: ../lib/wordpress-importer/class-wp-import.php:1208
 msgid "Remote server returned the following unexpected result: %1$s (%2$s)"
 msgstr ""
 
-#: ../lib/wordpress-importer/class-wp-import.php:1185
+#: ../lib/wordpress-importer/class-wp-import.php:1221
 msgid "Remote server did not respond"
 msgstr ""
 
-#: ../lib/wordpress-importer/class-wp-import.php:1193
+#: ../lib/wordpress-importer/class-wp-import.php:1229
 msgid "Zero size file downloaded"
 msgstr ""
 
-#: ../lib/wordpress-importer/class-wp-import.php:1199
+#: ../lib/wordpress-importer/class-wp-import.php:1235
 msgid "Downloaded file has incorrect size"
 msgstr ""
 
 #. translators: Max Size
-#: ../lib/wordpress-importer/class-wp-import.php:1210
+#: ../lib/wordpress-importer/class-wp-import.php:1246
 msgid "Remote file is too large, limit is %s"
 msgstr ""
 
-#: ../lib/wordpress-importer/class-wp-import.php:1248
+#: ../lib/wordpress-importer/class-wp-import.php:1284
 msgid "Sorry, this file type is not permitted for security reasons."
 msgstr ""
 
-#: ../lib/wordpress-importer/class-wp-import.php:1264
+#: ../lib/wordpress-importer/class-wp-import.php:1300
 msgid "The uploaded file could not be moved"
+msgstr ""
+
+#: ../lib/wordpress-importer/class-wp-import.php:1377
+msgid "Bundled media file not found."
+msgstr ""
+
+#: ../lib/wordpress-importer/class-wp-import.php:1392
+msgid "The bundled file could not be copied into the uploads directory."
 msgstr ""
 
 #: ../lib/wordpress-importer/parsers/class-wxr-parser-regex.php:179, ../lib/wordpress-importer/parsers/class-wxr-parser-simplexml.php:69, ../lib/wordpress-importer/parsers/class-wxr-parser-simplexml.php:76, ../lib/wordpress-importer/parsers/class-wxr-parser-xml.php:239
