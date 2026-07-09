@@ -293,9 +293,16 @@ class InstallDemo extends ImporterAjax {
 
 		$importer = $this->chunkedImporter();
 
+		// finalize() -> import_end() prints the vendored importer's own "All done.
+		// Have fun!" notice. It's the only thing this call ever echoes (the
+		// backfill/remap/recount steps before it are silent), and it would only
+		// duplicate the explicit success entry logged just below — including it
+		// as a warning would misleadingly surface a normal completion in
+		// wp-content/debug.log. Discard rather than route through
+		// logImporterOutput().
 		ob_start();
 		$importer->finalize();
-		$this->logImporterOutput( ob_get_clean() );
+		ob_end_clean();
 
 		// When images were excluded, strip the now-dangling featured-image links.
 		if ( 'true' === $this->excludeImages ) {
@@ -580,10 +587,43 @@ class InstallDemo extends ImporterAjax {
 		foreach ( (array) $lines as $line ) {
 			$line = trim( wp_strip_all_tags( $line ) );
 
-			if ( '' !== $line ) {
-				ImportLogger::warning( $line, $this->sessionId, $this->demoSlug );
+			if ( '' === $line || $this->isBenignCompletionNotice( $line ) ) {
+				continue;
 			}
+
+			ImportLogger::warning( $line, $this->sessionId, $this->demoSlug );
 		}
+	}
+
+	/**
+	 * Whether a captured output line is the vendored importer's own "done" notice.
+	 *
+	 * import_end() unconditionally prints two adjacent paragraphs (no line break
+	 * between them, so they land as a single line here) announcing a normal,
+	 * successful finish. Logging it as a warning would misleadingly surface a
+	 * routine completion in wp-content/debug.log (WARNING/ERROR entries are
+	 * mirrored there). Built from the same translation calls import_end() uses,
+	 * so the match holds under any locale.
+	 *
+	 * @param string $line A single stripped, trimmed line of captured output.
+	 *
+	 * @return bool
+	 * @since 1.2.0
+	 */
+	private function isBenignCompletionNotice( string $line ): bool {
+		static $notice = null;
+
+		if ( null === $notice ) {
+			$notice = trim(
+				wp_strip_all_tags(
+					esc_html__( 'All done.', 'easy-demo-importer' ) . ' ' .
+					esc_html__( 'Have fun!', 'easy-demo-importer' ) .
+					esc_html__( 'Remember to update the passwords and roles of imported users.', 'easy-demo-importer' )
+				)
+			);
+		}
+
+		return $line === $notice;
 	}
 
 	/**
