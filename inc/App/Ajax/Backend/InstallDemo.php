@@ -141,6 +141,15 @@ class InstallDemo extends ImporterAjax {
 		try {
 			$importer                    = $this->chunkedImporter();
 			$importer->fetch_attachments = ( 'true' !== $this->excludeImages );
+			$importer->bundled_media_dir = $this->bundledMediaDir();
+
+			if ( $importer->bundled_media_dir && 'true' !== $this->excludeImages ) {
+				ImportLogger::info(
+					esc_html__( 'Bundled media detected — images will be imported from the demo package instead of downloaded.', 'easy-demo-importer' ),
+					$this->sessionId,
+					$this->demoSlug
+				);
+			}
 
 			ob_start();
 			$total = $importer->prepare( $xmlFile );
@@ -297,6 +306,18 @@ class InstallDemo extends ImporterAjax {
 			$this->sessionId,
 			$this->demoSlug
 		);
+
+		if ( $importer->bundled_media_imported > 0 ) {
+			ImportLogger::info(
+				sprintf(
+					/* translators: %d: number of media files. */
+					esc_html__( '%d media files imported from the demo package.', 'easy-demo-importer' ),
+					(int) $importer->bundled_media_imported
+				),
+				$this->sessionId,
+				$this->demoSlug
+			);
+		}
 
 		/**
 		 * Action Hook: 'sd/edi/after_content_import'
@@ -504,6 +525,25 @@ class InstallDemo extends ImporterAjax {
 	}
 
 	/**
+	 * Absolute path to this demo's bundled `uploads/` folder, or '' if none.
+	 *
+	 * Bundled-media mode turns on automatically when the extracted demo package
+	 * contains an `uploads/` folder. Filterable so a theme author can force it on
+	 * or off per demo. When empty, every attachment is fetched over HTTP as before.
+	 *
+	 * @return string
+	 * @since 1.2.0
+	 */
+	private function bundledMediaDir(): string {
+		$dir = $this->demoUploadDir( $this->demoDir() ) . '/uploads';
+
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+		$enabled = (bool) apply_filters( 'sd/edi/importer/bundled_media_enabled', is_dir( $dir ), $this->demoSlug, $this->config );
+
+		return ( $enabled && is_dir( $dir ) ) ? $dir : '';
+	}
+
+	/**
 	 * Suppresses inline intermediate-size generation during the batch loop.
 	 *
 	 * Chunked imports download originals only and (re)build the resized sub-sizes
@@ -679,6 +719,7 @@ class InstallDemo extends ImporterAjax {
 			if ( file_exists( $xmlFilePath ) ) {
 				$wp_import                    = new SD_EDI_WP_Import();
 				$wp_import->fetch_attachments = $excludeImages;
+				$wp_import->bundled_media_dir = $this->bundledMediaDir();
 
 				if ( $skipImageRegeneration ) {
 					add_filter( 'intermediate_image_sizes_advanced', '__return_empty_array', 9999 );
