@@ -228,6 +228,11 @@ class RestEndpoints extends Base {
 						'default'           => '',
 						'sanitize_callback' => 'sanitize_text_field',
 					],
+					'group'      => [
+						'type'              => 'boolean',
+						'default'           => false,
+						'sanitize_callback' => 'rest_sanitize_boolean',
+					],
 					'limit'      => [
 						'type'              => 'integer',
 						'default'           => 500,
@@ -248,11 +253,17 @@ class RestEndpoints extends Base {
 	 */
 	public function importLog( WP_REST_Request $request ) {
 		$sessionId = (string) $request->get_param( 'session_id' );
+		$group     = (bool) $request->get_param( 'group' );
 		$limit     = (int) $request->get_param( 'limit' );
+		$limit     = $limit > 0 ? $limit : 500;
 
-		$entries = ImportLogger::get( $sessionId, $limit > 0 ? $limit : 500 );
+		// Grouped view (admin page): runs, newest first. Flat view (modal result
+		// screen): entries for a single session, or all when no session given.
+		$data = $group
+			? ImportLogger::getRuns( $limit )
+			: ImportLogger::get( $sessionId, $limit );
 
-		return $this->sendResponse( $entries, esc_html__( 'Import log fetched.', 'easy-demo-importer' ) );
+		return $this->sendResponse( $data, esc_html__( 'Import log fetched.', 'easy-demo-importer' ) );
 	}
 
 	/**

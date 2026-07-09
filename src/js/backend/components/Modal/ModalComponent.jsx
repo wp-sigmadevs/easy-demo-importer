@@ -50,6 +50,9 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 	const [showImportProgress, setShowImportProgress] = useState(false);
 	const [importProgress, setImportProgress] = useState([]);
 	const [importPercent, setImportPercent] = useState(null);
+	// Session of the just-finished run, kept for the result screen's log view
+	// (activeSessionId is cleared on success, so we track it separately).
+	const [logSessionId, setLogSessionId] = useState('');
 
 	/**
 	 * When the modal opens and there is a saved resume request (from a previous interrupted
@@ -132,6 +135,7 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 					const initialProgress = [{ message: importInitMessage }];
 					setImportProgress(initialProgress);
 					setImportPercent(null);
+					setLogSessionId('');
 
 					setTimeout(function () {
 						doAxios(
@@ -163,6 +167,7 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 		// Track the session ID from every step so handleReset can release the lock.
 		if (response.data.sessionId) {
 			setActiveSessionId(response.data.sessionId);
+			setLogSessionId(response.data.sessionId);
 		}
 
 		if (!response.data.error) {
@@ -207,6 +212,7 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 		setReset(true);
 		setImportProgress([]);
 		setImportPercent(null);
+		setLogSessionId('');
 		setImportComplete(false);
 	};
 
@@ -353,6 +359,7 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 										canResume={!!resumeRequest}
 										message={message}
 										hint={hint}
+										sessionId={logSessionId}
 									/>
 								)}
 							</div>

@@ -90,6 +90,78 @@ final class ImportLoggerTest extends UnitTestCase {
 		self::assertSame( 'sess-123', $captured['data']['session_id'] );
 		self::assertSame( '2026-07-09 12:00:00', $captured['data']['logged_at'] );
 	}
+
+	/**
+	 * Builds an oldest-first log row for grouping tests.
+	 *
+	 * @param string $session Session id.
+	 * @param string $slug    Demo slug.
+	 * @param string $level   Level.
+	 * @param string $at      Timestamp.
+	 *
+	 * @return array<string,string>
+	 */
+	private function row( string $session, string $slug, string $level, string $at ): array {
+		return [
+			'session_id' => $session,
+			'demo_slug'  => $slug,
+			'level'      => $level,
+			'message'    => "msg-$level",
+			'logged_at'  => $at,
+		];
+	}
+
+	public function test_group_rows_groups_by_session_newest_run_first(): void {
+		$runs = ImportLogger::groupRows(
+			[
+				$this->row( 'A', 'sportify', 'info', '2026-07-09 10:00:00' ),
+				$this->row( 'A', 'sportify', 'info', '2026-07-09 10:01:00' ),
+				$this->row( 'B', 'woo', 'info', '2026-07-09 11:00:00' ),
+			]
+		);
+
+		self::assertCount( 2, $runs );
+		self::assertSame( 'B', $runs[0]['session_id'], 'Newest run first.' );
+		self::assertSame( 'A', $runs[1]['session_id'] );
+		self::assertSame( 'sportify', $runs[1]['demo_slug'] );
+		self::assertSame( '2026-07-09 10:00:00', $runs[1]['started_at'] );
+		self::assertSame( 2, $runs[1]['count'] );
+	}
+
+	public function test_group_rows_any_error_marks_run_failed(): void {
+		$runs = ImportLogger::groupRows(
+			[
+				$this->row( 'A', 'woo', 'info', '2026-07-09 10:00:00' ),
+				$this->row( 'A', 'woo', 'error', '2026-07-09 10:01:00' ),
+				$this->row( 'A', 'woo', 'success', '2026-07-09 10:02:00' ),
+			]
+		);
+
+		self::assertSame( ImportLogger::ERROR, $runs[0]['status'], 'Error wins over a later success.' );
+	}
+
+	public function test_group_rows_success_marks_clean_run(): void {
+		$runs = ImportLogger::groupRows(
+			[
+				$this->row( 'A', 'woo', 'info', '2026-07-09 10:00:00' ),
+				$this->row( 'A', 'woo', 'success', '2026-07-09 10:02:00' ),
+			]
+		);
+
+		self::assertSame( ImportLogger::SUCCESS, $runs[0]['status'] );
+	}
+
+	public function test_group_rows_without_terminal_entry_stays_info(): void {
+		$runs = ImportLogger::groupRows(
+			[ $this->row( 'A', 'woo', 'info', '2026-07-09 10:00:00' ) ]
+		);
+
+		self::assertSame( ImportLogger::INFO, $runs[0]['status'] );
+	}
+
+	public function test_group_rows_empty_returns_empty(): void {
+		self::assertSame( [], ImportLogger::groupRows( [] ) );
+	}
 }
 
 /**

@@ -1,0 +1,85 @@
+// ================================
+//	Import Log.
+// ================================
+
+// Admin Import Log page — run accordion.
+.edi-import-log-wrapper {
+	.log-container {
+		margin-top: 20px;
+	}
+
+	.edi-log-run-label {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		flex-wrap: wrap;
+
+		.edi-log-run-time {
+			color: #646970;
+			font-size: 13px;
+		}
+
+		.edi-log-run-count {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			min-width: 20px;
+			height: 20px;
+			padding: 0 6px;
+			border-radius: 10px;
+			background: #f0f0f1;
+			color: #50575e;
+			font-size: 11px;
+		}
+	}
+}
+
+// Shared entry list — used inline on the result screen and (compactly) elsewhere.
+.edi-inline-log-list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	max-height: 220px;
+	overflow-y: auto;
+	text-align: left;
+
+	.edi-log-line {
+		display: flex;
+		align-items: flex-start;
+		gap: 8px;
+		padding: 4px 0;
+		font-size: 13px;
+		line-height: 1.5;
+
+		.edi-log-dot {
+			flex: 0 0 auto;
+			width: 8px;
+			height: 8px;
+			margin-top: 6px;
+			border-radius: 50%;
+		}
+
+		.edi-log-msg {
+			color: #3c434a;
+			word-break: break-word;
+		}
+
+		&.level-error .edi-log-msg {
+			color: #d63638;
+		}
+	}
+}
+
+// Inline log block on the modal result screen.
+.edi-import-log-inline {
+	margin: 16px auto 8px;
+	max-width: 520px;
+	text-align: left;
+
+	.edi-view-full-log {
+		display: inline-block;
+		margin-top: 6px;
+		font-size: 13px;
+		text-decoration: none;
+	}
+}
