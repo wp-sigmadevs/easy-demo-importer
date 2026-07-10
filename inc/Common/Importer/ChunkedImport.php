@@ -203,7 +203,12 @@ class ChunkedImport extends SD_EDI_WP_Import {
 		wp_defer_term_counting( true );
 
 		$total  = count( $this->posts );
-		$budget = (float) apply_filters( 'sd/edi/import_chunk_seconds', 45 ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+		// Kept short so the batch returns progress frequently — the client bar
+		// advances in many small steps instead of one big jump. Smaller is also
+		// further under the gateway wall-clock limit; the trade-off is more
+		// (cheap, immediately re-fired) round-trips. Raise via the filter to
+		// minimise request count at the cost of coarser progress.
+		$budget = (float) apply_filters( 'sd/edi/import_chunk_seconds', 10 ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 		$step   = max( 1, (int) apply_filters( 'sd/edi/import_chunk_posts', 5 ) ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 		$start  = microtime( true );
 

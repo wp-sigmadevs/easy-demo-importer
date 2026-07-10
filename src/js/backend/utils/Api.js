@@ -22,7 +22,7 @@ export const Api = Axios.create({
  * Map an HTTP status code to a user-facing message and hint.
  *
  * @param {number} code - HTTP status code.
- * @returns {{ message: string, hint: string }}
+ * @return {{ message: string, hint: string }}
  */
 const httpErrorInfo = (code) => {
 	const map = {
@@ -85,6 +85,17 @@ const AUTO_RESUME_PHASES = [
 	'sd_edi_import_xml_batch',
 	'sd_edi_regenerate_images',
 ];
+
+/**
+ * Phases whose card shows a progress bar. Only the content import and image
+ * regeneration report real quantitative progress; every other phase (plugins,
+ * customizer, widgets, …) is effectively instant and shows a plain card.
+ * `sd_edi_import_xml` is the content phase's entry action (its card persists
+ * across the internal prepare → batch → finalize sub-phases).
+ *
+ * @type {string[]}
+ */
+const PROGRESS_BAR_PHASES = ['sd_edi_import_xml', 'sd_edi_regenerate_images'];
 
 /**
  * Maximum consecutive automatic resume attempts before surfacing the manual
@@ -230,12 +241,28 @@ export const doAxios = async (
 					// at the result screen whenever a phase legitimately skipped its
 					// work and returned an empty nextPhaseMessage.
 					if (response.data.nextPhase) {
+						// A non-empty nextPhaseMessage marks a new user-facing card.
+						// Internal sub-phases (empty message — e.g. content import's
+						// prepare → batch → finalize) intentionally add no card and
+						// leave the bar untouched, so the single content card's bar
+						// advances smoothly instead of flickering back to 0 at each
+						// hand-off. Only a genuinely new card resets the bar to its
+						// indeterminate (shimmer) state until its own data arrives.
 						if (response.data.nextPhaseMessage) {
-							// Show the next-phase message, then fade in the
-							// completed message for the phase that just finished.
+							setImportPercent(null);
+
+							// Add the new phase's card, then fade the previous card
+							// to its completed state. Some transitions don't supply a
+							// completedMessage — keep the outgoing card's own text in
+							// that case instead of blanking it.
 							setImportProgress((prevProgress) => [
 								...prevProgress,
-								{ message: response.data.nextPhaseMessage },
+								{
+									message: response.data.nextPhaseMessage,
+									showBar: PROGRESS_BAR_PHASES.includes(
+										response.data.nextPhase
+									),
+								},
 							]);
 
 							setImportProgress((prevProgress) =>
@@ -244,7 +271,8 @@ export const doAxios = async (
 										? {
 												message:
 													response.data
-														.completedMessage,
+														.completedMessage ||
+													progress.message,
 												fade: true,
 											}
 										: progress
