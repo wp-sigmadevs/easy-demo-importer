@@ -88,15 +88,10 @@
 		}
 
 		.configure-col {
-			justify-content: flex-start;
-			align-self: flex-start;
+			justify-content: center;
+			align-self: center;
 
 			@extend .edi-d-flex;
-
-			@media only screen and (min-height: 765px) {
-				justify-content: center;
-				align-self: center;
-			}
 		}
 
 		.modal-content {
