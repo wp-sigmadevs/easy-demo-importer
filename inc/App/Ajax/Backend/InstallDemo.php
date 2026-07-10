@@ -199,11 +199,13 @@ class InstallDemo extends ImporterAjax {
 			$this->chunkPayload(
 				[
 					'nextPhase'        => 'sd_edi_import_xml_batch',
-					'nextPhaseMessage' => esc_html__( 'Importing content…', 'easy-demo-importer' ),
-					'progress'         => [
-						'processed' => 0,
-						'total'     => $total,
-					],
+					// Internal sub-phase of content import — no user-facing card.
+					// The single "Importing content…" card from the download step
+					// persists across prepare → batch → finalize. No progress is
+					// reported here on purpose: the bar shimmers (indeterminate)
+					// until the first batch reports a real percentage, so it never
+					// jumps in at a high value after a silent parse.
+					'nextPhaseMessage' => '',
 				]
 			)
 		);
@@ -265,7 +267,10 @@ class InstallDemo extends ImporterAjax {
 			$this->chunkPayload(
 				[
 					'nextPhase'        => 'sd_edi_import_xml_finalize',
-					'nextPhaseMessage' => esc_html__( 'Finalizing content…', 'easy-demo-importer' ),
+					// Internal sub-phase — no user-facing card. Progress is kept so
+					// the single content card's bar holds near 100% through the
+					// reference-fixup step instead of resetting.
+					'nextPhaseMessage' => '',
 					'progress'         => $progress,
 				]
 			)
@@ -413,7 +418,12 @@ class InstallDemo extends ImporterAjax {
 		$total  = count( $ids );
 		$cursor = isset( $data['cursor'] ) ? (int) $data['cursor'] : 0;
 
-		$budget = (float) apply_filters( 'sd/edi/regen_chunk_seconds', 40 ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+		// Kept short (matching the content batch budget) so regeneration returns
+		// progress frequently and the bar advances in small steps rather than
+		// sitting on the indeterminate shimmer until a single long window
+		// finishes. Smaller is also further under the gateway wall-clock limit;
+		// the trade-off is more (cheap, immediately re-fired) round-trips.
+		$budget = (float) apply_filters( 'sd/edi/regen_chunk_seconds', 10 ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 		$start  = microtime( true );
 
 		while ( $cursor < $total ) {

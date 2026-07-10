@@ -1,6 +1,7 @@
 import React from 'react';
-import { Button, Timeline, Progress } from 'antd';
+import { Button, Timeline } from 'antd';
 import { ProgressMessage } from '../../ProgressMessage';
+import { ImportBar } from '../../ImportBar';
 
 /* global sdEdiAdminParams */
 
@@ -21,22 +22,31 @@ const Imports = ({
 	handleImport,
 }) => {
 	/**
-	 * Renders the import progress timeline.
+	 * Renders the import progress timeline. The progress bar is attached to the
+	 * active card, but only for phases that report real progress (content import
+	 * and image regeneration, flagged via progress.showBar) — every other phase
+	 * shows a plain card.
 	 */
 	const renderImportProgress = () => {
+		const activeIndex = importProgress.length - 1;
+
 		return (
 			<Timeline
 				items={importProgress.map((progress, index) => ({
 					children: (
-						<ProgressMessage
-							key={index}
-							message={progress.message}
-							fade={progress.fade}
-						/>
+						<>
+							<ProgressMessage
+								key={index}
+								message={progress.message}
+								fade={progress.fade}
+							/>
+							{index === activeIndex && progress.showBar && (
+								<ImportBar percent={importPercent} />
+							)}
+						</>
 					),
 					key: index.toString(),
-					className:
-						index === importProgress.length - 1 ? 'active' : '',
+					className: index === activeIndex ? 'active' : '',
 				}))}
 			/>
 		);
@@ -45,16 +55,7 @@ const Imports = ({
 	return (
 		<div className={`import-progress ${importStatus}`}>
 			{showImportProgress ? (
-				<>
-					{importPercent !== null && (
-						<Progress
-							percent={importPercent}
-							status="active"
-							className="sd-edi-import-bar"
-						/>
-					)}
-					{renderImportProgress()}
-				</>
+				renderImportProgress()
 			) : (
 				<Button type="primary" onClick={handleImport}>
 					{sdEdiAdminParams.btnImport}
