@@ -101,11 +101,16 @@ class ActivatePlugins extends ImporterAjax {
 		 */
 		do_action( 'sd/edi/after_plugins_activation', $this ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
-		// Response.
+		// Response. Friendlier text in the modal; the log keeps the neutral
+		// equivalent.
 		$this->prepareResponse(
 			'sd_edi_download_demo_files',
 			esc_html__( 'Fetching demo files from the server.', 'easy-demo-importer' ),
-			$this->activeCount > 0 ? esc_html__( 'Required plugins are activated. Awesome!', 'easy-demo-importer' ) : esc_html__( 'Plugins are active, ready to rock!', 'easy-demo-importer' )
+			esc_html__( 'Plugins are all set and active!', 'easy-demo-importer' ),
+			false,
+			'',
+			'',
+			esc_html__( 'Required plugins activated.', 'easy-demo-importer' )
 		);
 	}
 

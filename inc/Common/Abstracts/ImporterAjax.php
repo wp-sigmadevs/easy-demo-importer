@@ -229,17 +229,22 @@ abstract class ImporterAjax {
 	/**
 	 * Prepare ajax response.
 	 *
-	 * @param string $nextPhase Next phase.
-	 * @param string $nextPhaseMessage Next phase message.
-	 * @param string $complete Completed message.
-	 * @param bool   $error Error.
-	 * @param string $errorMessage Error message.
-	 * @param string $errorHint Error hint.
+	 * @param string      $nextPhase Next phase.
+	 * @param string      $nextPhaseMessage Next phase message.
+	 * @param string      $complete Completed message, shown as the modal card text.
+	 * @param bool        $error Error.
+	 * @param string      $errorMessage Error message.
+	 * @param string      $errorHint Error hint.
+	 * @param string|null $logMessage Activity-log text for this completion, if it
+	 *                                should read differently there than the modal's
+	 *                                friendlier $complete text (e.g. no idioms, since
+	 *                                the log is a technical record). Defaults to
+	 *                                $complete when omitted.
 	 *
 	 * @return void
 	 * @since 1.0.0
 	 */
-	public function prepareResponse( $nextPhase, $nextPhaseMessage, $complete = '', $error = false, $errorMessage = '', $errorHint = '' ) {
+	public function prepareResponse( $nextPhase, $nextPhaseMessage, $complete = '', $error = false, $errorMessage = '', $errorHint = '', $logMessage = null ) {
 		$this->response = [
 			'demo'                  => $this->demoSlug,
 			'excludeImages'         => $this->excludeImages,
@@ -262,10 +267,12 @@ abstract class ImporterAjax {
 				ImportLogger::error( $errorMessage, $this->sessionId, $this->demoSlug );
 			}
 		} elseif ( '' !== $complete ) {
+			$logText = $logMessage ?? $complete;
+
 			if ( '' === $nextPhase ) {
-				ImportLogger::success( $complete, $this->sessionId, $this->demoSlug );
+				ImportLogger::success( $logText, $this->sessionId, $this->demoSlug );
 			} else {
-				ImportLogger::info( $complete, $this->sessionId, $this->demoSlug );
+				ImportLogger::info( $logText, $this->sessionId, $this->demoSlug );
 			}
 		}
 
