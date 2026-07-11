@@ -4,7 +4,13 @@
 
 .appearance_page_sd-easy-demo-importer {
 	.edi-server-status-wrapper {
-		.ant-collapse {
+		// :not(.edi-log-collapse) — this panel styling (including the 65px
+		// left padding that makes room for each section's icon, added via
+		// .server-container's ::before) is for the System Status accordion.
+		// The wrapper now also holds the Import Log accordion (both tabs
+		// share .edi-server-status-wrapper since they merged onto one page),
+		// which has no such icon and was inheriting the same gap.
+		.ant-collapse:not(.edi-log-collapse) {
 			border: 0;
 			background: #fff;
 			box-shadow: 1px 1px 2px 2px rgba(0, 0, 0, 0.05);
