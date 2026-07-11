@@ -144,6 +144,7 @@ For any inquiries, bug reports, or suggestions, please submit your request [here
 * Security: Improved protection against malicious archive extraction (ZipSlip).
 * Security: Added safeguards to prevent unsafe PHP file loading.
 * Security: Improved validation in the plugin installer for safer downloads.
+* Security: Closed a Stored XSS vulnerability in SVG upload handling where file-type detection and sanitization trusted the browser-supplied upload type instead of the file's actual content, and the REST media endpoint bypassed sanitization entirely (CVE-2024-9071).
 * Fix: Improved compatibility with Fluent Forms import logic.
 * Fix: Corrected settings validation during import.
 * Fix: Removed redundant error handlers that could cause unexpected behavior in AJAX requests.
