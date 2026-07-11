@@ -80,7 +80,7 @@ class PluginRowMeta extends Base {
 		}
 
 		if ( ! empty( $themeConfig ) ) {
-			$customRowMeta[] = '<a href="' . esc_url( $systemStatusPage ) . '">' . esc_html__( 'System Status', 'easy-demo-importer' ) . '</a>';
+			$customRowMeta[] = '<a href="' . esc_url( $systemStatusPage ) . '">' . esc_html__( 'Status & Logs', 'easy-demo-importer' ) . '</a>';
 		}
 
 		return array_merge( $customRowMeta, $links );

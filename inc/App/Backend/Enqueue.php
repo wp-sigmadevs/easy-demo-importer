@@ -189,14 +189,14 @@ class Enqueue extends EnqueueBase {
 				'confirmNo'                  => esc_html__( 'No', 'easy-demo-importer' ),
 
 				// Server Page Button.
-				'serverPageBtnText'          => esc_html__( 'System Status', 'easy-demo-importer' ),
+				'serverPageBtnText'          => esc_html__( 'Status & Logs', 'easy-demo-importer' ),
 				'serverPageUrl'              => sd_edi()->getData()['system_status_page'],
 				'logPageUrl'                 => sd_edi()->getData()['import_log_page'],
 				'restLogUrl'                 => esc_url_raw( rest_url( 'sd/edi/v1/import/log' ) ),
 				'logPageHeading'             => esc_html__( 'Import Log', 'easy-demo-importer' ),
-				'statusTabLabel'             => esc_html__( 'System Status', 'easy-demo-importer' ),
+				'statusTabLabel'             => esc_html__( 'Status & Logs', 'easy-demo-importer' ),
 				'logTabLabel'                => esc_html__( 'Import Log', 'easy-demo-importer' ),
-				'statusLogHeading'           => esc_html__( 'System Status & Import Log', 'easy-demo-importer' ),
+				'statusLogHeading'           => esc_html__( 'Status & Logs', 'easy-demo-importer' ),
 				'logDetailsLabel'            => esc_html__( 'Import details', 'easy-demo-importer' ),
 				'viewFullLog'                => esc_html__( 'View full log', 'easy-demo-importer' ),
 				'logSuccess'                 => esc_html__( 'Success', 'easy-demo-importer' ),
@@ -242,7 +242,7 @@ class Enqueue extends EnqueueBase {
 
 				// Server Requirements.
 				'reqHeader'                  => esc_html__( 'Server Requirements Not Met', 'easy-demo-importer' ),
-				'reqDescription'             => esc_html__( 'Your server does not meet the minimum requirements for demo import. Please review the System Status page for details. Proceeding without meeting these requirements may result in a failed or incomplete import.', 'easy-demo-importer' ),
+				'reqDescription'             => esc_html__( 'Your server does not meet the minimum requirements for demo import. Please review the Status & Logs page for details. Proceeding without meeting these requirements may result in a failed or incomplete import.', 'easy-demo-importer' ),
 				'reqProceed'                 => esc_html__( 'Continue Anyway', 'easy-demo-importer' ),
 
 				// Plugin Status.
