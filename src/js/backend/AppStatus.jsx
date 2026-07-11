@@ -27,7 +27,7 @@ const AppStatus = ({ defaultTab = 'status' }) => {
 	const items = [
 		{
 			key: 'status',
-			label: sdEdiAdminParams.statusTabLabel || 'System Status',
+			label: sdEdiAdminParams.statusTabLabel || 'Status & Logs',
 			children: <ServerStatusPanel />,
 		},
 		{
@@ -47,8 +47,7 @@ const AppStatus = ({ defaultTab = 'status' }) => {
 				<Header
 					logo={sdEdiAdminParams.ediLogo}
 					heading={
-						sdEdiAdminParams.statusLogHeading ||
-						'System Status & Import Log'
+						sdEdiAdminParams.statusLogHeading || 'Status & Logs'
 					}
 				/>
 
