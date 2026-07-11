@@ -196,7 +196,11 @@ class Initialize extends ImporterAjax {
 			'termmeta',
 			'terms',
 		];
-		$excludeTables = [ 'options', 'usermeta', 'users' ];
+		// sd_edi_import_log is the plugin's persistent activity log (see
+		// ImportLogger) — it's meant to survive across imports so each run
+		// appends its own accordion on the Import Log tab, not get wiped by a
+		// "reset database" import.
+		$excludeTables = [ 'options', 'usermeta', 'users', $wpdb->prefix . ImportLogger::TABLE ];
 
 		$coreTables = array_map(
 			function ( $tbl ) {
