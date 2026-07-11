@@ -269,6 +269,7 @@ export const doAxios = async (
 								prevProgress.map((progress, index) =>
 									index === prevProgress.length - 2
 										? {
+												...progress,
 												message:
 													response.data
 														.completedMessage ||

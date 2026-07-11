@@ -25,6 +25,21 @@
 	}
 }
 
+// Card entrance — opacity ONLY, never transform. The 3D stack positions each
+// card with translateZ; a transform-based entrance would override that
+// translateZ while playing, snapping the card to full size (a visible "grow")
+// before it settles back. Fading in leaves the stack transform untouched, so
+// a demoted card just steps back, shrinks via perspective and fades.
+@keyframes ediCardEnter {
+	from {
+		opacity: 0;
+	}
+
+	to {
+		opacity: 1;
+	}
+}
+
 .appearance_page_sd-easy-demo-importer {
 	.modal-content {
 		&.import-step {
@@ -59,9 +74,9 @@
 
 				.ant-timeline-item {
 					display: none;
-					transition: opacity 0.5s ease, transform 0.5s ease;
+					transition: opacity 0.6s cubic-bezier(0.22, 0.61, 0.36, 1),
+						transform 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
 					font-size: 20px !important;
-					animation: ediFadeInUp 0.5s ease;
 
 					@extend .edi-pos-r;
 
@@ -88,7 +103,7 @@
 
 					&:nth-last-child(1) {
 						transform: translateZ(0) translateY(0);
-						transition: 0.5s;
+						transition: 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
 					}
 
 					&:nth-last-child(2) {
@@ -146,12 +161,25 @@
 					// normal flow, directly under the message text inside the card —
 					// no absolute positioning, so it's immune to antd's
 					// runtime-injected .ant-timeline-item-content positioning (the
-					// reason earlier edge-hugging attempts drifted).
+					// reason earlier edge-hugging attempts drifted). Collapses
+					// (height + opacity) once the phase finishes so a completed card
+					// keeps just its checkmark, animating away instead of the card's
+					// height snapping.
 					.sd-edi-import-progress {
 						display: flex;
 						align-items: center;
 						gap: 10px;
 						margin-top: 10px;
+						max-height: 40px;
+						overflow: hidden;
+						transition: max-height 0.5s ease, margin-top 0.5s ease,
+							opacity 0.4s ease;
+
+						&.is-collapsed {
+							max-height: 0;
+							margin-top: 0;
+							opacity: 0;
+						}
 					}
 
 					// Shimmers (indeterminate) until a real percentage arrives, then
@@ -215,7 +243,7 @@
 					}
 
 					&.active {
-						animation: ediFadeInUp 0.5s ease;
+						animation: ediCardEnter 0.5s ease;
 
 						.ant-timeline-item-head {
 							&::before {

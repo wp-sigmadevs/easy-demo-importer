@@ -13,8 +13,15 @@ import React, { useEffect, useRef, useState } from 'react';
  *
  * @param {Object}  props         - Component properties.
  * @param {?number} props.percent - Progress percentage (0-100), or null while indeterminate.
+ * @param {boolean} props.active  - Whether this is the active phase card. When
+ *                                false (the phase finished and its card is
+ *                                demoting into the stack) the bar collapses
+ *                                away — a completed card shows only its
+ *                                checkmark, not a lingering full bar — but it
+ *                                stays mounted so the collapse animates
+ *                                instead of the card's height snapping.
  */
-export const ImportBar = ({ percent = null }) => {
+export const ImportBar = ({ percent = null, active = true }) => {
 	const [display, setDisplay] = useState(percent ?? 0);
 	const displayRef = useRef(display);
 	const rafRef = useRef(0);
@@ -61,7 +68,10 @@ export const ImportBar = ({ percent = null }) => {
 	const isIndeterminate = percent === null;
 
 	return (
-		<div className="sd-edi-import-progress">
+		<div
+			className={`sd-edi-import-progress${active ? '' : ' is-collapsed'}`}
+			aria-hidden={active ? undefined : true}
+		>
 			<div
 				className={`sd-edi-import-bar${
 					isIndeterminate ? ' is-indeterminate' : ''
