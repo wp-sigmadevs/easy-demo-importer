@@ -111,7 +111,9 @@
 	}
 }
 
-// Run header row: name + start time on the left, status pill + count on right.
+// Run header row: name, start time, status pill and count sit adjacent, left
+// to right — not spread to the row's far edges, which left an odd gap on
+// short entries (e.g. a bare demo slug + timestamp) in the wide card.
 .edi-log-run {
 	display: flex;
 	align-items: center;
@@ -134,7 +136,6 @@
 	.edi-log-run-status {
 		display: inline-flex;
 		align-items: center;
-		margin-left: auto;
 		height: 22px;
 		padding: 0 11px;
 		border-radius: 999px;

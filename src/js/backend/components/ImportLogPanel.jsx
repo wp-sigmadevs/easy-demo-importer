@@ -16,17 +16,85 @@ const LEVEL_COLORS = {
 };
 
 /**
- * Extracts the clock portion (HH:MM:SS) from a "YYYY-MM-DD HH:MM:SS" stamp so
- * per-entry rows stay compact — the run header already carries the date. Falls
- * back to the whole string if the format is unexpected.
+ * Turns a raw demo slug ("home-01") into a display label ("Home-1"):
+ * capitalizes the first letter and drops leading zeros from numeric segments.
+ * Display only — the raw slug is still what's sent to the server/grouped by.
  *
- * @param {string} stamp - Full timestamp.
- * @return {string} Time portion.
+ * @param {string} slug - Raw demo slug.
+ * @return {string} Humanized label.
  */
-const timeOnly = (stamp) =>
-	typeof stamp === 'string' && stamp.includes(' ')
-		? stamp.split(' ').pop()
-		: stamp;
+const humanizeSlug = (slug) => {
+	if (!slug) {
+		return slug;
+	}
+
+	return slug
+		.replace(/(^|-)0*(\d+)/g, (_match, sep, digits) => `${sep}${digits}`)
+		.replace(/^./, (c) => c.toUpperCase());
+};
+
+/**
+ * Parses a "YYYY-MM-DD HH:MM:SS" (UTC) stamp into a Date. Returns null for an
+ * unexpected format rather than an Invalid Date, so callers can fall back to
+ * the raw string.
+ *
+ * @param {string} stamp - Stored timestamp.
+ * @return {?Date} Parsed date, or null.
+ */
+const parseStamp = (stamp) => {
+	if (typeof stamp !== 'string') {
+		return null;
+	}
+
+	const iso = stamp.includes('T') ? stamp : `${stamp.replace(' ', 'T')}Z`;
+	const date = new Date(iso);
+
+	return Number.isNaN(date.getTime()) ? null : date;
+};
+
+/**
+ * Human-readable run start, e.g. "Jul 11, 2026, 10:56 AM". Falls back to the
+ * raw stamp if it can't be parsed.
+ *
+ * @param {string} stamp - Run's started_at stamp.
+ * @return {string} Formatted date/time.
+ */
+const formatRunTime = (stamp) => {
+	const date = parseStamp(stamp);
+
+	if (!date) {
+		return stamp;
+	}
+
+	return date.toLocaleString(undefined, {
+		year: 'numeric',
+		month: 'short',
+		day: 'numeric',
+		hour: 'numeric',
+		minute: '2-digit',
+	});
+};
+
+/**
+ * Human-readable entry time, e.g. "10:56:01 AM". The run header already
+ * carries the date, so entry rows stay to the clock only.
+ *
+ * @param {string} stamp - Entry's logged_at stamp.
+ * @return {string} Formatted time.
+ */
+const formatEntryTime = (stamp) => {
+	const date = parseStamp(stamp);
+
+	if (!date) {
+		return stamp;
+	}
+
+	return date.toLocaleTimeString(undefined, {
+		hour: 'numeric',
+		minute: '2-digit',
+		second: '2-digit',
+	});
+};
 
 /**
  * Header row for one import run.
@@ -46,9 +114,13 @@ const runLabel = (run) => {
 	return (
 		<div className="edi-log-run">
 			<span className="edi-log-run-name">
-				{run.demo_slug || sdEdiAdminParams.logUnknownDemo || 'Import'}
+				{humanizeSlug(run.demo_slug) ||
+					sdEdiAdminParams.logUnknownDemo ||
+					'Import'}
 			</span>
-			<span className="edi-log-run-time">{run.started_at}</span>
+			<span className="edi-log-run-time">
+				{formatRunTime(run.started_at)}
+			</span>
 			<span className={`edi-log-run-status is-${run.status}`}>
 				{status}
 			</span>
@@ -75,7 +147,7 @@ const runEntries = (entries) => (
 					}}
 				/>
 				<time className="edi-log-entry-time" title={entry.logged_at}>
-					{timeOnly(entry.logged_at)}
+					{formatEntryTime(entry.logged_at)}
 				</time>
 				<span className="edi-log-entry-msg">{entry.message}</span>
 			</li>
