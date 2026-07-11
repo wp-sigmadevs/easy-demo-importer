@@ -22,10 +22,14 @@ const Imports = ({
 	handleImport,
 }) => {
 	/**
-	 * Renders the import progress timeline. The progress bar is attached to the
-	 * active card, but only for phases that report real progress (content import
-	 * and image regeneration, flagged via progress.showBar) — every other phase
-	 * shows a plain card.
+	 * Renders the import progress timeline. The progress bar is attached to
+	 * cards for phases that report real progress (content import and image
+	 * regeneration, flagged via progress.showBar) — every other phase shows a
+	 * plain card. Once shown, a card's bar keeps rendering even after it's
+	 * demoted from active (frozen at 100%, since demotion only happens once
+	 * that phase has finished) rather than unmounting — unmounting it snapped
+	 * the card's height down right as it eased into the 3D stack, reading as
+	 * an unwanted grow/shrink before the card settled into place.
 	 */
 	const renderImportProgress = () => {
 		const activeIndex = importProgress.length - 1;
@@ -40,8 +44,15 @@ const Imports = ({
 								message={progress.message}
 								fade={progress.fade}
 							/>
-							{index === activeIndex && progress.showBar && (
-								<ImportBar percent={importPercent} />
+							{progress.showBar && (
+								<ImportBar
+									percent={
+										index === activeIndex
+											? importPercent
+											: 100
+									}
+									active={index === activeIndex}
+								/>
 							)}
 						</>
 					),
