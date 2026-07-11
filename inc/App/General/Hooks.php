@@ -90,8 +90,13 @@ class Hooks extends Base {
 		// Add SVG file support.
 		add_filter( 'upload_mimes', [ Filters::class, 'supportedFileTypes' ] );
 
-		// Sanitize the SVG file before it is uploaded to the server.
+		// Sanitize the SVG file before it is uploaded to the server. Both
+		// hooks are needed: wp_handle_upload_prefilter covers the admin
+		// media uploader, wp_handle_sideload_prefilter covers the REST
+		// media endpoint's raw-body upload path (wp_handle_sideload()),
+		// which never fired the former.
 		add_filter( 'wp_handle_upload_prefilter', [ Filters::class, 'sanitizeSVG' ] );
+		add_filter( 'wp_handle_sideload_prefilter', [ Filters::class, 'sanitizeSVG' ] );
 
 		// Fix WordPress MIME type detection for SVG files.
 		add_filter( 'wp_check_filetype_and_ext', [ Filters::class, 'fixSVGDetection' ], 10, 3 );
