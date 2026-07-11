@@ -72,8 +72,15 @@ class Filters {
 		$size_in_mb    = $size_in_kb / 1024;
 		$size_message  = ( $size_in_kb < 1024 ) ? $size_in_kb . 'KB' : number_format( $size_in_mb, 2 ) . 'MB';
 
-		// Validate file size.
-		if ( $file['size'] > $max_file_size ) {
+		// Validate file size. $file['size'] isn't always present -- the REST
+		// media endpoint's raw-body upload path (wp_handle_sideload_prefilter)
+		// builds a $file array without one, so fall back to the actual file
+		// size on disk.
+		$file_size = isset( $file['size'] )
+			? (int) $file['size']
+			: ( ! empty( $file['tmp_name'] ) && is_readable( $file['tmp_name'] ) ? (int) filesize( $file['tmp_name'] ) : 0 );
+
+		if ( $file_size > $max_file_size ) {
 			$file['error'] = sprintf(
 				/* translators: file size */
 				esc_html__( 'The uploaded SVG exceeds the maximum allowed file size of %s.', 'easy-demo-importer' ),
