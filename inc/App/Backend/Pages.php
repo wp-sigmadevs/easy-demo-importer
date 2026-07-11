@@ -89,33 +89,18 @@ class Pages extends Base {
 			'callback'    => [ Callbacks::class, 'renderDemoImportPage' ],
 		];
 
+		// System Status and Import Log are two tabs of a single page (rendered by
+		// the React app on the status route), so only one submenu is registered.
+		// Always available — the Import Log tab must stay reachable regardless of
+		// whether the active theme ships a demo config.
 		$subPages[] = [
 			'parent_slug' => 'themes.php',
-			'page_title'  => esc_html__( 'Import Log', 'easy-demo-importer' ),
-			'menu_title'  => apply_filters( 'sd/edi/log_menu_title', esc_html__( 'Easy Import Log', 'easy-demo-importer' ) ), // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+			'page_title'  => esc_html__( 'System Status & Import Log', 'easy-demo-importer' ),
+			'menu_title'  => apply_filters( 'sd/edi/status_menu_title', esc_html__( 'Easy Status & Logs', 'easy-demo-importer' ) ), // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 			'capability'  => 'manage_options',
-			'menu_slug'   => esc_url( $this->plugin->data()['import_log_page'] ),
+			'menu_slug'   => esc_url( $this->plugin->data()['system_status_page'] ),
 			'callback'    => '',
 		];
-
-		$themeConfig     = sd_edi()->getDemoConfig();
-		$activeTheme     = sd_edi()->activeTheme();
-		$supportedThemes = sd_edi()->supportedThemes();
-
-		if ( ! in_array( $activeTheme, $supportedThemes, true ) ) {
-			$themeConfig = [];
-		}
-
-		if ( ! empty( $themeConfig ) ) {
-			$subPages[] = [
-				'parent_slug' => 'themes.php',
-				'page_title'  => esc_html__( 'System Status Report', 'easy-demo-importer' ),
-				'menu_title'  => apply_filters( 'sd/edi/status_menu_title', esc_html__( 'Easy System Status', 'easy-demo-importer' ) ), // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
-				'capability'  => 'manage_options',
-				'menu_slug'   => esc_url( $this->plugin->data()['system_status_page'] ),
-				'callback'    => '',
-			];
-		}
 
 		return $subPages;
 	}

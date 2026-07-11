@@ -6,8 +6,7 @@ import {
 } from 'react-router-dom';
 import { useEffect } from 'react';
 
-import AppServer from './AppServer';
-import AppLog from './AppLog';
+import AppStatus from './AppStatus';
 import AppDemoImporter from './AppDemoImporter';
 import ErrorBoundary from './components/ErrorBoundary';
 
@@ -50,22 +49,17 @@ const LayoutWithEffects = ({ children }) => {
 				}
 			});
 
-			// Check for the active hash
-			if (activeHash.includes('system_status_page')) {
+			// The status + log tabs live under a single admin menu item, so both
+			// hashes highlight the System Status menu.
+			if (
+				activeHash.includes('system_status_page') ||
+				activeHash.includes('import_log')
+			) {
 				const systemStatusMenu = document.querySelector(
 					`a[href="${sdEdiAdminParams.serverPageUrl}"]`
 				);
 				if (systemStatusMenu) {
 					systemStatusMenu
-						.closest('li')
-						.classList.add('current', 'current_page_item');
-				}
-			} else if (activeHash.includes('import_log')) {
-				const logMenu = document.querySelector(
-					`a[href="${sdEdiAdminParams.logPageUrl}"]`
-				);
-				if (logMenu) {
-					logMenu
 						.closest('li')
 						.classList.add('current', 'current_page_item');
 				}
@@ -110,7 +104,7 @@ const routes = [
 		element: (
 			<ErrorBoundary>
 				<LayoutWithEffects>
-					<AppServer />
+					<AppStatus defaultTab="status" />
 				</LayoutWithEffects>
 			</ErrorBoundary>
 		),
@@ -120,7 +114,7 @@ const routes = [
 		element: (
 			<ErrorBoundary>
 				<LayoutWithEffects>
-					<AppLog />
+					<AppStatus defaultTab="log" />
 				</LayoutWithEffects>
 			</ErrorBoundary>
 		),

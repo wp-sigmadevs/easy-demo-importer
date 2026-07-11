@@ -4,7 +4,10 @@
 
 .appearance_page_sd-easy-demo-importer {
 	.edi-container {
-		&:not(.server-container) {
+		// The Status & Logs page nests `.edi-container.server-container` inside
+		// the outer `.edi-container.edi-status-log`; exclude the latter so this
+		// demo-grid skeleton doesn't leak onto the status/log loading states.
+		&:not(.server-container):not(.edi-status-log) {
 			.skeleton-wrapper {
 				box-shadow: 0 4px 50px rgba(0, 0, 0, 0.1);
 				border-radius: 5px;
