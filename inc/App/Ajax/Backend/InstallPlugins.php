@@ -123,11 +123,16 @@ class InstallPlugins extends ImporterAjax {
 			return;
 		}
 
-		// Response.
+		// Response. Friendlier text in the modal; the log keeps the neutral
+		// equivalent.
 		$this->prepareResponse(
 			'sd_edi_activate_plugins',
-			esc_html__( 'Activating those plugins.', 'easy-demo-importer' ),
-			$this->installCount > 0 ? esc_html__( 'Plugins installed, time to get started!', 'easy-demo-importer' ) : esc_html__( 'Plugins already installed, all set to go!', 'easy-demo-importer' )
+			esc_html__( 'Activating your plugins...', 'easy-demo-importer' ),
+			$this->installCount > 0 ? esc_html__( "Plugins installed — let's get started!", 'easy-demo-importer' ) : esc_html__( 'Plugins already installed — all set!', 'easy-demo-importer' ),
+			false,
+			'',
+			'',
+			$this->installCount > 0 ? esc_html__( 'Required plugins installed.', 'easy-demo-importer' ) : esc_html__( 'Required plugins already installed.', 'easy-demo-importer' )
 		);
 	}
 

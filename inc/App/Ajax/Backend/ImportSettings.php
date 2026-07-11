@@ -132,11 +132,16 @@ class ImportSettings extends ImporterAjax {
 			$formsFileExists = file_exists( $formFile );
 		}
 
-		// Response.
+		// Response. Friendlier text in the modal; the log keeps the neutral
+		// equivalent.
 		$this->prepareResponse(
 			$formsFileExists ? 'sd_edi_import_fluent_forms' : 'sd_edi_import_widgets',
-			$formsFileExists ? esc_html__( 'Importing Fluent Forms.', 'easy-demo-importer' ) : esc_html__( 'Importing all widgets', 'easy-demo-importer' ),
-			$settingsExists ? esc_html__( 'Theme settings are all set.', 'easy-demo-importer' ) : esc_html__( 'No theme settings import needed.', 'easy-demo-importer' )
+			$formsFileExists ? esc_html__( 'Importing Fluent Forms.', 'easy-demo-importer' ) : esc_html__( 'Importing all widgets.', 'easy-demo-importer' ),
+			$settingsExists ? esc_html__( 'Theme settings are all set!', 'easy-demo-importer' ) : esc_html__( 'No theme settings import needed.', 'easy-demo-importer' ),
+			false,
+			'',
+			'',
+			$settingsExists ? esc_html__( 'Theme settings imported.', 'easy-demo-importer' ) : null
 		);
 	}
 }

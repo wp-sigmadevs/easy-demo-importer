@@ -74,14 +74,16 @@ class DownloadFiles extends ImporterAjax {
 		$result  = $this->downloadDemoFiles( $demoZip );
 		$success = $result['success'];
 
-		// Response.
+		// Response. Friendlier text in the modal; the log keeps the neutral
+		// equivalent.
 		$this->prepareResponse(
 			$success ? 'sd_edi_import_xml' : '',
-			$success ? __( 'Importing content, sit back, relax! This might take a while.', 'easy-demo-importer' ) : '',
-			$success ? __( 'Demo files have landed, we are good to go!', 'easy-demo-importer' ) : '',
+			$success ? __( 'Importing content…', 'easy-demo-importer' ) : '',
+			$success ? __( 'Demo files downloaded — good to go!', 'easy-demo-importer' ) : '',
 			! $success,
 			! $success ? $result['message'] : '',
 			! $success ? $result['hint'] : '',
+			$success ? __( 'Demo files downloaded.', 'easy-demo-importer' ) : null
 		);
 	}
 

@@ -133,7 +133,11 @@ class InstallDemo extends ImporterAjax {
 			$this->prepareResponse(
 				'sd_edi_import_customizer',
 				esc_html__( 'Importing Customizer settings.', 'easy-demo-importer' ),
-				esc_html__( 'Everything has been imported smoothly.', 'easy-demo-importer' )
+				esc_html__( 'Content imported — smooth sailing!', 'easy-demo-importer' ),
+				false,
+				'',
+				'',
+				esc_html__( 'Content imported.', 'easy-demo-importer' )
 			);
 			return;
 		}
@@ -180,7 +184,11 @@ class InstallDemo extends ImporterAjax {
 			$this->prepareResponse(
 				'sd_edi_import_customizer',
 				esc_html__( 'Importing Customizer settings.', 'easy-demo-importer' ),
-				esc_html__( 'Everything has been imported smoothly.', 'easy-demo-importer' )
+				esc_html__( 'Content imported — smooth sailing!', 'easy-demo-importer' ),
+				false,
+				'',
+				'',
+				esc_html__( 'Content imported.', 'easy-demo-importer' )
 			);
 			return;
 		}
@@ -358,7 +366,11 @@ class InstallDemo extends ImporterAjax {
 
 			$this->prepareResponse(
 				'sd_edi_regenerate_images',
-				esc_html__( 'Regenerating images…', 'easy-demo-importer' ),
+				esc_html__( 'Regenerating images — sit tight!', 'easy-demo-importer' ),
+				esc_html__( 'Content imported — smooth sailing!', 'easy-demo-importer' ),
+				false,
+				'',
+				'',
 				esc_html__( 'Content imported.', 'easy-demo-importer' )
 			);
 			return;
@@ -367,7 +379,11 @@ class InstallDemo extends ImporterAjax {
 		$this->prepareResponse(
 			'sd_edi_import_customizer',
 			esc_html__( 'Importing Customizer settings.', 'easy-demo-importer' ),
-			esc_html__( 'Everything has been imported smoothly.', 'easy-demo-importer' )
+			esc_html__( 'Content imported — smooth sailing!', 'easy-demo-importer' ),
+			false,
+			'',
+			'',
+			esc_html__( 'Content imported.', 'easy-demo-importer' )
 		);
 	}
 
@@ -409,7 +425,11 @@ class InstallDemo extends ImporterAjax {
 			$this->prepareResponse(
 				'sd_edi_import_customizer',
 				esc_html__( 'Importing Customizer settings.', 'easy-demo-importer' ),
-				esc_html__( 'Everything has been imported smoothly.', 'easy-demo-importer' )
+				esc_html__( 'No images to regenerate — skipping.', 'easy-demo-importer' ),
+				false,
+				'',
+				'',
+				esc_html__( 'No images to regenerate. Skipping.', 'easy-demo-importer' )
 			);
 			return;
 		}
@@ -483,7 +503,11 @@ class InstallDemo extends ImporterAjax {
 		$this->prepareResponse(
 			'sd_edi_import_customizer',
 			esc_html__( 'Importing Customizer settings.', 'easy-demo-importer' ),
-			esc_html__( 'Everything has been imported smoothly.', 'easy-demo-importer' )
+			esc_html__( 'Images regenerated — looking sharp!', 'easy-demo-importer' ),
+			false,
+			'',
+			'',
+			esc_html__( 'Images regenerated.', 'easy-demo-importer' )
 		);
 	}
 

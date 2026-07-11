@@ -85,11 +85,16 @@ class Finalize extends ImporterAjax {
 			SessionManager::release( $this->sessionId );
 		}
 
-		// Response.
+		// Response. The celebratory headline is the final modal card and the
+		// Success screen's title — the log keeps a neutral completion line.
 		$this->prepareResponse(
 			'',
 			'',
-			esc_html__( 'Hooray! You are all set! Now go out and have a blast!', 'easy-demo-importer' )
+			esc_html__( 'Hooray! You are all set! Now go out and have a blast!', 'easy-demo-importer' ),
+			false,
+			'',
+			'',
+			esc_html__( 'Import completed successfully.', 'easy-demo-importer' )
 		);
 	}
 }

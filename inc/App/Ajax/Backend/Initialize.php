@@ -149,11 +149,18 @@ class Initialize extends ImporterAjax {
 		 */
 		do_action( 'sd/edi/importer_init', $this ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
-		// Response.
+		// Response. The modal gets a friendlier "Cleanup done!" for the
+		// non-reset branch; the activity log keeps the neutral "Cleanup
+		// completed." (the reset branch's text is already neutral, so it's
+		// used as-is in both places — passing null for logMessage there).
 		$this->prepareResponse(
 			'sd_edi_install_plugins',
-			esc_html__( 'Let us install the required plugins.', 'easy-demo-importer' ),
-			( $this->reset ) ? esc_html__( 'Database reset completed.', 'easy-demo-importer' ) : esc_html__( 'Minor cleanups done.', 'easy-demo-importer' )
+			esc_html__( 'Installing your plugins...', 'easy-demo-importer' ),
+			( $this->reset ) ? esc_html__( 'Database reset completed.', 'easy-demo-importer' ) : esc_html__( 'Cleanup done!', 'easy-demo-importer' ),
+			false,
+			'',
+			'',
+			( $this->reset ) ? null : esc_html__( 'Cleanup completed.', 'easy-demo-importer' )
 		);
 	}
 
