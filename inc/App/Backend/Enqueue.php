@@ -172,6 +172,8 @@ class Enqueue extends EnqueueBase {
 				// Modal Step Two.
 				'requiredPluginsTitle'       => esc_html__( 'Required Plugins', 'easy-demo-importer' ),
 				'configureImportTitle'       => esc_html__( 'Configure Your Import', 'easy-demo-importer' ),
+				'preflightTitle'             => esc_html__( 'Readiness check', 'easy-demo-importer' ),
+				'preflightBlocked'           => esc_html__( 'Resolve the failed checks below before importing.', 'easy-demo-importer' ),
 				'requiredPluginsIntro'       => self::importModalTexts()['stepTwo']['requiredPluginsIntro'],
 				'excludeImagesTitle'         => esc_html__( 'Skip Demo Images', 'easy-demo-importer' ),
 				'excludeImagesHint'          => esc_html__( 'Exclude demo images to speed up the import. Recommended if the import fails repeatedly.', 'easy-demo-importer' ),

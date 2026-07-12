@@ -1,6 +1,7 @@
 import ModalHeader from '../ModalHeader';
 import React, { useEffect } from 'react';
 import PluginList from '../../PluginList';
+import PreflightPanel from '../../PreflightPanel';
 import { Button, Col, Row, Skeleton, Switch, Tooltip } from 'antd';
 import useSharedDataStore from '../../../utils/sharedDataStore';
 import {
@@ -39,6 +40,8 @@ const Setup = ({ modalData, handleImport, handleReset }) => {
 		setCurrentStep,
 		skipImageRegeneration,
 		setSkipImageRegeneration,
+		preflightData,
+		fetchPreflightData,
 	} = useSharedDataStore();
 
 	/**
@@ -60,6 +63,22 @@ const Setup = ({ modalData, handleImport, handleReset }) => {
 			}
 		})();
 	}, [fetchPluginList]);
+
+	/**
+	 * Fetches the pre-import readiness report. fetchPreflightData handles its own
+	 * errors (it stores an error shape and never rejects), so no catch is needed.
+	 */
+	useEffect(() => {
+		fetchPreflightData('/sd/edi/v1/preflight');
+	}, [fetchPreflightData]);
+
+	/**
+	 * Readiness checks and whether a blocking check failed. While the report is
+	 * still loading (or if it errored), the import is never blocked.
+	 */
+	const preflight = preflightData?.success && preflightData.data;
+	const preflightChecks = preflight ? preflight.checks : [];
+	const importBlocked = preflight ? !preflight.canProceed : false;
 
 	const demoPluginData = pluginList.success ? pluginList.data : [];
 
@@ -239,6 +258,16 @@ const Setup = ({ modalData, handleImport, handleReset }) => {
 						</div>
 					</Col>
 				</Row>
+
+				{preflightChecks.length > 0 && (
+					<div className="preflight-row">
+						<PreflightPanel
+							checks={preflightChecks}
+							blocked={importBlocked}
+						/>
+					</div>
+				)}
+
 				<div className="step-actions">
 					<div className="actions-left">
 						<Button type="primary" onClick={handleReset}>
@@ -253,7 +282,11 @@ const Setup = ({ modalData, handleImport, handleReset }) => {
 								<span>{sdEdiAdminParams.btnPrevious}</span>
 							</Button>
 						)}
-						<Button type="primary" onClick={handleImport}>
+						<Button
+							type="primary"
+							onClick={handleImport}
+							disabled={importBlocked}
+						>
 							<span>{sdEdiAdminParams.btnStartImport}</span>
 							<DownloadOutlined />
 						</Button>
