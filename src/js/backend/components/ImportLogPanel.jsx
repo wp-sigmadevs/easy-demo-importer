@@ -113,7 +113,7 @@ const runLabel = (run) => {
 	const status = statusText[run.status] || run.status;
 
 	return (
-		<div className="edi-log-run">
+		<div className="edi-log-run" data-panel-key={run.session_id}>
 			<span className="edi-log-run-name">
 				{humanizeSlug(run.demo_slug) ||
 					sdEdiAdminParams.logUnknownDemo ||
@@ -164,6 +164,7 @@ const runEntries = (entries) => (
 const ImportLogPanel = () => {
 	const [loading, setLoading] = useState(true);
 	const [errorMessage, setErrorMessage] = useState('');
+	const [activePanel, setActivePanel] = useState('');
 	const { logData, fetchLogData } = useSharedDataStore();
 
 	useEffect(() => {
@@ -193,6 +194,53 @@ const ImportLogPanel = () => {
 	}, [logData]);
 
 	const runs = (logData && logData.success && logData.data) || [];
+
+	// Open the most recent run by default, once runs are available.
+	useEffect(() => {
+		if (runs.length && !activePanel) {
+			setActivePanel(runs[0].session_id);
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [runs]);
+
+	/**
+	 * Handles the change of the active accordion panel, then smooth-scrolls
+	 * to it once the expand animation has had time to run (matches
+	 * ServerInfoCollapse's behavior for the System Status tab).
+	 *
+	 * @param {string} key - The key of the newly active panel.
+	 */
+	const handleAccordionChange = (key) => {
+		setActivePanel(key);
+		setTimeout(() => {
+			scrollToPanel(key);
+		}, 300);
+	};
+
+	/**
+	 * Scrolls the page to the specified panel.
+	 *
+	 * @param {string} panelKey - The key of the panel to scroll to.
+	 */
+	const scrollToPanel = (panelKey) => {
+		const panelElement = document.querySelector(
+			`[data-panel-key="${panelKey}"]`
+		);
+
+		if (!panelElement) {
+			return;
+		}
+
+		const offset = 140;
+		const panelPosition = panelElement.getBoundingClientRect();
+		const currentScrollY = window.scrollY;
+		const scrollToPosition = panelPosition.top + currentScrollY - offset;
+
+		window.scrollTo({
+			top: scrollToPosition,
+			behavior: 'smooth',
+		});
+	};
 
 	const items = runs.map((run) => ({
 		key: run.session_id,
@@ -228,9 +276,11 @@ const ImportLogPanel = () => {
 			<Collapse
 				className="edi-log-collapse edi-fade-in"
 				bordered={false}
+				accordion
 				expandIconPosition="end"
 				items={items}
-				defaultActiveKey={[runs[0].session_id]}
+				activeKey={activePanel}
+				onChange={handleAccordionChange}
 			/>
 		);
 	}
