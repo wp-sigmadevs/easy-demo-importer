@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Collapse, Skeleton, Empty } from 'antd';
 import ErrorMessage from './ErrorMessage';
 import useSharedDataStore from '../utils/sharedDataStore';
+import { decodeEntities } from '../utils/decodeEntities';
 
 /* global sdEdiAdminParams */
 
@@ -150,7 +151,9 @@ const runEntries = (entries) => (
 				<time className="edi-log-entry-time" title={entry.logged_at}>
 					{formatEntryTime(entry.logged_at)}
 				</time>
-				<span className="edi-log-entry-msg">{entry.message}</span>
+				<span className="edi-log-entry-msg">
+					{decodeEntities(entry.message)}
+				</span>
 			</li>
 		))}
 	</ul>

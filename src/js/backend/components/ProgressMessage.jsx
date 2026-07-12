@@ -1,4 +1,5 @@
 import React from 'react';
+import { decodeEntities } from '../utils/decodeEntities';
 
 /**
  * Component for displaying a progress message.
@@ -7,5 +8,5 @@ import React from 'react';
  * @param {string} props.message - The message to display.
  */
 export const ProgressMessage = ({ message }) => (
-	<div className="progress-message">{message}</div>
+	<div className="progress-message">{decodeEntities(message)}</div>
 );
