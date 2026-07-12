@@ -255,6 +255,13 @@ class Initialize extends ImporterAjax {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$tableStatus = $wpdb->get_results( 'SHOW TABLE STATUS' );
 
+		// Snapshot shadow tables ({prefix}sd_edi_snap_*) hold the pre-import
+		// restore point, which is created (in response(), above) BEFORE this
+		// reset runs. They must never be swept into the truncate list below —
+		// doing so empties the restore point, so a later rollback would wipe the
+		// site instead of reverting it.
+		$snapshotInfix = $wpdb->prefix . Snapshot::INFIX;
+
 		if ( is_array( $tableStatus ) ) {
 			foreach ( $tableStatus as $table ) {
 				if ( 0 !== stripos( $table->Name, $wpdb->prefix ) ) {
@@ -262,6 +269,10 @@ class Initialize extends ImporterAjax {
 				}
 
 				if ( empty( $table->Engine ) ) {
+					continue;
+				}
+
+				if ( 0 === stripos( $table->Name, $snapshotInfix ) ) {
 					continue;
 				}
 
