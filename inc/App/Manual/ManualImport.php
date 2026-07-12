@@ -124,6 +124,17 @@ class ManualImport extends Base {
 			}
 		}
 
+		// ── Settings (optional flat { option: value } JSON) ─────────────────────
+		// Imported by ImportSettings with a blocklist on sensitive core options.
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing
+		if ( ! empty( $_FILES['settings'] ) && ! empty( $_FILES['settings']['name'] ) ) {
+			$settings = $this->normalizeFile( $_FILES['settings'] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+
+			if ( $this->uploadOk( $settings, $max ) && $this->hasExtension( $settings['name'], [ 'json' ] ) && $this->isValidJson( $settings['tmp_name'] ) ) {
+				$this->stage( $settings['tmp_name'], $dir . '/settings.json' );
+			}
+		}
+
 		$session = SessionManager::start();
 
 		wp_send_json_success(

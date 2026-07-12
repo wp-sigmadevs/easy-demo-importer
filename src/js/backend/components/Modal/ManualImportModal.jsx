@@ -33,6 +33,7 @@ const ManualImportModal = ({ visible, onClose }) => {
 	const contentRef = useRef(null);
 	const customizerRef = useRef(null);
 	const widgetsRef = useRef(null);
+	const settingsRef = useRef(null);
 
 	const reset = () => {
 		setStep(1);
@@ -86,6 +87,9 @@ const ManualImportModal = ({ visible, onClose }) => {
 		}
 		if (widgetsRef.current?.files?.[0]) {
 			fd.append('widgets', widgetsRef.current.files[0]);
+		}
+		if (settingsRef.current?.files?.[0]) {
+			fd.append('settings', settingsRef.current.files[0]);
 		}
 
 		fetch(sdEdiAdminParams.ajaxUrl, {
@@ -190,6 +194,18 @@ const ManualImportModal = ({ visible, onClose }) => {
 								type="file"
 								accept=".wie,.json"
 								ref={widgetsRef}
+							/>
+						</label>
+					</p>
+					<p>
+						<label>
+							{sdEdiAdminParams.manualSettingsLabel ||
+								'Theme settings (.json { option: value }) — optional'}
+							<br />
+							<input
+								type="file"
+								accept=".json"
+								ref={settingsRef}
 							/>
 						</label>
 					</p>
