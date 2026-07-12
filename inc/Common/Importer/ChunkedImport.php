@@ -285,31 +285,64 @@ class ChunkedImport extends SD_EDI_WP_Import {
 	}
 
 	/**
-	 * Authoritatively recomputes term counts for every taxonomy.
+	 * Authoritatively recomputes term counts for the terms this import touched.
 	 *
 	 * Batches defer term counting (see processBatch), and that deferred queue
 	 * cannot survive between the separate batch requests — so rather than relying
 	 * on it flushing, this recounts from actual DB state once, at the end. It is
 	 * correct regardless of what any batch flushed, so a batch that died and was
-	 * re-issued still leaves accurate counts. Each taxonomy's registered
-	 * update_count_callback is honored (e.g. WooCommerce product attributes).
+	 * re-issued still leaves accurate counts.
+	 *
+	 * The import only ever *adds* posts, so only the terms attached to this run's
+	 * imported posts can have a changed count. Rather than recounting every term
+	 * in every registered taxonomy — which on a large existing catalogue can
+	 * itself approach the wall-clock budget the chunking exists to avoid — this
+	 * gathers just those terms (plus the ancestors of hierarchical terms, whose
+	 * counts roll up children in e.g. WooCommerce product categories) and updates
+	 * only them. Each taxonomy's registered update_count_callback is honored.
 	 *
 	 * @return void
 	 * @since 1.2.0
 	 */
 	private function recountTerms(): void {
-		foreach ( get_taxonomies() as $taxonomy ) {
-			$term_ids = get_terms(
-				[
-					'taxonomy'   => $taxonomy,
-					'hide_empty' => false,
-					'fields'     => 'ids',
-				]
-			);
+		$post_ids = array_values( array_filter( array_map( 'intval', (array) $this->processed_posts ) ) );
 
-			if ( ! empty( $term_ids ) && ! is_wp_error( $term_ids ) ) {
-				wp_update_term_count_now( $term_ids, $taxonomy );
+		if ( empty( $post_ids ) ) {
+			return;
+		}
+
+		global $wpdb;
+
+		// $in is a comma-joined list of intval'd post IDs — safe to interpolate.
+		$in = implode( ',', $post_ids );
+
+		// Terms (grouped by taxonomy) attached to any post imported this run.
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$sql = "SELECT tt.taxonomy AS taxonomy, tt.term_id AS term_id FROM {$wpdb->term_relationships} tr INNER JOIN {$wpdb->term_taxonomy} tt ON tt.term_taxonomy_id = tr.term_taxonomy_id WHERE tr.object_id IN ({$in}) GROUP BY tt.taxonomy, tt.term_id";
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+		$rows = $wpdb->get_results( $sql );
+
+		if ( empty( $rows ) ) {
+			return;
+		}
+
+		$by_taxonomy = [];
+
+		foreach ( $rows as $row ) {
+			$by_taxonomy[ $row->taxonomy ][] = (int) $row->term_id;
+		}
+
+		foreach ( $by_taxonomy as $taxonomy => $term_ids ) {
+			// A hierarchical term's count rolls up its descendants, so an affected
+			// child means its ancestors must be recounted too.
+			if ( is_taxonomy_hierarchical( $taxonomy ) ) {
+				foreach ( $term_ids as $term_id ) {
+					$term_ids = array_merge( $term_ids, get_ancestors( $term_id, $taxonomy, 'taxonomy' ) );
+				}
 			}
+
+			wp_update_term_count_now( array_values( array_unique( array_map( 'intval', $term_ids ) ) ), $taxonomy );
 		}
 	}
 

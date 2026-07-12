@@ -169,4 +169,29 @@ final class ChunkedImportIntegrationTest extends WP_UnitTestCase {
 		$this->assertFalse( $state->exists() );
 		$this->assertNull( $state->loadImmutable() );
 	}
+
+	public function test_recount_touches_only_terms_attached_to_imported_posts(): void {
+		// A pre-existing category unrelated to the import, with a deliberately
+		// wrong count. The old "recount every term in every taxonomy" would have
+		// reset it to 0; the narrowed recount must leave it exactly as-is.
+		$unrelated = self::factory()->term->create(
+			[
+				'taxonomy' => 'category',
+				'name'     => 'Untouched',
+			]
+		);
+
+		global $wpdb;
+		$wpdb->update( $wpdb->term_taxonomy, [ 'count' => 99 ], [ 'term_id' => $unrelated ] );
+		clean_term_cache( $unrelated, 'category' );
+
+		$this->runFullImport( ImportState::forSession( $this->dir, 'itest-narrow' ) );
+
+		// The imported category IS reconciled from the deferred counts…
+		$category = get_term_by( 'slug', 'edi-sample', 'category' );
+		$this->assertSame( 2, (int) $category->count );
+
+		// …while a term with no imported posts is never recounted.
+		$this->assertSame( 99, (int) get_term( $unrelated, 'category' )->count );
+	}
 }
