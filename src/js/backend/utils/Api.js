@@ -53,6 +53,10 @@ const httpErrorInfo = (code) => {
 				'The server encountered an internal error (500 Internal Server Error).',
 			hint: 'Check your PHP error log for details. This is usually a server configuration issue unrelated to the import.',
 		},
+		502: {
+			message: 'The server gateway returned an error (502 Bad Gateway).',
+			hint: 'A proxy in front of your site (often Cloudflare or a load balancer) could not reach the server. Try again; if it persists, ask your host to check the upstream.',
+		},
 		503: {
 			message:
 				'The server is temporarily unavailable (503 Service Unavailable).',
@@ -61,6 +65,18 @@ const httpErrorInfo = (code) => {
 		504: {
 			message: 'The server gateway timed out (504 Gateway Timeout).',
 			hint: 'Your server or the remote server is temporarily overloaded. Try again in a few minutes. If the problem persists, contact your host about PHP execution time limits.',
+		},
+		520: {
+			message: 'Cloudflare reported an unknown server error (520).',
+			hint: 'This is a Cloudflare edge error, usually from the origin closing the connection during a long import. The import resumes automatically; if it stops, run it again — it continues where it left off.',
+		},
+		522: {
+			message: 'The connection to the server timed out (Cloudflare 522).',
+			hint: 'Cloudflare could not get a timely response from your origin. Large imports are chunked to avoid this — retry to resume; consider asking your host to raise the origin timeout.',
+		},
+		524: {
+			message: 'The server took too long to respond (Cloudflare 524).',
+			hint: 'Cloudflare enforces a fixed ~100s limit per request. The import is split into small resumable steps to stay under it — retry to continue from the last completed step.',
 		},
 	};
 

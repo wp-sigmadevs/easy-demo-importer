@@ -119,7 +119,17 @@ const useSharedDataStore = create((set) => ({
 			const response = await Api.get(endpoint, {});
 			set({ serverData: response.data, loading: false });
 		} catch (error) {
-			console.error(error);
+			// Surface the failure so the panel can show an error state instead of
+			// a misleading empty one.
+			set({
+				serverData: {
+					success: false,
+					message:
+						error?.response?.data?.message ||
+						'Could not load server status. Please refresh and try again.',
+				},
+				loading: false,
+			});
 		}
 	},
 	fetchLogData: async (endpoint) => {
@@ -127,7 +137,17 @@ const useSharedDataStore = create((set) => ({
 			const response = await Api.get(endpoint, {});
 			set({ logData: response.data, loading: false });
 		} catch (error) {
-			console.error(error);
+			// Surface the failure so the panel renders its error state rather than
+			// the "no activity yet" empty state on a real transport error.
+			set({
+				logData: {
+					success: false,
+					message:
+						error?.response?.data?.message ||
+						'Could not load the import log. Please refresh and try again.',
+				},
+				loading: false,
+			});
 		}
 	},
 	setCurrentStep: (step) => set({ currentStep: step }),

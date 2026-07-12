@@ -312,9 +312,41 @@ final class ImportLogger {
 	 * @since 1.2.0
 	 */
 	public static function getRuns( int $limit = 1000 ): array {
+		// Cache keyed on the latest row id: any new log entry changes the key and
+		// misses the cache, so the runs view is never stale after a write, while
+		// repeated Status-page opens between imports are served from the transient.
+		$cache_key = 'sd_edi_runs_' . self::latestId() . '_' . $limit;
+		$cached    = get_transient( $cache_key );
+
+		if ( is_array( $cached ) ) {
+			return $cached;
+		}
+
 		// Pull entries oldest-first within the scanned window so each run's
 		// timeline reads top-to-bottom in the order things happened.
-		return self::groupRows( array_reverse( self::get( '', $limit ) ) );
+		$runs = self::groupRows( array_reverse( self::get( '', $limit ) ) );
+
+		set_transient( $cache_key, $runs, 5 * MINUTE_IN_SECONDS );
+
+		return $runs;
+	}
+
+	/**
+	 * Highest log row id currently stored, or 0 when the table is empty/absent.
+	 *
+	 * Used as a cheap cache-buster for getRuns(): a new entry always increments
+	 * it, so the cached run list can never outlive a fresh log write.
+	 *
+	 * @return int
+	 * @since 1.2.0
+	 */
+	private static function latestId(): int {
+		global $wpdb;
+
+		$table = self::tableName();
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		return (int) $wpdb->get_var( "SELECT MAX(id) FROM {$table}" );
 	}
 
 	/**
@@ -360,7 +392,24 @@ final class ImportLogger {
 			} elseif ( self::SUCCESS === $row['level'] && self::ERROR !== $runs[ $sid ]['status'] ) {
 				$runs[ $sid ]['status'] = self::SUCCESS;
 			}
+
+			if ( self::WARNING === $row['level'] ) {
+				$runs[ $sid ]['has_warning'] = true;
+			}
 		}
+
+		// A run that finished cleanly but skipped items (per-image download
+		// failures are logged as warnings) is reported as "warning" so the pill
+		// reflects the partial failure rather than a misleading all-green success.
+		foreach ( $runs as &$run ) {
+			if ( self::SUCCESS === $run['status'] && ! empty( $run['has_warning'] ) ) {
+				$run['status'] = self::WARNING;
+			}
+
+			unset( $run['has_warning'] );
+		}
+
+		unset( $run );
 
 		// Newest run first.
 		return array_values( array_reverse( $runs, true ) );
