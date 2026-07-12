@@ -111,12 +111,19 @@ class InstallDemo extends ImporterAjax {
 		// Opt-in restore point: snapshot the content/options tables once, before
 		// any content is written, so the whole import can be rolled back later.
 		if ( $this->snapshot && ! Snapshot::exists() ) {
-			Snapshot::create();
-			ImportLogger::info(
-				esc_html__( 'Restore point created — this import can be rolled back.', 'easy-demo-importer' ),
-				$this->sessionId,
-				$this->demoSlug
-			);
+			if ( Snapshot::create() ) {
+				ImportLogger::info(
+					esc_html__( 'Restore point created — this import can be rolled back.', 'easy-demo-importer' ),
+					$this->sessionId,
+					$this->demoSlug
+				);
+			} else {
+				ImportLogger::warning(
+					esc_html__( 'Restore point skipped — this site is too large to snapshot safely; the import will continue without rollback.', 'easy-demo-importer' ),
+					$this->sessionId,
+					$this->demoSlug
+				);
+			}
 		}
 
 		/**
@@ -589,10 +596,19 @@ class InstallDemo extends ImporterAjax {
 		$still_failed  = isset( $_POST['stillFailed'] ) ? absint( wp_unslash( $_POST['stillFailed'] ) ) : 0;
 		// phpcs:enable WordPress.Security.NonceVerification.Missing
 
+		// The importer failing to load is a real error, not a completed retry —
+		// report it rather than a silent "finished".
+		if ( ! class_exists( 'SD_EDI_WP_Import' ) ) {
+			wp_send_json_error(
+				[ 'message' => esc_html__( 'The importer could not be loaded. Please try again.', 'easy-demo-importer' ) ],
+				500
+			);
+		}
+
 		$items = FailedMedia::get( $retry_session );
 		$total = count( $items );
 
-		if ( empty( $items ) || ! class_exists( 'SD_EDI_WP_Import' ) ) {
+		if ( empty( $items ) ) {
 			FailedMedia::clear( $retry_session );
 			wp_send_json_success(
 				[

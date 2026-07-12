@@ -167,15 +167,23 @@ const ImportLogPanel = () => {
 	const { logData, fetchLogData } = useSharedDataStore();
 
 	useEffect(() => {
+		let ignore = false;
+
 		(async () => {
 			try {
 				await fetchLogData('/sd/edi/v1/import/log?group=1');
 			} catch (error) {
-				console.error(error);
+				// The store records an error shape; nothing to do here.
 			} finally {
-				setLoading(false);
+				if (!ignore) {
+					setLoading(false);
+				}
 			}
 		})();
+
+		return () => {
+			ignore = true;
+		};
 	}, [fetchLogData]);
 
 	useEffect(() => {
