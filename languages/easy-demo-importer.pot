@@ -6,7 +6,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-07-12 10:47+0000\n"
+"POT-Creation-Date: 2026-07-12 11:14+0000\n"
 "Report-Msgid-Bugs-To: https://github.com/wp-sigmadevs/easy-demo-importer/issues\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -223,210 +223,214 @@ msgid "Widgets (.wie / .json) — optional"
 msgstr ""
 
 #: ../inc/App/Backend/Enqueue.php:220
-msgid "Please choose a content (WXR/XML) file."
+msgid "Theme settings (.json { option: value }) — optional"
 msgstr ""
 
 #: ../inc/App/Backend/Enqueue.php:221
-msgid "Roll Back"
+msgid "Please choose a content (WXR/XML) file."
 msgstr ""
 
 #: ../inc/App/Backend/Enqueue.php:222
-msgid "Roll back this import?"
+msgid "Roll Back"
 msgstr ""
 
 #: ../inc/App/Backend/Enqueue.php:223
-msgid "This restores your site to the moment before this import. Anything created since (new posts, orders, users) will be permanently lost."
+msgid "Roll back this import?"
 msgstr ""
 
 #: ../inc/App/Backend/Enqueue.php:224
-msgid "Roll back"
+msgid "This restores your site to the moment before this import. Anything created since (new posts, orders, users) will be permanently lost."
 msgstr ""
 
 #: ../inc/App/Backend/Enqueue.php:225
-msgid "Success"
+msgid "Roll back"
 msgstr ""
 
 #: ../inc/App/Backend/Enqueue.php:226
-msgid "Completed with warnings"
+msgid "Success"
 msgstr ""
 
 #: ../inc/App/Backend/Enqueue.php:227
-msgid "Failed"
+msgid "Completed with warnings"
 msgstr ""
 
 #: ../inc/App/Backend/Enqueue.php:228
+msgid "Failed"
+msgstr ""
+
+#: ../inc/App/Backend/Enqueue.php:229
 msgid "In progress"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:229, ../inc/App/Backend/Enqueue.php:237
+#: ../inc/App/Backend/Enqueue.php:230, ../inc/App/Backend/Enqueue.php:238
 msgid "Import"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:230
+#: ../inc/App/Backend/Enqueue.php:231
 msgid "No import activity has been logged yet."
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:231
+#: ../inc/App/Backend/Enqueue.php:232
 msgid "Back to Demo Importer"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:236
+#: ../inc/App/Backend/Enqueue.php:237
 msgid "Live Preview"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:238
+#: ../inc/App/Backend/Enqueue.php:239
 msgid "Cancel"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:239
+#: ../inc/App/Backend/Enqueue.php:240
 msgid "Continue"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:240
+#: ../inc/App/Backend/Enqueue.php:241
 msgid "Previous"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:241
+#: ../inc/App/Backend/Enqueue.php:242
 msgid "Start Import"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:242
+#: ../inc/App/Backend/Enqueue.php:243
 msgid "View Site"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:243
+#: ../inc/App/Backend/Enqueue.php:244
 msgid "Close"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:244
+#: ../inc/App/Backend/Enqueue.php:245
 msgid "Reload & Retry"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:245
+#: ../inc/App/Backend/Enqueue.php:246
 msgid "Resume Import"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:246
+#: ../inc/App/Backend/Enqueue.php:247
 msgid "Start Over"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:247
+#: ../inc/App/Backend/Enqueue.php:248
 msgid "Resuming import from where it left off..."
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:248
+#: ../inc/App/Backend/Enqueue.php:249
 msgid "Import was interrupted."
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:249
+#: ../inc/App/Backend/Enqueue.php:250
 msgid "Your previous import did not complete. Resume from where it left off, or start over to begin fresh."
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:250
+#: ../inc/App/Backend/Enqueue.php:251
 msgid "Click to Enlarge"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:251
+#: ../inc/App/Backend/Enqueue.php:252
 msgid "Contact Us"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:252
+#: ../inc/App/Backend/Enqueue.php:253
 msgid "View Documentation"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:253
+#: ../inc/App/Backend/Enqueue.php:254
 msgid "Need help?"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:254
+#: ../inc/App/Backend/Enqueue.php:255
 msgid "Documentation & FAQ"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:255
+#: ../inc/App/Backend/Enqueue.php:256
 msgid "All Demos"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:258
+#: ../inc/App/Backend/Enqueue.php:259
 msgid "Need Help?"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:259
+#: ../inc/App/Backend/Enqueue.php:260
 msgid "Documentation & FAQs"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:264
+#: ../inc/App/Backend/Enqueue.php:265
 msgid "System status data copied to clipboard."
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:265
+#: ../inc/App/Backend/Enqueue.php:266
 msgid "Could not copy to clipboard. Please try again."
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:268
+#: ../inc/App/Backend/Enqueue.php:269
 msgid "Server Requirements Not Met"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:269
+#: ../inc/App/Backend/Enqueue.php:270
 msgid "Your server does not meet the minimum requirements for demo import. Please review the Status & Logs page for details. Proceeding without meeting these requirements may result in a failed or incomplete import."
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:270
+#: ../inc/App/Backend/Enqueue.php:271
 msgid "Continue Anyway"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:273
+#: ../inc/App/Backend/Enqueue.php:274
 msgid "Not installed"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:274
+#: ../inc/App/Backend/Enqueue.php:275
 msgid "Installed and active"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:275
+#: ../inc/App/Backend/Enqueue.php:276
 msgid "Installed but not active"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:276
+#: ../inc/App/Backend/Enqueue.php:277
 msgid "Installed & active — update available"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:277
+#: ../inc/App/Backend/Enqueue.php:278
 msgid "Installed but inactive — update available"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:293
+#: ../inc/App/Backend/Enqueue.php:294
 msgid "We recommend backing up your site before proceeding. A backup plugin can help you restore your site if anything goes wrong during the import."
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:294
+#: ../inc/App/Backend/Enqueue.php:295
 msgid "This import will install all required plugins and bring in content, media, settings, customizer data, and widgets needed to replicate the demo site. Please review your existing content, as some data may be overwritten."
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:298
+#: ../inc/App/Backend/Enqueue.php:299
 msgid "To replicate the demo site, the following plugins will be automatically installed and activated if not already present. Scroll down to see the full list."
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:300
+#: ../inc/App/Backend/Enqueue.php:301
 msgid "Having trouble? Reach out to us and we'll help you get sorted quickly."
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:301
+#: ../inc/App/Backend/Enqueue.php:302
 msgid "Explore our documentation for step-by-step guides, helpful screenshots, and FAQs to walk you through the demo import process."
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:305
+#: ../inc/App/Backend/Enqueue.php:306
 msgid "Start"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:306
+#: ../inc/App/Backend/Enqueue.php:307
 msgid "Configure"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:307
+#: ../inc/App/Backend/Enqueue.php:308
 msgid "Imports"
 msgstr ""
 
-#: ../inc/App/Backend/Enqueue.php:308
+#: ../inc/App/Backend/Enqueue.php:309
 msgid "End"
 msgstr ""
 
@@ -1155,7 +1159,7 @@ msgstr ""
 msgid "Import completed successfully."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/ImportFluentForms.php:85, ../inc/App/Ajax/Backend/ImportSettings.php:139
+#: ../inc/App/Ajax/Backend/ImportFluentForms.php:85, ../inc/App/Ajax/Backend/ImportSettings.php:172
 msgid "Importing all widgets."
 msgstr ""
 
@@ -1215,19 +1219,19 @@ msgstr ""
 msgid "Skipping Slider Revolution import."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/ImportSettings.php:139
+#: ../inc/App/Ajax/Backend/ImportSettings.php:172
 msgid "Importing Fluent Forms."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/ImportSettings.php:140
+#: ../inc/App/Ajax/Backend/ImportSettings.php:173
 msgid "Theme settings are all set!"
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/ImportSettings.php:140
+#: ../inc/App/Ajax/Backend/ImportSettings.php:173
 msgid "No theme settings import needed."
 msgstr ""
 
-#: ../inc/App/Ajax/Backend/ImportSettings.php:144
+#: ../inc/App/Ajax/Backend/ImportSettings.php:177
 msgid "Theme settings imported."
 msgstr ""
 
