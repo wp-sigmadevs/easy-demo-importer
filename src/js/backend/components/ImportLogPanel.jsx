@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Collapse, Skeleton, Empty } from 'antd';
-import ErrorMessage from './ErrorMessage';
 import useSharedDataStore from '../utils/sharedDataStore';
 import { decodeEntities } from '../utils/decodeEntities';
 
@@ -264,7 +263,19 @@ const ImportLogPanel = () => {
 			</div>
 		);
 	} else if (logData && logData.success === false) {
-		content = <ErrorMessage message={errorMessage} />;
+		// Never render blank on a failed fetch. ErrorMessage expects an
+		// object ({text, btnText, btnUrl}) used by the import flow; the log
+		// store returns a plain string, so use Empty with a guaranteed
+		// fallback description instead.
+		content = (
+			<Empty
+				description={
+					errorMessage ||
+					sdEdiAdminParams.logFetchError ||
+					'Could not load the import log. Please reload the page and try again.'
+				}
+			/>
+		);
 	} else if (!runs.length) {
 		content = (
 			<Empty
