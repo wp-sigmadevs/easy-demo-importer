@@ -125,4 +125,48 @@ final class ChunkedImportIntegrationTest extends WP_UnitTestCase {
 
 		$this->assertCount( 1, $posts, 'The same WXR post must not be imported twice.' );
 	}
+
+	public function test_parse_output_written_once_and_resume_reads_both_files(): void {
+		$state = ImportState::forSession( $this->dir, 'itest-split' );
+
+		$prepare                    = new ChunkedImport( $state );
+		$prepare->fetch_attachments = false;
+		$prepare->prepare( $this->dir . '/content.xml' );
+
+		// prepare() writes the parsed-WXR output to the immutable store; the
+		// mutable store carries only the cursor + maps, never the heavy posts blob.
+		$immutable = $state->loadImmutable();
+		$mutable   = $state->load();
+		$this->assertIsArray( $immutable );
+		$this->assertArrayHasKey( 'posts', $immutable );
+		$this->assertNotEmpty( $immutable['posts'] );
+		$this->assertArrayNotHasKey( 'posts', $mutable );
+
+		// The immutable file must be written exactly once — batches never rewrite it.
+		$immutable_path = $state->path() . '.imm';
+		$digest_before  = md5_file( $immutable_path );
+
+		do {
+			$result = ( new ChunkedImport( $state ) )->processBatch();
+		} while ( empty( $result['done'] ) );
+
+		$this->assertSame(
+			$digest_before,
+			md5_file( $immutable_path ),
+			'The parsed-WXR blob must be written once at prepare(), not on every batch.'
+		);
+
+		( new ChunkedImport( $state ) )->finalize();
+
+		// A full resume across many fresh instances still imports every post,
+		// reconstructing state from the two files each request…
+		$this->assertInstanceOf(
+			\WP_Post::class,
+			get_page_by_path( 'edi-sample-post-one', OBJECT, 'post' )
+		);
+
+		// …and finalize() removes BOTH the mutable and immutable state files.
+		$this->assertFalse( $state->exists() );
+		$this->assertNull( $state->loadImmutable() );
+	}
 }
