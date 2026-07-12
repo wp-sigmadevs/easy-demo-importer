@@ -35,6 +35,8 @@ const Success = ({
 	hint,
 	demo = '',
 	sessionId = '',
+	manual = 'false',
+	manualKey = '',
 }) => {
 	const [failedCount, setFailedCount] = useState(0);
 	const [rollbackAvailable, setRollbackAvailable] = useState(false);
@@ -109,6 +111,8 @@ const Success = ({
 		body.append('action', 'sd_edi_retry_media');
 		body.append('sd_edi_nonce', sdEdiAdminParams.sd_edi_nonce);
 		body.append('demo', demo);
+		body.append('manual', manual);
+		body.append('manualKey', manualKey);
 		body.append('retrySession', sessionId);
 		body.append('retryCursor', cursor);
 		body.append('recovered', recovered);

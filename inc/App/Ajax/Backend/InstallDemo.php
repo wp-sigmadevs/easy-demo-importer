@@ -913,6 +913,8 @@ class InstallDemo extends ImporterAjax {
 				'skipImageRegeneration' => $this->skipImageRegeneration,
 				'reset'                 => $this->reset,
 				'snapshot'              => $this->snapshot,
+				'manual'                => $this->manual ? 'true' : 'false',
+				'manualKey'             => $this->manualKey,
 				'sessionId'             => $this->sessionId,
 				'nextPhase'             => '',
 				'nextPhaseMessage'      => '',

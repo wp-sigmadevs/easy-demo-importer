@@ -103,6 +103,22 @@ abstract class ImporterAjax {
 	public $snapshot = false;
 
 	/**
+	 * Whether this is a manual import (user-uploaded files, no theme config).
+	 *
+	 * @var bool
+	 * @since 1.2.0
+	 */
+	public $manual = false;
+
+	/**
+	 * Manual import working-directory key.
+	 *
+	 * @var string
+	 * @since 1.2.0
+	 */
+	public $manualKey = '';
+
+	/**
 	 * Import session ID.
 	 *
 	 * @var string
@@ -216,6 +232,11 @@ abstract class ImporterAjax {
 
 		// Check if a pre-import restore point (snapshot) was requested.
 		$this->snapshot = isset( $_POST['snapshot'] ) && 'true' === sanitize_text_field( wp_unslash( $_POST['snapshot'] ) );
+
+		// Manual-import flags (carried across every phase so the config stub +
+		// working directory resolve on each request).
+		$this->manual    = ManualContext::isManual();
+		$this->manualKey = ManualContext::requestKey();
 	}
 
 	/**
@@ -270,6 +291,8 @@ abstract class ImporterAjax {
 			'skipImageRegeneration' => $this->skipImageRegeneration,
 			'reset'                 => $this->reset,
 			'snapshot'              => $this->snapshot,
+			'manual'                => $this->manual ? 'true' : 'false',
+			'manualKey'             => $this->manualKey,
 			'sessionId'             => $this->sessionId,
 			'nextPhase'             => $nextPhase,
 			'nextPhaseMessage'      => $nextPhaseMessage,
