@@ -19,6 +19,7 @@ use SigmaDevs\EasyDemoImporter\Common\{
 	Abstracts\Base,
 	Traits\Singleton,
 	Utils\Preflight,
+	Utils\FailedMedia,
 	Functions\Helpers,
 	Functions\ImportLogger
 };
@@ -147,6 +148,47 @@ class RestEndpoints extends Base {
 		$this->addServerStatusEndpoint();
 		$this->addImportLogEndpoint();
 		$this->addPreflightEndpoint();
+		$this->addFailedMediaEndpoint();
+	}
+
+	/**
+	 * Add Failed-media count route.
+	 *
+	 * @return void
+	 * @since 1.2.0
+	 */
+	public function addFailedMediaEndpoint() {
+		register_rest_route(
+			$this->getNamespace(),
+			'/failed-media',
+			[
+				'methods'             => 'GET',
+				'callback'            => [ $this, 'failedMedia' ],
+				'permission_callback' => [ $this, 'permission' ],
+				'args'                => [
+					'session_id' => [
+						'sanitize_callback' => 'sanitize_text_field',
+					],
+				],
+			]
+		);
+	}
+
+	/**
+	 * Returns how many media downloads failed for a session (retry-able).
+	 *
+	 * @param WP_REST_Request $request REST request object.
+	 *
+	 * @return WP_REST_Response
+	 * @since 1.2.0
+	 */
+	public function failedMedia( WP_REST_Request $request ) {
+		$session_id = (string) $request->get_param( 'session_id' );
+
+		return $this->sendResponse(
+			[ 'count' => FailedMedia::count( $session_id ) ],
+			esc_html__( 'Data is ready to fetch', 'easy-demo-importer' )
+		);
 	}
 
 	/**
