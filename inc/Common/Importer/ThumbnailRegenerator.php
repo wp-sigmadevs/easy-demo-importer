@@ -120,12 +120,15 @@ final class ThumbnailRegenerator {
 	}
 
 	/**
-	 * Regenerates missing intermediate sizes and updates the attachment metadata.
+	 * Regenerates intermediate sizes and updates the attachment metadata.
+	 *
+	 * @param bool $onlyMissing When true (default) only sizes whose file is
+	 *                          missing are (re)built; false forces every size.
 	 *
 	 * @return bool True when metadata was (re)generated and saved.
 	 * @since 1.2.0
 	 */
-	public function regenerate(): bool {
+	public function regenerate( bool $onlyMissing = true ): bool {
 		if ( ! function_exists( 'wp_generate_attachment_metadata' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/image.php';
 		}
@@ -136,18 +139,25 @@ final class ThumbnailRegenerator {
 			$this->oldMetadata = [];
 		}
 
-		add_filter( 'intermediate_image_sizes_advanced', [ $this, 'filterMissingSizes' ], 10, 2 );
+		// Missing-only mode drops sizes whose file already exists at the right
+		// dimensions; force mode leaves the filter off so every size is rebuilt
+		// (needed when a registered size's dimensions actually changed).
+		if ( $onlyMissing ) {
+			add_filter( 'intermediate_image_sizes_advanced', [ $this, 'filterMissingSizes' ], 10, 2 );
+		}
 
 		$meta = wp_generate_attachment_metadata( $this->attachmentId, $this->fullSizePath );
 
-		remove_filter( 'intermediate_image_sizes_advanced', [ $this, 'filterMissingSizes' ], 10 );
+		if ( $onlyMissing ) {
+			remove_filter( 'intermediate_image_sizes_advanced', [ $this, 'filterMissingSizes' ], 10 );
+		}
 
 		if ( empty( $meta ) ) {
 			return false;
 		}
 
 		// Restore the sizes we intentionally skipped so metadata stays complete.
-		if ( ! empty( $this->skipped ) && ! empty( $this->oldMetadata['sizes'] ) ) {
+		if ( $onlyMissing && ! empty( $this->skipped ) && ! empty( $this->oldMetadata['sizes'] ) ) {
 			foreach ( $this->skipped as $label ) {
 				if ( ! empty( $this->oldMetadata['sizes'][ $label ] ) ) {
 					$meta['sizes'][ $label ] = $this->oldMetadata['sizes'][ $label ];
