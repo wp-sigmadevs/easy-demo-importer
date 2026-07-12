@@ -84,6 +84,7 @@ const useSharedDataStore = create((set) => ({
 	pluginList: {},
 	serverData: {},
 	logData: {},
+	preflightData: {},
 	loading: true,
 	currentStep: 1,
 	modalVisible: false,
@@ -129,6 +130,23 @@ const useSharedDataStore = create((set) => ({
 						'Could not load server status. Please refresh and try again.',
 				},
 				loading: false,
+			});
+		}
+	},
+	fetchPreflightData: async (endpoint) => {
+		try {
+			const response = await Api.get(endpoint, {});
+			set({ preflightData: response.data });
+		} catch (error) {
+			// Never block the import on a failed readiness check — surface it as
+			// an error entry but let the user proceed.
+			set({
+				preflightData: {
+					success: false,
+					message:
+						error?.response?.data?.message ||
+						'Could not run the readiness check.',
+				},
 			});
 		}
 	},
