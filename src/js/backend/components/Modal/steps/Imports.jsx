@@ -39,11 +39,7 @@ const Imports = ({
 				items={importProgress.map((progress, index) => ({
 					children: (
 						<>
-							<ProgressMessage
-								key={index}
-								message={progress.message}
-								fade={progress.fade}
-							/>
+							<ProgressMessage message={progress.message} />
 							{progress.showBar && (
 								<ImportBar
 									percent={
