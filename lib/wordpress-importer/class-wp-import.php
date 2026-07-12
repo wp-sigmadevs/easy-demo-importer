@@ -164,7 +164,7 @@ class SD_EDI_WP_Import extends WP_Importer {
 	 * Absolute path to the demo package's bundled `uploads/` folder, when the
 	 * package shipped its media on disk. Empty disables bundled-media mode and
 	 * every attachment is fetched over HTTP as before. Persisted across chunked
-	 * batches via ChunkedImport::STATE_PROPS.
+	 * batches via ChunkedImport::MUTABLE_PROPS.
 	 *
 	 * @var string
 	 * @since 1.2.0

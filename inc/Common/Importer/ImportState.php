@@ -101,11 +101,41 @@ final class ImportState {
 	 * @since 1.2.0
 	 */
 	public function save( array $data ): bool {
+		return $this->write( $this->path, $data );
+	}
+
+	/**
+	 * Persists the write-once immutable parse output (parsed posts, authors,
+	 * base_url …) to a sibling file.
+	 *
+	 * Kept separate from save() so the multi-megabyte parsed-WXR blob is written
+	 * exactly once during prepare() instead of being re-serialized and rewritten
+	 * on every batch alongside the small, fast-changing cursor + remap maps.
+	 *
+	 * @param array $data Immutable state to persist.
+	 *
+	 * @return bool True on success.
+	 * @since 1.2.0
+	 */
+	public function saveImmutable( array $data ): bool {
+		return $this->write( $this->immutablePath(), $data );
+	}
+
+	/**
+	 * Serializes an array to a path atomically with an exclusive lock.
+	 *
+	 * @param string $path Absolute destination path.
+	 * @param array  $data Data to persist.
+	 *
+	 * @return bool True on success.
+	 * @since 1.2.0
+	 */
+	private function write( string $path, array $data ): bool {
 		// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.serialize_serialize
 		$payload = serialize( $data );
 
 		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
-		return false !== file_put_contents( $this->path, $payload, LOCK_EX );
+		return false !== file_put_contents( $path, $payload, LOCK_EX );
 	}
 
 	/**
@@ -119,12 +149,38 @@ final class ImportState {
 	 * @since 1.2.0
 	 */
 	public function load(): ?array {
-		if ( ! is_file( $this->path ) ) {
+		return $this->read( $this->path );
+	}
+
+	/**
+	 * Loads the write-once immutable parse output written by saveImmutable().
+	 *
+	 * @return array|null Decoded state, or null if absent/unreadable/corrupt.
+	 * @since 1.2.0
+	 */
+	public function loadImmutable(): ?array {
+		return $this->read( $this->immutablePath() );
+	}
+
+	/**
+	 * Reads and unserializes a persisted state file.
+	 *
+	 * Object instantiation is disabled during unserialization as a
+	 * defense-in-depth measure; the payload only ever contains arrays and
+	 * scalars written by write().
+	 *
+	 * @param string $path Absolute path to read.
+	 *
+	 * @return array|null Decoded state, or null if absent/unreadable/corrupt.
+	 * @since 1.2.0
+	 */
+	private function read( string $path ): ?array {
+		if ( ! is_file( $path ) ) {
 			return null;
 		}
 
 		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_get_contents, WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
-		$payload = file_get_contents( $this->path );
+		$payload = file_get_contents( $path );
 
 		if ( false === $payload || '' === $payload ) {
 			return null;
@@ -140,15 +196,27 @@ final class ImportState {
 	}
 
 	/**
+	 * Sibling path holding the write-once immutable parse output.
+	 *
+	 * @return string
+	 * @since 1.2.0
+	 */
+	private function immutablePath(): string {
+		return $this->path . '.imm';
+	}
+
+	/**
 	 * Deletes the state file if present.
 	 *
 	 * @return void
 	 * @since 1.2.0
 	 */
 	public function delete(): void {
-		if ( is_file( $this->path ) ) {
-			// phpcs:ignore WordPress.WP.AlternativeFunctions.unlink_unlink
-			@unlink( $this->path ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		foreach ( [ $this->path, $this->immutablePath() ] as $path ) {
+			if ( is_file( $path ) ) {
+				// phpcs:ignore WordPress.WP.AlternativeFunctions.unlink_unlink
+				@unlink( $path ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+			}
 		}
 	}
 }
