@@ -218,6 +218,7 @@ class Enqueue extends EnqueueBase {
 				'manualCustomizerLabel'      => esc_html__( 'Customizer (.dat) — optional', 'easy-demo-importer' ),
 				'manualWidgetsLabel'         => esc_html__( 'Widgets (.wie / .json) — optional', 'easy-demo-importer' ),
 				'manualSettingsLabel'        => esc_html__( 'Theme settings (.json { option: value }) — optional', 'easy-demo-importer' ),
+				'manualUploading'            => esc_html__( 'Uploading', 'easy-demo-importer' ),
 				'manualNoContent'            => esc_html__( 'Please choose a content (WXR/XML) file.', 'easy-demo-importer' ),
 				'rollbackButton'             => esc_html__( 'Roll Back', 'easy-demo-importer' ),
 				'rollbackTitle'              => esc_html__( 'Roll back this import?', 'easy-demo-importer' ),

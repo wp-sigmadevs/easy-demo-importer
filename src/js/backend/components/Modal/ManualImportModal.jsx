@@ -21,6 +21,7 @@ const ManualImportModal = ({ visible, onClose }) => {
 	const [snapshot, setSnapshot] = useState(true);
 	const [excludeImages, setExcludeImages] = useState(false);
 	const [busy, setBusy] = useState(false);
+	const [uploadPct, setUploadPct] = useState(0);
 	const [error, setError] = useState('');
 	const [progress, setProgress] = useState([]);
 	const [percent, setPercent] = useState(null);
@@ -38,6 +39,7 @@ const ManualImportModal = ({ visible, onClose }) => {
 	const reset = () => {
 		setStep(1);
 		setBusy(false);
+		setUploadPct(0);
 		setError('');
 		setProgress([]);
 		setPercent(null);
@@ -63,6 +65,41 @@ const ManualImportModal = ({ visible, onClose }) => {
 		}
 	};
 
+	// Runs the import pipeline once the upload has assembled server-side.
+	const proceed = (key, sid) => {
+		setSessionId(sid);
+		setManualKey(key);
+		setStep(3);
+		setProgress([
+			{ message: sdEdiAdminParams.prepareImporting || 'Preparing…' },
+		]);
+
+		const request = {
+			demo: '__manual__',
+			manual: 'true',
+			manualKey: key,
+			reset: false,
+			snapshot: snapshot ? 'true' : 'false',
+			excludeImages: excludeImages ? 'true' : 'false',
+			skipImageRegeneration: 'false',
+			sessionId: sid,
+			nextPhase: 'sd_edi_import_xml',
+		};
+
+		doAxios(
+			request,
+			setProgress,
+			setStep,
+			handleImportResponse,
+			setMessage,
+			setHint,
+			() => {},
+			setPercent
+		);
+	};
+
+	const CHUNK_SIZE = 4 * 1024 * 1024;
+
 	const start = () => {
 		const contentFile = contentRef.current?.files?.[0];
 
@@ -76,74 +113,68 @@ const ManualImportModal = ({ visible, onClose }) => {
 
 		setError('');
 		setBusy(true);
+		setUploadPct(0);
 
-		const fd = new FormData();
-		fd.append('action', 'sd_edi_manual_upload');
-		fd.append('sd_edi_nonce', sdEdiAdminParams.sd_edi_nonce);
-		fd.append('content', contentFile);
+		const total = Math.max(1, Math.ceil(contentFile.size / CHUNK_SIZE));
+		const uploadId = (
+			Date.now().toString(16) + Math.random().toString(16).slice(2)
+		)
+			.replace(/[^a-f0-9]/g, '')
+			.slice(0, 20);
 
-		if (customizerRef.current?.files?.[0]) {
-			fd.append('customizer', customizerRef.current.files[0]);
-		}
-		if (widgetsRef.current?.files?.[0]) {
-			fd.append('widgets', widgetsRef.current.files[0]);
-		}
-		if (settingsRef.current?.files?.[0]) {
-			fd.append('settings', settingsRef.current.files[0]);
-		}
+		// Uploads the content file one slice per request; the optional small
+		// files ride along on the final chunk. The server assembles + validates.
+		const sendChunk = (i) => {
+			const startByte = i * CHUNK_SIZE;
+			const blob = contentFile.slice(startByte, startByte + CHUNK_SIZE);
 
-		fetch(sdEdiAdminParams.ajaxUrl, {
-			method: 'POST',
-			body: fd,
-			credentials: 'same-origin',
-		})
-			.then((r) => r.json())
-			.then((res) => {
-				if (!res?.success) {
-					setBusy(false);
-					setError(res?.data?.message || 'Upload failed.');
-					return;
+			const fd = new FormData();
+			fd.append('action', 'sd_edi_manual_upload');
+			fd.append('sd_edi_nonce', sdEdiAdminParams.sd_edi_nonce);
+			fd.append('uploadId', uploadId);
+			fd.append('chunkIndex', i);
+			fd.append('totalChunks', total);
+			fd.append('chunk', blob, 'content.xml');
+
+			if (i === total - 1) {
+				if (customizerRef.current?.files?.[0]) {
+					fd.append('customizer', customizerRef.current.files[0]);
 				}
+				if (widgetsRef.current?.files?.[0]) {
+					fd.append('widgets', widgetsRef.current.files[0]);
+				}
+				if (settingsRef.current?.files?.[0]) {
+					fd.append('settings', settingsRef.current.files[0]);
+				}
+			}
 
-				const key = res.data.manualKey;
-				const sid = res.data.sessionId;
-				setSessionId(sid);
-				setManualKey(key);
-				setStep(3);
-				setProgress([
-					{
-						message:
-							sdEdiAdminParams.prepareImporting || 'Preparing…',
-					},
-				]);
-
-				const request = {
-					demo: '__manual__',
-					manual: 'true',
-					manualKey: key,
-					reset: false,
-					snapshot: snapshot ? 'true' : 'false',
-					excludeImages: excludeImages ? 'true' : 'false',
-					skipImageRegeneration: 'false',
-					sessionId: sid,
-					nextPhase: 'sd_edi_import_xml',
-				};
-
-				doAxios(
-					request,
-					setProgress,
-					setStep,
-					handleImportResponse,
-					setMessage,
-					setHint,
-					() => {},
-					setPercent
-				);
+			fetch(sdEdiAdminParams.ajaxUrl, {
+				method: 'POST',
+				body: fd,
+				credentials: 'same-origin',
 			})
-			.catch(() => {
-				setBusy(false);
-				setError('Upload failed.');
-			});
+				.then((r) => r.json())
+				.then((res) => {
+					if (!res?.success) {
+						setBusy(false);
+						setError(res?.data?.message || 'Upload failed.');
+						return;
+					}
+
+					if (res.data.done) {
+						proceed(res.data.manualKey, res.data.sessionId);
+					} else {
+						setUploadPct(Math.round(((i + 1) / total) * 100));
+						sendChunk(i + 1);
+					}
+				})
+				.catch(() => {
+					setBusy(false);
+					setError('Upload failed.');
+				});
+		};
+
+		sendChunk(0);
 	};
 
 	return (
@@ -230,7 +261,10 @@ const ManualImportModal = ({ visible, onClose }) => {
 							{sdEdiAdminParams.btnCancel || 'Cancel'}
 						</Button>
 						<Button type="primary" loading={busy} onClick={start}>
-							{sdEdiAdminParams.btnStartImport || 'Start Import'}
+							{busy && uploadPct > 0
+								? `${sdEdiAdminParams.manualUploading || 'Uploading'} ${uploadPct}%`
+								: sdEdiAdminParams.btnStartImport ||
+									'Start Import'}
 						</Button>
 					</div>
 				</div>
