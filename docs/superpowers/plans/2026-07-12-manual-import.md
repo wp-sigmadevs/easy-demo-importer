@@ -2,9 +2,9 @@
 
 - **Date:** 2026-07-12
 - **Branch:** `manual-import` (off `regenerate-thumbnails`)
-- **Status:** 🟢 **Feature-complete & CI-green** — content + media + customizer +
-  widgets + settings. Only robustness item left: chunked large-file upload. See
-  §0 Progress.
+- **Status:** ✅ **COMPLETE & CI-green** — content + media + customizer + widgets +
+  settings, with chunked large-file upload. Only pending is manual QA on a live
+  site. See §0 Progress.
 - **Goal:** Let a user import **without** the theme providing demo config, by
   uploading their own files — mirroring One Click Demo Import's manual tab — while
   reusing this plugin's resumable/recovery machinery (chunked import, image
@@ -56,11 +56,16 @@ blocklist (siteurl/home/active_plugins/default_role/template/stylesheet/auth
 keys/…) plus a `*user_roles` guard, so a hostile file can't lock out the site or
 grant capabilities. A "Theme settings (.json)" upload was added to the modal.
 
+**Chunked upload — DONE (`d136a71`):** the content file is sliced client-side
+(4 MB chunks) and streamed to `sd_edi_manual_upload`; the server appends each to a
+`.manual-tmp-{id}.part` file (size-capped), and on the last chunk validates the
+assembled WXR + moves it into place (optional small files ride the final chunk).
+A live "Uploading N%" indicator was added. This removes the `upload_max_filesize`
+ceiling for big demos.
+
 **Still pending:**
-- **Chunked large-file upload** for big WXRs (single POST hits
-  `upload_max_filesize`) — the last robustness item.
 - **Manual QA:** no live WP here — needs a real upload → clone → retry → rollback
-  pass. Multisite untested.
+  pass, including a large (chunked) WXR. Multisite untested.
 
 ---
 
