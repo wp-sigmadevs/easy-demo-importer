@@ -17,6 +17,7 @@ use SigmaDevs\EasyDemoImporter\Common\Functions\{
 	ImportLogger,
 	SessionManager
 };
+use SigmaDevs\EasyDemoImporter\Common\Utils\ManualContext;
 
 // Do not allow directly accessing this file.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -146,23 +147,30 @@ abstract class ImporterAjax {
 			);
 		}
 
-		// Theme config.
-		$this->config = sd_edi()->getDemoConfig();
+		// Theme config — or, for a manual import (user-uploaded files, no theme
+		// demo config), a minimal stub pointing the phases at the uploaded working
+		// directory. The stub deliberately declares nothing beyond the working
+		// directory, so the settings/slider/fluent-forms phases no-op.
+		if ( ManualContext::isManual() ) {
+			$this->config = ManualContext::configStub( ManualContext::requestKey() );
+		} else {
+			$this->config = sd_edi()->getDemoConfig();
 
-		if ( empty( $this->config ) ) {
-			ImportLogger::error(
-				esc_html__( 'Demo configuration is missing or empty.', 'easy-demo-importer' ),
-				$this->sessionId,
-				$this->demoSlug
-			);
+			if ( empty( $this->config ) ) {
+				ImportLogger::error(
+					esc_html__( 'Demo configuration is missing or empty.', 'easy-demo-importer' ),
+					$this->sessionId,
+					$this->demoSlug
+				);
 
-			wp_send_json_error(
-				[
-					'errorMessage' => esc_html__( 'Demo configuration is missing or empty.', 'easy-demo-importer' ),
-					'errorHint'    => esc_html__( 'Make sure your theme is calling the sd/edi/importer/config filter and returning a valid configuration array.', 'easy-demo-importer' ),
-				],
-				500
-			);
+				wp_send_json_error(
+					[
+						'errorMessage' => esc_html__( 'Demo configuration is missing or empty.', 'easy-demo-importer' ),
+						'errorHint'    => esc_html__( 'Make sure your theme is calling the sd/edi/importer/config filter and returning a valid configuration array.', 'easy-demo-importer' ),
+					],
+					500
+				);
+			}
 		}
 
 		// Uploads Directory.
