@@ -64,7 +64,6 @@ class InstallDemo extends ImporterAjax {
 		add_action( 'wp_ajax_sd_edi_import_xml_finalize', [ $this, 'finalizeImport' ] );
 		add_action( 'wp_ajax_sd_edi_regenerate_images', [ $this, 'regenerateImages' ] );
 		add_action( 'wp_ajax_sd_edi_retry_media', [ $this, 'retryMedia' ] );
-		add_action( 'wp_ajax_sd_edi_rollback', [ $this, 'rollback' ] );
 	}
 
 	/**
@@ -682,36 +681,6 @@ class InstallDemo extends ImporterAjax {
 				'stillFailed' => $still_failed,
 			]
 		);
-	}
-
-	/**
-	 * Ajax: roll the site back to the pre-import restore point.
-	 *
-	 * Restores every snapshotted table from its shadow in one DB-native pass and
-	 * drops the shadows. Reverts the site to the moment the snapshot was taken —
-	 * anything created after the import is lost, which the UI confirms first.
-	 *
-	 * @return void
-	 * @since 1.2.0
-	 */
-	public function rollback() {
-		Helpers::verifyAjaxCall();
-
-		if ( ! Snapshot::exists() ) {
-			wp_send_json_error(
-				[ 'message' => esc_html__( 'No restore point is available to roll back to.', 'easy-demo-importer' ) ],
-				404
-			);
-		}
-
-		if ( ! Snapshot::restore() ) {
-			wp_send_json_error(
-				[ 'message' => esc_html__( 'Rollback failed. Your site was not changed.', 'easy-demo-importer' ) ],
-				500
-			);
-		}
-
-		wp_send_json_success( [ 'done' => true ] );
 	}
 
 	/**

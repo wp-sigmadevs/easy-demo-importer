@@ -82,19 +82,10 @@ const Success = ({
 			centered: true,
 			onOk: () => {
 				setRolling(true);
-				const body = new FormData();
-				body.append('action', 'sd_edi_rollback');
-				body.append('sd_edi_nonce', sdEdiAdminParams.sd_edi_nonce);
-				body.append('demo', demo);
 
-				return fetch(sdEdiAdminParams.ajaxUrl, {
-					method: 'POST',
-					body,
-					credentials: 'same-origin',
-				})
-					.then((r) => r.json())
+				return Api.post('/sd/edi/v1/rollback', {})
 					.then((res) => {
-						if (res?.success) {
+						if (res?.data?.success) {
 							window.location.reload();
 						} else {
 							setRolling(false);
