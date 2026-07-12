@@ -2,9 +2,9 @@
 
 - **Date:** 2026-07-12
 - **Branch:** `manual-import` (off `regenerate-thumbnails`)
-- **Status:** 🟢 **Phase A + most of B built & CI-green** (content + media + customizer
-  + widgets). Remaining: framework/redux settings and chunked large-file upload.
-  See §0 Progress.
+- **Status:** 🟢 **Feature-complete & CI-green** — content + media + customizer +
+  widgets + settings. Only robustness item left: chunked large-file upload. See
+  §0 Progress.
 - **Goal:** Let a user import **without** the theme providing demo config, by
   uploading their own files — mirroring One Click Demo Import's manual tab — while
   reusing this plugin's resumable/recovery machinery (chunked import, image
@@ -50,11 +50,15 @@ skipping. Inherits resumable import, retry-failed-media, and snapshot rollback.
 `unserialize(…, allowed_classes=false)` in the existing `Customizer` model; WXR
 sniffed before import; manual key is hex-only.
 
-**Still pending (see §6 Phase B/C):**
-- Framework/redux-style theme **settings** files (config-driven — the stub can't
-  know the option keys). Customizer covers the common case.
+**Settings — DONE (`dfcfb14`):** an optional `settings.json` (flat `{option: value}`
+map) is imported by `ImportSettings` when `manual`, reusing its sensitive-option
+blocklist (siteurl/home/active_plugins/default_role/template/stylesheet/auth
+keys/…) plus a `*user_roles` guard, so a hostile file can't lock out the site or
+grant capabilities. A "Theme settings (.json)" upload was added to the modal.
+
+**Still pending:**
 - **Chunked large-file upload** for big WXRs (single POST hits
-  `upload_max_filesize`).
+  `upload_max_filesize`) — the last robustness item.
 - **Manual QA:** no live WP here — needs a real upload → clone → retry → rollback
   pass. Multisite untested.
 
