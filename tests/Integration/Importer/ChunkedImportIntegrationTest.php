@@ -133,41 +133,43 @@ final class ChunkedImportIntegrationTest extends WP_UnitTestCase {
 		$prepare->fetch_attachments = false;
 		$prepare->prepare( $this->dir . '/content.xml' );
 
-		// prepare() writes the parsed-WXR output to the immutable store; the
-		// mutable store carries only the cursor + maps, never the heavy posts blob.
+		// prepare() splits the parse output into chunk files; the immutable meta
+		// records totals (not the posts) and the mutable store carries only the
+		// cursor + maps.
 		$immutable = $state->loadImmutable();
 		$mutable   = $state->load();
 		$this->assertIsArray( $immutable );
-		$this->assertArrayHasKey( 'posts', $immutable );
-		$this->assertNotEmpty( $immutable['posts'] );
+		$this->assertArrayNotHasKey( 'posts', $immutable );
+		$this->assertGreaterThan( 0, (int) $immutable['posts_total'] );
 		$this->assertArrayNotHasKey( 'posts', $mutable );
 
-		// The immutable file must be written exactly once — batches never rewrite it.
-		$immutable_path = $state->path() . '.imm';
-		$digest_before  = md5_file( $immutable_path );
+		// The fixture's posts land in at least one chunk file, written once.
+		$this->assertNotNull( $state->loadPostsChunk( 0 ) );
+		$chunk_digest = md5_file( $state->path() . '.posts.0' );
 
 		do {
 			$result = ( new ChunkedImport( $state ) )->processBatch();
 		} while ( empty( $result['done'] ) );
 
 		$this->assertSame(
-			$digest_before,
-			md5_file( $immutable_path ),
-			'The parsed-WXR blob must be written once at prepare(), not on every batch.'
+			$chunk_digest,
+			md5_file( $state->path() . '.posts.0' ),
+			'Post chunk files must be written once at prepare(), not on every batch.'
 		);
 
 		( new ChunkedImport( $state ) )->finalize();
 
 		// A full resume across many fresh instances still imports every post,
-		// reconstructing state from the two files each request…
+		// each request loading only the chunk it needs…
 		$this->assertInstanceOf(
 			\WP_Post::class,
 			get_page_by_path( 'edi-sample-post-one', OBJECT, 'post' )
 		);
 
-		// …and finalize() removes BOTH the mutable and immutable state files.
+		// …and finalize() removes the mutable, immutable AND chunk files.
 		$this->assertFalse( $state->exists() );
 		$this->assertNull( $state->loadImmutable() );
+		$this->assertNull( $state->loadPostsChunk( 0 ) );
 	}
 
 	public function test_recount_touches_only_terms_attached_to_imported_posts(): void {

@@ -37,7 +37,12 @@ final class ImportStateTest extends UnitTestCase {
 	 * @inheritDoc
 	 */
 	protected function tear_down() {
-		foreach ( [ $this->path, $this->path . '.imm' ] as $file ) {
+		$files = array_merge(
+			[ $this->path, $this->path . '.imm' ],
+			glob( $this->path . '.posts.*' ) ?: []
+		);
+
+		foreach ( $files as $file ) {
 			if ( is_file( $file ) ) {
 				unlink( $file );
 			}
@@ -98,18 +103,34 @@ final class ImportStateTest extends UnitTestCase {
 		self::assertNull( $state->loadImmutable() );
 	}
 
-	public function test_delete_removes_both_state_files(): void {
+	public function test_posts_chunks_save_and_load_by_index(): void {
+		$state = new ImportState( $this->path );
+
+		self::assertTrue( $state->savePostsChunk( 0, [ [ 'post_id' => 1 ] ] ) );
+		self::assertTrue( $state->savePostsChunk( 1, [ [ 'post_id' => 2 ] ] ) );
+
+		self::assertSame( [ [ 'post_id' => 1 ] ], $state->loadPostsChunk( 0 ) );
+		self::assertSame( [ [ 'post_id' => 2 ] ], $state->loadPostsChunk( 1 ) );
+		self::assertNull( $state->loadPostsChunk( 2 ) );
+	}
+
+	public function test_delete_removes_mutable_immutable_and_chunk_files(): void {
 		$state = new ImportState( $this->path );
 		$state->save( [ 'a' => 1 ] );
-		$state->saveImmutable( [ 'posts' => [ 1 ] ] );
+		$state->saveImmutable( [ 'posts_total' => 2 ] );
+		$state->savePostsChunk( 0, [ [ 'post_id' => 1 ] ] );
+		$state->savePostsChunk( 1, [ [ 'post_id' => 2 ] ] );
 
 		self::assertTrue( $state->exists() );
 		self::assertNotNull( $state->loadImmutable() );
+		self::assertNotNull( $state->loadPostsChunk( 0 ) );
 
 		$state->delete();
 
 		self::assertFalse( $state->exists() );
 		self::assertNull( $state->loadImmutable() );
+		self::assertNull( $state->loadPostsChunk( 0 ) );
+		self::assertNull( $state->loadPostsChunk( 1 ) );
 		// Deleting again is a no-op, never an error.
 		$state->delete();
 		self::assertFalse( $state->exists() );

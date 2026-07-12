@@ -42,7 +42,12 @@ final class ChunkedImportTest extends UnitTestCase {
 	 * @inheritDoc
 	 */
 	protected function tear_down() {
-		foreach ( [ $this->path, $this->path . '.imm' ] as $file ) {
+		$files = array_merge(
+			[ $this->path, $this->path . '.imm' ],
+			glob( $this->path . '.posts.*' ) ?: []
+		);
+
+		foreach ( $files as $file ) {
 			if ( is_file( $file ) ) {
 				unlink( $file );
 			}
@@ -63,8 +68,8 @@ final class ChunkedImportTest extends UnitTestCase {
 	public function test_state_persists_and_hydrates_across_instances(): void {
 		$importer = new ChunkedImport( new ImportState( $this->path ) );
 
-		// Seed the exact cross-request maps that resumability depends on.
-		$importer->posts                = [ [ 'post_id' => 1 ], [ 'post_id' => 2 ] ];
+		// Seed the exact cross-request maps + parse metadata that resumability
+		// depends on. Posts themselves live in chunk files, not this state.
 		$importer->processed_posts      = [ 1 => 101, 2 => 102 ];
 		$importer->processed_menu_items = [ 9 => 909 ];
 		$importer->post_orphans         = [ 2 => 1 ];
@@ -72,9 +77,11 @@ final class ChunkedImportTest extends UnitTestCase {
 		$importer->featured_images      = [ 101 => 55 ];
 		$importer->fetch_attachments    = true;
 		$this->setPrivate( $importer, 'offset', 5 );
+		$this->setPrivate( $importer, 'postsTotal', 250 );
+		$this->setPrivate( $importer, 'chunkSize', 100 );
 
-		// prepare() writes the immutable parse output once; each batch writes the
-		// mutable maps. Both must be present for a resume to reconstruct state.
+		// prepare() writes the immutable meta once; each batch writes the mutable
+		// maps. Both must be present for a resume to reconstruct state.
 		$this->invoke( $importer, 'persistImmutable' );
 		$this->invoke( $importer, 'persist' );
 
@@ -82,7 +89,6 @@ final class ChunkedImportTest extends UnitTestCase {
 		$resumed = new ChunkedImport( new ImportState( $this->path ) );
 		self::assertTrue( $this->invoke( $resumed, 'hydrate' ) );
 
-		self::assertSame( [ [ 'post_id' => 1 ], [ 'post_id' => 2 ] ], $resumed->posts );
 		self::assertSame( [ 1 => 101, 2 => 102 ], $resumed->processed_posts );
 		self::assertSame( [ 9 => 909 ], $resumed->processed_menu_items );
 		self::assertSame( [ 2 => 1 ], $resumed->post_orphans );
@@ -90,24 +96,44 @@ final class ChunkedImportTest extends UnitTestCase {
 		self::assertSame( [ 101 => 55 ], $resumed->featured_images );
 		self::assertTrue( $resumed->fetch_attachments );
 		self::assertSame( 5, $this->getPrivate( $resumed, 'offset' ) );
+		// The parse metadata (total + frozen chunk size) rides the immutable meta.
+		self::assertSame( 250, $this->getPrivate( $resumed, 'postsTotal' ) );
+		self::assertSame( 100, $this->getPrivate( $resumed, 'chunkSize' ) );
 	}
 
 	public function test_hydrate_returns_false_without_the_immutable_file(): void {
 		$importer = new ChunkedImport( new ImportState( $this->path ) );
-		$importer->posts = [ [ 'post_id' => 1 ] ];
-		$this->invoke( $importer, 'persist' ); // mutable only, no immutable file.
+		$this->invoke( $importer, 'persist' ); // mutable only, no immutable meta file.
 
-		// Missing the write-once parse output → cannot resume.
+		// Missing the write-once parse meta → cannot resume.
 		$resumed = new ChunkedImport( new ImportState( $this->path ) );
 		self::assertFalse( $this->invoke( $resumed, 'hydrate' ) );
 	}
 
-	public function test_batch_persist_never_rewrites_the_immutable_blob(): void {
+	public function test_prepare_splits_posts_into_chunk_files(): void {
+		$importer        = new ChunkedImport( new ImportState( $this->path ) );
+		$importer->posts = [ [ 'post_id' => 1 ], [ 'post_id' => 2 ], [ 'post_id' => 3 ] ];
+		$this->setPrivate( $importer, 'postsTotal', 3 );
+		$this->setPrivate( $importer, 'chunkSize', 2 );
+
+		$this->invoke( $importer, 'persistPosts' );
+
+		// 3 posts at chunk size 2 → two files, re-indexed from 0 within each.
+		$state = new ImportState( $this->path );
+		self::assertSame( [ [ 'post_id' => 1 ], [ 'post_id' => 2 ] ], $state->loadPostsChunk( 0 ) );
+		self::assertSame( [ [ 'post_id' => 3 ] ], $state->loadPostsChunk( 1 ) );
+		self::assertNull( $state->loadPostsChunk( 2 ) );
+	}
+
+	public function test_batch_persist_never_rewrites_the_post_chunks(): void {
 		$importer        = new ChunkedImport( new ImportState( $this->path ) );
 		$importer->posts = [ [ 'post_id' => 1 ], [ 'post_id' => 2 ] ];
+		$this->setPrivate( $importer, 'postsTotal', 2 );
+		$this->setPrivate( $importer, 'chunkSize', 100 );
 
 		$this->invoke( $importer, 'persistImmutable' );
-		$immutable_before = file_get_contents( $this->path . '.imm' );
+		$this->invoke( $importer, 'persistPosts' );
+		$chunk_before = file_get_contents( $this->path . '.posts.0' );
 
 		// Simulate several batches advancing the cursor + maps.
 		for ( $i = 1; $i <= 3; $i++ ) {
@@ -116,10 +142,10 @@ final class ChunkedImportTest extends UnitTestCase {
 			$this->invoke( $importer, 'persist' );
 		}
 
-		// The large parse output is written exactly once — batches never touch it.
-		self::assertSame( $immutable_before, file_get_contents( $this->path . '.imm' ) );
+		// The posts are written once at prepare — batches never touch the chunks.
+		self::assertSame( $chunk_before, file_get_contents( $this->path . '.posts.0' ) );
 
-		// And the per-batch file must not carry the heavy posts blob.
+		// And the per-batch mutable file must not carry any posts.
 		$mutable = unserialize( // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.serialize_unserialize
 			file_get_contents( $this->path ),
 			[ 'allowed_classes' => false ]

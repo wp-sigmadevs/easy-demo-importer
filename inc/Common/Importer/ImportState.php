@@ -122,6 +122,35 @@ final class ImportState {
 	}
 
 	/**
+	 * Persists one chunk of parsed posts to its own numbered file.
+	 *
+	 * The parsed post array is split into fixed-size chunks at prepare() so each
+	 * batch can load only the slice it processes, instead of unserializing the
+	 * entire (potentially tens-of-MB) post array on every request.
+	 *
+	 * @param int   $index Zero-based chunk index.
+	 * @param array $posts Posts in this chunk.
+	 *
+	 * @return bool True on success.
+	 * @since 1.2.0
+	 */
+	public function savePostsChunk( int $index, array $posts ): bool {
+		return $this->write( $this->postsChunkPath( $index ), $posts );
+	}
+
+	/**
+	 * Loads a single chunk of parsed posts.
+	 *
+	 * @param int $index Zero-based chunk index.
+	 *
+	 * @return array|null Posts in the chunk, or null if absent/corrupt.
+	 * @since 1.2.0
+	 */
+	public function loadPostsChunk( int $index ): ?array {
+		return $this->read( $this->postsChunkPath( $index ) );
+	}
+
+	/**
 	 * Serializes an array to a path atomically with an exclusive lock.
 	 *
 	 * @param string $path Absolute destination path.
@@ -206,13 +235,34 @@ final class ImportState {
 	}
 
 	/**
+	 * Path for a numbered posts chunk file.
+	 *
+	 * @param int $index Zero-based chunk index.
+	 *
+	 * @return string
+	 * @since 1.2.0
+	 */
+	private function postsChunkPath( int $index ): string {
+		return $this->path . '.posts.' . $index;
+	}
+
+	/**
 	 * Deletes the state file if present.
 	 *
 	 * @return void
 	 * @since 1.2.0
 	 */
 	public function delete(): void {
-		foreach ( [ $this->path, $this->immutablePath() ] as $path ) {
+		$paths = [ $this->path, $this->immutablePath() ];
+
+		// Sweep up every numbered posts chunk file written at prepare().
+		$chunks = glob( $this->path . '.posts.*' );
+
+		if ( is_array( $chunks ) ) {
+			$paths = array_merge( $paths, $chunks );
+		}
+
+		foreach ( $paths as $path ) {
 			if ( is_file( $path ) ) {
 				// phpcs:ignore WordPress.WP.AlternativeFunctions.unlink_unlink
 				@unlink( $path ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
