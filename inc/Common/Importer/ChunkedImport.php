@@ -37,21 +37,35 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class ChunkedImport extends SD_EDI_WP_Import {
 	/**
-	 * Parent importer properties that make up the full cross-request state.
-	 *
-	 * Every one of these is populated during a normal import() run and must be
-	 * carried between batches for parents, menus, featured images, comments and
-	 * URL remapping to resolve correctly at finalize().
+	 * Write-once parse output. Set by import_start() from the parsed WXR and
+	 * never mutated afterwards, so it is persisted to its own file exactly once
+	 * during prepare() and loaded read-only on every subsequent batch/finalize —
+	 * rather than being re-serialized and rewritten alongside the mutable maps on
+	 * each batch. `posts` alone can be tens of megabytes on a large WooCommerce
+	 * demo; not rewriting it per batch removes the dominant disk-I/O cost of the
+	 * chunked design.
 	 *
 	 * @var string[]
 	 * @since 1.2.0
 	 */
-	private const STATE_PROPS = [
+	private const IMMUTABLE_PROPS = [
 		'id',
 		'version',
 		'authors',
 		'posts',
 		'base_url',
+	];
+
+	/**
+	 * Mutable cross-request state: the cursor and the ID/orphan/remap maps that
+	 * grow as posts are processed. Small and fast-changing, so persisted on every
+	 * batch. Must be carried between batches for parents, menus, featured images,
+	 * comments and URL remapping to resolve correctly at finalize().
+	 *
+	 * @var string[]
+	 * @since 1.2.0
+	 */
+	private const MUTABLE_PROPS = [
 		'processed_authors',
 		'author_mapping',
 		'processed_terms',
@@ -128,6 +142,9 @@ class ChunkedImport extends SD_EDI_WP_Import {
 		wp_defer_comment_counting( false );
 
 		$this->offset = 0;
+
+		// Write the large parse output once; batches only rewrite the small maps.
+		$this->persistImmutable();
 		$this->persist();
 
 		return count( $this->posts );
@@ -354,7 +371,25 @@ class ChunkedImport extends SD_EDI_WP_Import {
 	}
 
 	/**
-	 * Serializes the current cross-request state to the store.
+	 * Writes the write-once immutable parse output to its own file. Called once,
+	 * at the end of prepare().
+	 *
+	 * @return void
+	 * @since 1.2.0
+	 */
+	private function persistImmutable(): void {
+		$data = [];
+
+		foreach ( self::IMMUTABLE_PROPS as $prop ) {
+			$data[ $prop ] = $this->$prop;
+		}
+
+		$this->state->saveImmutable( $data );
+	}
+
+	/**
+	 * Serializes the mutable cursor + maps to the store. Called once per batch;
+	 * the large immutable parse output is untouched.
 	 *
 	 * @return void
 	 * @since 1.2.0
@@ -362,7 +397,7 @@ class ChunkedImport extends SD_EDI_WP_Import {
 	private function persist(): void {
 		$data = [ 'offset' => $this->offset ];
 
-		foreach ( self::STATE_PROPS as $prop ) {
+		foreach ( self::MUTABLE_PROPS as $prop ) {
 			$data[ $prop ] = $this->$prop;
 		}
 
@@ -370,25 +405,33 @@ class ChunkedImport extends SD_EDI_WP_Import {
 	}
 
 	/**
-	 * Restores cross-request state from the store onto this instance.
+	 * Restores cross-request state by reading both the immutable parse file and
+	 * the mutable maps file onto this instance.
 	 *
-	 * @return bool True if state was found and applied; false otherwise.
+	 * @return bool True if both state files were found and applied; false otherwise.
 	 * @since 1.2.0
 	 */
 	private function hydrate(): bool {
-		$data = $this->state->load();
+		$immutable = $this->state->loadImmutable();
+		$mutable   = $this->state->load();
 
-		if ( null === $data ) {
+		if ( null === $immutable || null === $mutable ) {
 			return false;
 		}
 
-		foreach ( self::STATE_PROPS as $prop ) {
-			if ( array_key_exists( $prop, $data ) ) {
-				$this->$prop = $data[ $prop ];
+		foreach ( self::IMMUTABLE_PROPS as $prop ) {
+			if ( array_key_exists( $prop, $immutable ) ) {
+				$this->$prop = $immutable[ $prop ];
 			}
 		}
 
-		$this->offset = isset( $data['offset'] ) ? (int) $data['offset'] : 0;
+		foreach ( self::MUTABLE_PROPS as $prop ) {
+			if ( array_key_exists( $prop, $mutable ) ) {
+				$this->$prop = $mutable[ $prop ];
+			}
+		}
+
+		$this->offset = isset( $mutable['offset'] ) ? (int) $mutable['offset'] : 0;
 
 		return true;
 	}

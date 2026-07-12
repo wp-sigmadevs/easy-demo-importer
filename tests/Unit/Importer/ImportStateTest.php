@@ -37,8 +37,10 @@ final class ImportStateTest extends UnitTestCase {
 	 * @inheritDoc
 	 */
 	protected function tear_down() {
-		if ( is_file( $this->path ) ) {
-			unlink( $this->path );
+		foreach ( [ $this->path, $this->path . '.imm' ] as $file ) {
+			if ( is_file( $file ) ) {
+				unlink( $file );
+			}
 		}
 		parent::tear_down();
 	}
@@ -76,14 +78,38 @@ final class ImportStateTest extends UnitTestCase {
 		self::assertNull( $state->load() );
 	}
 
-	public function test_delete_removes_the_file(): void {
+	public function test_immutable_save_and_load_roundtrips_independently(): void {
+		$state = new ImportState( $this->path );
+
+		$immutable = [ 'posts' => [ [ 'post_id' => 1 ] ], 'base_url' => 'http://old.test' ];
+		$mutable   = [ 'offset' => 3, 'processed_posts' => [ 1 => 101 ] ];
+
+		self::assertTrue( $state->saveImmutable( $immutable ) );
+		self::assertTrue( $state->save( $mutable ) );
+
+		// The two stores are separate files and never overwrite each other.
+		self::assertSame( $immutable, $state->loadImmutable() );
+		self::assertSame( $mutable, $state->load() );
+	}
+
+	public function test_load_immutable_returns_null_when_missing(): void {
+		$state = new ImportState( $this->path );
+
+		self::assertNull( $state->loadImmutable() );
+	}
+
+	public function test_delete_removes_both_state_files(): void {
 		$state = new ImportState( $this->path );
 		$state->save( [ 'a' => 1 ] );
+		$state->saveImmutable( [ 'posts' => [ 1 ] ] );
+
 		self::assertTrue( $state->exists() );
+		self::assertNotNull( $state->loadImmutable() );
 
 		$state->delete();
 
 		self::assertFalse( $state->exists() );
+		self::assertNull( $state->loadImmutable() );
 		// Deleting again is a no-op, never an error.
 		$state->delete();
 		self::assertFalse( $state->exists() );

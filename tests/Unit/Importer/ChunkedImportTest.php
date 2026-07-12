@@ -42,8 +42,10 @@ final class ChunkedImportTest extends UnitTestCase {
 	 * @inheritDoc
 	 */
 	protected function tear_down() {
-		if ( is_file( $this->path ) ) {
-			unlink( $this->path );
+		foreach ( [ $this->path, $this->path . '.imm' ] as $file ) {
+			if ( is_file( $file ) ) {
+				unlink( $file );
+			}
 		}
 		parent::tear_down();
 	}
@@ -71,12 +73,16 @@ final class ChunkedImportTest extends UnitTestCase {
 		$importer->fetch_attachments    = true;
 		$this->setPrivate( $importer, 'offset', 5 );
 
+		// prepare() writes the immutable parse output once; each batch writes the
+		// mutable maps. Both must be present for a resume to reconstruct state.
+		$this->invoke( $importer, 'persistImmutable' );
 		$this->invoke( $importer, 'persist' );
 
 		// A fresh instance (a new AJAX request) must recover identical state.
 		$resumed = new ChunkedImport( new ImportState( $this->path ) );
 		self::assertTrue( $this->invoke( $resumed, 'hydrate' ) );
 
+		self::assertSame( [ [ 'post_id' => 1 ], [ 'post_id' => 2 ] ], $resumed->posts );
 		self::assertSame( [ 1 => 101, 2 => 102 ], $resumed->processed_posts );
 		self::assertSame( [ 9 => 909 ], $resumed->processed_menu_items );
 		self::assertSame( [ 2 => 1 ], $resumed->post_orphans );
@@ -84,6 +90,42 @@ final class ChunkedImportTest extends UnitTestCase {
 		self::assertSame( [ 101 => 55 ], $resumed->featured_images );
 		self::assertTrue( $resumed->fetch_attachments );
 		self::assertSame( 5, $this->getPrivate( $resumed, 'offset' ) );
+	}
+
+	public function test_hydrate_returns_false_without_the_immutable_file(): void {
+		$importer = new ChunkedImport( new ImportState( $this->path ) );
+		$importer->posts = [ [ 'post_id' => 1 ] ];
+		$this->invoke( $importer, 'persist' ); // mutable only, no immutable file.
+
+		// Missing the write-once parse output → cannot resume.
+		$resumed = new ChunkedImport( new ImportState( $this->path ) );
+		self::assertFalse( $this->invoke( $resumed, 'hydrate' ) );
+	}
+
+	public function test_batch_persist_never_rewrites_the_immutable_blob(): void {
+		$importer        = new ChunkedImport( new ImportState( $this->path ) );
+		$importer->posts = [ [ 'post_id' => 1 ], [ 'post_id' => 2 ] ];
+
+		$this->invoke( $importer, 'persistImmutable' );
+		$immutable_before = file_get_contents( $this->path . '.imm' );
+
+		// Simulate several batches advancing the cursor + maps.
+		for ( $i = 1; $i <= 3; $i++ ) {
+			$importer->processed_posts[ $i ] = 100 + $i;
+			$this->setPrivate( $importer, 'offset', $i );
+			$this->invoke( $importer, 'persist' );
+		}
+
+		// The large parse output is written exactly once — batches never touch it.
+		self::assertSame( $immutable_before, file_get_contents( $this->path . '.imm' ) );
+
+		// And the per-batch file must not carry the heavy posts blob.
+		$mutable = unserialize( // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.serialize_unserialize
+			file_get_contents( $this->path ),
+			[ 'allowed_classes' => false ]
+		);
+		self::assertArrayNotHasKey( 'posts', $mutable );
+		self::assertArrayHasKey( 'processed_posts', $mutable );
 	}
 
 	public function test_hydrate_returns_false_when_no_state_exists(): void {
