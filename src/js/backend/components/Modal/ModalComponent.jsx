@@ -26,6 +26,7 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 	const {
 		reset,
 		setReset,
+		snapshot,
 		excludeImages,
 		setExcludeImages,
 		skipImageRegeneration,
@@ -121,6 +122,7 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 				const request = {
 					demo: id,
 					reset,
+					snapshot,
 					excludeImages,
 					skipImageRegeneration,
 					nextPhase: 'sd_edi_install_demo',

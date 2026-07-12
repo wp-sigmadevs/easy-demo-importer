@@ -92,6 +92,7 @@ const useSharedDataStore = create((set) => ({
 	skipImageRegeneration: false,
 	importComplete: false,
 	reset: true,
+	snapshot: false,
 	message: '',
 	hint: '',
 	resumeRequest: loadResumeRequest(),
@@ -174,6 +175,7 @@ const useSharedDataStore = create((set) => ({
 	setExcludeImages: (value) => set({ excludeImages: value }),
 	setSkipImageRegeneration: (value) => set({ skipImageRegeneration: value }),
 	setReset: (value) => set({ reset: value }),
+	setSnapshot: (value) => set({ snapshot: value }),
 	setLoading: (value) => set({ loading: value }),
 	setImportComplete: (value) => set({ importComplete: value }),
 	setMessage: (message) => set(() => ({ message })),
@@ -194,6 +196,7 @@ const useSharedDataStore = create((set) => ({
 			skipImageRegeneration: false,
 			importComplete: false,
 			reset: true,
+			snapshot: false,
 			message: '',
 			hint: '',
 			// resumeRequest is intentionally persisted across page reloads — do not clear it here.
