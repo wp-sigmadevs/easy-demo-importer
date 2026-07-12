@@ -107,6 +107,14 @@ final class Snapshot {
 	public static function create(): bool {
 		global $wpdb;
 
+		// A single unchunked INSERT..SELECT per table can exceed the gateway
+		// timeout on a very large existing site. Skip (so the import proceeds
+		// without a restore point) rather than risk a half-done snapshot. Filter
+		// `sd/edi/snapshot_max_rows` to 0 to disable the guard.
+		if ( self::tooLargeToSnapshot() ) {
+			return false;
+		}
+
 		self::drop();
 
 		foreach ( self::tables() as $table ) {
@@ -156,6 +164,36 @@ final class Snapshot {
 		wp_cache_flush();
 
 		return true;
+	}
+
+	/**
+	 * Whether the snapshotted tables hold more rows than is safe to clone in one
+	 * unchunked pass. Counts per table, short-circuiting once the cap is passed.
+	 *
+	 * @return bool
+	 * @since 1.2.0
+	 */
+	private static function tooLargeToSnapshot(): bool {
+		global $wpdb;
+
+		$cap = (int) apply_filters( 'sd/edi/snapshot_max_rows', 500000 ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+
+		if ( $cap <= 0 ) {
+			return false;
+		}
+
+		$total = 0;
+
+		foreach ( self::tables() as $table ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared
+			$total += (int) $wpdb->get_var( "SELECT COUNT(*) FROM `{$table}`" );
+
+			if ( $total > $cap ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**

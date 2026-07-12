@@ -257,8 +257,18 @@ class RestEndpoints extends Base {
 	 * @since 1.2.0
 	 */
 	public function preflight() {
+		$cache_key = 'sd_edi_preflight';
+		$report    = get_transient( $cache_key );
+
+		if ( false === $report ) {
+			// Short cache so the uploads write-probe + per-plugin status lookups
+			// don't repeat on every page load; still fresh enough for a gate.
+			$report = Preflight::report();
+			set_transient( $cache_key, $report, MINUTE_IN_SECONDS );
+		}
+
 		return $this->sendResponse(
-			Preflight::report(),
+			$report,
 			esc_html__( 'Data is ready to fetch', 'easy-demo-importer' )
 		);
 	}

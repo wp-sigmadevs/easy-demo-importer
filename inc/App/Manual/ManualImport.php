@@ -50,13 +50,74 @@ class ManualImport extends Base {
 	const ACTION = 'sd_edi_manual_upload';
 
 	/**
-	 * Registers the upload handler.
+	 * Cron hook that sweeps abandoned upload artifacts.
+	 */
+	const CLEANUP_HOOK = 'sd_edi_manual_cleanup';
+
+	/**
+	 * Registers the upload handler + the daily cleanup sweep.
 	 *
 	 * @return void
 	 * @since 1.2.0
 	 */
 	public function register() {
 		add_action( 'wp_ajax_' . self::ACTION, [ $this, 'handleUpload' ] );
+		add_action( self::CLEANUP_HOOK, [ $this, 'cleanupStale' ] );
+
+		if ( ! wp_next_scheduled( self::CLEANUP_HOOK ) ) {
+			wp_schedule_event( time() + HOUR_IN_SECONDS, 'daily', self::CLEANUP_HOOK );
+		}
+	}
+
+	/**
+	 * Deletes orphaned chunk-assembly files and abandoned manual working dirs
+	 * (an upload begun but never finished/imported). TTL filterable.
+	 *
+	 * @return void
+	 * @since 1.2.0
+	 */
+	public function cleanupStale() {
+		$base = trailingslashit( wp_get_upload_dir()['basedir'] ) . 'easy-demo-importer';
+
+		if ( ! is_dir( $base ) ) {
+			return;
+		}
+
+		$ttl = (int) apply_filters( 'sd/edi/manual_artifact_ttl', 6 * HOUR_IN_SECONDS ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+		$now = time();
+
+		foreach ( (array) glob( $base . '/.manual-tmp-*.part' ) as $part ) {
+			if ( is_file( $part ) && ( $now - (int) filemtime( $part ) ) > $ttl ) {
+				wp_delete_file( $part );
+			}
+		}
+
+		foreach ( (array) glob( $base . '/manual-*', GLOB_ONLYDIR ) as $dir ) {
+			if ( is_dir( $dir ) && ( $now - (int) filemtime( $dir ) ) > $ttl ) {
+				$this->deleteDir( $dir );
+			}
+		}
+	}
+
+	/**
+	 * Recursively deletes a directory via WP_Filesystem.
+	 *
+	 * @param string $dir Absolute directory path.
+	 *
+	 * @return void
+	 * @since 1.2.0
+	 */
+	private function deleteDir( string $dir ) {
+		global $wp_filesystem;
+
+		if ( ! $wp_filesystem ) {
+			require_once ABSPATH . 'wp-admin/includes/file.php';
+			WP_Filesystem();
+		}
+
+		if ( $wp_filesystem ) {
+			$wp_filesystem->delete( $dir, true );
+		}
 	}
 
 	/**

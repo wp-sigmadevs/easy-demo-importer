@@ -16,13 +16,19 @@ const RestorePointBanner = () => {
 	const [rolling, setRolling] = useState(false);
 
 	useEffect(() => {
+		let ignore = false;
+
 		Api.get('/sd/edi/v1/failed-media', { params: { session_id: '' } })
 			.then((res) => {
-				if (res?.data?.success) {
+				if (!ignore && res?.data?.success) {
 					setAvailable(!!res.data.data.rollbackAvailable);
 				}
 			})
 			.catch(() => {});
+
+		return () => {
+			ignore = true;
+		};
 	}, []);
 
 	if (!available) {
