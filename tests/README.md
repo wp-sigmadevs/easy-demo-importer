@@ -31,7 +31,7 @@ export WP_TESTS_DIR=/tmp/wordpress-tests-lib
 composer test:integration
 ```
 
-(Use the standard `install-wp-tests.sh` from the WP-CLI scaffold if `bin/` does not yet contain one.)
+`bin/install-wp-tests.sh` is included. The **Integration Tests** GitHub Actions workflow runs this suite automatically (MariaDB service, PHP 7.4 + 8.2) on every push and PR.
 
 ### Option B — `@wordpress/env` (Docker)
 
