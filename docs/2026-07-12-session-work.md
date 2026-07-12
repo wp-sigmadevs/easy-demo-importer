@@ -17,19 +17,18 @@ master (bf2a840)
   └─ wxr-chunking (b41d802)          v1.2.0 candidate + Wave-1 review fixes
        └─ wxr-state-split (d6601fa)  perf work + integration-test CI job
             ├─ preflight-check (6c68c57)      preflight gate (merged onward)
-            └─ regenerate-thumbnails (74272c9)  ← ACTIVE accumulation branch
-                 (regen tool + preflight[merged] + retry + rollback)
+            └─ regenerate-thumbnails         regen tool + preflight[merged] + retry + rollback + WP-CLI
+                 └─ manual-import (f14446a)   ← TIP: full manual import + review fixes
 ```
 
-- **`regenerate-thumbnails`** is the branch that carries the whole stack. Per the
-  maintainer's instruction, all further work stays on it (no new branches).
+- **`manual-import`** is the accumulation branch and carries the entire stack.
 - `preflight-check` was merged into `regenerate-thumbnails` (`45ede65`); the only
-  merge conflict was the generated `languages/*.pot`, resolved by regenerating it
-  (union of both branches' strings).
+  merge conflict was the generated `languages/*.pot`, resolved by regenerating it.
 
-**Test suite:** 94 unit tests / 192 assertions (was 30 at the start of the WXR
+**Test suite:** 98 unit tests / 199 assertions (was 30 at the start of the WXR
 work). CI runs the unit matrix (PHP 7.4–8.4) and a WordPress integration suite
-(real WP + MariaDB, PHP 7.4 + 8.3) on every push and PR.
+(real WP + MariaDB, PHP 7.4 + 8.3) on every push and PR. Everything below is
+**pushed** and **CI-green** unless noted.
 
 ---
 
@@ -188,52 +187,92 @@ rows.
 
 ---
 
-## 8. Pending
+## 8. Feature: WP-CLI (`792ee65`)
 
-### 8.1 Blocking (needs a real server — not available this session)
-- **Manual QA of the whole v1.2.0 line** behind Cloudflare (the matrix in
-  `docs/qa/2026-07-09-v1.2.0-qa-checklist.md`). Gates merge → `master` + tag
-  `v1.2.0`. Nothing is merged to `master`; no tag exists.
-- **Full token-mutex fix** (correctness review SHOULD): the lock releases in a
-  `register_shutdown_function` that fires after `wp_send_json`, so the tight batch
-  loop can hit a still-held lock. **Pitfall (do NOT naively early-release):** the
-  lock value is a bare `time()` and the shutdown delete is unconditional, so
-  releasing early lets request A's shutdown delete request B's freshly-acquired
-  lock. The correct fix = a unique token per lock, conditional release in both
-  early-release and shutdown, before ~12 `wp_send_json` sites. Load-bearing and
-  unverifiable without a server → do during QA. (Softened to 2s in the interim.)
+`wp edi` commands, headless (no browser/AJAX/gateway limit), reusing the decoupled
+utilities: **`wp edi demos`** (list), **`wp edi regenerate [--force]`**,
+**`wp edi rollback [--yes]`**. New `inc/App/Cli/Commands.php`, registered always-on
+as `App\Cli`. `wp edi import`/`reset` deferred — the import phases are AJAX-coupled
+(`$_POST` + `wp_send_json`) and need decoupling first.
 
-### 8.2 Manual UI smoke tests (no WP available here — code/build/lint/unit only)
-- **Regenerate Thumbnails:** run with/without "force"; confirm bar completes.
-- **Preflight gate:** confirm checklist renders and Start disables on a blocking
-  fail (e.g. make uploads non-writable).
-- **Retry failed media:** import a demo whose images fail; confirm the retry
-  button appears and recovers them.
-- **Snapshot rollback:** the create→restore DB cycle — confirm rollback reverts
-  content + settings and the banner appears/disappears correctly. (Highest-value
-  manual test, since CI can't cover it.)
+---
 
-### 8.3 Feature backlog (suggested, not built)
-- **WP-CLI** (`wp edi import/list/reset/export`) — sidesteps the browser/AJAX/
-  gateway limits entirely; best remaining developer-value feature.
-- **Selective import** (content / WooCommerce / customizer / widgets / menus
-  toggles).
-- Retry-failed-media: re-retry of still-failing items (currently one-shot).
-- Snapshot rollback: chunk the `INSERT … SELECT` for very large tables; expire
-  old restore points; interaction with the "reset database" option.
+## 9. Feature: FULL manual import — OCDI-style (`1ee56b1`, `c945444`, `dfcfb14`, `d136a71`)
 
-### 8.4 Housekeeping / known non-blockers
-- **CI matrix divergence:** the integration workflow is PHP 7.4+8.3 on
-  `wxr-state-split`/`regenerate-thumbnails` but 7.4+8.2 was its earlier form —
-  ensure whichever branch merges first carries the 8.3 version.
-- **Merge plan:** decide the fold-back order — `wxr-chunking` (Wave 1) →
-  `wxr-state-split` (perf) → `regenerate-thumbnails` (features) → `master`, tag
-  `v1.2.0`. The integration CI workflow + `bin/install-wp-tests.sh` live on
-  `wxr-state-split` onward, **not** on `wxr-chunking`; whichever merges first
-  should carry them.
-- **Multisite:** renumber `1.2.0 → 1.3.0` on the `multi-site` branch (never
-  applied).
-- **Phase 4 `alpha`:** 3 known bugs + merge decision, still deferred.
-- Pre-existing lint debt (not introduced today): a handful of eslint
-  jsdoc/no-console/curly errors and the vendored `process_posts` phpcs complexity
-  warning.
+A **"Manual Import"** button on the importer page → upload your own files → a full
+functional clone, **without** the theme providing demo config:
+
+| Upload | Import |
+|---|---|
+| Content WXR `.xml` (required, **chunked** — any size) | posts/pages/products/**media**/terms/menus |
+| Customizer `.dat` (optional) | theme mods (safe `allowed_classes=false`) |
+| Widgets `.wie`/`.json` (optional) | widgets |
+| Settings `.json` (optional, flat `{option:value}`) | theme options (**blocklisted**) |
+
+**Key design:** `inc/App/Manual/ManualImport.php` validates + stages the uploads
+into a `manual-{key}/` working dir with the exact filenames the phases already read
+(`content.xml`/`customizer.dat`/`widget.wie`/`settings.json`); `inc/Common/Utils/
+ManualContext.php` supplies a minimal **config stub**, and `ImporterAjax`'s manual
+branch uses it instead of `getDemoConfig()`. So **every existing phase runs
+unchanged** and phases the upload didn't provide simply no-op. Inherits the whole
+resumable pipeline: image regeneration, retry-failed-media, snapshot rollback
+(default-on in the modal). Large files upload in 4 MB chunks assembled server-side
+(`.part` file + WXR sniff on the last chunk). Plan: `docs/superpowers/plans/
+2026-07-12-manual-import.md` (status: COMPLETE).
+
+---
+
+## 10. Multi-lens review + fixes (run twice; `7a4e1a3`, `f14446a`)
+
+Three parallel specialist agents (security / performance / correctness) over the
+full branch diff. All MUST + actionable SHOULD findings fixed:
+
+- **MUST** — uploaded files were in a web-reachable dir → new
+  `Setup::protectDirectory()` drops deny-all `index.php`/`.htaccess`/`web.config`;
+  `retryMedia` back-filled URLs per slice (repeated full-table scans) → now
+  accumulates remaps + back-fills once on the final slice; manual upload could
+  steal a running import's lock → `SessionManager::isLocked()` gate;
+  `stageOptional` silently dropped a failed optional file → now hard-fails.
+- **SHOULD** — `/preflight` cached 60 s; `Snapshot::create()` skips on huge sites
+  (`sd/edi/snapshot_max_rows`); daily cron (`sd_edi_manual_cleanup`) sweeps stale
+  `.part`/`manual-*` artifacts; `RestorePointBanner`/`ImportLogPanel` fetches are
+  unmount-safe; `retryMedia` returns a real error on importer-load failure.
+- **Security verified safe:** XXE (WXR parser rejects DOCTYPE), every
+  `unserialize(allowed_classes=false)`, path traversal (hex-only `sanitizeKey`),
+  Snapshot SQL (no user input in table names), all REST/AJAX gated on
+  `manage_options` + nonce.
+
+---
+
+## 11. Pending
+
+### 11.1 Blocking (needs a real server — not available this session)
+- **Manual QA of the whole v1.2.0 line** behind Cloudflare
+  (`docs/qa/2026-07-09-v1.2.0-qa-checklist.md`) — plus the new features'
+  runtime paths (nothing built today has run on live WP). Gates merge → `master`
+  + tag `v1.2.0`. Nothing merged to `master`; no tag.
+- **Full token-mutex fix** — deferred (softened to 2 s). Pitfall: the lock value is
+  a bare `time()` + unconditional shutdown delete, so a naive early-release lets
+  request A's shutdown delete request B's lock. Correct fix = unique token +
+  conditional release; load-bearing, do during QA.
+
+### 11.2 Manual UI/DB smoke tests (code/build/lint/unit-verified only)
+Regenerate Thumbnails (±force) · Preflight gate · Retry-failed-media · **Snapshot
+rollback** create→restore cycle (CI can't cover — DDL breaks WP_UnitTestCase txn) ·
+**Manual import** upload → clone → retry → rollback (incl. a large chunked WXR).
+
+### 11.3 Feature backlog (not built)
+- **WP-CLI `import`/`reset`** — needs the phases decoupled from `$_POST`/`wp_send_json`.
+- Selective import; retry re-retry of still-failing items; large-site snapshot
+  chunking + restore-point expiry.
+
+### 11.4 Housekeeping / known non-blockers
+- **Merge plan:** fold-back order `wxr-chunking → wxr-state-split →
+  regenerate-thumbnails → manual-import → master`, tag `v1.2.0`. The integration CI
+  + `bin/install-wp-tests.sh` live from `wxr-state-split` onward, not on
+  `wxr-chunking` — whichever merges first must carry them.
+- **Multisite:** renumber `1.2.0 → 1.3.0` on `multi-site`; new features untested on
+  multisite.
+- **Phase 4 `alpha`:** 3 known bugs + merge decision, deferred.
+- Pre-existing lint debt (not introduced today): a few eslint jsdoc/no-console/curly
+  errors and the vendored `process_posts` phpcs complexity warning.
