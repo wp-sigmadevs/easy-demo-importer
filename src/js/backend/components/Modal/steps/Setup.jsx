@@ -40,6 +40,8 @@ const Setup = ({ modalData, handleImport, handleReset }) => {
 		setCurrentStep,
 		skipImageRegeneration,
 		setSkipImageRegeneration,
+		snapshot,
+		setSnapshot,
 		preflightData,
 		fetchPreflightData,
 	} = useSharedDataStore();
@@ -230,6 +232,41 @@ const Setup = ({ modalData, handleImport, handleReset }) => {
 									</div>
 								</div>
 							)}
+							<div className="import-option new">
+								<div className="choose snapshot edi-d-flex edi-align-items-center edi-pos-r">
+									<Switch
+										checked={snapshot}
+										onChange={(checked) =>
+											setSnapshot(checked)
+										}
+									/>
+									<h4
+										className="edi-d-flex edi-align-items-center"
+										style={{ margin: 0 }}
+									>
+										{sdEdiAdminParams.snapshotTitle ||
+											'Create a restore point'}
+									</h4>
+									<Tooltip
+										title={
+											sdEdiAdminParams.snapshotHint ||
+											'Back up your content before importing so this import can be rolled back. Restoring reverts the site to this moment — anything added after is lost.'
+										}
+									>
+										<span
+											style={{
+												marginLeft: 8,
+												cursor: 'pointer',
+												fontSize: 20,
+												position: 'absolute',
+												right: 0,
+											}}
+										>
+											<QuestionCircleTwoTone />
+										</span>
+									</Tooltip>
+								</div>
+							</div>
 							<div className="import-option last">
 								<div className="choose reset-db edi-d-flex edi-align-items-center">
 									<Switch

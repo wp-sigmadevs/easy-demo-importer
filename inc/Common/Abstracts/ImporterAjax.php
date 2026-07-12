@@ -94,6 +94,14 @@ abstract class ImporterAjax {
 	public $reset;
 
 	/**
+	 * Create a restore point (snapshot) before importing.
+	 *
+	 * @var bool
+	 * @since 1.2.0
+	 */
+	public $snapshot = false;
+
+	/**
 	 * Import session ID.
 	 *
 	 * @var string
@@ -197,6 +205,9 @@ abstract class ImporterAjax {
 
 		// Check if database reset needed.
 		$this->reset = isset( $_POST['reset'] ) && 'true' === sanitize_text_field( wp_unslash( $_POST['reset'] ) );
+
+		// Check if a pre-import restore point (snapshot) was requested.
+		$this->snapshot = isset( $_POST['snapshot'] ) && 'true' === sanitize_text_field( wp_unslash( $_POST['snapshot'] ) );
 	}
 
 	/**
@@ -250,6 +261,7 @@ abstract class ImporterAjax {
 			'excludeImages'         => $this->excludeImages,
 			'skipImageRegeneration' => $this->skipImageRegeneration,
 			'reset'                 => $this->reset,
+			'snapshot'              => $this->snapshot,
 			'sessionId'             => $this->sessionId,
 			'nextPhase'             => $nextPhase,
 			'nextPhaseMessage'      => $nextPhaseMessage,

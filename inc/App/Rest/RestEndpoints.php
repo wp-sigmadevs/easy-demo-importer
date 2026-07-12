@@ -20,6 +20,7 @@ use SigmaDevs\EasyDemoImporter\Common\{
 	Traits\Singleton,
 	Utils\Preflight,
 	Utils\FailedMedia,
+	Utils\Snapshot,
 	Functions\Helpers,
 	Functions\ImportLogger
 };
@@ -186,7 +187,10 @@ class RestEndpoints extends Base {
 		$session_id = (string) $request->get_param( 'session_id' );
 
 		return $this->sendResponse(
-			[ 'count' => FailedMedia::count( $session_id ) ],
+			[
+				'count'             => FailedMedia::count( $session_id ),
+				'rollbackAvailable' => Snapshot::exists(),
+			],
 			esc_html__( 'Data is ready to fetch', 'easy-demo-importer' )
 		);
 	}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Result, Button } from 'antd';
+import { Result, Button, Modal } from 'antd';
 import {
 	ExportOutlined,
 	CloseOutlined,
@@ -37,6 +37,8 @@ const Success = ({
 	sessionId = '',
 }) => {
 	const [failedCount, setFailedCount] = useState(0);
+	const [rollbackAvailable, setRollbackAvailable] = useState(false);
+	const [rolling, setRolling] = useState(false);
 	const [retry, setRetry] = useState({
 		running: false,
 		done: false,
@@ -58,10 +60,50 @@ const Success = ({
 			.then((res) => {
 				if (res?.data?.success) {
 					setFailedCount(res.data.data.count || 0);
+					setRollbackAvailable(!!res.data.data.rollbackAvailable);
 				}
 			})
 			.catch(() => {});
 	}, [importComplete, sessionId]);
+
+	/**
+	 * Rolls the site back to the pre-import restore point after a hard confirm.
+	 * On success the admin is reloaded so the reverted state is shown.
+	 */
+	const handleRollback = () => {
+		Modal.confirm({
+			title: sdEdiAdminParams.rollbackTitle || 'Roll back this import?',
+			content:
+				sdEdiAdminParams.rollbackWarning ||
+				'This restores your site to the moment before this import. Anything created since (new posts, orders, users) will be permanently lost.',
+			okText: sdEdiAdminParams.rollbackConfirm || 'Roll back',
+			okButtonProps: { danger: true },
+			cancelText: sdEdiAdminParams.confirmNo || 'Cancel',
+			centered: true,
+			onOk: () => {
+				setRolling(true);
+				const body = new FormData();
+				body.append('action', 'sd_edi_rollback');
+				body.append('sd_edi_nonce', sdEdiAdminParams.sd_edi_nonce);
+				body.append('demo', demo);
+
+				return fetch(sdEdiAdminParams.ajaxUrl, {
+					method: 'POST',
+					body,
+					credentials: 'same-origin',
+				})
+					.then((r) => r.json())
+					.then((res) => {
+						if (res?.success) {
+							window.location.reload();
+						} else {
+							setRolling(false);
+						}
+					})
+					.catch(() => setRolling(false));
+			},
+		});
+	};
 
 	/**
 	 * Drives the resumable retry loop against the admin-ajax endpoint until the
@@ -210,6 +252,20 @@ const Success = ({
 							<span>{sdEdiAdminParams.btnClose}</span>
 						</Button>
 						{viewLogButton}
+						{rollbackAvailable && (
+							<Button
+								key="rollback"
+								danger
+								loading={rolling}
+								onClick={handleRollback}
+							>
+								<RollbackOutlined />
+								<span>
+									{sdEdiAdminParams.rollbackButton ||
+										'Roll Back'}
+								</span>
+							</Button>
+						)}
 						<Button
 							key="view-site"
 							type="primary"
