@@ -639,9 +639,16 @@ class InstallDemo extends ImporterAjax {
 			}
 		}
 
-		// Rewrite content URLs for whatever succeeded in this slice.
+		// Accumulate this slice's URL remaps rather than back-filling now: a
+		// full-table REPLACE per slice repeats costly posts/postmeta scans and can
+		// itself exceed the gateway timeout. All remaps are applied once, below,
+		// on the final slice.
+		$remap_key = 'sd_edi_retry_remap_' . md5( $retry_session );
+
 		if ( ! empty( $importer->url_remap ) ) {
-			$importer->backfill_attachment_urls();
+			$accumulated = get_option( $remap_key, [] );
+			$accumulated = is_array( $accumulated ) ? $accumulated : [];
+			update_option( $remap_key, array_merge( $accumulated, $importer->url_remap ), false );
 		}
 
 		$this->logImporterOutput( ob_get_clean() );
@@ -657,6 +664,16 @@ class InstallDemo extends ImporterAjax {
 				]
 			);
 		}
+
+		// Final slice: apply every accumulated remap in a single backfill pass.
+		$accumulated = get_option( $remap_key, [] );
+
+		if ( is_array( $accumulated ) && ! empty( $accumulated ) ) {
+			$importer->url_remap = $accumulated;
+			$importer->backfill_attachment_urls();
+		}
+
+		delete_option( $remap_key );
 
 		// One pass complete — clear the stored list.
 		FailedMedia::clear( $retry_session );

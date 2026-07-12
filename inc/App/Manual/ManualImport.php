@@ -16,6 +16,7 @@ declare( strict_types=1 );
 
 namespace SigmaDevs\EasyDemoImporter\App\Manual;
 
+use SigmaDevs\EasyDemoImporter\Config\Setup;
 use SigmaDevs\EasyDemoImporter\Common\{
 	Abstracts\Base,
 	Traits\Singleton,
@@ -73,6 +74,12 @@ class ManualImport extends Base {
 			$this->fail( esc_html__( 'You do not have permission to do this.', 'easy-demo-importer' ), 403 );
 		}
 
+		// Never steal a running import's lock (SessionManager::start() would
+		// force-take it, breaking the other import mid-pipeline).
+		if ( SessionManager::isLocked() ) {
+			$this->fail( esc_html__( 'Another import is already in progress. Please wait for it to finish.', 'easy-demo-importer' ), 409 );
+		}
+
 		$max = (int) apply_filters( 'sd/edi/manual_upload_max_bytes', 128 * MB_IN_BYTES ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
 		// A chunked upload (large content file split client-side) sends
@@ -94,6 +101,9 @@ class ManualImport extends Base {
 		if ( ! wp_mkdir_p( $dir ) ) {
 			$this->fail( esc_html__( 'Could not create the working directory. Check uploads folder permissions.', 'easy-demo-importer' ) );
 		}
+
+		// Block direct web access to the staged upload (private content + creds).
+		Setup::protectDirectory( dirname( $dir ) );
 
 		// ── Content (required WXR) ──────────────────────────────────────────────
 		$content = $this->normalizeFile( $_FILES['content'] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
@@ -143,6 +153,7 @@ class ManualImport extends Base {
 
 		$base = trailingslashit( wp_get_upload_dir()['basedir'] ) . 'easy-demo-importer';
 		wp_mkdir_p( $base );
+		Setup::protectDirectory( $base );
 		$part = $base . '/.manual-tmp-' . $upload_id . '.part';
 
 		// First chunk starts a fresh assembly file; keep total size under the cap.
@@ -213,8 +224,8 @@ class ManualImport extends Base {
 		if ( ! empty( $_FILES['customizer'] ) && ! empty( $_FILES['customizer']['name'] ) ) {
 			$cust = $this->normalizeFile( $_FILES['customizer'] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 
-			if ( $this->uploadOk( $cust, $max ) && $this->hasExtension( $cust['name'], [ 'dat' ] ) ) {
-				$this->stage( $cust['tmp_name'], $dir . '/customizer.dat' );
+			if ( $this->uploadOk( $cust, $max ) && $this->hasExtension( $cust['name'], [ 'dat' ] ) && ! $this->stage( $cust['tmp_name'], $dir . '/customizer.dat' ) ) {
+				$this->fail( esc_html__( 'Could not save the customizer file.', 'easy-demo-importer' ) );
 			}
 		}
 
@@ -222,8 +233,8 @@ class ManualImport extends Base {
 		if ( ! empty( $_FILES['widgets'] ) && ! empty( $_FILES['widgets']['name'] ) ) {
 			$widgets = $this->normalizeFile( $_FILES['widgets'] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 
-			if ( $this->uploadOk( $widgets, $max ) && $this->hasExtension( $widgets['name'], [ 'wie', 'json' ] ) && $this->isValidJson( $widgets['tmp_name'] ) ) {
-				$this->stage( $widgets['tmp_name'], $dir . '/widget.wie' );
+			if ( $this->uploadOk( $widgets, $max ) && $this->hasExtension( $widgets['name'], [ 'wie', 'json' ] ) && $this->isValidJson( $widgets['tmp_name'] ) && ! $this->stage( $widgets['tmp_name'], $dir . '/widget.wie' ) ) {
+				$this->fail( esc_html__( 'Could not save the widgets file.', 'easy-demo-importer' ) );
 			}
 		}
 
@@ -231,8 +242,8 @@ class ManualImport extends Base {
 		if ( ! empty( $_FILES['settings'] ) && ! empty( $_FILES['settings']['name'] ) ) {
 			$settings = $this->normalizeFile( $_FILES['settings'] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 
-			if ( $this->uploadOk( $settings, $max ) && $this->hasExtension( $settings['name'], [ 'json' ] ) && $this->isValidJson( $settings['tmp_name'] ) ) {
-				$this->stage( $settings['tmp_name'], $dir . '/settings.json' );
+			if ( $this->uploadOk( $settings, $max ) && $this->hasExtension( $settings['name'], [ 'json' ] ) && $this->isValidJson( $settings['tmp_name'] ) && ! $this->stage( $settings['tmp_name'], $dir . '/settings.json' ) ) {
+				$this->fail( esc_html__( 'Could not save the settings file.', 'easy-demo-importer' ) );
 			}
 		}
 	}
