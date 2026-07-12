@@ -108,8 +108,13 @@ class InstallDemo extends ImporterAjax {
 			$this->demoSlug
 		);
 
-		// Opt-in restore point: snapshot the content/options tables once, before
-		// any content is written, so the whole import can be rolled back later.
+		// Opt-in restore point for the MANUAL import path, which enters the
+		// pipeline here (nextPhase 'sd_edi_import_xml') and skips Initialize
+		// entirely, so Initialize's pre-reset snapshot never runs for it.
+		// Manual import uses reset=false, so the tables still hold the
+		// pre-import state at this point. The regular (Initialize) path already
+		// created the snapshot before its database reset; the exists() guard
+		// makes this a no-op there so a snapshot is never taken twice.
 		if ( $this->snapshot && ! Snapshot::exists() ) {
 			if ( Snapshot::create() ) {
 				ImportLogger::info(
