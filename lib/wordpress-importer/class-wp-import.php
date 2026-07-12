@@ -182,6 +182,18 @@ class SD_EDI_WP_Import extends WP_Importer {
 	public $bundled_media_imported = 0;
 
 	/**
+	 * Attachments whose download failed during import — each is
+	 * ['url' => source URL, 'data' => the slashed attachment post array] so the
+	 * retry-failed-media flow can re-attempt exactly those, without an attachment
+	 * having been created (a failed fetch never inserts one). Persisted across
+	 * chunked batches via ChunkedImport::MUTABLE_PROPS.
+	 *
+	 * @var array
+	 * @since 1.2.0
+	 */
+	public $failed_attachments = [];
+
+	/**
 	 * URL Remap
 	 *
 	 * @var array
@@ -755,6 +767,18 @@ class SD_EDI_WP_Import extends WP_Importer {
 				}
 
 				if ( is_wp_error( $post_id ) ) {
+					// Record a failed attachment download so it can be retried later
+					// without re-running the whole import. A failed fetch never
+					// created an attachment, so we keep the source URL + the post
+					// data needed to re-attempt exactly this one. Divergence from the
+					// vendored importer — keep it minimal for future upstream syncs.
+					if ( 'attachment' === $postdata['post_type'] && $this->fetch_attachments && ! empty( $remote_url ) ) {
+						$this->failed_attachments[] = [
+							'url'  => $remote_url,
+							'data' => $postdata,
+						];
+					}
+
 					// Include the WP_Error reason (e.g. a failed image download) so the
 					// plugin's activity log can surface *why* the item was skipped, not
 					// just that it was. Divergence from the vendored importer — keep it

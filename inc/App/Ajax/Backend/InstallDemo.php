@@ -20,7 +20,8 @@ use SigmaDevs\EasyDemoImporter\Common\{
 	Abstracts\ImporterAjax,
 	Importer\ChunkedImport,
 	Importer\ImportState,
-	Importer\ThumbnailRegenerator
+	Importer\ThumbnailRegenerator,
+	Utils\FailedMedia
 };
 
 // Do not allow directly accessing this file.
@@ -61,6 +62,7 @@ class InstallDemo extends ImporterAjax {
 		add_action( 'wp_ajax_sd_edi_import_xml_batch', [ $this, 'importBatch' ] );
 		add_action( 'wp_ajax_sd_edi_import_xml_finalize', [ $this, 'finalizeImport' ] );
 		add_action( 'wp_ajax_sd_edi_regenerate_images', [ $this, 'regenerateImages' ] );
+		add_action( 'wp_ajax_sd_edi_retry_media', [ $this, 'retryMedia' ] );
 	}
 
 	/**
@@ -340,6 +342,22 @@ class InstallDemo extends ImporterAjax {
 			);
 		}
 
+		// Persist any attachments whose download failed so the user can retry just
+		// those from the result screen, without re-running the whole import.
+		FailedMedia::save( $this->sessionId, (array) $importer->failed_attachments );
+
+		if ( ! empty( $importer->failed_attachments ) ) {
+			ImportLogger::warning(
+				sprintf(
+					/* translators: %d: number of failed media files. */
+					esc_html__( '%d media file(s) could not be downloaded — you can retry them from the result screen.', 'easy-demo-importer' ),
+					count( $importer->failed_attachments )
+				),
+				$this->sessionId,
+				$this->demoSlug
+			);
+		}
+
 		/**
 		 * Action Hook: 'sd/edi/after_content_import'
 		 *
@@ -525,6 +543,135 @@ class InstallDemo extends ImporterAjax {
 	}
 
 	/**
+	 * Ajax: retry the media downloads that failed during a run.
+	 *
+	 * Reads the failed-attachment list saved at finalize (keyed by the original
+	 * import session, passed as retrySession so it bypasses the live-import
+	 * session guard), re-attempts each in time-boxed, resumable slices via a fresh
+	 * importer, and rewrites the content URLs for whatever succeeds. The cursor +
+	 * tallies round-trip through the request; the storage is cleared when the pass
+	 * completes.
+	 *
+	 * @return void
+	 * @since 1.2.0
+	 */
+	public function retryMedia() {
+		Helpers::verifyAjaxCall();
+
+		if ( ! defined( 'SD_EDI_LOAD_IMPORTERS' ) ) {
+			define( 'SD_EDI_LOAD_IMPORTERS', true );
+		}
+
+		if ( ! class_exists( 'SD_EDI_WP_Import' ) ) {
+			$wpImporter = sd_edi()->getPluginPath() . '/lib/wordpress-importer/wordpress-importer.php';
+
+			if ( file_exists( $wpImporter ) ) {
+				require_once $wpImporter;
+			}
+		}
+
+		// phpcs:disable WordPress.Security.NonceVerification.Missing -- verifyAjaxCall() checked the nonce.
+		$retry_session = isset( $_POST['retrySession'] ) ? sanitize_text_field( wp_unslash( $_POST['retrySession'] ) ) : '';
+		$cursor        = isset( $_POST['retryCursor'] ) ? absint( wp_unslash( $_POST['retryCursor'] ) ) : 0;
+		$recovered     = isset( $_POST['recovered'] ) ? absint( wp_unslash( $_POST['recovered'] ) ) : 0;
+		$still_failed  = isset( $_POST['stillFailed'] ) ? absint( wp_unslash( $_POST['stillFailed'] ) ) : 0;
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
+
+		$items = FailedMedia::get( $retry_session );
+		$total = count( $items );
+
+		if ( empty( $items ) || ! class_exists( 'SD_EDI_WP_Import' ) ) {
+			FailedMedia::clear( $retry_session );
+			wp_send_json_success(
+				[
+					'done'        => true,
+					'cursor'      => $cursor,
+					'total'       => $total,
+					'recovered'   => $recovered,
+					'stillFailed' => $still_failed,
+				]
+			);
+		}
+
+		/** This action is documented in response(); re-applies the per-request resource boost. */
+		do_action( 'sd/edi/before_import', '', $this ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+
+		$importer                    = new SD_EDI_WP_Import();
+		$importer->fetch_attachments = true;
+		$importer->bundled_media_dir = $this->bundledMediaDir();
+
+		$budget = (float) apply_filters( 'sd/edi/retry_chunk_seconds', 20 ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+		$start  = microtime( true );
+
+		ob_start();
+
+		while ( $cursor < $total ) {
+			$record = isset( $items[ $cursor ] ) ? $items[ $cursor ] : [];
+			$data   = isset( $record['data'] ) ? (array) $record['data'] : [];
+			$url    = isset( $record['url'] ) ? (string) $record['url'] : '';
+
+			$result = ( '' !== $url && ! empty( $data ) )
+				? $importer->process_attachment( $data, $url )
+				: new \WP_Error( 'sd_edi_retry_invalid', 'Invalid record.' );
+
+			if ( is_wp_error( $result ) ) {
+				++$still_failed;
+			} else {
+				++$recovered;
+			}
+
+			++$cursor;
+
+			if ( ( microtime( true ) - $start ) >= $budget ) {
+				break;
+			}
+		}
+
+		// Rewrite content URLs for whatever succeeded in this slice.
+		if ( ! empty( $importer->url_remap ) ) {
+			$importer->backfill_attachment_urls();
+		}
+
+		$this->logImporterOutput( ob_get_clean() );
+
+		if ( $cursor < $total ) {
+			wp_send_json_success(
+				[
+					'done'        => false,
+					'cursor'      => $cursor,
+					'total'       => $total,
+					'recovered'   => $recovered,
+					'stillFailed' => $still_failed,
+				]
+			);
+		}
+
+		// One pass complete — clear the stored list.
+		FailedMedia::clear( $retry_session );
+
+		ImportLogger::info(
+			sprintf(
+				/* translators: 1: recovered count, 2: still-failed count. */
+				esc_html__( 'Media retry finished — %1$d recovered, %2$d still failed.', 'easy-demo-importer' ),
+				$recovered,
+				$still_failed
+			),
+			$retry_session,
+			$this->demoSlug
+		);
+
+		wp_send_json_success(
+			[
+				'done'        => true,
+				'cursor'      => $cursor,
+				'total'       => $total,
+				'recovered'   => $recovered,
+				'stillFailed' => $still_failed,
+			]
+		);
+	}
+
+	/**
 	 * Whether the resumable chunked importer is enabled.
 	 *
 	 * @return bool
@@ -632,8 +779,8 @@ class InstallDemo extends ImporterAjax {
 	/**
 	 * Whether a captured output line is the vendored importer's own "done" notice.
 	 *
-	 * import_end() unconditionally prints two adjacent paragraphs (no line break
-	 * between them, so they land as a single line here) announcing a normal,
+	 * The import_end() method unconditionally prints two adjacent paragraphs (no
+	 * line break between them, so they land as a single line here) announcing a normal,
 	 * successful finish. Logging it as a warning would misleadingly surface a
 	 * routine completion in wp-content/debug.log (WARNING/ERROR entries are
 	 * mirrored there). Built from the same translation calls import_end() uses,
@@ -805,6 +952,9 @@ class InstallDemo extends ImporterAjax {
 				ob_start();
 				$wp_import->import( $xmlFilePath );
 				$this->logImporterOutput( ob_get_clean() );
+
+				// Persist failed attachment downloads for the retry flow.
+				FailedMedia::save( $this->sessionId, (array) $wp_import->failed_attachments );
 
 				if ( ! $excludeImages ) {
 					$this->unsetThumbnails();
