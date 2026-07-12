@@ -19,6 +19,7 @@ use SigmaDevs\EasyDemoImporter\Common\{
 	Functions\ImportLogger,
 	Functions\SessionManager,
 	Importer\ImportState,
+	Utils\Snapshot,
 	Abstracts\ImporterAjax
 };
 
@@ -126,6 +127,27 @@ class Initialize extends ImporterAjax {
 		// Start a new import session and acquire the mutex lock.
 		$session         = SessionManager::start();
 		$this->sessionId = $session['session_id'];
+
+		// Opt-in restore point: snapshot the content/options tables here, at the
+		// very start of the pipeline — BEFORE the database reset below wipes them.
+		// Taken in InstallDemo previously, which runs after this reset, so a
+		// reset import snapshotted the already-emptied tables and a rollback
+		// restored the site to that empty state. Guarded so it runs once.
+		if ( $this->snapshot && ! Snapshot::exists() ) {
+			if ( Snapshot::create() ) {
+				ImportLogger::info(
+					esc_html__( 'Restore point created — this import can be rolled back.', 'easy-demo-importer' ),
+					$this->sessionId,
+					$this->demoSlug
+				);
+			} else {
+				ImportLogger::warning(
+					esc_html__( 'Restore point skipped — this site is too large to snapshot safely; the import will continue without rollback.', 'easy-demo-importer' ),
+					$this->sessionId,
+					$this->demoSlug
+				);
+			}
+		}
 
 		// Resetting database.
 		if ( $this->reset ) {
