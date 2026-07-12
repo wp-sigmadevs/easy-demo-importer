@@ -52,9 +52,19 @@ class ChunkedImport extends SD_EDI_WP_Import {
 		'id',
 		'version',
 		'authors',
-		'posts',
 		'base_url',
 	];
+
+	/**
+	 * Default number of parsed posts per on-disk chunk file. Chosen so a batch
+	 * loads only a small slice of the parse output per request (not the whole
+	 * post array), while keeping the chunk-file count modest. Filterable via
+	 * `sd/edi/import_posts_chunk_size`; the value chosen at prepare() is frozen in
+	 * the immutable meta so every batch computes the same chunk boundaries.
+	 *
+	 * @since 1.2.0
+	 */
+	private const DEFAULT_POSTS_CHUNK_SIZE = 100;
 
 	/**
 	 * Mutable cross-request state: the cursor and the ID/orphan/remap maps that
@@ -90,12 +100,29 @@ class ChunkedImport extends SD_EDI_WP_Import {
 	private $state;
 
 	/**
-	 * Index of the next post to process within $this->posts.
+	 * Global index of the next post to process across all chunks.
 	 *
 	 * @var int
 	 * @since 1.2.0
 	 */
 	private $offset = 0;
+
+	/**
+	 * Total number of parsed posts, read from the immutable meta. Batches use
+	 * this instead of count( $this->posts ), which now holds only one chunk.
+	 *
+	 * @var int
+	 * @since 1.2.0
+	 */
+	private $postsTotal = 0;
+
+	/**
+	 * Posts-per-chunk size frozen at prepare(), read from the immutable meta.
+	 *
+	 * @var int
+	 * @since 1.2.0
+	 */
+	private $chunkSize = 0;
 
 	/**
 	 * Constructor.
@@ -141,13 +168,19 @@ class ChunkedImport extends SD_EDI_WP_Import {
 		wp_defer_term_counting( false );
 		wp_defer_comment_counting( false );
 
-		$this->offset = 0;
+		$this->offset     = 0;
+		$this->postsTotal = count( $this->posts );
+		$this->chunkSize  = max( 1, (int) apply_filters( 'sd/edi/import_posts_chunk_size', self::DEFAULT_POSTS_CHUNK_SIZE ) ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
-		// Write the large parse output once; batches only rewrite the small maps.
+		// Write the parse output once, split into per-chunk files; batches only
+		// rewrite the small mutable maps. Then free the in-memory post array.
 		$this->persistImmutable();
+		$this->persistPosts();
 		$this->persist();
 
-		return count( $this->posts );
+		$this->posts = [];
+
+		return $this->postsTotal;
 	}
 
 	/**
@@ -219,7 +252,8 @@ class ChunkedImport extends SD_EDI_WP_Import {
 		// from DB state, so a batch that times out mid-loop still ends correct.
 		wp_defer_term_counting( true );
 
-		$total  = count( $this->posts );
+		$total = $this->postsTotal;
+
 		// Kept short so the batch returns progress frequently — the client bar
 		// advances in many small steps instead of one big jump. Smaller is also
 		// further under the gateway wall-clock limit; the trade-off is more
@@ -231,20 +265,41 @@ class ChunkedImport extends SD_EDI_WP_Import {
 
 		wp_suspend_cache_invalidation( true );
 
+		// Walk the global cursor across the per-chunk files, holding only the
+		// chunk currently being processed in memory. Each chunk file is read once,
+		// except one that straddles a request boundary (re-read on resume) — the
+		// importer's post_exists() keeps the re-processed head idempotent.
 		while ( $this->offset < $total ) {
-			$this->process_posts( $this->offset, $step );
-			$this->offset = min( $this->offset + $step, $total );
+			$chunk_index = intdiv( $this->offset, $this->chunkSize );
+			$chunk       = $this->state->loadPostsChunk( $chunk_index );
 
-			// Always finish the current step, then stop once over budget so the
-			// request returns well under the gateway wall-clock limit.
-			if ( ( microtime( true ) - $start ) >= $budget ) {
+			// A missing/corrupt chunk cannot be processed; stop rather than loop.
+			if ( ! is_array( $chunk ) ) {
+				$this->offset = $total;
 				break;
+			}
+
+			$this->posts = $chunk;
+			$chunk_count = count( $chunk );
+			$local       = $this->offset - ( $chunk_index * $this->chunkSize );
+
+			while ( $local < $chunk_count ) {
+				$this->process_posts( $local, $step );
+				$local        = min( $local + $step, $chunk_count );
+				$this->offset = ( $chunk_index * $this->chunkSize ) + $local;
+
+				// Always finish the current step, then stop once over budget so the
+				// request returns well under the gateway wall-clock limit.
+				if ( ( microtime( true ) - $start ) >= $budget ) {
+					break 2;
+				}
 			}
 		}
 
 		wp_suspend_cache_invalidation( false );
 
-		$done = $this->offset >= $total;
+		$done        = $this->offset >= $total;
+		$this->posts = [];
 		$this->persist();
 
 		return [
@@ -411,13 +466,32 @@ class ChunkedImport extends SD_EDI_WP_Import {
 	 * @since 1.2.0
 	 */
 	private function persistImmutable(): void {
-		$data = [];
+		$data = [
+			'posts_total' => $this->postsTotal,
+			'chunk_size'  => $this->chunkSize,
+		];
 
 		foreach ( self::IMMUTABLE_PROPS as $prop ) {
 			$data[ $prop ] = $this->$prop;
 		}
 
 		$this->state->saveImmutable( $data );
+	}
+
+	/**
+	 * Splits the parsed post array into fixed-size chunk files. Called once, at
+	 * the end of prepare().
+	 *
+	 * @return void
+	 * @since 1.2.0
+	 */
+	private function persistPosts(): void {
+		$index = 0;
+
+		foreach ( array_chunk( $this->posts, $this->chunkSize ) as $chunk ) {
+			$this->state->savePostsChunk( $index, $chunk );
+			++$index;
+		}
 	}
 
 	/**
@@ -457,6 +531,9 @@ class ChunkedImport extends SD_EDI_WP_Import {
 				$this->$prop = $immutable[ $prop ];
 			}
 		}
+
+		$this->postsTotal = (int) ( $immutable['posts_total'] ?? 0 );
+		$this->chunkSize  = max( 1, (int) ( $immutable['chunk_size'] ?? self::DEFAULT_POSTS_CHUNK_SIZE ) );
 
 		foreach ( self::MUTABLE_PROPS as $prop ) {
 			if ( array_key_exists( $prop, $mutable ) ) {
