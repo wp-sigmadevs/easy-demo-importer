@@ -18,6 +18,7 @@ use WP_REST_Response;
 use SigmaDevs\EasyDemoImporter\Common\{
 	Abstracts\Base,
 	Traits\Singleton,
+	Utils\Preflight,
 	Functions\Helpers,
 	Functions\ImportLogger
 };
@@ -145,6 +146,38 @@ class RestEndpoints extends Base {
 		$this->addPluginStatusEndpoint();
 		$this->addServerStatusEndpoint();
 		$this->addImportLogEndpoint();
+		$this->addPreflightEndpoint();
+	}
+
+	/**
+	 * Add Preflight (import readiness) route.
+	 *
+	 * @return void
+	 * @since 1.2.0
+	 */
+	public function addPreflightEndpoint() {
+		register_rest_route(
+			$this->getNamespace(),
+			'/preflight',
+			[
+				'methods'             => 'GET',
+				'callback'            => [ $this, 'preflight' ],
+				'permission_callback' => [ $this, 'permission' ],
+			]
+		);
+	}
+
+	/**
+	 * Returns the pre-import readiness report.
+	 *
+	 * @return WP_REST_Response
+	 * @since 1.2.0
+	 */
+	public function preflight() {
+		return $this->sendResponse(
+			Preflight::report(),
+			esc_html__( 'Data is ready to fetch', 'easy-demo-importer' )
+		);
 	}
 
 	/**
