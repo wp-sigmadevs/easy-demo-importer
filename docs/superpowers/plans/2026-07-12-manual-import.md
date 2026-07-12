@@ -1,12 +1,62 @@
 # Plan: Manual demo import (OCDI-style "import your own files")
 
 - **Date:** 2026-07-12
-- **Branch:** `regenerate-thumbnails` (all work stays here — no new branches)
-- **Status:** 🟡 Plan written; not started.
+- **Branch:** `manual-import` (off `regenerate-thumbnails`)
+- **Status:** 🟢 **Phase A + most of B built & CI-green** (content + media + customizer
+  + widgets). Remaining: framework/redux settings and chunked large-file upload.
+  See §0 Progress.
 - **Goal:** Let a user import **without** the theme providing demo config, by
   uploading their own files — mirroring One Click Demo Import's manual tab — while
   reusing this plugin's resumable/recovery machinery (chunked import, image
   regeneration, retry-failed-media, preflight, snapshot rollback).
+
+---
+
+## 0. Progress (2026-07-12)
+
+**Built on branch `manual-import`** — `1ee56b1` (backend), `c945444` (frontend +
+threading). Unit + integration CI green (PHP 7.4–8.4 unit; 7.4 + 8.3 real-WP
+integration). 98 unit tests.
+
+Delivered **more than the planned Phase A** — customizer + widgets came along for
+free because they read fixed filenames (`customizer.dat`, `widget.wie`) and reuse
+cleanly via the config stub:
+
+- `inc/Common/Utils/ManualContext.php` — manual working-dir + config-stub resolver
+  + hex-only key sanitiser (path-traversal-safe; unit-tested, incl. a traversal
+  case). Reserved slug `__manual__`.
+- `inc/App/Manual/ManualImport.php` — `wp_ajax_sd_edi_manual_upload`: `manage_options`
+  + nonce + size cap + `is_uploaded_file`; validates content (WXR sniff), customizer
+  (`.dat`), widgets (`.wie/.json` JSON-validated); stages to `manual-{key}/` as
+  `content.xml` / `customizer.dat` / `widget.wie`; starts the session; returns
+  `{manualKey, sessionId}`.
+- `inc/Common/Abstracts/ImporterAjax.php` — manual branch: when `manual=true`, use
+  `ManualContext::configStub()` instead of `getDemoConfig()` (bypasses the empty
+  -config gate). `manual` + `manualKey` threaded through every phase response.
+- `inc/App/Ajax/Backend/InstallDemo.php`, `src/js/backend/utils/Api.js` — round-trip
+  `manual` / `manualKey` across phases.
+- `src/js/backend/components/Modal/ManualImportModal.jsx` — upload form → upload →
+  `doAxios(nextPhase='sd_edi_import_xml', manual=true)`, reusing the `Imports` and
+  `Success` steps. Snapshot toggle default ON.
+- `AppDemoImporter.jsx` — "Manual Import" button opens the modal.
+- `Success.jsx` — forwards `manual`/`manualKey` so **retry-failed-media works for
+  config-less manual imports**.
+
+**Reuse confirmed working end-to-end via the config stub:** content → image
+regeneration → customizer → widgets → finalize, with settings/sliders/fluent-forms
+skipping. Inherits resumable import, retry-failed-media, and snapshot rollback.
+
+**Security posture (verified):** `.dat` object-injection already blocked by
+`unserialize(…, allowed_classes=false)` in the existing `Customizer` model; WXR
+sniffed before import; manual key is hex-only.
+
+**Still pending (see §6 Phase B/C):**
+- Framework/redux-style theme **settings** files (config-driven — the stub can't
+  know the option keys). Customizer covers the common case.
+- **Chunked large-file upload** for big WXRs (single POST hits
+  `upload_max_filesize`).
+- **Manual QA:** no live WP here — needs a real upload → clone → retry → rollback
+  pass. Multisite untested.
 
 ---
 
