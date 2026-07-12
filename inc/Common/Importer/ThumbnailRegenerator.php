@@ -212,7 +212,8 @@ final class ThumbnailRegenerator {
 			$existing = $this->oldMetadata['sizes'][ $label ];
 
 			if (
-				(int) $existing['width'] === $dstW
+				isset( $existing['width'], $existing['height'] )
+				&& (int) $existing['width'] === $dstW
 				&& (int) $existing['height'] === $dstH
 				&& file_exists( $filename )
 			) {
