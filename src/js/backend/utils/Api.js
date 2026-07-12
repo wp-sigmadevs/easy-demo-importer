@@ -161,6 +161,8 @@ export const doAxios = async (
 		params.append('demo', request.demo);
 		params.append('reset', request.reset);
 		params.append('snapshot', request.snapshot);
+		params.append('manual', request.manual || 'false');
+		params.append('manualKey', request.manualKey || '');
 		params.append('excludeImages', request.excludeImages);
 		params.append('skipImageRegeneration', request.skipImageRegeneration);
 		params.append('sd_edi_nonce', sdEdiAdminParams.sd_edi_nonce);

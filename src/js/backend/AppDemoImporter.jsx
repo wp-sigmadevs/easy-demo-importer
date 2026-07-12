@@ -6,6 +6,7 @@ import React, { useState, useEffect } from 'react';
 import GridSkeleton from './components/GridSkeleton';
 import ErrorMessage from './components/ErrorMessage';
 import RestorePointBanner from './components/RestorePointBanner';
+import ManualImportModal from './components/Modal/ManualImportModal';
 import useSharedDataStore from './utils/sharedDataStore';
 import ModalComponent from './components/Modal/ModalComponent';
 import ModalRequirements from './components/Modal/ModaRequirements';
@@ -25,6 +26,7 @@ const AppDemoImporter = () => {
 	const [modalData, setModalData] = useState(null);
 	const [errorMessage, setErrorMessage] = useState(null);
 	const [isModalVisible, setIsModalVisible] = useState(false);
+	const [manualVisible, setManualVisible] = useState(false);
 	const resetStore = useSharedDataStore((state) => state.resetStore);
 
 	/**
@@ -358,6 +360,17 @@ const AppDemoImporter = () => {
 				/>
 
 				<RestorePointBanner />
+
+				<div className="edi-manual-import-bar">
+					<Button onClick={() => setManualVisible(true)}>
+						{sdEdiAdminParams.manualImportButton || 'Manual Import'}
+					</Button>
+				</div>
+
+				<ManualImportModal
+					visible={manualVisible}
+					onClose={() => setManualVisible(false)}
+				/>
 
 				{importList.success && hasErrors(serverInfo) && (
 					<ModalRequirements
