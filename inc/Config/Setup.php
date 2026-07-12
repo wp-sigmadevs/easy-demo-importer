@@ -150,10 +150,45 @@ class Setup {
 	 */
 	public static function createDemoDir() {
 		$uploadsDir = wp_get_upload_dir();
-		$demoDir    = 'easy-demo-importer';
+		$dir        = $uploadsDir['basedir'] . '/easy-demo-importer';
 
-		if ( ! is_dir( $uploadsDir['basedir'] . '/' . $demoDir ) ) {
-			wp_mkdir_p( $uploadsDir['basedir'] . '/' . $demoDir );
+		if ( ! is_dir( $dir ) ) {
+			wp_mkdir_p( $dir );
+		}
+
+		self::protectDirectory( $dir );
+	}
+
+	/**
+	 * Blocks direct web access to a directory (and everything under it).
+	 *
+	 * The import working directory holds user-uploaded WXR / settings / customizer
+	 * files that routinely contain private content and author credentials, so it
+	 * must never be downloadable. Drops deny-all index.php + .htaccess + web.config.
+	 *
+	 * @param string $dir Absolute directory path.
+	 *
+	 * @return void
+	 * @since 1.2.0
+	 */
+	public static function protectDirectory( $dir ) {
+		if ( ! is_dir( $dir ) ) {
+			return;
+		}
+
+		$files = [
+			'index.php'  => "<?php\n// Silence is golden.\n",
+			'.htaccess'  => "Require all denied\n<IfModule !mod_authz_core.c>\n\tDeny from all\n</IfModule>\n",
+			'web.config' => '<?xml version="1.0" encoding="UTF-8"?><configuration><system.webServer><authorization><deny users="*" /></authorization></system.webServer></configuration>',
+		];
+
+		foreach ( $files as $name => $contents ) {
+			$path = trailingslashit( $dir ) . $name;
+
+			if ( ! file_exists( $path ) ) {
+				// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
+				file_put_contents( $path, $contents );
+			}
 		}
 	}
 }

@@ -95,6 +95,17 @@ class ImportSettings extends ImporterAjax {
 			'nonce_key',
 			'nonce_salt',
 			'sidebars_widgets',
+			'upload_path',
+			'upload_url_path',
+			'mailserver_url',
+			'mailserver_login',
+			'mailserver_pass',
+			'mailserver_port',
+			'moderation_keys',
+			'disallowed_keys',
+			'blog_public',
+			'ping_sites',
+			'blacklist_keys',
 		];
 
 		// Manual import: an optional settings.json holding a flat
