@@ -13,6 +13,7 @@ declare( strict_types=1 );
 
 namespace SigmaDevs\EasyDemoImporter\Tests\Unit\Importer;
 
+use Mockery;
 use Brain\Monkey\Functions;
 use SigmaDevs\EasyDemoImporter\Common\Importer\ThumbnailRegenerator;
 use SigmaDevs\EasyDemoImporter\Tests\Unit\UnitTestCase;
@@ -71,5 +72,52 @@ final class ThumbnailRegeneratorTest extends UnitTestCase {
 		Functions\when( 'wp_get_original_image_path' )->justReturn( false );
 
 		$this->assertNull( ThumbnailRegenerator::forAttachment( 123 ) );
+	}
+
+	/**
+	 * Missing-only mode (default) registers the intermediate-size filter so only
+	 * absent thumbnails are (re)built.
+	 */
+	public function test_only_missing_mode_registers_the_missing_sizes_filter() {
+		Functions\when( 'wp_get_attachment_metadata' )->justReturn( [ 'sizes' => [] ] );
+		Functions\when( 'wp_generate_attachment_metadata' )->justReturn( [ 'file' => 'x.jpg', 'sizes' => [] ] );
+		Functions\when( 'wp_update_attachment_metadata' )->justReturn( true );
+
+		Functions\expect( 'add_filter' )
+			->once()
+			->with( 'intermediate_image_sizes_advanced', Mockery::type( 'array' ), 10, 2 );
+		Functions\expect( 'remove_filter' )->once();
+
+		$this->assertTrue( $this->makeRegenerator()->regenerate( true ) );
+	}
+
+	/**
+	 * Force mode leaves the filter off entirely, so every registered size is
+	 * rebuilt from the original.
+	 */
+	public function test_force_mode_skips_the_missing_sizes_filter() {
+		Functions\when( 'wp_get_attachment_metadata' )->justReturn( [ 'sizes' => [] ] );
+		Functions\when( 'wp_generate_attachment_metadata' )->justReturn( [ 'file' => 'x.jpg', 'sizes' => [] ] );
+		Functions\when( 'wp_update_attachment_metadata' )->justReturn( true );
+
+		Functions\expect( 'add_filter' )->never();
+		Functions\expect( 'remove_filter' )->never();
+
+		$this->assertTrue( $this->makeRegenerator()->regenerate( false ) );
+	}
+
+	/**
+	 * Builds a regenerator without the private forAttachment() guard chain, so a
+	 * test can exercise regenerate() directly.
+	 *
+	 * @return ThumbnailRegenerator
+	 */
+	private function makeRegenerator(): ThumbnailRegenerator {
+		$instance = ( new \ReflectionClass( ThumbnailRegenerator::class ) )->newInstanceWithoutConstructor();
+
+		$this->setPrivate( $instance, 'attachmentId', 123 );
+		$this->setPrivate( $instance, 'fullSizePath', '/tmp/x.jpg' );
+
+		return $instance;
 	}
 }
