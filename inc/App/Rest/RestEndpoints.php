@@ -150,6 +150,43 @@ class RestEndpoints extends Base {
 		$this->addImportLogEndpoint();
 		$this->addPreflightEndpoint();
 		$this->addFailedMediaEndpoint();
+		$this->addRollbackEndpoint();
+	}
+
+	/**
+	 * Add Rollback route (restore the pre-import snapshot).
+	 *
+	 * @return void
+	 * @since 1.2.0
+	 */
+	public function addRollbackEndpoint() {
+		register_rest_route(
+			$this->getNamespace(),
+			'/rollback',
+			[
+				'methods'             => 'POST',
+				'callback'            => [ $this, 'rollback' ],
+				'permission_callback' => [ $this, 'permission' ],
+			]
+		);
+	}
+
+	/**
+	 * Restores the pre-import snapshot, reverting the site to before the import.
+	 *
+	 * @return WP_REST_Response
+	 * @since 1.2.0
+	 */
+	public function rollback() {
+		if ( ! Snapshot::exists() ) {
+			return $this->sendError( esc_html__( 'No restore point is available to roll back to.', 'easy-demo-importer' ), [], 404 );
+		}
+
+		if ( ! Snapshot::restore() ) {
+			return $this->sendError( esc_html__( 'Rollback failed. Your site was not changed.', 'easy-demo-importer' ), [], 500 );
+		}
+
+		return $this->sendResponse( [ 'done' => true ], esc_html__( 'Site rolled back.', 'easy-demo-importer' ) );
 	}
 
 	/**

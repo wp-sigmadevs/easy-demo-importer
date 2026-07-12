@@ -266,6 +266,12 @@ const Setup = ({ modalData, handleImport, handleReset }) => {
 										</span>
 									</Tooltip>
 								</div>
+								<div className="option-details">
+									<p>
+										{sdEdiAdminParams.snapshotDetails ||
+											'Before importing, a copy of your posts, pages, media records, categories, tags, menus, comments and site settings (including the theme customizer and widgets) is saved. If you are not happy with the result, one click restores your site to exactly this state — from the result screen or the “Restore point” banner on the importer page. Note: rolling back also removes anything created after this import, and the restore point is replaced the next time you import.'}
+									</p>
+								</div>
 							</div>
 							<div className="import-option last">
 								<div className="choose reset-db edi-d-flex edi-align-items-center">

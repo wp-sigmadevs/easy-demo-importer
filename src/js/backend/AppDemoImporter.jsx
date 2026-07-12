@@ -5,6 +5,7 @@ import { useShallow } from 'zustand/react/shallow';
 import React, { useState, useEffect } from 'react';
 import GridSkeleton from './components/GridSkeleton';
 import ErrorMessage from './components/ErrorMessage';
+import RestorePointBanner from './components/RestorePointBanner';
 import useSharedDataStore from './utils/sharedDataStore';
 import ModalComponent from './components/Modal/ModalComponent';
 import ModalRequirements from './components/Modal/ModaRequirements';
@@ -355,6 +356,8 @@ const AppDemoImporter = () => {
 					logo={sdEdiAdminParams.ediLogo}
 					heading="Demo Importer"
 				/>
+
+				<RestorePointBanner />
 
 				{importList.success && hasErrors(serverInfo) && (
 					<ModalRequirements
