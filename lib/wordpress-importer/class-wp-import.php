@@ -1393,9 +1393,15 @@ class SD_EDI_WP_Import extends WP_Importer {
 		}
 
 		// Match the surrounding uploads' permissions, as fetch_remote_file() does.
-		$stat  = stat( dirname( $new_file ) );
-		$perms = $stat['mode'] & 0000666;
-		chmod( $new_file, $perms ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_chmod
+		// Guard the stat(): if it fails (dir race / open_basedir) we must NOT fall
+		// through to chmod( $new_file, 0 ), which would strip all permissions and
+		// make the just-copied media unreadable by the web server.
+		$stat = stat( dirname( $new_file ) );
+
+		if ( false !== $stat ) {
+			$perms = $stat['mode'] & 0000666;
+			chmod( $new_file, $perms ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_chmod
+		}
 
 		$wp_filetype = wp_check_filetype( $file_name );
 

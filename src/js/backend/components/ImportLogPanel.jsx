@@ -105,6 +105,7 @@ const formatEntryTime = (stamp) => {
 const runLabel = (run) => {
 	const statusText = {
 		success: sdEdiAdminParams.logSuccess || 'Success',
+		warning: sdEdiAdminParams.logWarning || 'Completed with warnings',
 		error: sdEdiAdminParams.logFailed || 'Failed',
 		info: sdEdiAdminParams.logInProgress || 'In progress',
 	};

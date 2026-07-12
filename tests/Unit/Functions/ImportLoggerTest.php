@@ -151,6 +151,32 @@ final class ImportLoggerTest extends UnitTestCase {
 		self::assertSame( ImportLogger::SUCCESS, $runs[0]['status'] );
 	}
 
+	public function test_group_rows_success_with_warnings_becomes_warning(): void {
+		$runs = ImportLogger::groupRows(
+			[
+				$this->row( 'A', 'woo', 'info', '2026-07-09 10:00:00' ),
+				$this->row( 'A', 'woo', 'warning', '2026-07-09 10:01:00' ),
+				$this->row( 'A', 'woo', 'success', '2026-07-09 10:02:00' ),
+			]
+		);
+
+		self::assertSame( ImportLogger::WARNING, $runs[0]['status'] );
+		// The internal tracking flag must never leak into the payload.
+		self::assertArrayNotHasKey( 'has_warning', $runs[0] );
+	}
+
+	public function test_group_rows_error_wins_over_warnings(): void {
+		$runs = ImportLogger::groupRows(
+			[
+				$this->row( 'A', 'woo', 'warning', '2026-07-09 10:00:00' ),
+				$this->row( 'A', 'woo', 'error', '2026-07-09 10:01:00' ),
+				$this->row( 'A', 'woo', 'success', '2026-07-09 10:02:00' ),
+			]
+		);
+
+		self::assertSame( ImportLogger::ERROR, $runs[0]['status'] );
+	}
+
 	public function test_group_rows_without_terminal_entry_stays_info(): void {
 		$runs = ImportLogger::groupRows(
 			[ $this->row( 'A', 'woo', 'info', '2026-07-09 10:00:00' ) ]

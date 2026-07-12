@@ -200,6 +200,7 @@ class Enqueue extends EnqueueBase {
 				'logDetailsLabel'            => esc_html__( 'Import details', 'easy-demo-importer' ),
 				'viewFullLog'                => esc_html__( 'View full log', 'easy-demo-importer' ),
 				'logSuccess'                 => esc_html__( 'Success', 'easy-demo-importer' ),
+				'logWarning'                 => esc_html__( 'Completed with warnings', 'easy-demo-importer' ),
 				'logFailed'                  => esc_html__( 'Failed', 'easy-demo-importer' ),
 				'logInProgress'              => esc_html__( 'In progress', 'easy-demo-importer' ),
 				'logUnknownDemo'             => esc_html__( 'Import', 'easy-demo-importer' ),
