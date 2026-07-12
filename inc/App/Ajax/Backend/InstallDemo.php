@@ -727,7 +727,12 @@ class InstallDemo extends ImporterAjax {
 					'nextPhase'        => $phase,
 					'nextPhaseMessage' => esc_html__( 'Waiting for previous import to finish…', 'easy-demo-importer' ),
 					'retry'            => true,
-					'retryAfter'       => 5,
+					// Kept short: the common case here is a benign timing overlap in
+					// the tight batch loop (the previous request's shutdown handler
+					// has not released the lock yet), not real contention — so a brief
+					// re-check avoids a jarring multi-second stall. Genuine concurrent
+					// imports simply poll every 2s until the other finishes.
+					'retryAfter'       => 2,
 				]
 			)
 		);
