@@ -2,7 +2,7 @@
 /**
  * Tools Class: RegenerateThumbnails
  *
- * A standalone "Regenerate Thumbnails" utility under the WordPress Tools menu.
+ * A standalone "Easy Thumbnails" utility under the Appearance menu.
  * Reuses the resumable, time-boxed ThumbnailRegenerator engine (the same one
  * that powers the import's regeneration phase) to rebuild intermediate image
  * sizes across the whole media library without timing out on large libraries.
@@ -72,15 +72,16 @@ class RegenerateThumbnails extends Base {
 	}
 
 	/**
-	 * Adds the submenu under Tools.
+	 * Adds the submenu under Appearance.
 	 *
 	 * @return void
 	 * @since 1.2.0
 	 */
 	public function menu() {
-		add_management_page(
-			esc_html__( 'Regenerate Thumbnails', 'easy-demo-importer' ),
-			esc_html__( 'Regenerate Thumbnails', 'easy-demo-importer' ),
+		add_submenu_page(
+			'themes.php',
+			esc_html__( 'Thumbnails', 'easy-demo-importer' ),
+			esc_html__( 'Easy Thumbnails', 'easy-demo-importer' ),
 			self::CAP,
 			self::SLUG,
 			[ $this, 'render' ]
