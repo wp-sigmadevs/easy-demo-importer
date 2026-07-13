@@ -9,13 +9,18 @@
  * Rolling back truncates each live table and copies its rows back from the
  * shadow, then drops the shadows.
  *
- * Scope is deliberately limited to the import's blast radius — content, terms,
- * comments and options — and never touches users or other tables. The media
- * library (wp-content/uploads) is captured in lockstep via {@see MediaSnapshot}
- * so a rollback restores the actual image files, not just their attachment rows.
- * Restoring reverts the site to the moment the snapshot was taken: anything
- * created after the import is lost, so this is offered opt-in with a loud
- * confirmation and is meant for fresh setup sites.
+ * Scope is every prefixed table the import could touch — discovered dynamically
+ * with the same scan {@see Initialize::databaseReset()} uses, so the set that a
+ * reset wipes and the set the snapshot backs up are identical (posts, terms,
+ * comments, options AND every plugin's own custom tables: WooCommerce orders,
+ * form entries, bookings, …). Users, usermeta, the activity log and regenerable
+ * queues (Action Scheduler) are excluded; the exclude list is filterable via
+ * `sd/edi/snapshot_exclude_tables`. The media library (wp-content/uploads) is
+ * captured in lockstep via {@see MediaSnapshot} so a rollback restores the actual
+ * image files, not just their attachment rows. Restoring reverts the site to the
+ * moment the snapshot was taken: anything created after the import is lost, so
+ * this is offered opt-in with a loud confirmation and is meant for fresh setup
+ * sites.
  *
  * @package SigmaDevs\EasyDemoImporter
  * @since   1.2.0
@@ -24,6 +29,8 @@
 declare( strict_types=1 );
 
 namespace SigmaDevs\EasyDemoImporter\Common\Utils;
+
+use SigmaDevs\EasyDemoImporter\Common\Functions\ImportLogger;
 
 // Do not allow directly accessing this file.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -51,7 +58,10 @@ final class Snapshot {
 	const SESSION_OPTION = 'sd_edi_snapshot_session';
 
 	/**
-	 * Live tables included in a snapshot.
+	 * Live tables included in a snapshot — every prefixed table with a storage
+	 * engine, discovered the same way {@see Initialize::databaseReset()} finds the
+	 * tables it resets, minus the exclude list. Keeps the reset set and the backup
+	 * set identical so a rollback is complete.
 	 *
 	 * @return string[]
 	 * @since 1.2.0
@@ -59,17 +69,105 @@ final class Snapshot {
 	private static function tables(): array {
 		global $wpdb;
 
-		return [
-			$wpdb->posts,
-			$wpdb->postmeta,
-			$wpdb->terms,
-			$wpdb->term_taxonomy,
-			$wpdb->term_relationships,
-			$wpdb->termmeta,
-			$wpdb->comments,
-			$wpdb->commentmeta,
-			$wpdb->options,
-		];
+		$tables = [];
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$status = $wpdb->get_results( 'SHOW TABLE STATUS' );
+
+		if ( ! is_array( $status ) ) {
+			return $tables;
+		}
+
+		foreach ( $status as $table ) {
+			if ( 0 !== stripos( $table->Name, $wpdb->prefix ) ) {
+				continue;
+			}
+
+			// Views and the like have no engine and cannot be cloned.
+			if ( empty( $table->Engine ) ) {
+				continue;
+			}
+
+			if ( self::isExcluded( $table->Name, $wpdb->prefix ) ) {
+				continue;
+			}
+
+			$tables[] = $table->Name;
+		}
+
+		return $tables;
+	}
+
+	/**
+	 * Whether a table is kept out of the snapshot: the shadows themselves, user
+	 * accounts (never reverted, so a rollback can't delete logins), the plugin's
+	 * own persistent activity log, and regenerable queues such as Action
+	 * Scheduler. Filterable via `sd/edi/snapshot_exclude_tables` (bare, unprefixed
+	 * table names).
+	 *
+	 * @param string $table  Full table name (includes prefix).
+	 * @param string $prefix Table prefix.
+	 *
+	 * @return bool
+	 * @since 1.2.0
+	 */
+	private static function isExcluded( string $table, string $prefix ): bool {
+		$bare = ( '' !== $prefix && 0 === strpos( $table, $prefix ) )
+			? substr( $table, strlen( $prefix ) )
+			: $table;
+
+		// Never snapshot the shadow tables (would recurse the restore point).
+		if ( 0 === strpos( $bare, self::INFIX ) ) {
+			return true;
+		}
+
+		// Regenerable / transient job queues — large and pointless to revert.
+		if ( 0 === strpos( $bare, 'actionscheduler' ) ) {
+			return true;
+		}
+
+		$exclude = (array) apply_filters( // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+			'sd/edi/snapshot_exclude_tables',
+			[ 'users', 'usermeta', ImportLogger::TABLE ]
+		);
+
+		return in_array( $bare, $exclude, true );
+	}
+
+	/**
+	 * Reverse of {@see shadowName()}: `{prefix}sd_edi_snap_posts` → `{prefix}posts`.
+	 *
+	 * @param string $shadow Shadow table name (includes prefix).
+	 * @param string $prefix Table prefix.
+	 *
+	 * @return string
+	 * @since 1.2.0
+	 */
+	private static function liveFromShadow( string $shadow, string $prefix ): string {
+		$needle = $prefix . self::INFIX;
+
+		return ( 0 === strpos( $shadow, $needle ) )
+			? $prefix . substr( $shadow, strlen( $needle ) )
+			: $shadow;
+	}
+
+	/**
+	 * Every shadow table that currently exists (the tables actually saved by the
+	 * live restore point). Restore and drop key off this rather than a fresh scan
+	 * of live tables, since an import can add or drop tables mid-run.
+	 *
+	 * @return string[]
+	 * @since 1.2.0
+	 */
+	private static function shadowTables(): array {
+		global $wpdb;
+
+		$like = $wpdb->esc_like( $wpdb->prefix . self::INFIX ) . '%';
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$found = $wpdb->get_col( $wpdb->prepare( 'SHOW TABLES LIKE %s', $like ) );
+
+		return is_array( $found ) ? $found : [];
 	}
 
 	/**
@@ -98,14 +196,7 @@ final class Snapshot {
 	 * @since 1.2.0
 	 */
 	public static function exists(): bool {
-		global $wpdb;
-
-		$like = $wpdb->esc_like( $wpdb->prefix . self::INFIX ) . '%';
-
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$found = $wpdb->get_col( $wpdb->prepare( 'SHOW TABLES LIKE %s', $like ) );
-
-		return ! empty( $found );
+		return ! empty( self::shadowTables() );
 	}
 
 	/**
@@ -184,20 +275,19 @@ final class Snapshot {
 	public static function restore(): bool {
 		global $wpdb;
 
-		if ( ! self::exists() ) {
+		$shadows = self::shadowTables();
+
+		if ( empty( $shadows ) ) {
 			return false;
 		}
 
-		foreach ( self::tables() as $table ) {
-			$shadow = self::shadowName( $table, $wpdb->prefix );
+		foreach ( $shadows as $shadow ) {
+			$table = self::liveFromShadow( $shadow, $wpdb->prefix );
 
+			// Recreate the live table if the import dropped it, so the shadow's
+			// rows always have somewhere to go back to.
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared
-			$exists = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->esc_like( $shadow ) ) );
-
-			if ( ! $exists ) {
-				continue;
-			}
-
+			$wpdb->query( "CREATE TABLE IF NOT EXISTS `{$table}` LIKE `{$shadow}`" );
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared
 			$wpdb->query( "TRUNCATE `{$table}`" );
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared
@@ -255,9 +345,7 @@ final class Snapshot {
 	public static function drop(): void {
 		global $wpdb;
 
-		foreach ( self::tables() as $table ) {
-			$shadow = self::shadowName( $table, $wpdb->prefix );
-
+		foreach ( self::shadowTables() as $shadow ) {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared
 			$wpdb->query( "DROP TABLE IF EXISTS `{$shadow}`" );
 		}
