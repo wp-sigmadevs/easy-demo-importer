@@ -30,7 +30,7 @@ const LayoutWithEffects = ({ children }) => {
 		 */
 		const updateMenuLink = () => {
 			const demoImporterLink = document.querySelector(
-				`a[href*="${sdEdiAdminParams.importPageLink}"]`
+				`#adminmenu #menu-appearance .wp-submenu a[href*="${sdEdiAdminParams.importPageLink}"]`
 			);
 
 			if (demoImporterLink && !demoImporterLink.href.includes('#/')) {
