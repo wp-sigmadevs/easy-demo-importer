@@ -18,7 +18,7 @@ master (bf2a840)
        └─ wxr-state-split (d6601fa)  perf work + integration-test CI job
             ├─ preflight-check (6c68c57)      preflight gate (merged onward)
             └─ regenerate-thumbnails         regen tool + preflight[merged] + retry + rollback + WP-CLI
-                 └─ manual-import (13febbc)   ← TIP: full manual import + review fixes + rollback overhaul (§13)
+                 └─ manual-import (0c0b4c9)   ← TIP: full manual import + review fixes + rollback overhaul (§13)
 ```
 
 - **`manual-import`** is the accumulation branch and carries the entire stack.
@@ -313,6 +313,7 @@ itself is correct — 3 rows → wiped → 3 restored). Branch tip is now **`13f
 | `72880d1` | **feat(rollback): snapshot the uploads media so rollback fully restores media files.** New `inc/Common/Utils/MediaSnapshot.php`, driven in lockstep through `Snapshot::create/restore/drop`. **Reset import** → rename `uploads/` aside instantly (no byte copy, no disk doubling), recreate empty, restore moves it back. **Non-reset / manual** → write a file manifest, rollback deletes only files the import added. Cross-filesystem uploads (custom `UPLOADS` disk) → rename fails → auto-fallback to manifest + logged warning. Symlinks skipped on walk + delete. Both strategies proven on a real temp FS. |
 | `e265026` | **feat(rollback): keep-or-discard prompt on the success screen.** New REST `POST /discard-restore-point` → `Snapshot::drop()` (drops shadow tables *and* the moved-aside media copy; site untouched). `Success.jsx` shows a notice when a restore point exists: keep (do nothing) or **Discard restore point** → confirm → flips to "disk reclaimed", hides Roll Back. 6 new i18n keys. |
 | `13febbc` | **feat(rollback): same discard action on the persistent `RestorePointBanner`** so a returning user who closed the modal can also reclaim disk. Reuses the discard i18n keys; buttons disable each other while running. |
+| `0c0b4c9` | **feat(rollback): snapshot *every* prefixed table, not a fixed 9.** Was: hard-coded list (posts/postmeta/terms/…/options), so custom plugin tables (WooCommerce HPOS orders, form entries, bookings) were wiped by a reset but never backed up → lost on rollback. Now `Snapshot::tables()` discovers all `{prefix}*` tables via the same `SHOW TABLE STATUS` scan `databaseReset()` uses, minus an exclude list (`users`, `usermeta`, activity log, `sd_edi_snap_*` shadows, `actionscheduler*`), filterable via `sd/edi/snapshot_exclude_tables`. `restore()`/`drop()` now enumerate the **shadow** tables that actually exist and reverse-map to live names (imports can add/drop tables mid-run); `restore()` `CREATE TABLE IF NOT EXISTS` before refill so a dropped table still comes back. Reset-set == backup-set → complete restore. Verified on live MySQL: a custom `wp_wc_orders` table round-trips; excluded `wp_users` is not reverted (new users survive). |
 
 **New API surface:** `Snapshot::create( $sessionId, $reset, $demoSlug )` (was arg-less),
 `Snapshot::isForSession( $sessionId )`, `Snapshot::SESSION_OPTION`; `MediaSnapshot`
