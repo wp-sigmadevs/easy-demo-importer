@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-07-13T10:00:10+00:00\n"
+"POT-Creation-Date: 2026-07-13T10:43:04+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: easy-demo-importer\n"
@@ -607,19 +607,19 @@ msgid "Environment ready"
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:184
-msgid "Skip Demo Images"
+msgid "Import Demo Images"
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:185
-msgid "Exclude demo images to speed up the import. Recommended if the import fails repeatedly."
+msgid "Downloads the demo images. Turn off for a faster import, or if the import fails repeatedly."
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:186
-msgid "Skip Image Regeneration"
+msgid "Regenerate Images"
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:187
-msgid "Skips image regeneration during import for a faster experience. You can regenerate thumbnails later using a plugin like 'Regenerate Thumbnails'."
+msgid "Regenerates thumbnail sizes during import. Turn off for a faster import; you can regenerate later from Tools."
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:188
@@ -860,138 +860,142 @@ msgid "Close"
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:258
-msgid "Reload & Retry"
+msgid "More"
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:259
-msgid "Resume Import"
+msgid "Reload & Retry"
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:260
-msgid "Start Over"
+msgid "Resume Import"
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:261
-msgid "Resuming import from where it left off..."
+msgid "Start Over"
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:262
-msgid "Import was interrupted."
+msgid "Resuming import from where it left off..."
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:263
-msgid "Your previous import did not complete. Resume from where it left off, or start over to begin fresh."
+msgid "Import was interrupted."
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:264
-msgid "Click to Enlarge"
+msgid "Your previous import did not complete. Resume from where it left off, or start over to begin fresh."
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:265
-msgid "Contact Us"
+msgid "Click to Enlarge"
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:266
-msgid "View Documentation"
+msgid "Contact Us"
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:267
-msgid "Need help?"
+msgid "View Documentation"
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:268
-msgid "Documentation & FAQ"
+msgid "Need help?"
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:269
+msgid "Documentation & FAQ"
+msgstr ""
+
+#: inc/App/Backend/Enqueue.php:270
 msgid "All Demos"
 msgstr ""
 
-#: inc/App/Backend/Enqueue.php:272
+#: inc/App/Backend/Enqueue.php:273
 msgid "Need Help?"
 msgstr ""
 
-#: inc/App/Backend/Enqueue.php:273
+#: inc/App/Backend/Enqueue.php:274
 msgid "Documentation & FAQs"
 msgstr ""
 
-#: inc/App/Backend/Enqueue.php:278
+#: inc/App/Backend/Enqueue.php:279
 msgid "System status data copied to clipboard."
 msgstr ""
 
-#: inc/App/Backend/Enqueue.php:279
+#: inc/App/Backend/Enqueue.php:280
 msgid "Could not copy to clipboard. Please try again."
 msgstr ""
 
-#: inc/App/Backend/Enqueue.php:282
+#: inc/App/Backend/Enqueue.php:283
 msgid "Server Requirements Not Met"
 msgstr ""
 
-#: inc/App/Backend/Enqueue.php:283
+#: inc/App/Backend/Enqueue.php:284
 msgid "Your server does not meet the minimum requirements for demo import. Please review the Status & Logs page for details. Proceeding without meeting these requirements may result in a failed or incomplete import."
 msgstr ""
 
-#: inc/App/Backend/Enqueue.php:284
+#: inc/App/Backend/Enqueue.php:285
 msgid "Continue Anyway"
 msgstr ""
 
-#: inc/App/Backend/Enqueue.php:287
+#: inc/App/Backend/Enqueue.php:288
 msgid "Not installed"
 msgstr ""
 
-#: inc/App/Backend/Enqueue.php:288
+#: inc/App/Backend/Enqueue.php:289
 msgid "Installed and active"
 msgstr ""
 
-#: inc/App/Backend/Enqueue.php:289
+#: inc/App/Backend/Enqueue.php:290
 msgid "Installed but not active"
 msgstr ""
 
-#: inc/App/Backend/Enqueue.php:290
+#: inc/App/Backend/Enqueue.php:291
 msgid "Installed & active — update available"
 msgstr ""
 
-#: inc/App/Backend/Enqueue.php:291
+#: inc/App/Backend/Enqueue.php:292
 msgid "Installed but inactive — update available"
 msgstr ""
 
-#: inc/App/Backend/Enqueue.php:307
+#: inc/App/Backend/Enqueue.php:308
 msgid "We recommend backing up your site before proceeding. A backup plugin can help you restore your site if anything goes wrong during the import."
 msgstr ""
 
-#: inc/App/Backend/Enqueue.php:308
+#: inc/App/Backend/Enqueue.php:309
 msgid "This import will install all required plugins and bring in content, media, settings, customizer data, and widgets needed to replicate the demo site. Please review your existing content, as some data may be overwritten."
 msgstr ""
 
-#: inc/App/Backend/Enqueue.php:312
+#: inc/App/Backend/Enqueue.php:313
 msgid "To replicate the demo site, the following plugins will be automatically installed and activated if not already present. Scroll down to see the full list."
 msgstr ""
 
-#: inc/App/Backend/Enqueue.php:314
+#: inc/App/Backend/Enqueue.php:315
 msgid "Having trouble? Reach out to us and we'll help you get sorted quickly."
 msgstr ""
 
-#: inc/App/Backend/Enqueue.php:315
+#: inc/App/Backend/Enqueue.php:316
 msgid "Explore our documentation for step-by-step guides, helpful screenshots, and FAQs to walk you through the demo import process."
 msgstr ""
 
-#: inc/App/Backend/Enqueue.php:319
+#: inc/App/Backend/Enqueue.php:320
 msgid "Start"
 msgstr ""
 
-#: inc/App/Backend/Enqueue.php:320
+#: inc/App/Backend/Enqueue.php:321
 msgid "Readiness"
 msgstr ""
 
-#: inc/App/Backend/Enqueue.php:321
+#: inc/App/Backend/Enqueue.php:322
 msgid "Configure"
 msgstr ""
 
-#: inc/App/Backend/Enqueue.php:322
+#: inc/App/Backend/Enqueue.php:323
 msgid "Imports"
 msgstr ""
 
-#: inc/App/Backend/Enqueue.php:323
+#: inc/App/Backend/Enqueue.php:324
 msgid "End"
 msgstr ""
 
