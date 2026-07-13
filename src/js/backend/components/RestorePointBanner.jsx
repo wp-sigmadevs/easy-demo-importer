@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Alert, Button, Modal } from 'antd';
-import { RollbackOutlined } from '@ant-design/icons';
+import { RollbackOutlined, DeleteOutlined } from '@ant-design/icons';
 import { Api } from '../utils/Api';
 
 /* global sdEdiAdminParams */
@@ -14,6 +14,7 @@ import { Api } from '../utils/Api';
 const RestorePointBanner = () => {
 	const [available, setAvailable] = useState(false);
 	const [rolling, setRolling] = useState(false);
+	const [discarding, setDiscarding] = useState(false);
 
 	useEffect(() => {
 		let ignore = false;
@@ -61,6 +62,37 @@ const RestorePointBanner = () => {
 		});
 	};
 
+	/**
+	 * Discards the restore point to reclaim its disk. Non-destructive to the site,
+	 * but removes rollback — so it confirms first, then hides the banner.
+	 */
+	const handleDiscard = () => {
+		Modal.confirm({
+			title:
+				sdEdiAdminParams.discardConfirmTitle ||
+				'Discard the restore point?',
+			content:
+				sdEdiAdminParams.discardConfirmText ||
+				'This frees the disk space used by the backup. You will no longer be able to roll this import back.',
+			okText: sdEdiAdminParams.discardConfirm || 'Discard',
+			cancelText: sdEdiAdminParams.confirmNo || 'Cancel',
+			centered: true,
+			onOk: () => {
+				setDiscarding(true);
+
+				return Api.post('/sd/edi/v1/discard-restore-point', {})
+					.then((res) => {
+						if (res?.data?.success) {
+							setAvailable(false);
+						} else {
+							setDiscarding(false);
+						}
+					})
+					.catch(() => setDiscarding(false));
+			},
+		});
+	};
+
 	return (
 		<Alert
 			type="warning"
@@ -75,12 +107,31 @@ const RestorePointBanner = () => {
 				'You can roll your site back to the state it was in before that import. Rolling back also removes anything created since.'
 			}
 			action={
-				<Button danger loading={rolling} onClick={handleRollback}>
-					<RollbackOutlined />
-					<span>
-						{sdEdiAdminParams.rollbackButton || 'Roll Back'}
-					</span>
-				</Button>
+				<>
+					<Button
+						loading={discarding}
+						disabled={rolling}
+						onClick={handleDiscard}
+						style={{ marginRight: 8 }}
+					>
+						<DeleteOutlined />
+						<span>
+							{sdEdiAdminParams.discardButton ||
+								'Discard restore point'}
+						</span>
+					</Button>
+					<Button
+						danger
+						loading={rolling}
+						disabled={discarding}
+						onClick={handleRollback}
+					>
+						<RollbackOutlined />
+						<span>
+							{sdEdiAdminParams.rollbackButton || 'Roll Back'}
+						</span>
+					</Button>
+				</>
 			}
 		/>
 	);
