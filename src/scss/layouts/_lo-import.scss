@@ -74,8 +74,7 @@
 
 				.ant-timeline-item {
 					display: none;
-					transition: opacity 0.6s cubic-bezier(0.22, 0.61, 0.36, 1),
-						transform 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
+					transition: opacity 0.3s cubic-bezier(0.22, 0.61, 0.36, 1), transform 0.3s cubic-bezier(0.22, 0.61, 0.36, 1);
 					font-size: 20px !important;
 
 					@extend .edi-pos-r;
@@ -103,7 +102,7 @@
 
 					&:nth-last-child(1) {
 						transform: translateZ(0) translateY(0);
-						transition: 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
+						transition: 0.3s cubic-bezier(0.22, 0.61, 0.36, 1);
 					}
 
 					&:nth-last-child(2) {
