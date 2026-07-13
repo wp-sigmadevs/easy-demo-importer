@@ -226,9 +226,11 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 	 * The session lock is still held, so no re-initialisation needed.
 	 */
 	const handleResume = () => {
-		if (!resumeRequest) return;
+		if (!resumeRequest) {
+			return;
+		}
 
-		setCurrentStep(3);
+		setCurrentStep(4);
 		setShowImportProgress(true);
 		setImportProgress([
 			{
