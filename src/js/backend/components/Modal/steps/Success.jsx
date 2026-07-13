@@ -7,6 +7,7 @@ import {
 	RollbackOutlined,
 	FileTextOutlined,
 	SyncOutlined,
+	DeleteOutlined,
 } from '@ant-design/icons';
 import { Api } from '../../../utils/Api';
 
@@ -41,6 +42,7 @@ const Success = ({
 	const [failedCount, setFailedCount] = useState(0);
 	const [rollbackAvailable, setRollbackAvailable] = useState(false);
 	const [rolling, setRolling] = useState(false);
+	const [discard, setDiscard] = useState({ running: false, done: false });
 	const [retry, setRetry] = useState({
 		running: false,
 		done: false,
@@ -94,6 +96,39 @@ const Success = ({
 						}
 					})
 					.catch(() => setRolling(false));
+			},
+		});
+	};
+
+	/**
+	 * Discards the restore point to reclaim the disk it holds. Non-destructive to
+	 * the site, but removes the ability to roll this import back — so it confirms
+	 * first, then hides the rollback affordance.
+	 */
+	const handleDiscard = () => {
+		Modal.confirm({
+			title:
+				sdEdiAdminParams.discardConfirmTitle ||
+				'Discard the restore point?',
+			content:
+				sdEdiAdminParams.discardConfirmText ||
+				'This frees the disk space used by the backup. You will no longer be able to roll this import back.',
+			okText: sdEdiAdminParams.discardConfirm || 'Discard',
+			cancelText: sdEdiAdminParams.confirmNo || 'Cancel',
+			centered: true,
+			onOk: () => {
+				setDiscard({ running: true, done: false });
+
+				return Api.post('/sd/edi/v1/discard-restore-point', {})
+					.then((res) => {
+						if (res?.data?.success) {
+							setRollbackAvailable(false);
+							setDiscard({ running: false, done: true });
+						} else {
+							setDiscard({ running: false, done: false });
+						}
+					})
+					.catch(() => setDiscard({ running: false, done: false }));
 			},
 		});
 	};
@@ -182,6 +217,43 @@ const Success = ({
 		) : null;
 
 	/**
+	 * Keep-vs-discard prompt for the restore point. Shown on a happy import when a
+	 * restore point exists: keeping it (do nothing) preserves rollback; discarding
+	 * reclaims the disk the backup holds. Roll Back itself lives in the action row.
+	 */
+	const restorePointNotice =
+		importComplete && (rollbackAvailable || discard.done) ? (
+			<div
+				className="edi-restore-point-notice"
+				style={{ margin: '4px auto 16px', maxWidth: 520 }}
+			>
+				{discard.done ? (
+					<p style={{ margin: 0, color: '#50575e' }}>
+						{sdEdiAdminParams.discardDone ||
+							'Restore point discarded — disk space reclaimed.'}
+					</p>
+				) : (
+					<>
+						<p style={{ margin: '0 0 8px', color: '#50575e' }}>
+							{sdEdiAdminParams.restorePointKeepNotice ||
+								'A restore point is holding a backup of your previous site, which uses disk space. Keep it to stay able to roll back, or discard it now to free the space.'}
+						</p>
+						<Button
+							loading={discard.running}
+							onClick={handleDiscard}
+						>
+							<DeleteOutlined />
+							<span>
+								{sdEdiAdminParams.discardButton ||
+									'Discard restore point'}
+							</span>
+						</Button>
+					</>
+				)}
+			</div>
+		) : null;
+
+	/**
 	 * Link to the dedicated Import Log page (always available — a static admin
 	 * URL, not scoped to this run). Rendered as a button alongside Close /
 	 * View Site rather than duplicating entries inline: the dedicated page can
@@ -241,6 +313,7 @@ const Success = ({
 						<h3>{message}</h3>
 					</div>
 					{retryMedia}
+					{restorePointNotice}
 					<div className="ant-result-extra edi-d-flex edi-justify-content-center">
 						<Button key="close" onClick={handleReset}>
 							<CloseOutlined />
