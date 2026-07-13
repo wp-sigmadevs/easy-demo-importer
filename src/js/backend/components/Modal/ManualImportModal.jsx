@@ -11,10 +11,17 @@ import {
 	Segmented,
 } from 'antd';
 import {
-	UploadOutlined,
 	CloseOutlined,
+	DeleteOutlined,
 	DownloadOutlined,
 	QuestionCircleTwoTone,
+	CheckCircleFilled,
+	FileTextOutlined,
+	FileZipOutlined,
+	BgColorsOutlined,
+	AppstoreOutlined,
+	SettingOutlined,
+	PictureOutlined,
 } from '@ant-design/icons';
 import { doAxios } from '../../utils/Api';
 import Imports from './steps/Imports';
@@ -272,27 +279,81 @@ const ManualImportModal = ({ visible, onClose }) => {
 		}
 	};
 
-	// A single controlled file picker rendered as an antd Upload. Prevents the
-	// auto-upload (beforeUpload returns false) and just captures the File.
-	const filePicker = ({ file, setFile, accept, label }) => (
-		<div className="manual-file">
-			<Upload
-				accept={accept}
-				maxCount={1}
-				fileList={file ? [file] : []}
-				beforeUpload={(f) => {
-					setFile(f);
-					setError('');
-					return false;
-				}}
-				onRemove={() => setFile(null)}
-			>
-				<Button icon={<UploadOutlined />}>
-					{sdEdiAdminParams.manualChooseFile || 'Choose File'}
-				</Button>
-			</Upload>
-			<span className="manual-file-label">{label}</span>
-		</div>
+	const formatSize = (bytes) =>
+		bytes >= 1024 * 1024
+			? `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+			: `${Math.max(1, Math.round(bytes / 1024))} KB`;
+
+	// A single controlled file slot rendered as an antd Dragger, so each slot
+	// accepts both drag-and-drop and click-to-browse. Auto-upload is prevented
+	// (beforeUpload returns false) — the File is just captured into state.
+	// `wide` renders the large hero variant (content slot / bundle mode).
+	const fileSlot = ({
+		file,
+		setFile,
+		accept,
+		icon,
+		title,
+		subtitle,
+		required = false,
+		wide = false,
+	}) => (
+		<Upload.Dragger
+			className={`manual-slot${wide ? ' is-wide' : ''}${
+				file ? ' is-filled' : ''
+			}`}
+			accept={accept}
+			maxCount={1}
+			fileList={[]}
+			showUploadList={false}
+			beforeUpload={(f) => {
+				setFile(f);
+				setError('');
+				return false;
+			}}
+		>
+			<div className="manual-slot-body">
+				<span className="manual-slot-icon">
+					{file ? <CheckCircleFilled /> : icon}
+				</span>
+				<span className="manual-slot-meta">
+					<span className="manual-slot-title" title={file?.name}>
+						{file ? file.name : title}
+					</span>
+					<span className="manual-slot-hint">
+						{file ? formatSize(file.size) : subtitle}
+					</span>
+				</span>
+				{file ? (
+					<Button
+						className="manual-slot-remove"
+						type="text"
+						size="small"
+						icon={<DeleteOutlined />}
+						onClick={(e) => {
+							e.stopPropagation();
+							setFile(null);
+						}}
+					/>
+				) : (
+					<span
+						className={`manual-slot-tag${
+							required ? ' is-required' : ''
+						}`}
+					>
+						{required
+							? sdEdiAdminParams.manualRequired || 'Required'
+							: sdEdiAdminParams.manualOptional || 'Optional'}
+					</span>
+				)}
+			</div>
+			{wide && !file && (
+				<p className="manual-slot-drop-hint">
+					{sdEdiAdminParams.manualDropHint ||
+						'Drop a file or click to browse'}
+				</p>
+			)}
+		</Upload.Dragger>
 	);
 
 	const STEP_ITEMS = [
@@ -379,69 +440,106 @@ const ManualImportModal = ({ visible, onClose }) => {
 														'Files'}
 												</h5>
 
-												{mode === 'bundle'
-													? filePicker({
-															file: bundleFile,
+												{mode === 'bundle' ? (
+													fileSlot({
+														file: bundleFile,
+														setFile: setBundleFile,
+														accept: '.zip',
+														icon: (
+															<FileZipOutlined />
+														),
+														title:
+															sdEdiAdminParams.manualBundleDropTitle ||
+															'Drop your bundle .zip here',
+														subtitle:
+															sdEdiAdminParams.manualBundleDropHint ||
+															'One .zip containing content, customizer, widgets, settings and images',
+														required: true,
+														wide: true,
+													})
+												) : (
+													<>
+														{fileSlot({
+															file: contentFile,
 															setFile:
-																setBundleFile,
-															accept: '.zip',
-															label:
-																sdEdiAdminParams.manualBundleLabel ||
-																'Bundle (.zip: content, customizer, widgets, settings, images) — required',
-														})
-													: [
-															filePicker({
-																file: contentFile,
-																setFile:
-																	setContentFile,
-																accept: '.xml',
-																label:
-																	sdEdiAdminParams.manualContentLabel ||
-																	'Content (WXR / XML) — required',
-															}),
-															filePicker({
+																setContentFile,
+															accept: '.xml',
+															icon: (
+																<FileTextOutlined />
+															),
+															title:
+																sdEdiAdminParams.manualSlotContentTitle ||
+																'Content',
+															subtitle:
+																sdEdiAdminParams.manualSlotContentHint ||
+																'WXR / XML export',
+															required: true,
+															wide: true,
+														})}
+														<div className="manual-slot-grid">
+															{fileSlot({
 																file: customizerFile,
 																setFile:
 																	setCustomizerFile,
 																accept: '.dat',
-																label:
-																	sdEdiAdminParams.manualCustomizerLabel ||
-																	'Customizer (.dat) — optional',
-															}),
-															filePicker({
+																icon: (
+																	<BgColorsOutlined />
+																),
+																title:
+																	sdEdiAdminParams.manualSlotCustomizerTitle ||
+																	'Customizer',
+																subtitle:
+																	sdEdiAdminParams.manualSlotCustomizerHint ||
+																	'.dat file',
+															})}
+															{fileSlot({
 																file: widgetsFile,
 																setFile:
 																	setWidgetsFile,
 																accept: '.wie,.json',
-																label:
-																	sdEdiAdminParams.manualWidgetsLabel ||
-																	'Widgets (.wie / .json) — optional',
-															}),
-															filePicker({
+																icon: (
+																	<AppstoreOutlined />
+																),
+																title:
+																	sdEdiAdminParams.manualSlotWidgetsTitle ||
+																	'Widgets',
+																subtitle:
+																	sdEdiAdminParams.manualSlotWidgetsHint ||
+																	'.wie or .json',
+															})}
+															{fileSlot({
 																file: settingsFile,
 																setFile:
 																	setSettingsFile,
 																accept: '.json,.zip',
-																label:
-																	sdEdiAdminParams.manualSettingsLabel ||
-																	'Settings — single .json, or a .zip of per-option JSONs — optional',
-															}),
-															filePicker({
+																icon: (
+																	<SettingOutlined />
+																),
+																title:
+																	sdEdiAdminParams.manualSlotSettingsTitle ||
+																	'Settings',
+																subtitle:
+																	sdEdiAdminParams.manualSlotSettingsHint ||
+																	'.json, or .zip of JSONs',
+															})}
+															{fileSlot({
 																file: imagesFile,
 																setFile:
 																	setImagesFile,
 																accept: '.zip',
-																label:
-																	sdEdiAdminParams.manualImagesLabel ||
-																	'Images (.zip, mirrors the uploads folder) — optional',
-															}),
-														].map((picker, i) => (
-															<React.Fragment
-																key={i}
-															>
-																{picker}
-															</React.Fragment>
-														))}
+																icon: (
+																	<PictureOutlined />
+																),
+																title:
+																	sdEdiAdminParams.manualSlotImagesTitle ||
+																	'Images',
+																subtitle:
+																	sdEdiAdminParams.manualSlotImagesHint ||
+																	'.zip of the uploads folder',
+															})}
+														</div>
+													</>
+												)}
 											</div>
 										</Col>
 
