@@ -18,7 +18,7 @@ master (bf2a840)
        └─ wxr-state-split (d6601fa)  perf work + integration-test CI job
             ├─ preflight-check (6c68c57)      preflight gate (merged onward)
             └─ regenerate-thumbnails         regen tool + preflight[merged] + retry + rollback + WP-CLI
-                 └─ manual-import (fe52c16)   ← TIP: full manual import + review fixes + post-session polish
+                 └─ manual-import (13febbc)   ← TIP: full manual import + review fixes + rollback overhaul (§13)
 ```
 
 - **`manual-import`** is the accumulation branch and carries the entire stack.
@@ -300,3 +300,30 @@ in the original session's design and want a live-run check.
 
 State at handoff: 98 unit tests + integration CI green (PHP 7.4/8.3); clean tree;
 in sync with `origin/manual-import`. Nothing merged to `master`; no `v1.2.0` tag.
+
+## 13. Rollback overhaul — "why does my rollback restore nothing?" (`89bdf9f`..`13febbc`)
+
+Triggered by a report: *rollback restores no content; the snapshot table may not be
+created.* Root-caused with a live MySQL 8.4 repro (the shadow-table SQL round-trip
+itself is correct — 3 rows → wiped → 3 restored). Branch tip is now **`13febbc`**.
+
+| Commit | What |
+|---|---|
+| `89bdf9f` | **fix(rollback): fresh snapshot per import, not a reused stale one.** Root cause: `Snapshot::create()` was gated on `! Snapshot::exists()`, and shadow tables are only dropped on rollback — so every import after the first *reused the first import's restore point*. If that first snapshot was taken on an empty/fresh site (the normal case while testing), every later rollback reverted to empty → "no content". Fix: gate on the **session** (`Snapshot::isForSession($sessionId)` backed by option `sd_edi_snapshot_session`), not table existence. `create()` now `drop()`s stale shadows first and records the session marker (even on too-large skip, so per-chunk callers don't recount). Both call sites (`Initialize`, `InstallDemo`) updated. |
+| `72880d1` | **feat(rollback): snapshot the uploads media so rollback fully restores media files.** New `inc/Common/Utils/MediaSnapshot.php`, driven in lockstep through `Snapshot::create/restore/drop`. **Reset import** → rename `uploads/` aside instantly (no byte copy, no disk doubling), recreate empty, restore moves it back. **Non-reset / manual** → write a file manifest, rollback deletes only files the import added. Cross-filesystem uploads (custom `UPLOADS` disk) → rename fails → auto-fallback to manifest + logged warning. Symlinks skipped on walk + delete. Both strategies proven on a real temp FS. |
+| `e265026` | **feat(rollback): keep-or-discard prompt on the success screen.** New REST `POST /discard-restore-point` → `Snapshot::drop()` (drops shadow tables *and* the moved-aside media copy; site untouched). `Success.jsx` shows a notice when a restore point exists: keep (do nothing) or **Discard restore point** → confirm → flips to "disk reclaimed", hides Roll Back. 6 new i18n keys. |
+| `13febbc` | **feat(rollback): same discard action on the persistent `RestorePointBanner`** so a returning user who closed the modal can also reclaim disk. Reuses the discard i18n keys; buttons disable each other while running. |
+
+**New API surface:** `Snapshot::create( $sessionId, $reset, $demoSlug )` (was arg-less),
+`Snapshot::isForSession( $sessionId )`, `Snapshot::SESSION_OPTION`; `MediaSnapshot`
+(`create/restore/discard`, option `sd_edi_mediasnap`); REST `/discard-restore-point`.
+
+**Verify during QA:**
+- Rollback on a site that **already has content** (empty site correctly restores to empty — that is not a bug).
+- Media round-trip: reset import → rollback restores original image files; non-reset → demo media removed, originals intact.
+- A kept (not-rolled-back) reset import leaves originals in `wp-content/sd-edi-restore/` until the next snapshot/rollback — expected disk cost; auto-cleaned on next import or discard.
+- Discard from both the success screen and the banner frees disk and removes the rollback affordance.
+
+State at handoff: 98 unit tests pass, 0 phpcs errors, production build compiled, pot
+regenerated. Assets are gitignored (built at release), so only source is committed.
+Clean tree, in sync with `origin/manual-import`. Nothing merged to `master`; no tag.
