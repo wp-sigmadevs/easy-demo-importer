@@ -277,8 +277,23 @@ final class Snapshot {
 
 		$shadows = self::shadowTables();
 
+		// Restore the media library FIRST — its descriptor lives in the
+		// `sd_edi_mediasnap` option, and the options table is one of the shadows
+		// restored below. Reverting options before reading that descriptor would
+		// wipe it (it is written after the options snapshot is taken), leaving the
+		// media un-restored. Doing media first reads the descriptor while it is
+		// still present.
+		$media_restored = MediaSnapshot::restore();
+
 		if ( empty( $shadows ) ) {
-			return false;
+			// No database restore point. Still a success if media was reverted;
+			// clean up either way so no stale marker lingers.
+			if ( $media_restored ) {
+				self::drop();
+				wp_cache_flush();
+			}
+
+			return $media_restored;
 		}
 
 		foreach ( $shadows as $shadow ) {
@@ -293,10 +308,6 @@ final class Snapshot {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared
 			$wpdb->query( "INSERT INTO `{$table}` SELECT * FROM `{$shadow}`" );
 		}
-
-		// Restore the media library alongside the database so the two stay in
-		// lockstep (no-op when only a DB snapshot was taken).
-		MediaSnapshot::restore();
 
 		self::drop();
 
