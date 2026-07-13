@@ -117,7 +117,7 @@ class InstallDemo extends ImporterAjax {
 		// makes this a no-op there (and on the repeated per-chunk calls) so a
 		// snapshot is taken once per import and never twice.
 		if ( $this->snapshot && ! Snapshot::isForSession( $this->sessionId ) ) {
-			if ( Snapshot::create( $this->sessionId ) ) {
+			if ( Snapshot::create( $this->sessionId, $this->reset, $this->demoSlug ) ) {
 				ImportLogger::info(
 					esc_html__( 'Restore point created — this import can be rolled back.', 'easy-demo-importer' ),
 					$this->sessionId,

@@ -10,10 +10,12 @@
  * shadow, then drops the shadows.
  *
  * Scope is deliberately limited to the import's blast radius — content, terms,
- * comments and options — and never touches users or other tables. Restoring
- * reverts the site to the moment the snapshot was taken: anything created after
- * the import is lost, so this is offered opt-in with a loud confirmation and is
- * meant for fresh setup sites.
+ * comments and options — and never touches users or other tables. The media
+ * library (wp-content/uploads) is captured in lockstep via {@see MediaSnapshot}
+ * so a rollback restores the actual image files, not just their attachment rows.
+ * Restoring reverts the site to the moment the snapshot was taken: anything
+ * created after the import is lost, so this is offered opt-in with a loud
+ * confirmation and is meant for fresh setup sites.
  *
  * @package SigmaDevs\EasyDemoImporter
  * @since   1.2.0
@@ -129,11 +131,14 @@ final class Snapshot {
 	 * size, so the repeated per-chunk callers stop retrying for this session.
 	 *
 	 * @param string $sessionId Import session this restore point belongs to.
+	 * @param bool   $reset     Whether the import resets the database and uploads
+	 *                          (selects the media capture strategy).
+	 * @param string $demoSlug  Demo slug, for the activity log.
 	 *
 	 * @return bool True on success.
 	 * @since 1.2.0
 	 */
-	public static function create( string $sessionId = '' ): bool {
+	public static function create( string $sessionId = '', bool $reset = false, string $demoSlug = '' ): bool {
 		global $wpdb;
 
 		// Clear any stale shadows from a previous import before anything else, so
@@ -162,6 +167,10 @@ final class Snapshot {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared
 			$wpdb->query( "INSERT INTO `{$shadow}` SELECT * FROM `{$table}`" );
 		}
+
+		// Capture the media library too, so a rollback restores the image files
+		// and not just their attachment rows.
+		MediaSnapshot::create( $sessionId, $reset, $demoSlug );
 
 		return true;
 	}
@@ -194,6 +203,10 @@ final class Snapshot {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared
 			$wpdb->query( "INSERT INTO `{$table}` SELECT * FROM `{$shadow}`" );
 		}
+
+		// Restore the media library alongside the database so the two stay in
+		// lockstep (no-op when only a DB snapshot was taken).
+		MediaSnapshot::restore();
 
 		self::drop();
 
@@ -248,6 +261,9 @@ final class Snapshot {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared
 			$wpdb->query( "DROP TABLE IF EXISTS `{$shadow}`" );
 		}
+
+		// Discard the media half in lockstep with the database half.
+		MediaSnapshot::discard();
 
 		// The restore point is gone; forget which session owned it so the next
 		// import takes a fresh snapshot.
