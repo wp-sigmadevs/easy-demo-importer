@@ -136,20 +136,6 @@
 	}
 }
 
-// Secondary actions on the success screen, tucked behind the "More" button.
-// Portaled to <body>, so styled at the root rather than under the modal.
-.edi-success-more {
-	display: flex;
-	flex-direction: column;
-	gap: 8px;
-	min-width: 190px;
-
-	.ant-btn {
-		width: 100%;
-		justify-content: center;
-	}
-}
-
 // Manual-import modal — its file pickers. The rest of the chrome (steps,
 // option groups, action bar) is inherited from the shared modal styles.
 .edi-manual-modal {
