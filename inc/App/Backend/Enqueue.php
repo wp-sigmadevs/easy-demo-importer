@@ -171,6 +171,8 @@ class Enqueue extends EnqueueBase {
 
 				// Modal Step Two.
 				'requiredPluginsTitle'       => esc_html__( 'Required Plugins', 'easy-demo-importer' ),
+				'readinessTitle'             => esc_html__( 'Environment Readiness', 'easy-demo-importer' ),
+				'readinessIntro'             => esc_html__( 'These checks confirm your server can run the import. Resolve any blocking issue before you continue.', 'easy-demo-importer' ),
 				'configureImportTitle'       => esc_html__( 'Configure Your Import', 'easy-demo-importer' ),
 				'preflightTitle'             => esc_html__( 'Readiness check', 'easy-demo-importer' ),
 				'preflightBlocked'           => esc_html__( 'Resolve the failed checks below before importing.', 'easy-demo-importer' ),
@@ -313,9 +315,10 @@ class Enqueue extends EnqueueBase {
 				'ticketUrl'   => 'https://docs.sigmadevs.com/easy-demo-importer/contact-us/',
 				'stepTitles'  => [
 					'step1' => esc_html__( 'Start', 'easy-demo-importer' ),
-					'step2' => esc_html__( 'Configure', 'easy-demo-importer' ),
-					'step3' => esc_html__( 'Imports', 'easy-demo-importer' ),
-					'step4' => esc_html__( 'End', 'easy-demo-importer' ),
+					'step2' => esc_html__( 'Readiness', 'easy-demo-importer' ),
+					'step3' => esc_html__( 'Configure', 'easy-demo-importer' ),
+					'step4' => esc_html__( 'Imports', 'easy-demo-importer' ),
+					'step5' => esc_html__( 'End', 'easy-demo-importer' ),
 				],
 			]
 		);
