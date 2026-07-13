@@ -1,8 +1,6 @@
 import ModalHeader from '../ModalHeader';
-import React, { useEffect } from 'react';
-import PluginList from '../../PluginList';
-import PreflightPanel from '../../PreflightPanel';
-import { Button, Col, Row, Skeleton, Switch, Tooltip } from 'antd';
+import React from 'react';
+import { Button, Col, Row, Switch, Tooltip } from 'antd';
 import useSharedDataStore from '../../../utils/sharedDataStore';
 import {
 	ArrowLeftOutlined,
@@ -14,28 +12,21 @@ import {
 /* global sdEdiAdminParams */
 
 /**
- * Component representing the setup step in the modal.
+ * Configure step: the import options only. The required-plugins list and the
+ * environment checklist moved to the preceding Readiness step, so this step is
+ * just the user's choices, laid out in two columns — media options on the left,
+ * safety options (restore point, reset) on the right.
  *
- * @param            modalData.modalData
- * @param {Object}   modalData              - The data for the modal.
- * @param {Function} handleImport           - Function to handle the import process.
- * @param {Function} handleReset            - Handles resetting the modal.
- * @param            modalData.handleImport
- * @param            modalData.handleReset
+ * @param {Object}   props              - Component props.
+ * @param {Function} props.handleImport - Starts the import process.
+ * @param {Function} props.handleReset  - Closes/resets the modal.
  */
-const Setup = ({ modalData, handleImport, handleReset }) => {
-	/**
-	 * Values from the shared data store.
-	 */
+const Setup = ({ handleImport, handleReset }) => {
 	const {
 		excludeImages,
 		setExcludeImages,
 		reset,
 		setReset,
-		pluginList,
-		fetchPluginList,
-		loading,
-		setLoading,
 		currentStep,
 		setCurrentStep,
 		skipImageRegeneration,
@@ -43,70 +34,15 @@ const Setup = ({ modalData, handleImport, handleReset }) => {
 		snapshot,
 		setSnapshot,
 		preflightData,
-		fetchPreflightData,
 	} = useSharedDataStore();
 
 	/**
-	 * Sets the loading state to true.
-	 */
-	useEffect(() => {
-		setLoading(true);
-	}, [setLoading]);
-
-	/**
-	 * Fetches the plugin list from the server.
-	 */
-	useEffect(() => {
-		(async () => {
-			try {
-				await fetchPluginList('/sd/edi/v1/plugin/list');
-			} catch (error) {
-				console.error(error);
-			}
-		})();
-	}, [fetchPluginList]);
-
-	/**
-	 * Fetches the pre-import readiness report. fetchPreflightData handles its own
-	 * errors (it stores an error shape and never rejects), so no catch is needed.
-	 */
-	useEffect(() => {
-		fetchPreflightData('/sd/edi/v1/preflight');
-	}, [fetchPreflightData]);
-
-	/**
-	 * Readiness checks and whether a blocking check failed. While the report is
-	 * still loading (or if it errored), the import is never blocked.
+	 * Whether a blocking readiness check failed. The checklist itself lives on the
+	 * Readiness step; here we only read the result to keep Start Import gated.
 	 */
 	const preflight = preflightData?.success && preflightData.data;
-	const preflightChecks = preflight ? preflight.checks : [];
 	const importBlocked = preflight ? !preflight.canProceed : false;
 
-	const demoPluginData = pluginList.success ? pluginList.data : [];
-
-	/**
-	 * Array of plugin data objects.
-	 */
-	const pluginDataArray = Object.entries(demoPluginData).map(
-		([key, value]) => ({
-			key,
-			...value,
-		})
-	);
-
-	/**
-	 * Filtered array of plugin data objects based on modal data.
-	 */
-	const filteredPluginDataArray =
-		Object.keys(modalData?.data?.plugins || {}).length > 0
-			? pluginDataArray.filter(
-					(plugin) => modalData.data.plugins[plugin.key] !== undefined
-				)
-			: pluginDataArray;
-
-	/**
-	 * Function to handle the previous step action.
-	 */
 	const handlePrevious = () => {
 		setCurrentStep(currentStep - 1);
 	};
@@ -116,50 +52,11 @@ const Setup = ({ modalData, handleImport, handleReset }) => {
 			<ModalHeader currentStep={currentStep} />
 
 			<div className="modal-content-inner">
-				<Row gutter={[30, 30]}>
-					<Col
-						className="gutter-row"
-						xs={24}
-						sm={24}
-						md={12}
-						lg={12}
-						xl={12}
-					>
-						<div className="required-plugins">
-							<h3>{sdEdiAdminParams.requiredPluginsTitle}</h3>
-							<p>{sdEdiAdminParams.requiredPluginsIntro}</p>
-							{loading ? (
-								<div className="skeleton-list">
-									<Skeleton
-										active
-										avatar
-										paragraph={{ rows: 1, width: '25%' }}
-										style={{
-											borderBottom:
-												'1px solid rgba(5, 5, 5, 0.06)',
-										}}
-									/>
-									<Skeleton
-										active
-										avatar
-										paragraph={{ rows: 1, width: '25%' }}
-									/>
-								</div>
-							) : (
-								<PluginList plugins={filteredPluginDataArray} />
-							)}
-						</div>
-					</Col>
-					<Col
-						className="gutter-row configure-col"
-						xs={24}
-						sm={24}
-						md={12}
-						lg={12}
-						xl={12}
-					>
-						<div className="import-options">
-							<h3>{sdEdiAdminParams.configureImportTitle}</h3>
+				<div className="import-options">
+					<h3>{sdEdiAdminParams.configureImportTitle}</h3>
+
+					<Row gutter={[30, 20]}>
+						<Col xs={24} sm={24} md={12} lg={12} xl={12}>
 							<div className="import-option new">
 								<div className="choose exclude-images edi-d-flex edi-align-items-center edi-pos-r">
 									<Switch
@@ -193,6 +90,7 @@ const Setup = ({ modalData, handleImport, handleReset }) => {
 									</Tooltip>
 								</div>
 							</div>
+
 							{!excludeImages && (
 								<div className="import-option new">
 									<div className="choose exclude-images edi-d-flex edi-align-items-center edi-pos-r">
@@ -232,6 +130,9 @@ const Setup = ({ modalData, handleImport, handleReset }) => {
 									</div>
 								</div>
 							)}
+						</Col>
+
+						<Col xs={24} sm={24} md={12} lg={12} xl={12}>
 							<div className="import-option new">
 								<div className="choose snapshot edi-d-flex edi-align-items-center edi-pos-r">
 									<Switch
@@ -269,10 +170,11 @@ const Setup = ({ modalData, handleImport, handleReset }) => {
 								<div className="option-details">
 									<p>
 										{sdEdiAdminParams.snapshotDetails ||
-											'Before importing, a copy of your posts, pages, media records, categories, tags, menus, comments and site settings (including the theme customizer and widgets) is saved. If you are not happy with the result, one click restores your site to exactly this state — from the result screen or the “Restore point” banner on the importer page. Note: rolling back also removes anything created after this import, and the restore point is replaced the next time you import.'}
+											'Before importing, a copy of your posts, pages, media (including the uploaded image files, not just their records), categories, tags, menus, comments and site settings (including the theme customizer and widgets) is saved. If you are not happy with the result, one click restores your site to exactly this state — from the result screen or the “Restore point” banner on the importer page. Note: rolling back also removes anything created after this import, and the restore point is replaced the next time you import.'}
 									</p>
 								</div>
 							</div>
+
 							<div className="import-option last">
 								<div className="choose reset-db edi-d-flex edi-align-items-center">
 									<Switch
@@ -298,18 +200,9 @@ const Setup = ({ modalData, handleImport, handleReset }) => {
 									</p>
 								</div>
 							</div>
-						</div>
-					</Col>
-				</Row>
-
-				{preflightChecks.length > 0 && (
-					<div className="preflight-row">
-						<PreflightPanel
-							checks={preflightChecks}
-							blocked={importBlocked}
-						/>
-					</div>
-				)}
+						</Col>
+					</Row>
+				</div>
 
 				<div className="step-actions">
 					<div className="actions-left">
@@ -319,12 +212,10 @@ const Setup = ({ modalData, handleImport, handleReset }) => {
 						</Button>
 					</div>
 					<div className="actions-right edi-d-flex edi-align-items-center">
-						{currentStep > 1 && (
-							<Button type="primary" onClick={handlePrevious}>
-								<ArrowLeftOutlined />
-								<span>{sdEdiAdminParams.btnPrevious}</span>
-							</Button>
-						)}
+						<Button type="primary" onClick={handlePrevious}>
+							<ArrowLeftOutlined />
+							<span>{sdEdiAdminParams.btnPrevious}</span>
+						</Button>
 						<Button
 							type="primary"
 							onClick={handleImport}

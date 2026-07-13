@@ -1,4 +1,5 @@
 import Begin from './steps/Begin';
+import Readiness from './steps/Readiness';
 import Setup from './steps/Setup';
 import Imports from './steps/Imports';
 import Success from './steps/Success';
@@ -71,7 +72,7 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 				sdEdiAdminParams.importInterruptedHint ||
 					'Your previous import did not complete. Resume from where it left off, or start over to begin fresh.'
 			);
-			setCurrentStep(4);
+			setCurrentStep(5);
 		}
 	}, [visible]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -130,7 +131,7 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 				};
 
 				try {
-					setCurrentStep(3);
+					setCurrentStep(4);
 					setShowImportProgress(true);
 
 					// Start the import process
@@ -304,7 +305,8 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 										status: getCurrentStatus(
 											currentStep,
 											importComplete,
-											index
+											index,
+											steps.length
 										),
 									}))}
 								/>
@@ -327,6 +329,18 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 								}`}
 							>
 								{currentStep === 2 && (
+									<Readiness
+										modalData={modalData}
+										handleReset={handleReset}
+									/>
+								)}
+							</div>
+							<div
+								className={`modal-content step ${
+									currentStep === 3 ? 'fade-in' : 'fade-out'
+								}`}
+							>
+								{currentStep === 3 && (
 									<Setup
 										modalData={modalData}
 										handleImport={handleImport}
@@ -336,10 +350,10 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 							</div>
 							<div
 								className={`modal-content step import-step ${
-									currentStep === 3 ? 'fade-in' : 'fade-out'
+									currentStep === 4 ? 'fade-in' : 'fade-out'
 								}`}
 							>
-								{currentStep === 3 && (
+								{currentStep === 4 && (
 									<Imports
 										importStatus={importStatus}
 										importProgress={importProgress}
@@ -351,10 +365,10 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 							</div>
 							<div
 								className={`modal-content step ${
-									currentStep === 4 ? 'fade-in' : 'fade-out'
+									currentStep === 5 ? 'fade-in' : 'fade-out'
 								}`}
 							>
-								{currentStep === 4 && (
+								{currentStep === 5 && (
 									<Success
 										importComplete={importComplete}
 										handleReset={handleReset}

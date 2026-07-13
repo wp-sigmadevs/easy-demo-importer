@@ -18,14 +18,14 @@ const ICONS = {
 };
 
 /**
- * Pre-import readiness checklist, collapsed to a single summary bar.
+ * Pre-import readiness checklist under a status summary bar.
  *
- * Almost every load is all-green, so an always-open list is pure noise and
- * (in the fixed-height modal) overflowed onto the backdrop. Instead the panel
- * shows one status line and only reveals the full list on click — or
- * automatically when something warns or blocks, so real problems are never
- * hidden. Uses a CSS max-height transition (no motion library) to match the
- * rest of the UI.
+ * The full list is shown by default so users can review what was checked before
+ * they import; the summary bar stays on top as an at-a-glance status and lets
+ * them collapse the detail if they want. The body scrolls within its own bound
+ * (max-height + overflow) so a long list never spills onto the modal backdrop.
+ * A warning/blocking state always forces the list open. Uses a CSS max-height
+ * transition (no motion library) to match the rest of the UI.
  *
  * @param {Object}  props         - Component props.
  * @param {Array}   props.checks  - Readiness checks from the /preflight endpoint.
@@ -47,8 +47,9 @@ const PreflightPanel = ({ checks = [], blocked = false }) => {
 		overall = 'warn';
 	}
 
-	// Collapsed when all-green; open when there's something worth reading.
-	const [open, setOpen] = useState(overall !== 'pass');
+	// Open by default so users can review the checks before importing; still
+	// collapsible via the summary bar.
+	const [open, setOpen] = useState(true);
 
 	// Checks arrive async — if they resolve to a warning/blocking state after
 	// the first render, reveal the list rather than leaving it collapsed.
