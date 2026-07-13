@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-07-13T11:00:58+00:00\n"
+"POT-Creation-Date: 2026-07-13T11:59:18+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: easy-demo-importer\n"
@@ -731,7 +731,7 @@ msgstr ""
 
 #: inc/App/Backend/Enqueue.php:220
 #: inc/App/Backend/Enqueue.php:222
-#: inc/App/Backend/Enqueue.php:229
+#: inc/App/Backend/Enqueue.php:235
 msgid "Manual Import"
 msgstr ""
 
@@ -756,269 +756,293 @@ msgid "Upload"
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:227
-#: inc/App/Backend/Enqueue.php:251
-#: inc/App/Backend/Enqueue.php:259
+#: inc/App/Backend/Enqueue.php:257
+#: inc/App/Backend/Enqueue.php:265
 msgid "Import"
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:228
-#: inc/App/Backend/Enqueue.php:332
+#: inc/App/Backend/Enqueue.php:338
 msgid "End"
 msgstr ""
 
+#: inc/App/Backend/Enqueue.php:229
+msgid "Separate files"
+msgstr ""
+
 #: inc/App/Backend/Enqueue.php:230
-msgid "This imports into your current site. Keep the restore point on so you can roll back."
+msgid "Single bundle (.zip)"
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:231
-msgid "Content (WXR / XML) — required"
+msgid "Bundle (.zip: content, customizer, widgets, settings, images) — required"
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:232
-msgid "Customizer (.dat) — optional"
+msgid "Images (.zip, mirrors the uploads folder) — optional"
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:233
-msgid "Widgets (.wie / .json) — optional"
+msgid "Downloads images referenced by the export. Automatically skipped when you provide an images .zip."
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:234
-msgid "Theme settings (.json { option: value }) — optional"
-msgstr ""
-
-#: inc/App/Backend/Enqueue.php:235
-msgid "Uploading"
+msgid "Please choose a bundle .zip file."
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:236
-msgid "Please choose a content (WXR/XML) file."
+msgid "This imports into your current site. Keep the restore point on so you can roll back."
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:237
-msgid "Roll Back"
+msgid "Content (WXR / XML) — required"
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:238
-msgid "Roll back this import?"
+msgid "Customizer (.dat) — optional"
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:239
-msgid "This restores your site to the moment before this import. Anything created since (new posts, orders, users) will be permanently lost."
+msgid "Widgets (.wie / .json) — optional"
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:240
-msgid "Roll back"
+msgid "Settings — single .json, or a .zip of per-option JSONs — optional"
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:241
-msgid "A restore point is holding a backup of your previous site, which uses disk space. Keep it to stay able to roll back, or discard it now to free the space."
+msgid "Uploading"
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:242
-msgid "Discard restore point"
+msgid "Please choose a content (WXR/XML) file."
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:243
-msgid "Discard the restore point?"
+msgid "Roll Back"
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:244
-msgid "This frees the disk space used by the backup. You will no longer be able to roll this import back."
+msgid "Roll back this import?"
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:245
-msgid "Discard"
+msgid "This restores your site to the moment before this import. Anything created since (new posts, orders, users) will be permanently lost."
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:246
-msgid "Restore point discarded — disk space reclaimed."
+msgid "Roll back"
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:247
-msgid "Success"
+msgid "A restore point is holding a backup of your previous site, which uses disk space. Keep it to stay able to roll back, or discard it now to free the space."
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:248
-msgid "Completed with warnings"
+msgid "Discard restore point"
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:249
-msgid "Failed"
+msgid "Discard the restore point?"
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:250
-msgid "In progress"
+msgid "This frees the disk space used by the backup. You will no longer be able to roll this import back."
+msgstr ""
+
+#: inc/App/Backend/Enqueue.php:251
+msgid "Discard"
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:252
-msgid "No import activity has been logged yet."
+msgid "Restore point discarded — disk space reclaimed."
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:253
-msgid "Back to Demo Importer"
+msgid "Success"
+msgstr ""
+
+#: inc/App/Backend/Enqueue.php:254
+msgid "Completed with warnings"
+msgstr ""
+
+#: inc/App/Backend/Enqueue.php:255
+msgid "Failed"
+msgstr ""
+
+#: inc/App/Backend/Enqueue.php:256
+msgid "In progress"
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:258
-msgid "Live Preview"
+msgid "No import activity has been logged yet."
 msgstr ""
 
-#: inc/App/Backend/Enqueue.php:260
-msgid "Cancel"
-msgstr ""
-
-#: inc/App/Backend/Enqueue.php:261
-msgid "Continue"
-msgstr ""
-
-#: inc/App/Backend/Enqueue.php:262
-msgid "Previous"
-msgstr ""
-
-#: inc/App/Backend/Enqueue.php:263
-msgid "Start Import"
+#: inc/App/Backend/Enqueue.php:259
+msgid "Back to Demo Importer"
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:264
-msgid "View Site"
-msgstr ""
-
-#: inc/App/Backend/Enqueue.php:265
-msgid "Close"
+msgid "Live Preview"
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:266
-msgid "More"
+msgid "Cancel"
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:267
-msgid "Reload & Retry"
+msgid "Continue"
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:268
-msgid "Resume Import"
+msgid "Previous"
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:269
-msgid "Start Over"
+msgid "Start Import"
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:270
-msgid "Resuming import from where it left off..."
+msgid "View Site"
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:271
-msgid "Import was interrupted."
+msgid "Close"
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:272
-msgid "Your previous import did not complete. Resume from where it left off, or start over to begin fresh."
+msgid "More"
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:273
-msgid "Click to Enlarge"
+msgid "Reload & Retry"
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:274
-msgid "Contact Us"
+msgid "Resume Import"
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:275
-msgid "View Documentation"
+msgid "Start Over"
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:276
-msgid "Need help?"
+msgid "Resuming import from where it left off..."
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:277
-msgid "Documentation & FAQ"
+msgid "Import was interrupted."
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:278
-msgid "All Demos"
+msgid "Your previous import did not complete. Resume from where it left off, or start over to begin fresh."
+msgstr ""
+
+#: inc/App/Backend/Enqueue.php:279
+msgid "Click to Enlarge"
+msgstr ""
+
+#: inc/App/Backend/Enqueue.php:280
+msgid "Contact Us"
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:281
-msgid "Need Help?"
+msgid "View Documentation"
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:282
-msgid "Documentation & FAQs"
+msgid "Need help?"
+msgstr ""
+
+#: inc/App/Backend/Enqueue.php:283
+msgid "Documentation & FAQ"
+msgstr ""
+
+#: inc/App/Backend/Enqueue.php:284
+msgid "All Demos"
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:287
-msgid "System status data copied to clipboard."
+msgid "Need Help?"
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:288
-msgid "Could not copy to clipboard. Please try again."
-msgstr ""
-
-#: inc/App/Backend/Enqueue.php:291
-msgid "Server Requirements Not Met"
-msgstr ""
-
-#: inc/App/Backend/Enqueue.php:292
-msgid "Your server does not meet the minimum requirements for demo import. Please review the Status & Logs page for details. Proceeding without meeting these requirements may result in a failed or incomplete import."
+msgid "Documentation & FAQs"
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:293
-msgid "Continue Anyway"
+msgid "System status data copied to clipboard."
 msgstr ""
 
-#: inc/App/Backend/Enqueue.php:296
-msgid "Not installed"
+#: inc/App/Backend/Enqueue.php:294
+msgid "Could not copy to clipboard. Please try again."
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:297
-msgid "Installed and active"
+msgid "Server Requirements Not Met"
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:298
-msgid "Installed but not active"
+msgid "Your server does not meet the minimum requirements for demo import. Please review the Status & Logs page for details. Proceeding without meeting these requirements may result in a failed or incomplete import."
 msgstr ""
 
 #: inc/App/Backend/Enqueue.php:299
+msgid "Continue Anyway"
+msgstr ""
+
+#: inc/App/Backend/Enqueue.php:302
+msgid "Not installed"
+msgstr ""
+
+#: inc/App/Backend/Enqueue.php:303
+msgid "Installed and active"
+msgstr ""
+
+#: inc/App/Backend/Enqueue.php:304
+msgid "Installed but not active"
+msgstr ""
+
+#: inc/App/Backend/Enqueue.php:305
 msgid "Installed & active — update available"
 msgstr ""
 
-#: inc/App/Backend/Enqueue.php:300
+#: inc/App/Backend/Enqueue.php:306
 msgid "Installed but inactive — update available"
 msgstr ""
 
-#: inc/App/Backend/Enqueue.php:316
+#: inc/App/Backend/Enqueue.php:322
 msgid "We recommend backing up your site before proceeding. A backup plugin can help you restore your site if anything goes wrong during the import."
 msgstr ""
 
-#: inc/App/Backend/Enqueue.php:317
+#: inc/App/Backend/Enqueue.php:323
 msgid "This import will install all required plugins and bring in content, media, settings, customizer data, and widgets needed to replicate the demo site. Please review your existing content, as some data may be overwritten."
 msgstr ""
 
-#: inc/App/Backend/Enqueue.php:321
+#: inc/App/Backend/Enqueue.php:327
 msgid "To replicate the demo site, the following plugins will be automatically installed and activated if not already present. Scroll down to see the full list."
 msgstr ""
 
-#: inc/App/Backend/Enqueue.php:323
+#: inc/App/Backend/Enqueue.php:329
 msgid "Having trouble? Reach out to us and we'll help you get sorted quickly."
 msgstr ""
 
-#: inc/App/Backend/Enqueue.php:324
+#: inc/App/Backend/Enqueue.php:330
 msgid "Explore our documentation for step-by-step guides, helpful screenshots, and FAQs to walk you through the demo import process."
 msgstr ""
 
-#: inc/App/Backend/Enqueue.php:328
+#: inc/App/Backend/Enqueue.php:334
 msgid "Start"
 msgstr ""
 
-#: inc/App/Backend/Enqueue.php:329
+#: inc/App/Backend/Enqueue.php:335
 msgid "Readiness"
 msgstr ""
 
-#: inc/App/Backend/Enqueue.php:330
+#: inc/App/Backend/Enqueue.php:336
 msgid "Configure"
 msgstr ""
 
-#: inc/App/Backend/Enqueue.php:331
+#: inc/App/Backend/Enqueue.php:337
 msgid "Imports"
 msgstr ""
 
@@ -1035,68 +1059,58 @@ msgstr ""
 msgid "Install Demo Data"
 msgstr ""
 
-#: inc/App/Manual/ManualImport.php:131
+#: inc/App/Manual/ManualImport.php:173
 #: inc/App/Tools/RegenerateThumbnails.php:102
 msgid "Security check failed. Refresh the page and try again."
 msgstr ""
 
-#: inc/App/Manual/ManualImport.php:135
+#: inc/App/Manual/ManualImport.php:177
 #: inc/App/Tools/RegenerateThumbnails.php:106
 msgid "You do not have permission to do this."
 msgstr ""
 
-#: inc/App/Manual/ManualImport.php:141
+#: inc/App/Manual/ManualImport.php:183
 msgid "Another import is already in progress. Please wait for it to finish."
 msgstr ""
 
-#: inc/App/Manual/ManualImport.php:156
-msgid "A content (WXR/XML) file is required."
-msgstr ""
-
-#: inc/App/Manual/ManualImport.php:163
-msgid "Could not create the working directory. Check uploads folder permissions."
-msgstr ""
-
-#: inc/App/Manual/ManualImport.php:173
-msgid "The content file failed to upload or is too large."
-msgstr ""
-
-#: inc/App/Manual/ManualImport.php:177
-#: inc/App/Manual/ManualImport.php:250
-msgid "That does not look like a WordPress export (WXR/XML) file."
-msgstr ""
-
-#: inc/App/Manual/ManualImport.php:181
-#: inc/App/Manual/ManualImport.php:264
-msgid "Could not save the content file."
-msgstr ""
-
-#: inc/App/Manual/ManualImport.php:205
+#: inc/App/Manual/ManualImport.php:206
 msgid "Invalid upload session."
 msgstr ""
 
 #: inc/App/Manual/ManualImport.php:212
+msgid "Could not create the working directory. Check uploads folder permissions."
+msgstr ""
+
+#: inc/App/Manual/ManualImport.php:240
+msgid "Unknown upload target."
+msgstr ""
+
+#: inc/App/Manual/ManualImport.php:250
 msgid "A chunk failed to upload."
 msgstr ""
 
-#: inc/App/Manual/ManualImport.php:229
-msgid "The content file is too large."
+#: inc/App/Manual/ManualImport.php:265
+msgid "That file is too large."
 msgstr ""
 
-#: inc/App/Manual/ManualImport.php:258
-msgid "Could not create the working directory."
+#: inc/App/Manual/ManualImport.php:288
+msgid "Could not save an uploaded file."
 msgstr ""
 
-#: inc/App/Manual/ManualImport.php:289
-msgid "Could not save the customizer file."
+#: inc/App/Manual/ManualImport.php:331
+msgid "A content (WXR/XML) file is required, and it must be a valid WordPress export."
 msgstr ""
 
-#: inc/App/Manual/ManualImport.php:298
-msgid "Could not save the widgets file."
+#: inc/App/Manual/ManualImport.php:355
+msgid "The bundle .zip could not be unpacked."
 msgstr ""
 
-#: inc/App/Manual/ManualImport.php:307
-msgid "Could not save the settings file."
+#: inc/App/Manual/ManualImport.php:426
+msgid "The settings .zip could not be unpacked."
+msgstr ""
+
+#: inc/App/Manual/ManualImport.php:496
+msgid "The images .zip could not be unpacked into the uploads folder."
 msgstr ""
 
 #: inc/App/Rest/RestEndpoints.php:183

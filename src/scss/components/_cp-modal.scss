@@ -153,6 +153,14 @@
 // Manual-import modal — its file pickers. The rest of the chrome (steps,
 // option groups, action bar) is inherited from the shared modal styles.
 .edi-manual-modal {
+	.manual-mode-switch {
+		margin-bottom: 24px;
+
+		.ant-segmented {
+			font-weight: 500;
+		}
+	}
+
 	.manual-file {
 		display: flex;
 		align-items: center;

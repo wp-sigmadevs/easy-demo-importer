@@ -1,5 +1,15 @@
 import React, { useState } from 'react';
-import { Modal, Button, Switch, Steps, Row, Col, Upload, Tooltip } from 'antd';
+import {
+	Modal,
+	Button,
+	Switch,
+	Steps,
+	Row,
+	Col,
+	Upload,
+	Tooltip,
+	Segmented,
+} from 'antd';
 import {
 	UploadOutlined,
 	CloseOutlined,
@@ -13,15 +23,17 @@ import Success from './steps/Success';
 /* global sdEdiAdminParams */
 
 /**
- * Manual import modal — upload your own WXR (+ optional customizer / widgets /
- * settings) and run the full import pipeline against them. Shares the wizard
- * modal's chrome (step indicator, option groups, action bar) so it matches the
- * demo-import experience, and reuses the Imports (progress) and Success (result)
- * steps.
+ * Manual import modal — upload your own export and run the full import pipeline
+ * against it. Two modes feed the same server machinery:
+ *   - Separate: content .xml (required) + optional customizer .dat / widgets
+ *     .wie / settings (.json or a .zip of per-option JSONs) / images .zip.
+ *   - Bundle: a single .zip containing all of the above.
+ * Every file is uploaded in chunks (so large image/bundle zips beat PHP upload
+ * limits), then a finalize call unpacks + routes them server-side.
  *
- * Step numbers align with the shared doAxios helper: it drives the result screen
- * to step 5, so Upload = 1, Import (progress) = 2, End (result) = 5. The three
- * dots are mapped from those values.
+ * Shares the wizard modal's chrome and reuses the Imports (progress) and Success
+ * (result) steps. Step values align with doAxios (which drives the result to
+ * step 5): Upload = 1, Import = 2, End = 5; the three dots map from those.
  *
  * @param {Object}   props         - Props.
  * @param {boolean}  props.visible - Whether the modal is open.
@@ -29,6 +41,7 @@ import Success from './steps/Success';
  * @return {JSX.Element} The modal.
  */
 const ManualImportModal = ({ visible, onClose }) => {
+	const [mode, setMode] = useState('separate');
 	const [step, setStep] = useState(1);
 	const [snapshot, setSnapshot] = useState(true);
 	const [excludeImages, setExcludeImages] = useState(false);
@@ -47,8 +60,11 @@ const ManualImportModal = ({ visible, onClose }) => {
 	const [customizerFile, setCustomizerFile] = useState(null);
 	const [widgetsFile, setWidgetsFile] = useState(null);
 	const [settingsFile, setSettingsFile] = useState(null);
+	const [imagesFile, setImagesFile] = useState(null);
+	const [bundleFile, setBundleFile] = useState(null);
 
 	const reset = () => {
+		setMode('separate');
 		setStep(1);
 		setBusy(false);
 		setUploadPct(0);
@@ -64,6 +80,8 @@ const ManualImportModal = ({ visible, onClose }) => {
 		setCustomizerFile(null);
 		setWidgetsFile(null);
 		setSettingsFile(null);
+		setImagesFile(null);
+		setBundleFile(null);
 	};
 
 	const handleClose = () => {
@@ -81,8 +99,10 @@ const ManualImportModal = ({ visible, onClose }) => {
 		}
 	};
 
-	// Runs the import pipeline once the upload has assembled server-side.
-	const proceed = (key, sid) => {
+	// Runs the import pipeline once the upload has assembled + finalized. When the
+	// server extracted bundled media, image downloading is skipped (the files are
+	// already in uploads).
+	const proceed = (key, sid, hasImages) => {
 		setSessionId(sid);
 		setManualKey(key);
 		setStep(2);
@@ -96,7 +116,7 @@ const ManualImportModal = ({ visible, onClose }) => {
 			manualKey: key,
 			reset: false,
 			snapshot: snapshot ? 'true' : 'false',
-			excludeImages: excludeImages ? 'true' : 'false',
+			excludeImages: hasImages || excludeImages ? 'true' : 'false',
 			skipImageRegeneration: 'false',
 			sessionId: sid,
 			nextPhase: 'sd_edi_import_xml',
@@ -116,8 +136,96 @@ const ManualImportModal = ({ visible, onClose }) => {
 
 	const CHUNK_SIZE = 4 * 1024 * 1024;
 
-	const start = () => {
-		if (!contentFile) {
+	// Uploads one file to its named target, chunk by chunk. Resolves when the
+	// server has assembled the whole file; rejects with a message on failure.
+	const uploadFile = (file, target, uploadId, onProgress) =>
+		new Promise((resolve, reject) => {
+			const total = Math.max(1, Math.ceil(file.size / CHUNK_SIZE));
+
+			const send = (i) => {
+				const blob = file.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
+				const fd = new FormData();
+				fd.append('action', 'sd_edi_manual_upload');
+				fd.append('sd_edi_nonce', sdEdiAdminParams.sd_edi_nonce);
+				fd.append('uploadId', uploadId);
+				fd.append('target', target);
+				fd.append('chunkIndex', i);
+				fd.append('totalChunks', total);
+				fd.append('chunk', blob, file.name);
+
+				fetch(sdEdiAdminParams.ajaxUrl, {
+					method: 'POST',
+					body: fd,
+					credentials: 'same-origin',
+				})
+					.then((r) => r.json())
+					.then((res) => {
+						if (!res?.success) {
+							reject(res?.data?.message || 'Upload failed.');
+							return;
+						}
+						onProgress((i + 1) / total);
+						if (res.data.done) {
+							resolve();
+						} else {
+							send(i + 1);
+						}
+					})
+					.catch(() => reject('Upload failed.'));
+			};
+
+			send(0);
+		});
+
+	// Asks the server to unpack + route the staged files and start the session.
+	const finalizeUpload = (uploadId) => {
+		const fd = new FormData();
+		fd.append('action', 'sd_edi_manual_upload');
+		fd.append('sd_edi_nonce', sdEdiAdminParams.sd_edi_nonce);
+		fd.append('uploadId', uploadId);
+		fd.append('finalize', '1');
+
+		return fetch(sdEdiAdminParams.ajaxUrl, {
+			method: 'POST',
+			body: fd,
+			credentials: 'same-origin',
+		}).then((r) => r.json());
+	};
+
+	// Builds the [file, target] list for the active mode.
+	const filesToUpload = () => {
+		if (mode === 'bundle') {
+			return bundleFile ? [[bundleFile, 'bundle']] : [];
+		}
+
+		const list = [[contentFile, 'content']];
+
+		if (customizerFile) {
+			list.push([customizerFile, 'customizer']);
+		}
+		if (widgetsFile) {
+			list.push([widgetsFile, 'widgets']);
+		}
+		if (settingsFile) {
+			const isZip = /\.zip$/i.test(settingsFile.name);
+			list.push([settingsFile, isZip ? 'settingsZip' : 'settings']);
+		}
+		if (imagesFile) {
+			list.push([imagesFile, 'images']);
+		}
+
+		return list;
+	};
+
+	const start = async () => {
+		if (mode === 'bundle' && !bundleFile) {
+			setError(
+				sdEdiAdminParams.manualNoBundle ||
+					'Please choose a bundle .zip file.'
+			);
+			return;
+		}
+		if (mode === 'separate' && !contentFile) {
 			setError(
 				sdEdiAdminParams.manualNoContent ||
 					'Please choose a content (WXR/XML) file.'
@@ -125,70 +233,43 @@ const ManualImportModal = ({ visible, onClose }) => {
 			return;
 		}
 
-		setError('');
-		setBusy(true);
-		setUploadPct(0);
-
-		const total = Math.max(1, Math.ceil(contentFile.size / CHUNK_SIZE));
+		const files = filesToUpload();
 		const uploadId = (
 			Date.now().toString(16) + Math.random().toString(16).slice(2)
 		)
 			.replace(/[^a-f0-9]/g, '')
 			.slice(0, 20);
 
-		// Uploads the content file one slice per request; the optional small files
-		// ride along on the final chunk. The server assembles + validates.
-		const sendChunk = (i) => {
-			const startByte = i * CHUNK_SIZE;
-			const blob = contentFile.slice(startByte, startByte + CHUNK_SIZE);
+		setError('');
+		setBusy(true);
+		setUploadPct(0);
 
-			const fd = new FormData();
-			fd.append('action', 'sd_edi_manual_upload');
-			fd.append('sd_edi_nonce', sdEdiAdminParams.sd_edi_nonce);
-			fd.append('uploadId', uploadId);
-			fd.append('chunkIndex', i);
-			fd.append('totalChunks', total);
-			fd.append('chunk', blob, 'content.xml');
-
-			if (i === total - 1) {
-				if (customizerFile) {
-					fd.append('customizer', customizerFile);
-				}
-				if (widgetsFile) {
-					fd.append('widgets', widgetsFile);
-				}
-				if (settingsFile) {
-					fd.append('settings', settingsFile);
-				}
+		try {
+			for (let n = 0; n < files.length; n++) {
+				const [file, target] = files[n];
+				// eslint-disable-next-line no-await-in-loop
+				await uploadFile(file, target, uploadId, (p) => {
+					setUploadPct(Math.round(((n + p) / files.length) * 100));
+				});
 			}
 
-			fetch(sdEdiAdminParams.ajaxUrl, {
-				method: 'POST',
-				body: fd,
-				credentials: 'same-origin',
-			})
-				.then((r) => r.json())
-				.then((res) => {
-					if (!res?.success) {
-						setBusy(false);
-						setError(res?.data?.message || 'Upload failed.');
-						return;
-					}
+			const res = await finalizeUpload(uploadId);
 
-					if (res.data.done) {
-						proceed(res.data.manualKey, res.data.sessionId);
-					} else {
-						setUploadPct(Math.round(((i + 1) / total) * 100));
-						sendChunk(i + 1);
-					}
-				})
-				.catch(() => {
-					setBusy(false);
-					setError('Upload failed.');
-				});
-		};
+			if (!res?.success) {
+				setBusy(false);
+				setError(res?.data?.message || 'Import could not be prepared.');
+				return;
+			}
 
-		sendChunk(0);
+			proceed(
+				res.data.manualKey,
+				res.data.sessionId,
+				!!res.data.hasImages
+			);
+		} catch (e) {
+			setBusy(false);
+			setError(typeof e === 'string' ? e : 'Upload failed.');
+		}
 	};
 
 	// A single controlled file picker rendered as an antd Upload. Prevents the
@@ -224,6 +305,8 @@ const ManualImportModal = ({ visible, onClose }) => {
 	const DOT_BY_STEP = { 1: 0, 2: 1, 5: 2 };
 	const dotCurrent = DOT_BY_STEP[step] ?? 2;
 
+	const startDisabled = mode === 'bundle' ? !bundleFile : !contentFile;
+
 	return (
 		<Modal
 			open={visible}
@@ -258,10 +341,29 @@ const ManualImportModal = ({ visible, onClose }) => {
 						{step === 1 && (
 							<div className="modal-content-inner">
 								<div className="import-options">
-									<h3>
-										{sdEdiAdminParams.manualUploadTitle ||
-											'Upload Your Export Files'}
-									</h3>
+									<div className="manual-mode-switch">
+										<Segmented
+											value={mode}
+											onChange={(v) => {
+												setMode(v);
+												setError('');
+											}}
+											options={[
+												{
+													label:
+														sdEdiAdminParams.manualModeSeparate ||
+														'Separate files',
+													value: 'separate',
+												},
+												{
+													label:
+														sdEdiAdminParams.manualModeBundle ||
+														'Single bundle (.zip)',
+													value: 'bundle',
+												},
+											]}
+										/>
+									</div>
 
 									<Row gutter={[30, 24]}>
 										<Col
@@ -277,38 +379,69 @@ const ManualImportModal = ({ visible, onClose }) => {
 														'Files'}
 												</h5>
 
-												{filePicker({
-													file: contentFile,
-													setFile: setContentFile,
-													accept: '.xml',
-													label:
-														sdEdiAdminParams.manualContentLabel ||
-														'Content (WXR / XML) — required',
-												})}
-												{filePicker({
-													file: customizerFile,
-													setFile: setCustomizerFile,
-													accept: '.dat',
-													label:
-														sdEdiAdminParams.manualCustomizerLabel ||
-														'Customizer (.dat) — optional',
-												})}
-												{filePicker({
-													file: widgetsFile,
-													setFile: setWidgetsFile,
-													accept: '.wie,.json',
-													label:
-														sdEdiAdminParams.manualWidgetsLabel ||
-														'Widgets (.wie / .json) — optional',
-												})}
-												{filePicker({
-													file: settingsFile,
-													setFile: setSettingsFile,
-													accept: '.json',
-													label:
-														sdEdiAdminParams.manualSettingsLabel ||
-														'Theme settings (.json) — optional',
-												})}
+												{mode === 'bundle'
+													? filePicker({
+															file: bundleFile,
+															setFile:
+																setBundleFile,
+															accept: '.zip',
+															label:
+																sdEdiAdminParams.manualBundleLabel ||
+																'Bundle (.zip: content, customizer, widgets, settings, images) — required',
+														})
+													: [
+															filePicker({
+																file: contentFile,
+																setFile:
+																	setContentFile,
+																accept: '.xml',
+																label:
+																	sdEdiAdminParams.manualContentLabel ||
+																	'Content (WXR / XML) — required',
+															}),
+															filePicker({
+																file: customizerFile,
+																setFile:
+																	setCustomizerFile,
+																accept: '.dat',
+																label:
+																	sdEdiAdminParams.manualCustomizerLabel ||
+																	'Customizer (.dat) — optional',
+															}),
+															filePicker({
+																file: widgetsFile,
+																setFile:
+																	setWidgetsFile,
+																accept: '.wie,.json',
+																label:
+																	sdEdiAdminParams.manualWidgetsLabel ||
+																	'Widgets (.wie / .json) — optional',
+															}),
+															filePicker({
+																file: settingsFile,
+																setFile:
+																	setSettingsFile,
+																accept: '.json,.zip',
+																label:
+																	sdEdiAdminParams.manualSettingsLabel ||
+																	'Settings — single .json, or a .zip of per-option JSONs — optional',
+															}),
+															filePicker({
+																file: imagesFile,
+																setFile:
+																	setImagesFile,
+																accept: '.zip',
+																label:
+																	sdEdiAdminParams.manualImagesLabel ||
+																	'Images (.zip, mirrors the uploads folder) — optional',
+															}),
+														].map((picker, i) => (
+															<React.Fragment
+																key={i}
+															>
+																{picker}
+															</React.Fragment>
+														))}
 											</div>
 										</Col>
 
@@ -366,7 +499,8 @@ const ManualImportModal = ({ visible, onClose }) => {
 														</h4>
 														<Tooltip
 															title={
-																sdEdiAdminParams.importImagesHint
+																sdEdiAdminParams.manualImportImagesHint ||
+																'Downloads images referenced by the export. Automatically skipped when you provide an images .zip.'
 															}
 														>
 															<span className="manual-help">
@@ -406,7 +540,7 @@ const ManualImportModal = ({ visible, onClose }) => {
 										<Button
 											type="primary"
 											loading={busy}
-											disabled={!contentFile}
+											disabled={startDisabled}
 											onClick={start}
 										>
 											<span>
