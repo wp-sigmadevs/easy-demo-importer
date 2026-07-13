@@ -12,4 +12,23 @@
 	.edi-server-status-wrapper {
 		margin: 0 0 0 -20px;
 	}
+
+	// Manual-import call to action — a right-aligned, intentional secondary
+	// action rather than a lone button floating above the demo grid.
+	.edi-manual-import-bar {
+		display: flex;
+		align-items: center;
+		justify-content: flex-end;
+		gap: 12px;
+		margin: 4px 0 18px;
+
+		.edi-manual-import-hint {
+			font-size: 13px;
+			color: #6b7280;
+		}
+
+		.ant-btn {
+			font-weight: 500;
+		}
+	}
 }
