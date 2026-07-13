@@ -335,46 +335,79 @@
 			}
 
 			.import-options {
-				padding: 30px;
-				//border: 2px solid #2d74d5;
-				border: 2px solid $color-primary;
-				//height: 300px;
-				flex-direction: column;
+				padding: 30px 30px 10px;
 
-				@extend .edi-d-flex;
-				@extend .edi-justify-content-center;
+				// The modal is a fixed height with the action bar pinned to its
+				// bottom, so tall option content must scroll rather than hide
+				// behind the bar. Heights mirror the Begin step's preview pane.
+				overflow-y: auto;
+				max-height: 330px;
+
+				@media only screen and (min-height: 680px) {
+					max-height: 360px;
+				}
 
 				@media only screen and (min-height: 765px) {
-					//height: 310px;
+					max-height: 400px;
+				}
+
+				@media only screen and (min-height: 850px) {
+					max-height: 445px;
+				}
+
+				@media only screen and (min-height: 950px) {
+					max-height: 495px;
+				}
+
+				@media only screen and (min-height: 1050px) {
+					max-height: 545px;
 				}
 
 				h3 {
-					margin-bottom: 30px;
+					margin-bottom: 26px;
 				}
 
-				.option-details {
-					p {
-						font-size: 14px;
-						color: #777;
-						font-style: italic;
+				// Two option groups sit side by side. The left group is plain;
+				// the right group is a subtle card so the high-impact safety
+				// options (restore point + destructive reset) draw the eye.
+				.configure-group {
+					height: 100%;
+
+					&.is-card {
+						padding: 22px 24px;
+						border: 1px solid rgba(5, 5, 5, 0.12);
+						border-radius: 10px;
+						background: #fcfcfd;
 					}
 
-					&.warn-text {
-						p {
-							@extend .warn-text;
-						}
+					&.is-plain {
+						// Align content with the card's top edge without the
+						// left inset, so the divide reads as "boxed vs open".
+						padding: 22px 24px 0 2px;
 					}
+				}
+
+				.configure-group-label {
+					margin: 0 0 18px;
+					font-size: 12px;
+					font-weight: 600;
+					letter-spacing: 0.06em;
+					text-transform: uppercase;
+					color: #8a8f94;
 				}
 
 				.choose {
-					column-gap: 15px;
+					column-gap: 14px;
 
 					h4 {
-						margin-bottom: 0;
-						margin-top: 0;
+						margin: 0;
+						font-size: 16px;
+						line-height: 1.3;
 					}
 
 					.ant-switch {
+						flex: 0 0 auto;
+
 						&.ant-switch-checked {
 							background-image: linear-gradient(109.6deg, rgb(45, 116, 213) 11.2%, rgb(121, 137, 212) 91.2%);
 							background-size: 200% auto;
@@ -386,24 +419,32 @@
 					}
 				}
 
-				.import-option {
-					&:not(:last-child) {
-						border-bottom: 1px solid rgba(5, 5, 5, 0.06);
-						margin-bottom: 20px;
+				// Every option is uniform: a switch + label, then a muted
+				// description underneath — no hover-only tooltips.
+				.option-details {
+					margin-top: 8px;
+
+					p {
+						margin: 0;
+						font-size: 13px;
+						line-height: 1.55;
+						color: #777;
+						font-style: italic;
 					}
 
-					&.last {
-						.option-details {
-							p {
-								&:last-child {
-									margin-bottom: 0;
-								}
-							}
+					&.warn-text {
+						p {
+							@extend .warn-text;
+							font-style: normal;
 						}
 					}
+				}
 
-					&.new {
-						padding-bottom: 20px;
+				.import-option {
+					&:not(:last-child) {
+						margin-bottom: 18px;
+						padding-bottom: 18px;
+						border-bottom: 1px solid rgba(5, 5, 5, 0.07);
 					}
 				}
 			}

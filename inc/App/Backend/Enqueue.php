@@ -174,6 +174,8 @@ class Enqueue extends EnqueueBase {
 				'readinessTitle'             => esc_html__( 'Environment Readiness', 'easy-demo-importer' ),
 				'readinessIntro'             => esc_html__( 'These checks confirm your server can run the import. Resolve any blocking issue before you continue.', 'easy-demo-importer' ),
 				'configureImportTitle'       => esc_html__( 'Configure Your Import', 'easy-demo-importer' ),
+				'configurePerformanceLabel'  => esc_html__( 'Performance', 'easy-demo-importer' ),
+				'configureSafetyLabel'       => esc_html__( 'Safety', 'easy-demo-importer' ),
 				'preflightTitle'             => esc_html__( 'Readiness check', 'easy-demo-importer' ),
 				'preflightBlocked'           => esc_html__( 'Resolve the failed checks below before importing.', 'easy-demo-importer' ),
 				'preflightSummaryFail'       => esc_html__( 'Issues must be fixed to start import', 'easy-demo-importer' ),
