@@ -314,7 +314,7 @@ export const doAxios = async (
 							);
 						}, 3000);
 					} else {
-						setCurrentStep(4);
+						setCurrentStep(5);
 					}
 				} else {
 					setMessage(
@@ -326,7 +326,7 @@ export const doAxios = async (
 					if (request.sessionId) {
 						setResumeRequest(request);
 					}
-					setCurrentStep(4);
+					setCurrentStep(5);
 				}
 			} else {
 				if (canAutoResume(response.status)) {
@@ -340,7 +340,7 @@ export const doAxios = async (
 				if (request.sessionId) {
 					setResumeRequest(request);
 				}
-				setCurrentStep(4);
+				setCurrentStep(5);
 			}
 		} catch (error) {
 			const status = error.response ? error.response.status : 0;
@@ -372,7 +372,7 @@ export const doAxios = async (
 			if (request.sessionId) {
 				setResumeRequest(request);
 			}
-			setCurrentStep(4);
+			setCurrentStep(5);
 		}
 	} else {
 		setMessage(sdEdiAdminParams.importSuccess);
