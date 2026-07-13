@@ -174,6 +174,8 @@ class Enqueue extends EnqueueBase {
 				'configureImportTitle'       => esc_html__( 'Configure Your Import', 'easy-demo-importer' ),
 				'preflightTitle'             => esc_html__( 'Readiness check', 'easy-demo-importer' ),
 				'preflightBlocked'           => esc_html__( 'Resolve the failed checks below before importing.', 'easy-demo-importer' ),
+				'preflightSummaryFail'       => esc_html__( 'Issues must be fixed to start import', 'easy-demo-importer' ),
+				'preflightSummaryReady'      => esc_html__( 'Environment ready', 'easy-demo-importer' ),
 				'requiredPluginsIntro'       => self::importModalTexts()['stepTwo']['requiredPluginsIntro'],
 				'excludeImagesTitle'         => esc_html__( 'Skip Demo Images', 'easy-demo-importer' ),
 				'excludeImagesHint'          => esc_html__( 'Exclude demo images to speed up the import. Recommended if the import fails repeatedly.', 'easy-demo-importer' ),
