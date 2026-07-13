@@ -151,6 +151,7 @@ class RestEndpoints extends Base {
 		$this->addPreflightEndpoint();
 		$this->addFailedMediaEndpoint();
 		$this->addRollbackEndpoint();
+		$this->addDiscardEndpoint();
 	}
 
 	/**
@@ -187,6 +188,38 @@ class RestEndpoints extends Base {
 		}
 
 		return $this->sendResponse( [ 'done' => true ], esc_html__( 'Site rolled back.', 'easy-demo-importer' ) );
+	}
+
+	/**
+	 * Add Discard route (drop the restore point to reclaim disk).
+	 *
+	 * @return void
+	 * @since 1.2.0
+	 */
+	public function addDiscardEndpoint() {
+		register_rest_route(
+			$this->getNamespace(),
+			'/discard-restore-point',
+			[
+				'methods'             => 'POST',
+				'callback'            => [ $this, 'discardRestorePoint' ],
+				'permission_callback' => [ $this, 'permission' ],
+			]
+		);
+	}
+
+	/**
+	 * Discards the restore point — drops the shadow tables and the moved-aside
+	 * media copy — when the user is happy with the import and wants the disk back.
+	 * The site itself is untouched.
+	 *
+	 * @return WP_REST_Response
+	 * @since 1.2.0
+	 */
+	public function discardRestorePoint() {
+		Snapshot::drop();
+
+		return $this->sendResponse( [ 'done' => true ], esc_html__( 'Restore point discarded.', 'easy-demo-importer' ) );
 	}
 
 	/**
