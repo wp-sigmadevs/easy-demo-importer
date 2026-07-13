@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Result, Button, Modal, Popover } from 'antd';
+import { Result, Button, Modal, Dropdown, Space, Tooltip } from 'antd';
 import {
 	ExportOutlined,
 	CloseOutlined,
@@ -8,7 +8,7 @@ import {
 	FileTextOutlined,
 	SyncOutlined,
 	DeleteOutlined,
-	DownOutlined,
+	EllipsisOutlined,
 } from '@ant-design/icons';
 import { Api } from '../../../utils/Api';
 
@@ -218,39 +218,20 @@ const Success = ({
 		) : null;
 
 	/**
-	 * Keep-vs-discard prompt for the restore point. Shown on a happy import when a
-	 * restore point exists: keeping it (do nothing) preserves rollback; discarding
-	 * reclaims the disk the backup holds. Roll Back itself lives in the action row.
+	 * Confirmation shown once the restore point has been discarded. The
+	 * pre-discard prompt now lives in the action row's dropdown (Discard
+	 * Restore Point item, help text as its tooltip) instead of here.
 	 */
 	const restorePointNotice =
-		importComplete && (rollbackAvailable || discard.done) ? (
+		importComplete && discard.done ? (
 			<div
 				className="edi-restore-point-notice"
 				style={{ margin: '4px auto 16px', maxWidth: 520 }}
 			>
-				{discard.done ? (
-					<p style={{ margin: 0, color: '#50575e' }}>
-						{sdEdiAdminParams.discardDone ||
-							'Restore point discarded — disk space reclaimed.'}
-					</p>
-				) : (
-					<>
-						<p style={{ margin: '0 0 8px', color: '#50575e' }}>
-							{sdEdiAdminParams.restorePointKeepNotice ||
-								'A restore point is holding a backup of your previous site, which uses disk space. Keep it to stay able to roll back, or discard it now to free the space.'}
-						</p>
-						<Button
-							loading={discard.running}
-							onClick={handleDiscard}
-						>
-							<DeleteOutlined />
-							<span>
-								{sdEdiAdminParams.discardButton ||
-									'Discard restore point'}
-							</span>
-						</Button>
-					</>
-				)}
+				<p style={{ margin: 0, color: '#50575e' }}>
+					{sdEdiAdminParams.discardDone ||
+						'Restore point discarded — disk space reclaimed.'}
+				</p>
 			</div>
 		) : null;
 
@@ -279,6 +260,66 @@ const Success = ({
 		const handleViewSite = () => {
 			const homeUrl = sdEdiAdminParams.homeUrl;
 			window.open(homeUrl, '_blank');
+		};
+
+		/**
+		 * Secondary actions collapsed into the "More…" dropdown.
+		 */
+		const moreItems = [
+			{
+				key: 'close',
+				icon: <CloseOutlined />,
+				label: sdEdiAdminParams.btnClose,
+			},
+			sdEdiAdminParams.logPageUrl && {
+				key: 'view-log',
+				icon: <FileTextOutlined />,
+				label: (
+					<a href={sdEdiAdminParams.logPageUrl} target="_self">
+						{sdEdiAdminParams.viewFullLog || 'View Log'}
+					</a>
+				),
+			},
+			rollbackAvailable && {
+				key: 'rollback',
+				icon: <RollbackOutlined />,
+				label: rolling
+					? sdEdiAdminParams.rollbackRunning || 'Rolling back…'
+					: sdEdiAdminParams.rollbackButton || 'Roll Back',
+				danger: true,
+				disabled: rolling,
+			},
+			rollbackAvailable && {
+				key: 'discard',
+				icon: <DeleteOutlined />,
+				label: (
+					<Tooltip
+						title={
+							sdEdiAdminParams.restorePointKeepNotice ||
+							'A restore point is holding a backup of your previous site, which uses disk space. Keep it to stay able to roll back, or discard it now to free the space.'
+						}
+					>
+						<span>
+							{discard.running
+								? sdEdiAdminParams.discardRunning ||
+									'Discarding…'
+								: sdEdiAdminParams.discardButton ||
+									'Discard restore point'}
+						</span>
+					</Tooltip>
+				),
+				disabled: discard.running,
+			},
+		].filter(Boolean);
+
+		const handleMoreMenuClick = ({ key }) => {
+			if (key === 'close') {
+				handleReset();
+			} else if (key === 'rollback') {
+				handleRollback();
+			} else if (key === 'discard') {
+				handleDiscard();
+			}
 		};
 
 		return (
@@ -316,53 +357,21 @@ const Success = ({
 					{retryMedia}
 					{restorePointNotice}
 					<div className="ant-result-extra edi-d-flex edi-justify-content-center">
-						<Popover
-							trigger="click"
-							placement="top"
-							overlayClassName="edi-success-more-pop"
-							content={
-								<div className="edi-success-more">
-									<Button block onClick={handleReset}>
-										<CloseOutlined />
-										<span>{sdEdiAdminParams.btnClose}</span>
-									</Button>
-									{sdEdiAdminParams.logPageUrl && (
-										<Button
-											block
-											href={sdEdiAdminParams.logPageUrl}
-											target="_self"
-										>
-											<FileTextOutlined />
-											<span>
-												{sdEdiAdminParams.viewFullLog ||
-													'View Log'}
-											</span>
-										</Button>
-									)}
-									{rollbackAvailable && (
-										<Button
-											block
-											danger
-											loading={rolling}
-											onClick={handleRollback}
-										>
-											<RollbackOutlined />
-											<span>
-												{sdEdiAdminParams.rollbackButton ||
-													'Roll Back'}
-											</span>
-										</Button>
-									)}
-								</div>
-							}
+						<Dropdown
+							menu={{
+								items: moreItems,
+								onClick: handleMoreMenuClick,
+							}}
+							placement="bottomRight"
+							trigger={['click']}
 						>
-							<Button>
-								<span>
-									{sdEdiAdminParams.btnMore || 'More'}
-								</span>
-								<DownOutlined />
-							</Button>
-						</Popover>
+							<Space.Compact>
+								<Button>
+									{sdEdiAdminParams.btnMore || 'More…'}
+								</Button>
+								<Button icon={<EllipsisOutlined />} />
+							</Space.Compact>
+						</Dropdown>
 						<Button
 							key="view-site"
 							type="primary"
