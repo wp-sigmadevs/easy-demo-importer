@@ -25,18 +25,21 @@
 	}
 }
 
-// Card entrance — opacity ONLY, never transform. The 3D stack positions each
-// card with translateZ; a transform-based entrance would override that
-// translateZ while playing, snapping the card to full size (a visible "grow")
-// before it settles back. Fading in leaves the stack transform untouched, so
-// a demoted card just steps back, shrinks via perspective and fades.
+// Card entrance — slides up + fades in. The active slot's resting transform
+// is always translateZ(0) translateY(0) (see :nth-last-child(1) below); both
+// keyframe states keep that same translateZ(0) so the animation never drops
+// the 3D stack's Z position mid-flight (a bare translateY() here previously
+// overrode it, snapping the card to full size before settling — the "grow"
+// bug this was rewritten to avoid).
 @keyframes ediCardEnter {
 	from {
 		opacity: 0;
+		transform: translateZ(0) translateY(50%);
 	}
 
 	to {
 		opacity: 1;
+		transform: translateZ(0) translateY(0);
 	}
 }
 
@@ -226,7 +229,7 @@
 						&.is-indeterminate .sd-edi-import-bar-fill {
 							width: 40%;
 							animation: ediBarIndeterminate 1.2s
-								ease-in-out infinite;
+								ease-in-out infinite alternate;
 						}
 					}
 

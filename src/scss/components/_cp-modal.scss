@@ -136,6 +136,59 @@
 	}
 }
 
+// Success screen's "More…" dropdown items (Roll Back, Discard Backup).
+// Portaled to <body>, so styled at the root rather than under the modal.
+// antd v5's own CSS-in-JS rules for .ant-dropdown-menu-item can land after
+// ours in the stylesheet, so color/background need !important to win.
+.edi-menu-item-primary {
+	color: $color-primary !important;
+
+	.anticon,
+	.edi-menu-help-icon {
+		color: $color-primary !important;
+	}
+
+	&:hover,
+	&.ant-dropdown-menu-item-active {
+		background-image: linear-gradient(109.6deg, rgb(45, 116, 213) 11.2%, rgb(121, 137, 212) 91.2%) !important;
+		color: #fff !important;
+
+		.anticon,
+		.edi-menu-help-icon {
+			color: #fff !important;
+		}
+	}
+}
+
+.edi-menu-item-danger {
+	.edi-menu-help-icon {
+		color: #ff4d4f !important;
+	}
+
+	&:hover,
+	&.ant-dropdown-menu-item-active {
+		background-image: linear-gradient(109.6deg, #ff4d4f 11.2%, #a44f51 91.2%) !important;
+		color: #fff !important;
+
+		.anticon,
+		.edi-menu-help-icon {
+			color: #fff !important;
+		}
+	}
+}
+
+// Label + help-icon row — icon pinned to the item's right edge.
+.edi-menu-item-label {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	width: 100%;
+}
+
+.edi-menu-help-icon {
+	margin-inline-start: 12px;
+}
+
 // Manual-import modal — its file pickers. The rest of the chrome (steps,
 // option groups, action bar) is inherited from the shared modal styles.
 .edi-manual-modal {

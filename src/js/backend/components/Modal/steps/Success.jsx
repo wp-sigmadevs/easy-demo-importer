@@ -8,7 +8,7 @@ import {
 	FileTextOutlined,
 	SyncOutlined,
 	DeleteOutlined,
-	EllipsisOutlined,
+	QuestionCircleOutlined,
 } from '@ant-design/icons';
 import { Api } from '../../../utils/Api';
 
@@ -17,15 +17,18 @@ import { Api } from '../../../utils/Api';
 /**
  * Component representing the import success or failure message.
  *
- * @param {boolean}  importComplete  - Flag indicating whether the import was completed.
- * @param {Function} handleReset     - Function to handle the reset action.
- * @param {Function} handleResume    - Function to resume the import from the failed step.
- * @param {Function} handleStartOver - Function to release the lock and reload.
- * @param {boolean}  canResume       - Whether a resumable request is available.
- * @param {string}   message         - Import message.
- * @param {string}   hint            - Actionable hint for error resolution.
- * @param {string}   demo            - The imported demo slug (for the retry request).
- * @param {string}   sessionId       - The finished run's session id (for retry).
+ * @param {Object}   props                 - Component props.
+ * @param {boolean}  props.importComplete  - Flag indicating whether the import was completed.
+ * @param {Function} props.handleReset     - Function to handle the reset action.
+ * @param {Function} props.handleResume    - Function to resume the import from the failed step.
+ * @param {Function} props.handleStartOver - Function to release the lock and reload.
+ * @param {boolean}  props.canResume       - Whether a resumable request is available.
+ * @param {string}   props.message         - Import message.
+ * @param {string}   props.hint            - Actionable hint for error resolution.
+ * @param {string}   props.demo            - The imported demo slug (for the retry request).
+ * @param {string}   props.sessionId       - The finished run's session id (for retry).
+ * @param {string}   props.manual          - Whether this run was a manual (zip-based) import.
+ * @param {string}   props.manualKey       - The manual import's upload key (for the retry request).
  */
 const Success = ({
 	importComplete,
@@ -263,14 +266,10 @@ const Success = ({
 		};
 
 		/**
-		 * Secondary actions collapsed into the "More…" dropdown.
+		 * Secondary actions collapsed into the "More…" dropdown. Close has
+		 * its own button in the action row, so it's not repeated here.
 		 */
 		const moreItems = [
-			{
-				key: 'close',
-				icon: <CloseOutlined />,
-				label: sdEdiAdminParams.btnClose,
-			},
 			sdEdiAdminParams.logPageUrl && {
 				key: 'view-log',
 				icon: <FileTextOutlined />,
@@ -283,39 +282,52 @@ const Success = ({
 			rollbackAvailable && {
 				key: 'rollback',
 				icon: <RollbackOutlined />,
-				label: rolling
-					? sdEdiAdminParams.rollbackRunning || 'Rolling back…'
-					: sdEdiAdminParams.rollbackButton || 'Roll Back',
-				danger: true,
+				label: (
+					<span className="edi-menu-item-label">
+						{rolling
+							? sdEdiAdminParams.rollbackRunning ||
+								'Rolling back…'
+							: sdEdiAdminParams.rollbackButton || 'Roll Back'}
+						<Tooltip
+							title={
+								sdEdiAdminParams.rollbackWarning ||
+								'This restores your site to the moment before this import. Anything created since (new posts, orders, users) will be permanently lost.'
+							}
+						>
+							<QuestionCircleOutlined className="edi-menu-help-icon" />
+						</Tooltip>
+					</span>
+				),
+				className: 'edi-menu-item-primary',
 				disabled: rolling,
 			},
 			rollbackAvailable && {
 				key: 'discard',
 				icon: <DeleteOutlined />,
+				danger: true,
 				label: (
-					<Tooltip
-						title={
-							sdEdiAdminParams.restorePointKeepNotice ||
-							'A restore point is holding a backup of your previous site, which uses disk space. Keep it to stay able to roll back, or discard it now to free the space.'
-						}
-					>
-						<span>
-							{discard.running
-								? sdEdiAdminParams.discardRunning ||
-									'Discarding…'
-								: sdEdiAdminParams.discardButton ||
-									'Discard restore point'}
-						</span>
-					</Tooltip>
+					<span className="edi-menu-item-label">
+						{discard.running
+							? sdEdiAdminParams.discardRunning || 'Discarding…'
+							: sdEdiAdminParams.discardButton ||
+								'Discard Backup'}
+						<Tooltip
+							title={
+								sdEdiAdminParams.restorePointKeepNotice ||
+								'A restore point is holding a backup of your previous site, which uses disk space. Keep it to stay able to roll back, or discard it now to free the space.'
+							}
+						>
+							<QuestionCircleOutlined className="edi-menu-help-icon" />
+						</Tooltip>
+					</span>
 				),
+				className: 'edi-menu-item-danger',
 				disabled: discard.running,
 			},
 		].filter(Boolean);
 
 		const handleMoreMenuClick = ({ key }) => {
-			if (key === 'close') {
-				handleReset();
-			} else if (key === 'rollback') {
+			if (key === 'rollback') {
 				handleRollback();
 			} else if (key === 'discard') {
 				handleDiscard();
@@ -357,21 +369,24 @@ const Success = ({
 					{retryMedia}
 					{restorePointNotice}
 					<div className="ant-result-extra edi-d-flex edi-justify-content-center">
-						<Dropdown
-							menu={{
-								items: moreItems,
-								onClick: handleMoreMenuClick,
-							}}
-							placement="bottomRight"
-							trigger={['click']}
-						>
-							<Space.Compact>
+						<Space.Compact>
+							<Button onClick={handleReset}>
+								<CloseOutlined />
+								<span>{sdEdiAdminParams.btnClose}</span>
+							</Button>
+							<Dropdown
+								menu={{
+									items: moreItems,
+									onClick: handleMoreMenuClick,
+								}}
+								placement="bottomRight"
+								trigger={['click']}
+							>
 								<Button>
 									{sdEdiAdminParams.btnMore || 'More…'}
 								</Button>
-								<Button icon={<EllipsisOutlined />} />
-							</Space.Compact>
-						</Dropdown>
+							</Dropdown>
+						</Space.Compact>
 						<Button
 							key="view-site"
 							type="primary"
