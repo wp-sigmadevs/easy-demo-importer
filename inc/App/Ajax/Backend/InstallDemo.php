@@ -113,10 +113,11 @@ class InstallDemo extends ImporterAjax {
 		// entirely, so Initialize's pre-reset snapshot never runs for it.
 		// Manual import uses reset=false, so the tables still hold the
 		// pre-import state at this point. The regular (Initialize) path already
-		// created the snapshot before its database reset; the exists() guard
-		// makes this a no-op there so a snapshot is never taken twice.
-		if ( $this->snapshot && ! Snapshot::exists() ) {
-			if ( Snapshot::create() ) {
+		// created the snapshot before its database reset; the per-session guard
+		// makes this a no-op there (and on the repeated per-chunk calls) so a
+		// snapshot is taken once per import and never twice.
+		if ( $this->snapshot && ! Snapshot::isForSession( $this->sessionId ) ) {
+			if ( Snapshot::create( $this->sessionId ) ) {
 				ImportLogger::info(
 					esc_html__( 'Restore point created — this import can be rolled back.', 'easy-demo-importer' ),
 					$this->sessionId,
