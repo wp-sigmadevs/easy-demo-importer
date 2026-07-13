@@ -67,7 +67,10 @@ class RegenerateThumbnails extends Base {
 	 * @since 1.2.0
 	 */
 	public function register() {
-		add_action( 'admin_menu', [ $this, 'menu' ] );
+		// Priority 20 — registered after Pages' Easy Demo Importer + Status &
+		// Logs submenus (default priority 10), so this always lands last
+		// regardless of classmap discovery order.
+		add_action( 'admin_menu', [ $this, 'menu' ], 20 );
 		add_action( 'wp_ajax_' . self::ACTION, [ $this, 'handle' ] );
 	}
 
