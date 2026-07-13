@@ -18,7 +18,7 @@ master (bf2a840)
        └─ wxr-state-split (d6601fa)  perf work + integration-test CI job
             ├─ preflight-check (6c68c57)      preflight gate (merged onward)
             └─ regenerate-thumbnails         regen tool + preflight[merged] + retry + rollback + WP-CLI
-                 └─ manual-import (f367363)   ← TIP: full manual import + review fixes + rollback overhaul (§13)
+                 └─ manual-import (e97c286)   ← TIP: rollback overhaul (§13) + wizard UX + manual-import zip modes (§14)
 ```
 
 - **`manual-import`** is the accumulation branch and carries the entire stack.
@@ -346,3 +346,31 @@ considering committing an optimized classmap or documenting this in the release 
 State at handoff: 98 unit tests pass, 0 phpcs errors, production build compiled, pot
 regenerated. Assets are gitignored (built at release), so only source is committed.
 Clean tree, in sync with `origin/manual-import`. Nothing merged to `master`; no tag.
+
+## 14. Wizard UX overhaul + manual-import zip modes (`5a736c0`..`e97c286`)
+
+Branch tip is now **`e97c286`**. All verified in the browser on `wpcheck.local`.
+
+| Commit | What |
+|---|---|
+| `5a736c0` | **feat(wizard): split Setup into Readiness + Configure.** The old single "Configure" step (plugins + checklist + toggles, cramped) became two: **Readiness** (required-plugins list + the preflight checklist, shown open) and **Configure** (just the toggles). Steps are now Start → Readiness → Configure → Imports → End (5). New `Readiness.jsx`; step renumbering wired through `ModalComponent`, `helpers.js` (`getCurrentStatus` made step-count-aware), and `stepTitles`. `PreflightPanel` now opens by default (still collapsible; scrolls). |
+| `d5e12ef` | **feat(configure): tooltip-free option rows.** Removed the `?` tooltips; every option is a uniform row (switch + label, muted description **below**). Two groups: left "Performance" (borderless), right "Safety" (subtle bordered card for restore-point + destructive reset). Dropped the heavy whole-box blue border. Options panel scrolls within the fixed modal (responsive max-height) so tall content clears the pinned action bar. |
+| `b69785c` | **refactor(configure): tighten restore-point copy** (~7 lines → 3) so the Safety card fits without scrolling. |
+| `8a7664e` | **fix(wizard): advance to the result step after import.** The §13/5a736c0 renumber updated `ModalComponent` but missed **four hard-coded `setCurrentStep(4)` calls in `Api.js` `doAxios`** (the result transition — success + 3 error paths). After inserting Readiness the result screen is step **5**, so imports were completing but the UI stayed on "Imports". Fixed all four to 5. Would have hit *every* real import. |
+| `4f84a44` | **feat(configure): safer defaults + consolidated success actions.** (1) Restore point now defaults **ON** in the store — the destructive reset defaults on, so the parachute is armed too. (2) Positive-framed toggles: "Skip Demo Images"→**"Import Demo Images"**, "Skip Image Regeneration"→**"Regenerate Images"** (switch inverted vs the underlying `excludeImages`/`skipImageRegeneration`; no backend change). (3) Success screen actions: **View Site** (primary) + a **"More ▾" popover** holding Close / View Log / Roll Back. |
+| `a53d4db` | **feat(manual-import): match the wizard modal design + reposition the entry button.** The Manual Import button moved from a lone left-floating bar to a **right-aligned CTA** (hint + upload icon) above the demo grid. The modal was rebuilt to reuse the wizard chrome (steps Upload→Import→End, option groups, action bar) — polished antd `Upload` pickers instead of raw `<input type=file>`. Manual step values aligned to `doAxios` (Upload=1, Import=2, End=5). |
+| `33815f1` | **feat(manual-import): two modes with zip support.** A **Segmented switcher**: *Separate* (5 inputs — content .xml required, customizer .dat, widgets .wie, settings [.json OR .zip of per-option JSONs], images .zip) vs *Bundle* (one .zip with everything). Server (`ManualImport.php`) rewritten to a **per-target chunked assembler + `finalize`** (large image/bundle zips beat PHP upload limits): `settings.zip`→each `name.json` = option `name` merged into `settings.json`; `images.zip`→extracted into `uploads/` (import auto-skips download via a `hasImages` flag); `bundle.zip`→unzipped and mapped by extension. Content `.xml` required in both modes. |
+| `e97c286` | **fix(manual-import): route bundled media nested under a wrapper folder.** Real demo zips nest everything under a `demo-content/` folder, so media paths are `demo-content/uploads/…`; the uploads matcher only checked the path *start*. Changed to match `uploads/` anywhere (`(?:^|/)uploads/(.+)`). |
+
+**New API / files:** `Readiness.jsx`; `ManualImport.php` reworked (`assembleChunk`, `finalize`, `routeBundle`, `expandSettingsZip`, `extractImages`, `collectSettingJson`, `targets()` allowlist; upload cap raised to 512 MB); REST unchanged. Manual upload transport is now: chunk each file to a named `target`, then POST `finalize=1`.
+
+**End-to-end proven with the real sportfy demo files** (`plugins/sportfy-core/demo-importer/demo-files/`):
+- **Bundle** (`demo-content.zip`, 12 MB): routed content (6.8 MB) + customizer + widgets + 8 per-option settings + **1433 images** → full import (all phases logged) → success → rollback clean.
+- **Separate** (loose files + a built `settings.zip` + `images.zip`): all 5 inputs processed; two options deleted beforehand were **re-applied** by the settings zip; full import → success → rollback clean.
+- Content counts don't change because the site already *is* the sportfy demo (WXR skips duplicate GUIDs — "Font Family already exists" warnings confirm the phase ran).
+
+**Manual bundle format (for docs/theme authors):** top-level `content.xml` (or any `*.xml`) + `customizer.dat` + `widget.wie` + per-option `*.json` (a `settings.json` is a flat map; any other `*.json` = one option keyed by filename) + an `uploads/` folder mirroring `wp-content/uploads`. A single wrapper folder is fine. Widgets should be `.wie` inside a bundle (avoids `.json` ambiguity with settings).
+
+Final state: eslint 0 / phpcs 0 / build compiles / 98 unit tests pass / pot regenerated.
+Clean tree (only the optimized vendor autoloader is uncommitted — see the §13 build note).
+Nothing merged to `master`; no `v1.2.0` tag.
