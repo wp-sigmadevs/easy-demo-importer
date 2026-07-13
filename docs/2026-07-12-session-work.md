@@ -18,7 +18,7 @@ master (bf2a840)
        └─ wxr-state-split (d6601fa)  perf work + integration-test CI job
             ├─ preflight-check (6c68c57)      preflight gate (merged onward)
             └─ regenerate-thumbnails         regen tool + preflight[merged] + retry + rollback + WP-CLI
-                 └─ manual-import (f14446a)   ← TIP: full manual import + review fixes
+                 └─ manual-import (fe52c16)   ← TIP: full manual import + review fixes + post-session polish
 ```
 
 - **`manual-import`** is the accumulation branch and carries the entire stack.
@@ -276,3 +276,27 @@ rollback** create→restore cycle (CI can't cover — DDL breaks WP_UnitTestCase
 - **Phase 4 `alpha`:** 3 known bugs + merge decision, deferred.
 - Pre-existing lint debt (not introduced today): a few eslint jsdoc/no-console/curly
   errors and the vendored `process_posts` phpcs complexity warning.
+
+---
+
+## 12. Post-session commits (after `592da51`)
+
+Landed after the main write-up above; branch tip is now **`fe52c16`** (clean,
+pushed, CI-green). Maintainer commits followed by one i18n fix:
+
+| Commit | What |
+|---|---|
+| `0362147` | fix(log-ui): accordion + smooth-scroll on Import Log, matching System Status |
+| `58b54d9` | **fix(rollback): snapshot *before* the database reset, not after** — snapshot creation moved into `Initialize::response()` so a "reset + snapshot" import captures the pre-reset state (relocated from `InstallDemo`). |
+| `24c3c8d` | feat(preflight): collapse the readiness checks into a single summary bar (`PreflightPanel.jsx` redesign + `_cp-preflight.scss`) |
+| `aefc5ef` | fix(messages): decode HTML entities in progress + log text |
+| `f89dafa` | **fix(rollback): exclude snapshot tables from the database reset** (`Initialize.php` — the reset no longer drops the `{prefix}sd_edi_snap_*` shadows, so a restore point survives a reset) |
+| `087c0ba` | fix(log-ui): never render blank on a failed log fetch |
+| `fe52c16` | chore(i18n): localize the two preflight summary-bar strings (`preflightSummaryFail`, `preflightSummaryReady`) |
+
+**Verify during QA:** the two rollback/reset interaction fixes (`58b54d9`, `f89dafa`)
+— snapshot taken before reset, and reset preserving the snapshot tables — were not
+in the original session's design and want a live-run check.
+
+State at handoff: 98 unit tests + integration CI green (PHP 7.4/8.3); clean tree;
+in sync with `origin/manual-import`. Nothing merged to `master`; no `v1.2.0` tag.
