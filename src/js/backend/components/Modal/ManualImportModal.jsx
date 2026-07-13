@@ -1,5 +1,11 @@
-import React, { useState, useRef } from 'react';
-import { Modal, Button, Switch } from 'antd';
+import React, { useState } from 'react';
+import { Modal, Button, Switch, Steps, Row, Col, Upload, Tooltip } from 'antd';
+import {
+	UploadOutlined,
+	CloseOutlined,
+	DownloadOutlined,
+	QuestionCircleTwoTone,
+} from '@ant-design/icons';
 import { doAxios } from '../../utils/Api';
 import Imports from './steps/Imports';
 import Success from './steps/Success';
@@ -7,9 +13,15 @@ import Success from './steps/Success';
 /* global sdEdiAdminParams */
 
 /**
- * Manual import modal — upload your own WXR (+ optional customizer/widgets),
- * then run the full import pipeline against them. Reuses the existing progress
- * (Imports) and result (Success) steps.
+ * Manual import modal — upload your own WXR (+ optional customizer / widgets /
+ * settings) and run the full import pipeline against them. Shares the wizard
+ * modal's chrome (step indicator, option groups, action bar) so it matches the
+ * demo-import experience, and reuses the Imports (progress) and Success (result)
+ * steps.
+ *
+ * Step numbers align with the shared doAxios helper: it drives the result screen
+ * to step 5, so Upload = 1, Import (progress) = 2, End (result) = 5. The three
+ * dots are mapped from those values.
  *
  * @param {Object}   props         - Props.
  * @param {boolean}  props.visible - Whether the modal is open.
@@ -31,10 +43,10 @@ const ManualImportModal = ({ visible, onClose }) => {
 	const [sessionId, setSessionId] = useState('');
 	const [manualKey, setManualKey] = useState('');
 
-	const contentRef = useRef(null);
-	const customizerRef = useRef(null);
-	const widgetsRef = useRef(null);
-	const settingsRef = useRef(null);
+	const [contentFile, setContentFile] = useState(null);
+	const [customizerFile, setCustomizerFile] = useState(null);
+	const [widgetsFile, setWidgetsFile] = useState(null);
+	const [settingsFile, setSettingsFile] = useState(null);
 
 	const reset = () => {
 		setStep(1);
@@ -48,6 +60,10 @@ const ManualImportModal = ({ visible, onClose }) => {
 		setHint('');
 		setSessionId('');
 		setManualKey('');
+		setContentFile(null);
+		setCustomizerFile(null);
+		setWidgetsFile(null);
+		setSettingsFile(null);
 	};
 
 	const handleClose = () => {
@@ -69,7 +85,7 @@ const ManualImportModal = ({ visible, onClose }) => {
 	const proceed = (key, sid) => {
 		setSessionId(sid);
 		setManualKey(key);
-		setStep(3);
+		setStep(2);
 		setProgress([
 			{ message: sdEdiAdminParams.prepareImporting || 'Preparing…' },
 		]);
@@ -101,8 +117,6 @@ const ManualImportModal = ({ visible, onClose }) => {
 	const CHUNK_SIZE = 4 * 1024 * 1024;
 
 	const start = () => {
-		const contentFile = contentRef.current?.files?.[0];
-
 		if (!contentFile) {
 			setError(
 				sdEdiAdminParams.manualNoContent ||
@@ -122,8 +136,8 @@ const ManualImportModal = ({ visible, onClose }) => {
 			.replace(/[^a-f0-9]/g, '')
 			.slice(0, 20);
 
-		// Uploads the content file one slice per request; the optional small
-		// files ride along on the final chunk. The server assembles + validates.
+		// Uploads the content file one slice per request; the optional small files
+		// ride along on the final chunk. The server assembles + validates.
 		const sendChunk = (i) => {
 			const startByte = i * CHUNK_SIZE;
 			const blob = contentFile.slice(startByte, startByte + CHUNK_SIZE);
@@ -137,14 +151,14 @@ const ManualImportModal = ({ visible, onClose }) => {
 			fd.append('chunk', blob, 'content.xml');
 
 			if (i === total - 1) {
-				if (customizerRef.current?.files?.[0]) {
-					fd.append('customizer', customizerRef.current.files[0]);
+				if (customizerFile) {
+					fd.append('customizer', customizerFile);
 				}
-				if (widgetsRef.current?.files?.[0]) {
-					fd.append('widgets', widgetsRef.current.files[0]);
+				if (widgetsFile) {
+					fd.append('widgets', widgetsFile);
 				}
-				if (settingsRef.current?.files?.[0]) {
-					fd.append('settings', settingsRef.current.files[0]);
+				if (settingsFile) {
+					fd.append('settings', settingsFile);
 				}
 			}
 
@@ -177,124 +191,277 @@ const ManualImportModal = ({ visible, onClose }) => {
 		sendChunk(0);
 	};
 
+	// A single controlled file picker rendered as an antd Upload. Prevents the
+	// auto-upload (beforeUpload returns false) and just captures the File.
+	const filePicker = ({ file, setFile, accept, label }) => (
+		<div className="manual-file">
+			<Upload
+				accept={accept}
+				maxCount={1}
+				fileList={file ? [file] : []}
+				beforeUpload={(f) => {
+					setFile(f);
+					setError('');
+					return false;
+				}}
+				onRemove={() => setFile(null)}
+			>
+				<Button icon={<UploadOutlined />}>
+					{sdEdiAdminParams.manualChooseFile || 'Choose File'}
+				</Button>
+			</Upload>
+			<span className="manual-file-label">{label}</span>
+		</div>
+	);
+
+	const STEP_ITEMS = [
+		{ title: sdEdiAdminParams.manualStepUpload || 'Upload' },
+		{ title: sdEdiAdminParams.manualStepImport || 'Import' },
+		{ title: sdEdiAdminParams.manualStepEnd || 'End' },
+	];
+
+	// Map the doAxios-driven step values (1 / 2 / 5) onto the three dots.
+	const DOT_BY_STEP = { 1: 0, 2: 1, 5: 2 };
+	const dotCurrent = DOT_BY_STEP[step] ?? 2;
+
 	return (
 		<Modal
 			open={visible}
-			onCancel={handleClose}
+			closable={false}
 			footer={null}
-			width={720}
+			width={900}
 			centered
 			destroyOnClose
-			maskClosable={step !== 3}
+			maskClosable={step === 1}
+			onCancel={step === 1 ? handleClose : undefined}
 			className="edi-manual-modal"
 		>
-			{step === 1 && (
-				<div className="manual-upload">
-					<h2>{sdEdiAdminParams.manualTitle || 'Manual Import'}</h2>
-					<p className="warn-text">
-						{sdEdiAdminParams.manualWarning ||
-							'This imports into your current site. Keep the restore point on so you can roll back.'}
-					</p>
-
-					<p>
-						<label>
-							{sdEdiAdminParams.manualContentLabel ||
-								'Content (WXR / XML) — required'}
-							<br />
-							<input type="file" accept=".xml" ref={contentRef} />
-						</label>
-					</p>
-					<p>
-						<label>
-							{sdEdiAdminParams.manualCustomizerLabel ||
-								'Customizer (.dat) — optional'}
-							<br />
-							<input
-								type="file"
-								accept=".dat"
-								ref={customizerRef}
-							/>
-						</label>
-					</p>
-					<p>
-						<label>
-							{sdEdiAdminParams.manualWidgetsLabel ||
-								'Widgets (.wie / .json) — optional'}
-							<br />
-							<input
-								type="file"
-								accept=".wie,.json"
-								ref={widgetsRef}
-							/>
-						</label>
-					</p>
-					<p>
-						<label>
-							{sdEdiAdminParams.manualSettingsLabel ||
-								'Theme settings (.json { option: value }) — optional'}
-							<br />
-							<input
-								type="file"
-								accept=".json"
-								ref={settingsRef}
-							/>
-						</label>
-					</p>
-
-					<p>
-						<Switch checked={snapshot} onChange={setSnapshot} />{' '}
-						{sdEdiAdminParams.snapshotTitle ||
-							'Create a restore point'}
-					</p>
-					<p>
-						<Switch
-							checked={excludeImages}
-							onChange={setExcludeImages}
-						/>{' '}
-						{sdEdiAdminParams.excludeImagesTitle || 'Skip images'}
-					</p>
-
-					{error && <p className="warn-text">{error}</p>}
-
-					<div className="step-actions">
-						<Button onClick={handleClose}>
-							{sdEdiAdminParams.btnCancel || 'Cancel'}
-						</Button>
-						<Button type="primary" loading={busy} onClick={start}>
-							{busy && uploadPct > 0
-								? `${sdEdiAdminParams.manualUploading || 'Uploading'} ${uploadPct}%`
-								: sdEdiAdminParams.btnStartImport ||
-									'Start Import'}
-						</Button>
+			<Row>
+				<Col span={24}>
+					<div className="modal-steps">
+						<h2>
+							{sdEdiAdminParams.manualModalHeaderPrefix ||
+								'Manual Import'}
+						</h2>
+						<Steps
+							progressDot
+							current={dotCurrent}
+							items={STEP_ITEMS}
+						/>
 					</div>
-				</div>
-			)}
 
-			{step === 3 && (
-				<Imports
-					importStatus=""
-					importProgress={progress}
-					importPercent={percent}
-					showImportProgress
-					handleImport={() => {}}
-				/>
-			)}
+					<div
+						className={`modal-content step ${
+							step === 1 ? 'fade-in' : 'fade-out'
+						}`}
+					>
+						{step === 1 && (
+							<div className="modal-content-inner">
+								<div className="import-options">
+									<h3>
+										{sdEdiAdminParams.manualUploadTitle ||
+											'Upload Your Export Files'}
+									</h3>
 
-			{step === 4 && (
-				<Success
-					importComplete={complete}
-					handleReset={handleClose}
-					handleResume={() => {}}
-					handleStartOver={handleClose}
-					canResume={false}
-					message={message}
-					hint={hint}
-					demo="__manual__"
-					sessionId={sessionId}
-					manual="true"
-					manualKey={manualKey}
-				/>
-			)}
+									<Row gutter={[30, 24]}>
+										<Col
+											xs={24}
+											sm={24}
+											md={12}
+											lg={12}
+											xl={12}
+										>
+											<div className="configure-group is-plain">
+												<h5 className="configure-group-label">
+													{sdEdiAdminParams.manualFilesLabel ||
+														'Files'}
+												</h5>
+
+												{filePicker({
+													file: contentFile,
+													setFile: setContentFile,
+													accept: '.xml',
+													label:
+														sdEdiAdminParams.manualContentLabel ||
+														'Content (WXR / XML) — required',
+												})}
+												{filePicker({
+													file: customizerFile,
+													setFile: setCustomizerFile,
+													accept: '.dat',
+													label:
+														sdEdiAdminParams.manualCustomizerLabel ||
+														'Customizer (.dat) — optional',
+												})}
+												{filePicker({
+													file: widgetsFile,
+													setFile: setWidgetsFile,
+													accept: '.wie,.json',
+													label:
+														sdEdiAdminParams.manualWidgetsLabel ||
+														'Widgets (.wie / .json) — optional',
+												})}
+												{filePicker({
+													file: settingsFile,
+													setFile: setSettingsFile,
+													accept: '.json',
+													label:
+														sdEdiAdminParams.manualSettingsLabel ||
+														'Theme settings (.json) — optional',
+												})}
+											</div>
+										</Col>
+
+										<Col
+											xs={24}
+											sm={24}
+											md={12}
+											lg={12}
+											xl={12}
+										>
+											<div className="configure-group is-card">
+												<h5 className="configure-group-label">
+													{sdEdiAdminParams.configureSafetyLabel ||
+														'Safety'}
+												</h5>
+
+												<div className="import-option">
+													<div className="choose edi-d-flex edi-align-items-center">
+														<Switch
+															checked={snapshot}
+															onChange={
+																setSnapshot
+															}
+														/>
+														<h4>
+															{sdEdiAdminParams.snapshotTitle ||
+																'Create a restore point'}
+														</h4>
+													</div>
+													<div className="option-details warn-text">
+														<p>
+															{sdEdiAdminParams.manualWarning ||
+																'This imports into your current site. Keep the restore point on so you can roll back.'}
+														</p>
+													</div>
+												</div>
+
+												<div className="import-option last">
+													<div className="choose edi-d-flex edi-align-items-center">
+														<Switch
+															checked={
+																!excludeImages
+															}
+															onChange={(
+																checked
+															) =>
+																setExcludeImages(
+																	!checked
+																)
+															}
+														/>
+														<h4>
+															{sdEdiAdminParams.importImagesTitle ||
+																'Import Demo Images'}
+														</h4>
+														<Tooltip
+															title={
+																sdEdiAdminParams.importImagesHint
+															}
+														>
+															<span className="manual-help">
+																<QuestionCircleTwoTone />
+															</span>
+														</Tooltip>
+													</div>
+												</div>
+											</div>
+										</Col>
+									</Row>
+
+									{error && (
+										<p
+											className="warn-text"
+											style={{ marginTop: 12 }}
+										>
+											{error}
+										</p>
+									)}
+								</div>
+
+								<div className="step-actions">
+									<div className="actions-left">
+										<Button
+											type="primary"
+											onClick={handleClose}
+										>
+											<CloseOutlined />
+											<span>
+												{sdEdiAdminParams.btnCancel ||
+													'Cancel'}
+											</span>
+										</Button>
+									</div>
+									<div className="actions-right edi-d-flex edi-align-items-center">
+										<Button
+											type="primary"
+											loading={busy}
+											disabled={!contentFile}
+											onClick={start}
+										>
+											<span>
+												{busy && uploadPct > 0
+													? `${sdEdiAdminParams.manualUploading || 'Uploading'} ${uploadPct}%`
+													: sdEdiAdminParams.btnStartImport ||
+														'Start Import'}
+											</span>
+											<DownloadOutlined />
+										</Button>
+									</div>
+								</div>
+							</div>
+						)}
+					</div>
+
+					<div
+						className={`modal-content step import-step ${
+							step === 2 ? 'fade-in' : 'fade-out'
+						}`}
+					>
+						{step === 2 && (
+							<Imports
+								importStatus=""
+								importProgress={progress}
+								importPercent={percent}
+								showImportProgress
+								handleImport={() => {}}
+							/>
+						)}
+					</div>
+
+					<div
+						className={`modal-content step ${
+							step === 5 ? 'fade-in' : 'fade-out'
+						}`}
+					>
+						{step === 5 && (
+							<Success
+								importComplete={complete}
+								handleReset={handleClose}
+								handleResume={() => {}}
+								handleStartOver={handleClose}
+								canResume={false}
+								message={message}
+								hint={hint}
+								demo="__manual__"
+								sessionId={sessionId}
+								manual="true"
+								manualKey={manualKey}
+							/>
+						)}
+					</div>
+				</Col>
+			</Row>
 		</Modal>
 	);
 };

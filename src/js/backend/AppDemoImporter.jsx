@@ -11,6 +11,7 @@ import useSharedDataStore from './utils/sharedDataStore';
 import ModalComponent from './components/Modal/ModalComponent';
 import ModalRequirements from './components/Modal/ModaRequirements';
 import { Row, Col, Button, Tabs, Skeleton, Input, Empty } from 'antd';
+import { UploadOutlined } from '@ant-design/icons';
 
 /* global sdEdiAdminParams */
 
@@ -362,7 +363,14 @@ const AppDemoImporter = () => {
 				<RestorePointBanner />
 
 				<div className="edi-manual-import-bar">
-					<Button onClick={() => setManualVisible(true)}>
+					<span className="edi-manual-import-hint">
+						{sdEdiAdminParams.manualImportHint ||
+							'Have your own export? Import it manually.'}
+					</span>
+					<Button
+						icon={<UploadOutlined />}
+						onClick={() => setManualVisible(true)}
+					>
 						{sdEdiAdminParams.manualImportButton || 'Manual Import'}
 					</Button>
 				</div>

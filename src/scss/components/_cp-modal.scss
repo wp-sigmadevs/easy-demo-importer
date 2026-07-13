@@ -149,3 +149,32 @@
 		justify-content: center;
 	}
 }
+
+// Manual-import modal — its file pickers. The rest of the chrome (steps,
+// option groups, action bar) is inherited from the shared modal styles.
+.edi-manual-modal {
+	.manual-file {
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 6px 12px;
+		margin-bottom: 16px;
+
+		.manual-file-label {
+			font-size: 13px;
+			color: #777;
+			font-style: italic;
+		}
+
+		.ant-upload-list {
+			width: 100%;
+		}
+	}
+
+	.manual-help {
+		margin-left: 8px;
+		cursor: pointer;
+		font-size: 18px;
+		display: inline-flex;
+	}
+}
