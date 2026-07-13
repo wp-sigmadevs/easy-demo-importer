@@ -41,6 +41,14 @@ final class Snapshot {
 	const INFIX = 'sd_edi_snap_';
 
 	/**
+	 * Option that records which import session the current restore point belongs
+	 * to. Used to take a fresh snapshot once per import (rather than reusing a
+	 * stale one left behind by a previous import) while still no-opping the
+	 * repeated per-chunk calls within a single session.
+	 */
+	const SESSION_OPTION = 'sd_edi_snapshot_session';
+
+	/**
 	 * Live tables included in a snapshot.
 	 *
 	 * @return string[]
@@ -99,13 +107,44 @@ final class Snapshot {
 	}
 
 	/**
+	 * Whether a restore point has already been taken for the given import
+	 * session. Lets the once-per-import creation no-op on the repeated per-chunk
+	 * calls, while still taking a fresh snapshot for each new import session.
+	 *
+	 * @param string $sessionId Current import session ID.
+	 *
+	 * @return bool
+	 * @since 1.2.0
+	 */
+	public static function isForSession( string $sessionId ): bool {
+		return '' !== $sessionId && get_option( self::SESSION_OPTION ) === $sessionId;
+	}
+
+	/**
 	 * Creates a fresh restore point, replacing any previous one.
+	 *
+	 * Always drops any stale shadow tables left by a previous import first, so a
+	 * new import never inherits an earlier import's (possibly empty) restore
+	 * point. The session marker is recorded even when the snapshot is skipped for
+	 * size, so the repeated per-chunk callers stop retrying for this session.
+	 *
+	 * @param string $sessionId Import session this restore point belongs to.
 	 *
 	 * @return bool True on success.
 	 * @since 1.2.0
 	 */
-	public static function create(): bool {
+	public static function create( string $sessionId = '' ): bool {
 		global $wpdb;
+
+		// Clear any stale shadows from a previous import before anything else, so
+		// a skipped (too-large) or half-done snapshot can never leave an older
+		// import's restore point in place.
+		self::drop();
+
+		// Mark this session handled up front — even the too-large skip below must
+		// record it, or the per-chunk callers would recount the whole DB on every
+		// request. Autoload off: read only during an active import.
+		update_option( self::SESSION_OPTION, $sessionId, false );
 
 		// A single unchunked INSERT..SELECT per table can exceed the gateway
 		// timeout on a very large existing site. Skip (so the import proceeds
@@ -114,8 +153,6 @@ final class Snapshot {
 		if ( self::tooLargeToSnapshot() ) {
 			return false;
 		}
-
-		self::drop();
 
 		foreach ( self::tables() as $table ) {
 			$shadow = self::shadowName( $table, $wpdb->prefix );
@@ -211,5 +248,9 @@ final class Snapshot {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared
 			$wpdb->query( "DROP TABLE IF EXISTS `{$shadow}`" );
 		}
+
+		// The restore point is gone; forget which session owned it so the next
+		// import takes a fresh snapshot.
+		delete_option( self::SESSION_OPTION );
 	}
 }

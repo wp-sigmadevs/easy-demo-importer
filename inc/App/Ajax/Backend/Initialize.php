@@ -133,8 +133,8 @@ class Initialize extends ImporterAjax {
 		// Taken in InstallDemo previously, which runs after this reset, so a
 		// reset import snapshotted the already-emptied tables and a rollback
 		// restored the site to that empty state. Guarded so it runs once.
-		if ( $this->snapshot && ! Snapshot::exists() ) {
-			if ( Snapshot::create() ) {
+		if ( $this->snapshot && ! Snapshot::isForSession( $this->sessionId ) ) {
+			if ( Snapshot::create( $this->sessionId ) ) {
 				ImportLogger::info(
 					esc_html__( 'Restore point created — this import can be rolled back.', 'easy-demo-importer' ),
 					$this->sessionId,
