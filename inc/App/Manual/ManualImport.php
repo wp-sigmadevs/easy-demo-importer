@@ -373,9 +373,10 @@ class ManualImport extends Base {
 			$ext  = strtolower( pathinfo( $name, PATHINFO_EXTENSION ) );
 			$rel  = ltrim( str_replace( $extract, '', $path ), '/\\' );
 
-			// Media placed under an uploads/ folder mirrors the live structure.
-			if ( 0 === stripos( $rel, 'uploads/' ) && in_array( $ext, $this->imageExtensions(), true ) ) {
-				$dest = trailingslashit( $uploads ) . preg_replace( '#^uploads/#i', '', $rel );
+			// Media placed under an uploads/ folder (at any depth — the zip may
+			// nest everything under a wrapper folder) mirrors the live structure.
+			if ( in_array( $ext, $this->imageExtensions(), true ) && preg_match( '#(?:^|/)uploads/(.+)$#i', $rel, $m ) ) {
+				$dest = trailingslashit( $uploads ) . $m[1];
 				wp_mkdir_p( dirname( $dest ) );
 				// phpcs:ignore WordPress.WP.AlternativeFunctions.rename_rename, WordPress.PHP.NoSilencedErrors.Discouraged
 				@rename( $path, $dest );
