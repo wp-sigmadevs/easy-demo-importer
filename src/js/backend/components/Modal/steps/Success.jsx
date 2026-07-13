@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Result, Button, Modal } from 'antd';
+import { Result, Button, Modal, Popover } from 'antd';
 import {
 	ExportOutlined,
 	CloseOutlined,
@@ -8,6 +8,7 @@ import {
 	FileTextOutlined,
 	SyncOutlined,
 	DeleteOutlined,
+	DownOutlined,
 } from '@ant-design/icons';
 import { Api } from '../../../utils/Api';
 
@@ -315,25 +316,53 @@ const Success = ({
 					{retryMedia}
 					{restorePointNotice}
 					<div className="ant-result-extra edi-d-flex edi-justify-content-center">
-						<Button key="close" onClick={handleReset}>
-							<CloseOutlined />
-							<span>{sdEdiAdminParams.btnClose}</span>
-						</Button>
-						{viewLogButton}
-						{rollbackAvailable && (
-							<Button
-								key="rollback"
-								danger
-								loading={rolling}
-								onClick={handleRollback}
-							>
-								<RollbackOutlined />
+						<Popover
+							trigger="click"
+							placement="top"
+							overlayClassName="edi-success-more-pop"
+							content={
+								<div className="edi-success-more">
+									<Button block onClick={handleReset}>
+										<CloseOutlined />
+										<span>{sdEdiAdminParams.btnClose}</span>
+									</Button>
+									{sdEdiAdminParams.logPageUrl && (
+										<Button
+											block
+											href={sdEdiAdminParams.logPageUrl}
+											target="_self"
+										>
+											<FileTextOutlined />
+											<span>
+												{sdEdiAdminParams.viewFullLog ||
+													'View Log'}
+											</span>
+										</Button>
+									)}
+									{rollbackAvailable && (
+										<Button
+											block
+											danger
+											loading={rolling}
+											onClick={handleRollback}
+										>
+											<RollbackOutlined />
+											<span>
+												{sdEdiAdminParams.rollbackButton ||
+													'Roll Back'}
+											</span>
+										</Button>
+									)}
+								</div>
+							}
+						>
+							<Button>
 								<span>
-									{sdEdiAdminParams.rollbackButton ||
-										'Roll Back'}
+									{sdEdiAdminParams.btnMore || 'More'}
 								</span>
+								<DownOutlined />
 							</Button>
-						)}
+						</Popover>
 						<Button
 							key="view-site"
 							type="primary"

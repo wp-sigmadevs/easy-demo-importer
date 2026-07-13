@@ -92,7 +92,9 @@ const useSharedDataStore = create((set) => ({
 	skipImageRegeneration: false,
 	importComplete: false,
 	reset: true,
-	snapshot: false,
+	// On by default: reset is on by default and is destructive, so the restore
+	// point (the parachute) should be armed too rather than left off.
+	snapshot: true,
 	message: '',
 	hint: '',
 	resumeRequest: loadResumeRequest(),
@@ -196,7 +198,7 @@ const useSharedDataStore = create((set) => ({
 			skipImageRegeneration: false,
 			importComplete: false,
 			reset: true,
-			snapshot: false,
+			snapshot: true,
 			message: '',
 			hint: '',
 			// resumeRequest is intentionally persisted across page reloads — do not clear it here.

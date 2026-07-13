@@ -65,20 +65,20 @@ const Setup = ({ handleImport, handleReset }) => {
 								<div className="import-option">
 									<div className="choose edi-d-flex edi-align-items-center">
 										<Switch
-											checked={excludeImages}
+											checked={!excludeImages}
 											onChange={(checked) =>
-												setExcludeImages(checked)
+												setExcludeImages(!checked)
 											}
 										/>
 										<h4>
-											{
-												sdEdiAdminParams.excludeImagesTitle
-											}
+											{sdEdiAdminParams.importImagesTitle ||
+												'Import Demo Images'}
 										</h4>
 									</div>
 									<div className="option-details">
 										<p>
-											{sdEdiAdminParams.excludeImagesHint}
+											{sdEdiAdminParams.importImagesHint ||
+												'Downloads the demo images. Turn off for a faster import, or if the import fails repeatedly.'}
 										</p>
 									</div>
 								</div>
@@ -87,24 +87,22 @@ const Setup = ({ handleImport, handleReset }) => {
 									<div className="import-option">
 										<div className="choose edi-d-flex edi-align-items-center">
 											<Switch
-												checked={skipImageRegeneration}
+												checked={!skipImageRegeneration}
 												onChange={(checked) =>
 													setSkipImageRegeneration(
-														checked
+														!checked
 													)
 												}
 											/>
 											<h4>
-												{
-													sdEdiAdminParams.skipImageRegenerationTitle
-												}
+												{sdEdiAdminParams.regenerateImagesTitle ||
+													'Regenerate Images'}
 											</h4>
 										</div>
 										<div className="option-details">
 											<p>
-												{
-													sdEdiAdminParams.skipImageRegenerationHint
-												}
+												{sdEdiAdminParams.regenerateImagesHint ||
+													'Regenerates thumbnail sizes during import. Turn off for a faster import; you can regenerate later from Tools.'}
 											</p>
 										</div>
 									</div>
