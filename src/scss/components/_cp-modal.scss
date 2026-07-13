@@ -189,7 +189,7 @@
 	margin-inline-start: 12px;
 }
 
-// Manual-import modal — its file pickers. The rest of the chrome (steps,
+// Manual-import modal — its file slots. The rest of the chrome (steps,
 // option groups, action bar) is inherited from the shared modal styles.
 .edi-manual-modal {
 	.manual-mode-switch {
@@ -200,21 +200,150 @@
 		}
 	}
 
-	.manual-file {
-		display: flex;
-		align-items: center;
-		flex-wrap: wrap;
-		gap: 6px 12px;
-		margin-bottom: 16px;
-
-		.manual-file-label {
-			font-size: 13px;
-			color: #777;
-			font-style: italic;
+	// Each slot is an antd Dragger restyled into a compact card, so every
+	// file type accepts both drag-and-drop and click-to-browse.
+	.manual-slot {
+		&.ant-upload-wrapper {
+			display: block;
+			margin-bottom: 12px;
 		}
 
-		.ant-upload-list {
-			width: 100%;
+		.ant-upload-drag {
+			border-radius: 10px;
+			border: 1px dashed rgba(5, 5, 5, 0.22);
+			background: #fcfcfd;
+			transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+
+			&:hover,
+			&.ant-upload-drag-hover {
+				border-color: $color-primary;
+				background: rgba(45, 116, 213, 0.03);
+			}
+
+			.ant-upload-btn {
+				padding: 0;
+			}
+
+			.ant-upload-drag-container {
+				display: block;
+			}
+		}
+
+		.manual-slot-body {
+			display: flex;
+			align-items: center;
+			column-gap: 12px;
+			padding: 12px 14px;
+			text-align: left;
+		}
+
+		.manual-slot-icon {
+			flex: 0 0 auto;
+			display: inline-flex;
+			font-size: 20px;
+			color: $color-primary;
+		}
+
+		.manual-slot-meta {
+			flex: 1;
+			min-width: 0;
+			display: flex;
+			flex-direction: column;
+			row-gap: 1px;
+		}
+
+		.manual-slot-title {
+			font-size: 13px;
+			font-weight: 600;
+			color: #333;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+
+		.manual-slot-hint {
+			font-size: 11.5px;
+			color: #8a8f94;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+
+		.manual-slot-tag {
+			flex: 0 0 auto;
+			padding: 2px 9px;
+			border-radius: 999px;
+			font-size: 10px;
+			font-weight: 600;
+			letter-spacing: 0.05em;
+			text-transform: uppercase;
+			background: rgba(5, 5, 5, 0.05);
+			color: #8a8f94;
+
+			&.is-required {
+				background: rgba(45, 116, 213, 0.1);
+				color: $color-primary;
+			}
+		}
+
+		.manual-slot-remove {
+			flex: 0 0 auto;
+			color: #999;
+
+			&:hover {
+				color: #ff4d4f;
+			}
+		}
+
+		// A chosen file: solid primary border + green check.
+		&.is-filled {
+			.ant-upload-drag {
+				border-style: solid;
+				border-color: rgba(45, 116, 213, 0.45);
+				background: rgba(45, 116, 213, 0.04);
+			}
+
+			.manual-slot-icon {
+				color: #52c41a;
+			}
+		}
+
+		// Hero variant — the required content slot / the bundle dropzone.
+		&.is-wide {
+			.manual-slot-body {
+				padding: 20px;
+			}
+
+			.manual-slot-icon {
+				font-size: 30px;
+			}
+
+			.manual-slot-title {
+				font-size: 14px;
+				white-space: normal;
+			}
+
+			.manual-slot-drop-hint {
+				margin: -10px 0 0;
+				padding: 0 20px 16px 62px;
+				font-size: 12px;
+				color: #8a8f94;
+				text-align: left;
+			}
+		}
+	}
+
+	.manual-slot-grid {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 12px;
+
+		.manual-slot.ant-upload-wrapper {
+			margin-bottom: 0;
+		}
+
+		@media only screen and (max-width: 575px) {
+			grid-template-columns: 1fr;
 		}
 	}
 
