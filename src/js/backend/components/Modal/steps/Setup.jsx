@@ -135,7 +135,7 @@ const Setup = ({ handleImport, handleReset }) => {
 									<div className="option-details">
 										<p>
 											{sdEdiAdminParams.snapshotDetails ||
-												'Before importing, a copy of your posts, pages, media (including the uploaded image files, not just their records), categories, tags, menus, comments and site settings (including the theme customizer and widgets) is saved. If you are not happy with the result, one click restores your site to exactly this state — from the result screen or the “Restore point” banner on the importer page. Note: rolling back also removes anything created after this import, and the restore point is replaced the next time you import.'}
+												'Saves a full backup — content, media files, and settings — before importing. One click restores this exact state from the result screen or the restore-point banner. Rolling back also removes anything created after the import.'}
 										</p>
 									</div>
 								</div>
