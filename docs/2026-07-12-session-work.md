@@ -18,7 +18,7 @@ master (bf2a840)
        └─ wxr-state-split (d6601fa)  perf work + integration-test CI job
             ├─ preflight-check (6c68c57)      preflight gate (merged onward)
             └─ regenerate-thumbnails         regen tool + preflight[merged] + retry + rollback + WP-CLI
-                 └─ manual-import (ebfe44d)   ← TIP: full manual import + review fixes + rollback overhaul (§13)
+                 └─ manual-import (f367363)   ← TIP: full manual import + review fixes + rollback overhaul (§13)
 ```
 
 - **`manual-import`** is the accumulation branch and carries the entire stack.
@@ -313,6 +313,7 @@ itself is correct — 3 rows → wiped → 3 restored). Branch tip is now **`13f
 | `72880d1` | **feat(rollback): snapshot the uploads media so rollback fully restores media files.** New `inc/Common/Utils/MediaSnapshot.php`, driven in lockstep through `Snapshot::create/restore/drop`. **Reset import** → rename `uploads/` aside instantly (no byte copy, no disk doubling), recreate empty, restore moves it back. **Non-reset / manual** → write a file manifest, rollback deletes only files the import added. Cross-filesystem uploads (custom `UPLOADS` disk) → rename fails → auto-fallback to manifest + logged warning. Symlinks skipped on walk + delete. Both strategies proven on a real temp FS. |
 | `e265026` | **feat(rollback): keep-or-discard prompt on the success screen.** New REST `POST /discard-restore-point` → `Snapshot::drop()` (drops shadow tables *and* the moved-aside media copy; site untouched). `Success.jsx` shows a notice when a restore point exists: keep (do nothing) or **Discard restore point** → confirm → flips to "disk reclaimed", hides Roll Back. 6 new i18n keys. |
 | `13febbc` | **feat(rollback): same discard action on the persistent `RestorePointBanner`** so a returning user who closed the modal can also reclaim disk. Reuses the discard i18n keys; buttons disable each other while running. |
+| `f367363` | **fix(rollback): release the import lock after a restore.** Found during a full real demo-import→rollback E2E on `wpcheck.local`. `SessionManager::start()` sets the lock *before* the snapshot, so it lives in the options shadow; reverting options on rollback restored the completed import's lock, and the next import was wrongly rejected as "already in progress" (self-heals in ≤30 min via the lock transient TTL, or instantly via "Start Over", but still an annoyance). Fix: `SessionManager::forceRelease()` at the end of `Snapshot::restore()` — a rolled-back site is never mid-import. |
 | `ebfe44d` | **fix(rollback): restore media BEFORE reverting the options table — the media-not-restoring bug.** Found by end-to-end Playwright test on a real Local WooCommerce site (`wpcheck.local`), instrumented with `error_log`. Root cause: `Snapshot::create()` snapshots `wp_options` into a shadow *before* `MediaSnapshot::create()` writes the `sd_edi_mediasnap` descriptor option — so the options shadow never contains it. `Snapshot::restore()` then reverted `wp_options` from that shadow *first*, **deleting `sd_edi_mediasnap`**, and only afterwards called `MediaSnapshot::restore()`, which read `false` and bailed → media never moved back, shadow uploads orphaned in `wp-content/sd-edi-restore/`. Isolated CLI tests passed only because the option stayed in that one process's in-memory cache (raw-SQL revert doesn't invalidate it); real multi-request rollbacks read a fresh DB and failed. Fix: call `MediaSnapshot::restore()` at the *top* of `Snapshot::restore()`, before the DB revert, so the descriptor is read while still present; also makes media restore succeed even when no DB shadows exist. Verified via UI→REST rollback: pristine original media restored, demo media dropped, nothing orphaned. |
 | `0c0b4c9` | **feat(rollback): snapshot *every* prefixed table, not a fixed 9.** Was: hard-coded list (posts/postmeta/terms/…/options), so custom plugin tables (WooCommerce HPOS orders, form entries, bookings) were wiped by a reset but never backed up → lost on rollback. Now `Snapshot::tables()` discovers all `{prefix}*` tables via the same `SHOW TABLE STATUS` scan `databaseReset()` uses, minus an exclude list (`users`, `usermeta`, activity log, `sd_edi_snap_*` shadows, `actionscheduler*`), filterable via `sd/edi/snapshot_exclude_tables`. `restore()`/`drop()` now enumerate the **shadow** tables that actually exist and reverse-map to live names (imports can add/drop tables mid-run); `restore()` `CREATE TABLE IF NOT EXISTS` before refill so a dropped table still comes back. Reset-set == backup-set → complete restore. Verified on live MySQL: a custom `wp_wc_orders` table round-trips; excluded `wp_users` is not reverted (new users survive). |
 
@@ -320,11 +321,27 @@ itself is correct — 3 rows → wiped → 3 restored). Branch tip is now **`13f
 `Snapshot::isForSession( $sessionId )`, `Snapshot::SESSION_OPTION`; `MediaSnapshot`
 (`create/restore/discard`, option `sd_edi_mediasnap`); REST `/discard-restore-point`.
 
+**Full E2E verified (Playwright, `wpcheck.local`, Local + WooCommerce/Elementor/Fluent Forms):**
+a real "Main Home" demo import with reset + restore point, then Roll Back from the
+success screen. Snapshot during import = **55 shadow tables** (full coverage) + moved-aside
+uploads + `sd_edi_mediasnap`. After rollback every metric returned to baseline:
+posts 10, pages 57, products 56, attachments 160; uploads reverted from `2025+2026`
+to `2026`-only (import-added media dropped); 0 shadow tables, 0 restore options, 0
+orphaned restore dirs. Media + DB + cleanup all correct through the real UI→REST path.
+
 **Verify during QA:**
 - Rollback on a site that **already has content** (empty site correctly restores to empty — that is not a bug).
 - Media round-trip: reset import → rollback restores original image files; non-reset → demo media removed, originals intact.
 - A kept (not-rolled-back) reset import leaves originals in `wp-content/sd-edi-restore/` until the next snapshot/rollback — expected disk cost; auto-cleaned on next import or discard.
 - Discard from both the success screen and the banner frees disk and removes the rollback affordance.
+
+**⚠ Build gotcha (not a code bug, but bit us during testing):** the service loader
+(`Bootstrap::getServices`) discovers `App\*` classes via `$this->composer->getClassMap()`,
+so the plugin **requires an optimized/authoritative autoloader** — a plain
+`composer install`/`dump-autoload` (non-optimized) yields an empty App classmap and the
+**entire admin menu silently disappears** (page 403s with "not allowed to access"). Always
+build/deploy with `composer install --optimize-autoloader` (or `dump-autoload -o`). Worth
+considering committing an optimized classmap or documenting this in the release checklist.
 
 State at handoff: 98 unit tests pass, 0 phpcs errors, production build compiled, pot
 regenerated. Assets are gitignored (built at release), so only source is committed.
