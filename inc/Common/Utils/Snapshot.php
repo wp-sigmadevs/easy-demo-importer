@@ -31,6 +31,7 @@ declare( strict_types=1 );
 namespace SigmaDevs\EasyDemoImporter\Common\Utils;
 
 use SigmaDevs\EasyDemoImporter\Common\Functions\ImportLogger;
+use SigmaDevs\EasyDemoImporter\Common\Functions\SessionManager;
 
 // Do not allow directly accessing this file.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -310,6 +311,12 @@ final class Snapshot {
 		}
 
 		self::drop();
+
+		// Reverting the options table restored the in-progress import's lock (it
+		// was snapshotted right after the session started). A rolled-back site is
+		// definitively not mid-import, so clear the lock or the next import would
+		// be wrongly rejected as "already in progress".
+		SessionManager::forceRelease();
 
 		// The wholesale table swap invalidates every cache layer.
 		wp_cache_flush();
