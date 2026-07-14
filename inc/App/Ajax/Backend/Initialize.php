@@ -137,18 +137,24 @@ class Initialize extends ImporterAjax {
 		// InstallDemo's lazy install on installs that never re-ran activation.
 		ImportLogger::maybeInstall();
 
-		// Reject if another import is already running.
-		if ( SessionManager::isLocked() ) {
+		// Reject only if an import is genuinely running (a fresh heartbeat). A lock
+		// held by an interrupted import — its heartbeat has gone quiet — must not
+		// block a new one, so it is superseded below.
+		if ( SessionManager::isLive() ) {
 			$this->prepareResponse(
 				'',
 				'',
 				'',
 				true,
 				esc_html__( 'Another import is already in progress.', 'easy-demo-importer' ),
-				esc_html__( 'Wait for the current import to finish before starting a new one. If you believe the previous import has crashed, wait 30 minutes for the lock to expire automatically, then try again.', 'easy-demo-importer' )
+				esc_html__( 'Wait for the current import to finish before starting a new one. If you believe the previous import has crashed, wait a couple of minutes for it to be released automatically, then try again.', 'easy-demo-importer' )
 			);
 			return;
 		}
+
+		// Release any stale (interrupted) lock so it does not block this import.
+		// A live import was already caught above, so this only clears abandoned ones.
+		SessionManager::forceRelease();
 
 		// Start a new import session and acquire the mutex lock.
 		$session         = SessionManager::start();

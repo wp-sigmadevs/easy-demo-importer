@@ -107,6 +107,30 @@ class SessionManager {
 	}
 
 	/**
+	 * Whether an import is genuinely live right now.
+	 *
+	 * A locked session whose heartbeat has gone quiet (interrupted, but still
+	 * within its 30-minute lock so it can be resumed) is NOT live — it must not
+	 * block a fresh import. Only a session with a recent heartbeat is treated as
+	 * a running import. Uses the same staleness window as the Import Log.
+	 *
+	 * @return bool
+	 * @since 1.2.0
+	 */
+	public static function isLive(): bool {
+		$session = static::get();
+
+		if ( null === $session ) {
+			return false;
+		}
+
+		$last_active = (int) ( $session['last_active'] ?? $session['started_at'] ?? 0 );
+		$threshold   = (int) apply_filters( 'sd/edi/interrupted_after_seconds', 2 * MINUTE_IN_SECONDS ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+
+		return ( time() - $last_active ) <= $threshold;
+	}
+
+	/**
 	 * Refresh the session heartbeat.
 	 *
 	 * Called at the start of every import phase so the "last_active" timestamp
