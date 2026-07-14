@@ -8,7 +8,7 @@ import {
 	Col,
 	Upload,
 	Tooltip,
-	Segmented,
+	Tabs,
 } from 'antd';
 import {
 	CloseOutlined,
@@ -403,24 +403,25 @@ const ManualImportModal = ({ visible, onClose }) => {
 							<div className="modal-content-inner">
 								<div className="import-options">
 									<div className="manual-mode-switch">
-										<Segmented
-											value={mode}
+										<Tabs
+											className="edi-manual-switch"
+											activeKey={mode}
 											onChange={(v) => {
 												setMode(v);
 												setError('');
 											}}
-											options={[
+											items={[
 												{
+													key: 'separate',
 													label:
 														sdEdiAdminParams.manualModeSeparate ||
 														'Separate files',
-													value: 'separate',
 												},
 												{
+													key: 'bundle',
 													label:
 														sdEdiAdminParams.manualModeBundle ||
 														'Single bundle (.zip)',
-													value: 'bundle',
 												},
 											]}
 										/>
