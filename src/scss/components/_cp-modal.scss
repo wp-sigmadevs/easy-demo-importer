@@ -192,11 +192,60 @@
 // Manual-import modal — its file slots. The rest of the chrome (steps,
 // option groups, action bar) is inherited from the shared modal styles.
 .edi-manual-modal {
+	// The file column and the safety card rarely have matching heights here (the
+	// separate-files column is much taller than the two safety toggles), so let
+	// each group size to its own content instead of stretching the card into a
+	// large empty box. !important overrides the shared, deeply-nested height:100%
+	// rule; scoped to the manual modal so the Configure step keeps equal cards.
+	.import-options .configure-group {
+		height: auto !important;
+	}
+
+	// Mode switcher, styled to match the Status page's top tab pill: a centred
+	// white rounded bar with the brand-gradient pill marking the active mode.
 	.manual-mode-switch {
-		margin-bottom: 24px;
+		display: flex;
+		justify-content: center;
+		margin-bottom: 28px;
 
 		.ant-segmented {
-			font-weight: 500;
+			padding: 5px;
+			background: #fff;
+			border-radius: 999px;
+			box-shadow: 0 6px 22px rgba(16, 24, 40, 0.1);
+
+			// The sliding thumb and the selected item both carry the gradient
+			// pill; antd's default white thumb and its shadow are overridden.
+			.ant-segmented-thumb,
+			.ant-segmented-item-selected {
+				border-radius: 999px;
+				box-shadow: none;
+				background: linear-gradient(109.6deg, rgb(45, 116, 213) 11.2%, rgb(121, 137, 212) 91.2%);
+			}
+
+			.ant-segmented-item {
+				border-radius: 999px;
+				color: #4b5563;
+				transition: color 0.2s;
+
+				&:hover:not(.ant-segmented-item-selected) {
+					color: $color-primary;
+					background: transparent;
+				}
+
+				.ant-segmented-item-label {
+					min-width: 150px;
+					height: 40px;
+					line-height: 40px;
+					padding: 0 24px;
+					font-size: 15px;
+					font-weight: 500;
+				}
+			}
+
+			.ant-segmented-item-selected {
+				color: #fff;
+			}
 		}
 	}
 
@@ -220,13 +269,25 @@
 				background: rgba(45, 116, 213, 0.03);
 			}
 
+			// antd defaults this to `display: table`, which shrink-to-fits its
+			// content — a long hint then widened the flex body past the slot and
+			// pushed the Required/Optional tag into the next column. Force block
+			// + full width so the body is bounded and the text truncates/wraps.
 			.ant-upload-btn {
+				display: block !important;
+				width: 100%;
 				padding: 0;
 			}
 
 			.ant-upload-drag-container {
 				display: block;
 			}
+		}
+
+		// Hero (wide) slots have room for the full description, so let the hint
+		// wrap instead of truncating to a single ellipsised line.
+		&.is-wide .manual-slot-hint {
+			white-space: normal;
 		}
 
 		.manual-slot-body {
