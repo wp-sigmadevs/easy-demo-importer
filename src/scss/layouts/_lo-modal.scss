@@ -270,9 +270,12 @@
 				}
 			}
 
-			.required-plugins {
+			.required-plugins,
+			.readiness-checks {
 				@extend .edi-pos-r;
 
+				// Same bottom fade on both columns, and the same list height
+				// below, so the fade sits at the same height on each side.
 				&::before {
 					content: '';
 					display: block;

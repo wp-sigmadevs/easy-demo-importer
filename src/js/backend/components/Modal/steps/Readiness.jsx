@@ -142,11 +142,20 @@ const Readiness = ({ modalData, handleReset }) => {
 								{sdEdiAdminParams.readinessIntro ||
 									'These checks confirm your server can run the import. Resolve any blocking issue before you continue.'}
 							</p>
+							{sdEdiAdminParams.serverPageUrl && (
+								<a
+									className="readiness-status-link"
+									href={sdEdiAdminParams.serverPageUrl}
+									target="_blank"
+									rel="noreferrer"
+								>
+									{sdEdiAdminParams.viewFullStatus ||
+										'View full system status'}
+									<ArrowRightOutlined />
+								</a>
+							)}
 							{preflightChecks.length > 0 ? (
-								<PreflightPanel
-									checks={preflightChecks}
-									blocked={importBlocked}
-								/>
+								<PreflightPanel checks={preflightChecks} />
 							) : (
 								<div className="skeleton-list">
 									<Skeleton active paragraph={{ rows: 4 }} />

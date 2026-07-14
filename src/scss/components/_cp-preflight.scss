@@ -1,138 +1,83 @@
 // ================================
 //	Pre-import readiness panel.
-//	Collapsed summary bar + expandable checklist.
+//	Plain list matching the Required Plugins list beside it — no box,
+//	no collapse. Shared column chrome (bottom fade, list height, intro
+//	paragraph size) lives with .required-plugins in _lo-modal.scss so both
+//	columns stay pixel-identical.
 // ================================
 
 .preflight-row {
 	margin-top: 20px;
 }
 
+// A quiet secondary affordance, not a bold inline link buried in the
+// paragraph — its own line, small, with an arrow instead of an underline.
+.readiness-status-link {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	margin-top: 4px;
+	font-size: 13px;
+	font-weight: 500;
+	color: $color-primary;
+	text-decoration: none;
+
+	.anticon {
+		font-size: 11px;
+		transition: transform 0.15s ease;
+	}
+
+	&:hover {
+		text-decoration: underline;
+		color: $color-primary;
+
+		.anticon {
+			transform: translateX(2px);
+		}
+	}
+}
+
 .edi-preflight {
-	$c-pass: #00a32a;
-	$c-warn: #dba617;
 	$c-fail: #d63638;
+	$c-warn: #8a6d1a;
 
-	border: 1px solid rgba(5, 5, 5, 0.1);
-	border-radius: 8px;
-	overflow: hidden;
-	background: #fff;
-
-	// Status accent on the left edge of the summary bar.
-	&.is-pass .edi-preflight-summary {
-		border-left: 3px solid $c-pass;
+	// Preview: label stacked above message, like the Required Plugins list.
+	.ant-list-item {
+		display: grid;
+		grid-template-columns: auto 1fr;
+		column-gap: 16px;
+		align-items: start;
 	}
 
-	&.is-warn .edi-preflight-summary {
-		border-left: 3px solid $c-warn;
-	}
-
-	&.is-fail .edi-preflight-summary {
-		border-left: 3px solid $c-fail;
-	}
-
-	// Clickable summary bar.
-	.edi-preflight-summary {
-		display: flex;
-		align-items: center;
-		gap: 10px;
-		width: 100%;
-		margin: 0;
-		padding: 12px 14px;
-		border: 0;
-		border-left: 3px solid transparent;
-		background: #f6f7f7;
-		font-size: 13px;
-		font-weight: 600;
-		color: #1d2327;
-		text-align: left;
-		cursor: pointer;
-		transition: background 0.2s ease;
-
-		&:hover {
-			background: #f0f1f2;
-		}
-
-		&:focus-visible {
-			outline: 2px solid #2271b1;
-			outline-offset: -2px;
-		}
-	}
-
-	.edi-preflight-summary-icon {
-		flex: 0 0 auto;
-		display: inline-flex;
-		font-size: 16px;
-	}
-
-	.edi-preflight-summary-text {
-		flex: 1 1 auto;
-	}
-
-	.edi-preflight-caret {
-		flex: 0 0 auto;
-		font-size: 12px;
-		color: #787c82;
-		transition: transform 0.3s ease;
-	}
-
-	&.is-open .edi-preflight-caret {
-		transform: rotate(180deg);
-	}
-
-	// Collapsible body — CSS max-height transition, no motion library.
-	.edi-preflight-body {
-		max-height: 0;
-		overflow: hidden;
-		transition: max-height 0.35s ease;
-	}
-
-	&.is-open .edi-preflight-body {
-		max-height: 460px;
-		overflow-y: auto;
-	}
-
-	.edi-preflight-list {
-		list-style: none;
-		margin: 0;
-		padding: 6px 14px 10px;
-	}
-
-	.edi-preflight-item {
-		display: flex;
-		align-items: baseline;
-		gap: 8px;
-		padding: 5px 0;
-		font-size: 13px;
-		border-top: 1px solid rgba(5, 5, 5, 0.04);
-
-		&:first-child {
-			border-top: 0;
-		}
-	}
-
+	// Same icon size as the Required Plugins list beside it.
 	.edi-preflight-item-icon {
-		flex: 0 0 auto;
+		grid-row: 1 / 3;
+		font-size: 20px;
+		top: -2px;
+
+		@extend .edi-pos-r;
 	}
 
 	.edi-preflight-item-label {
-		flex: 0 0 auto;
-		min-width: 130px;
+		grid-column: 2;
 		font-weight: 600;
 		color: #1d2327;
+		margin: 0 0 4px 0;
 	}
 
+	// Same muted tone as the Required Plugins list's description line.
 	.edi-preflight-item-msg {
-		flex: 1 1 auto;
-		color: #50575e;
+		grid-column: 2;
+		color: rgba(0, 0, 0, 0.45);
 	}
 
 	// Draw attention to the rows that actually need action.
-	.edi-preflight-item.is-fail .edi-preflight-item-msg {
-		color: #d63638;
+	.ant-list-item.is-fail .edi-preflight-item-msg {
+		color: $c-fail;
 		font-weight: 600;
 	}
 
-	.edi-preflight-item.is-warn .edi-preflight-item-msg {
-		color: #8a6d1a;
+	.ant-list-item.is-warn .edi-preflight-item-msg {
+		color: $c-warn;
 	}
 }
