@@ -141,6 +141,7 @@ For any inquiries, bug reports, or suggestions, please submit your request [here
 * Feature: Determinate content-import progress bar, with automatic resume after transient connection drops or gateway timeouts during the import.
 * Feature: Added support for importing LayerSlider slides.
 * Feature: Import can now resume automatically if interrupted, thanks to the new Session Manager.
+* Feature: New Regenerate Thumbnails tool (Appearance → Easy Thumbnails) — rebuilds the intermediate image sizes across your whole media library in resumable, time-boxed batches that will not time out on large libraries. Includes a live image-by-image log, a Force-regenerate-every-size option, and an optional one-at-a-time mode.
 * Security: Improved protection against malicious archive extraction (ZipSlip).
 * Security: Added safeguards to prevent unsafe PHP file loading.
 * Security: Improved validation in the plugin installer for safer downloads.
@@ -154,6 +155,7 @@ For any inquiries, bug reports, or suggestions, please submit your request [here
 * Fix: An interrupted import now resurfaces automatically on reload — the demo importer reopens the affected demo with the Resume / Start Over prompt instead of returning to the demo grid with no indication the import was incomplete.
 * Tweak: The Import Log now closes out an interrupted run with an "Import was interrupted" entry and an "Interrupted" status, instead of leaving it stuck on "In progress". Runs that stop after content import but before finishing are no longer mislabelled as successful.
 * Tweak: A new import no longer has to wait for an interrupted one to release its lock — an abandoned import is superseded automatically, while a genuinely-running import still blocks a second one.
+* Tweak: Thumbnail regeneration runs are now recorded alongside imports, and the Status page's log tab has been renamed from "Import Logs" to "Activity" to reflect that it covers all plugin activity.
 * Tweak: Refactored slider import logic to improve reliability and reduce duplicate code.
 * Tweak: Improved Widgets and database search-replace handling.
 * Tweak: Enhanced Customizer data import handling.
