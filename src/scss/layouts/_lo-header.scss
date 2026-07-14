@@ -20,10 +20,13 @@
 		height: 45px;
 		border-radius: 8px;
 		font-weight: 500;
-		color: #374151;
+		color: $color-primary;
+		background: rgba(45, 116, 213, 0.06);
+		border-color: rgba(45, 116, 213, 0.35);
 
 		&:hover {
 			border-color: $color-primary;
+			background: rgba(45, 116, 213, 0.12);
 
 			@extend .edi-primary-color;
 		}

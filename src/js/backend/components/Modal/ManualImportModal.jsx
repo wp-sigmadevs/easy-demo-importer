@@ -286,11 +286,12 @@ const ManualImportModal = ({ visible, onClose }) => {
 		subtitle,
 		required = false,
 		wide = false,
+		full = false,
 	}) => (
 		<Upload.Dragger
 			className={`manual-slot${wide ? ' is-wide' : ''}${
-				file ? ' is-filled' : ''
-			}`}
+				full ? ' is-full' : ''
+			}${file ? ' is-filled' : ''}`}
 			accept={accept}
 			maxCount={1}
 			fileList={[]}
@@ -511,6 +512,7 @@ const ManualImportModal = ({ visible, onClose }) => {
 																subtitle:
 																	sdEdiAdminParams.manualSlotSettingsHint ||
 																	'.json, or .zip of JSONs',
+																full: true,
 															})}
 															{fileSlot({
 																file: imagesFile,
@@ -526,6 +528,7 @@ const ManualImportModal = ({ visible, onClose }) => {
 																subtitle:
 																	sdEdiAdminParams.manualSlotImagesHint ||
 																	'.zip of the uploads folder',
+																full: true,
 															})}
 														</div>
 													</>
