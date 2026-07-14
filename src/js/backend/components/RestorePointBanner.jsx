@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Alert, Button, Modal } from 'antd';
-import { RollbackOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Button, Modal } from 'antd';
+import {
+	RollbackOutlined,
+	DeleteOutlined,
+	HistoryOutlined,
+} from '@ant-design/icons';
 import { Api } from '../utils/Api';
 
 /* global sdEdiAdminParams */
@@ -45,6 +49,7 @@ const RestorePointBanner = () => {
 			okText: sdEdiAdminParams.rollbackConfirm || 'Roll back',
 			okButtonProps: { danger: true },
 			cancelText: sdEdiAdminParams.confirmNo || 'Cancel',
+			className: 'confirmation-modal',
 			centered: true,
 			onOk: () => {
 				setRolling(true);
@@ -76,6 +81,7 @@ const RestorePointBanner = () => {
 				'This frees the disk space used by the backup. You will no longer be able to roll this import back.',
 			okText: sdEdiAdminParams.discardConfirm || 'Discard',
 			cancelText: sdEdiAdminParams.confirmNo || 'Cancel',
+			className: 'confirmation-modal',
 			centered: true,
 			onOk: () => {
 				setDiscarding(true);
@@ -94,46 +100,44 @@ const RestorePointBanner = () => {
 	};
 
 	return (
-		<Alert
-			type="warning"
-			showIcon
-			style={{ marginBottom: 20 }}
-			message={
-				sdEdiAdminParams.rollbackBannerTitle ||
-				'A restore point from your last import is available.'
-			}
-			description={
-				sdEdiAdminParams.rollbackBannerDesc ||
-				'You can roll your site back to the state it was in before that import. Rolling back also removes anything created since.'
-			}
-			action={
-				<>
-					<Button
-						loading={discarding}
-						disabled={rolling}
-						onClick={handleDiscard}
-						style={{ marginRight: 8 }}
-					>
-						<DeleteOutlined />
-						<span>
-							{sdEdiAdminParams.discardButton ||
-								'Discard restore point'}
-						</span>
-					</Button>
-					<Button
-						danger
-						loading={rolling}
-						disabled={discarding}
-						onClick={handleRollback}
-					>
-						<RollbackOutlined />
-						<span>
-							{sdEdiAdminParams.rollbackButton || 'Roll Back'}
-						</span>
-					</Button>
-				</>
-			}
-		/>
+		<div className="edi-restore-banner">
+			<div className="edi-restore-banner-info">
+				<span className="edi-restore-banner-icon">
+					<HistoryOutlined />
+				</span>
+				<div className="edi-restore-banner-text">
+					<h4>
+						{sdEdiAdminParams.rollbackBannerTitle ||
+							'A restore point from your last import is available.'}
+					</h4>
+					<p>
+						{sdEdiAdminParams.rollbackBannerDesc ||
+							'You can roll your site back to the state it was in before that import. Rolling back also removes anything created since.'}
+					</p>
+				</div>
+			</div>
+			<div className="edi-restore-banner-actions">
+				<Button
+					className="edi-restore-discard"
+					loading={discarding}
+					disabled={rolling}
+					onClick={handleDiscard}
+					icon={<DeleteOutlined />}
+				>
+					{sdEdiAdminParams.discardButton || 'Discard Backup'}
+				</Button>
+				<Button
+					className="edi-restore-rollback"
+					danger
+					loading={rolling}
+					disabled={discarding}
+					onClick={handleRollback}
+					icon={<RollbackOutlined />}
+				>
+					{sdEdiAdminParams.rollbackButton || 'Roll Back'}
+				</Button>
+			</div>
+		</div>
 	);
 };
 

@@ -28,7 +28,84 @@
 		}
 
 		.ant-btn {
+			height: 40px;
+			border-radius: 8px;
 			font-weight: 500;
+		}
+	}
+
+	// Restore-point notice — a clean card that matches the demo grid's white,
+	// rounded, softly-shadowed surfaces rather than a jarring full-width alert.
+	.edi-restore-banner {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 20px;
+		margin: 0 0 20px;
+		padding: 16px 22px;
+		background: #fff;
+		border: 1px solid #eef0f4;
+		border-radius: 12px;
+		box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+
+		.edi-restore-banner-info {
+			display: flex;
+			align-items: center;
+			gap: 16px;
+			min-width: 0;
+		}
+
+		.edi-restore-banner-icon {
+			flex: 0 0 auto;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			width: 42px;
+			height: 42px;
+			border-radius: 50%;
+			background: #fff7e6;
+			color: #fa8c16;
+			font-size: 20px;
+		}
+
+		.edi-restore-banner-text {
+			min-width: 0;
+
+			h4 {
+				margin: 0 0 3px;
+				font-size: 15px;
+				font-weight: 600;
+				color: #1f2937;
+			}
+
+			p {
+				margin: 0;
+				font-size: 13px;
+				line-height: 1.5;
+				color: #6b7280;
+			}
+		}
+
+		.edi-restore-banner-actions {
+			flex: 0 0 auto;
+			display: flex;
+			align-items: center;
+			gap: 10px;
+
+			.ant-btn {
+				height: 40px;
+				border-radius: 8px;
+				font-weight: 500;
+			}
+		}
+
+		@media only screen and (max-width: 782px) {
+			flex-direction: column;
+			align-items: flex-start;
+
+			.edi-restore-banner-actions {
+				width: 100%;
+			}
 		}
 	}
 }
