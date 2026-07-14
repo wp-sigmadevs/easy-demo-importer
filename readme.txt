@@ -151,6 +151,7 @@ For any inquiries, bug reports, or suggestions, please submit your request [here
 * Fix: Added verification to ensure demo files download correctly before import.
 * Fix: Improved input validation and sanitization across AJAX requests.
 * Fix: Prevented a JavaScript crash when network requests fail or time out.
+* Fix: An interrupted import now resurfaces automatically on reload — the demo importer reopens the affected demo with the Resume / Start Over prompt instead of returning to the demo grid with no indication the import was incomplete.
 * Tweak: Refactored slider import logic to improve reliability and reduce duplicate code.
 * Tweak: Improved Widgets and database search-replace handling.
 * Tweak: Enhanced Customizer data import handling.
