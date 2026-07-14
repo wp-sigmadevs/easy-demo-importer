@@ -68,6 +68,7 @@ final class Plugin {
 			'demo_import_page'    => 'sd-easy-demo-importer',
 			'system_status_page'  => admin_url( 'themes.php?page=sd-easy-demo-importer#/system_status_page' ),
 			'import_log_page'     => admin_url( 'themes.php?page=sd-easy-demo-importer#/import_log' ),
+			'regen_thumbs_page'   => admin_url( 'themes.php?page=sd-easy-demo-importer#/regenerate_thumbnails' ),
 			'views_folder'        => 'views',
 			'template_folder'     => 'templates',
 			'ext_template_folder' => 'sd-edi-templates',

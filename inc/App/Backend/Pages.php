@@ -102,6 +102,17 @@ class Pages extends Base {
 			'callback'    => '',
 		];
 
+		// Regenerate Thumbnails is a React route on the same page (like the
+		// status/log tabs), so it's registered as a URL submenu with no callback.
+		$subPages[] = [
+			'parent_slug' => 'themes.php',
+			'page_title'  => esc_html__( 'Regenerate Thumbnails', 'easy-demo-importer' ),
+			'menu_title'  => apply_filters( 'sd/edi/regen_menu_title', esc_html__( 'Easy Thumbnails', 'easy-demo-importer' ) ), // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+			'capability'  => 'manage_options',
+			'menu_slug'   => esc_url( $this->plugin->data()['regen_thumbs_page'] ),
+			'callback'    => '',
+		];
+
 		return $subPages;
 	}
 
