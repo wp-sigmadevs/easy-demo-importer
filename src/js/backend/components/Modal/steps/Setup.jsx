@@ -111,58 +111,62 @@ const Setup = ({ handleImport, handleReset }) => {
 						</Col>
 
 						<Col xs={24} sm={24} md={12} lg={12} xl={12}>
-							<div className="configure-group is-card">
+							<div className="configure-group is-plain">
 								<h5 className="configure-group-label">
 									{sdEdiAdminParams.configureSafetyLabel ||
 										'Safety'}
 								</h5>
 
-								<div className="import-option">
-									<div className="choose edi-d-flex edi-align-items-center">
-										<Switch
-											checked={snapshot}
-											onChange={(checked) =>
-												setSnapshot(checked)
-											}
-										/>
-										<h4>
-											{sdEdiAdminParams.snapshotTitle ||
-												'Create a restore point'}
-										</h4>
+								<div className="safety-card">
+									<div className="import-option">
+										<div className="choose edi-d-flex edi-align-items-center">
+											<Switch
+												checked={snapshot}
+												onChange={(checked) =>
+													setSnapshot(checked)
+												}
+											/>
+											<h4>
+												{sdEdiAdminParams.snapshotTitle ||
+													'Create a restore point'}
+											</h4>
+										</div>
+										<div className="option-details">
+											<p>
+												{sdEdiAdminParams.snapshotDetails ||
+													'Saves a full backup — content, media files, and settings — before importing. One click restores this exact state from the result screen or the restore-point banner. Rolling back also removes anything created after the import.'}
+											</p>
+										</div>
 									</div>
-									<div className="option-details">
-										<p>
-											{sdEdiAdminParams.snapshotDetails ||
-												'Saves a full backup — content, media files, and settings — before importing. One click restores this exact state from the result screen or the restore-point banner. Rolling back also removes anything created after the import.'}
-										</p>
-									</div>
-								</div>
 
-								<div className="import-option last">
-									<div className="choose edi-d-flex edi-align-items-center">
-										<Switch
-											checked={reset}
-											onChange={(checked) =>
-												setReset(checked)
-											}
-										/>
-										<h4>
-											{
-												sdEdiAdminParams.resetDatabaseTitle
-											}
-										</h4>
-									</div>
-									<div className="option-details warn-text">
-										<p>
-											<b>
-												<i>
-													{
-														sdEdiAdminParams.resetDatabaseWarning
-													}
-												</i>
-											</b>
-											{sdEdiAdminParams.resetDatabaseHint}
-										</p>
+									<div className="import-option last">
+										<div className="choose edi-d-flex edi-align-items-center">
+											<Switch
+												checked={reset}
+												onChange={(checked) =>
+													setReset(checked)
+												}
+											/>
+											<h4>
+												{
+													sdEdiAdminParams.resetDatabaseTitle
+												}
+											</h4>
+										</div>
+										<div className="option-details warn-text">
+											<p>
+												<b>
+													<i>
+														{
+															sdEdiAdminParams.resetDatabaseWarning
+														}
+													</i>
+												</b>
+												{
+													sdEdiAdminParams.resetDatabaseHint
+												}
+											</p>
+										</div>
 									</div>
 								</div>
 							</div>
