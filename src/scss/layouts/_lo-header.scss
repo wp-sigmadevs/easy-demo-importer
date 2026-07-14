@@ -127,3 +127,70 @@
 		}
 	}
 }
+
+// Tree connector — links the Easy Activity / Easy Thumbnails submenu items
+// back to their Easy Demo Importer parent, like a nested admin nav. Each
+// row's corner ("|_") and its pass-through stem (the plain "|" continuing
+// to the next row) are separate pieces so only the path down to whichever
+// child is active gets lit.
+.appearance_page_sd-easy-demo-importer {
+	#adminmenu .wp-submenu {
+		a[href$="#/system_status_page"],
+		a[href$="#/regenerate_thumbnails"] {
+			position: relative;
+			padding-left: 26px;
+		}
+
+		// Easy Activity (middle item): corner into its own label, "|_".
+		a[href$="#/system_status_page"]::before,
+		// Easy Thumbnails (last item): corner into its own label, "|_".
+		a[href$="#/regenerate_thumbnails"]::before {
+			content: '';
+			position: absolute;
+			left: 12px;
+			top: 0;
+			height: 50%;
+			width: 8px;
+			border-left: 1px solid rgba(255, 255, 255, 0.45);
+			border-bottom: 1px solid rgba(255, 255, 255, 0.45);
+			border-bottom-left-radius: 6px;
+		}
+
+		// Easy Activity's pass-through stem, continuing on to Easy
+		// Thumbnails below it — a plain "|", no corner of its own.
+		a[href$="#/system_status_page"]::after {
+			content: '';
+			position: absolute;
+			left: 12px;
+			top: 50%;
+			bottom: 0;
+			border-left: 1px solid rgba(255, 255, 255, 0.45);
+		}
+
+		// Easy Activity active — light its own corner (both the stem and
+		// the branch into its label).
+		li.current > a[href$="#/system_status_page"]::before {
+			border-left-color: #fff;
+			border-bottom-color: #fff;
+		}
+
+		// Easy Thumbnails active — light the trunk down to it: only the
+		// vertical pass-through through Easy Activity's row (not its
+		// horizontal branch, which belongs to Easy Activity), plus Easy
+		// Thumbnails' own corner.
+		&:has(li.current > a[href$="#/regenerate_thumbnails"]) {
+			a[href$="#/system_status_page"]::before {
+				border-left-color: #fff;
+			}
+
+			a[href$="#/system_status_page"]::after {
+				border-left-color: #fff;
+			}
+		}
+
+		li.current > a[href$="#/regenerate_thumbnails"]::before {
+			border-left-color: #fff;
+			border-bottom-color: #fff;
+		}
+	}
+}
