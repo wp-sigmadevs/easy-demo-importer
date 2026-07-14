@@ -323,17 +323,29 @@ final class ImportLogger {
 	 * @since 1.2.0
 	 */
 	public static function getRuns( int $limit = 1000 ): array {
-		// The active session id is part of the cache key: when an interrupted
-		// import's session finally clears (lock released or TTL expired) the run
-		// flips to "interrupted" even though no new log row was written, so the
-		// latest-id component alone would keep serving the stale "in progress" view.
-		$active     = SessionManager::get();
-		$active_sid = $active['session_id'] ?? '';
+		// A live import refreshes its session heartbeat every phase; one that was
+		// interrupted goes quiet while still holding the 30-minute lock. Treat a
+		// session whose heartbeat has gone stale as no longer active so its run is
+		// flagged interrupted instead of sitting on "In progress" until the lock
+		// expires. The threshold sits comfortably above the longest single chunk.
+		$active      = SessionManager::get();
+		$active_sid  = $active['session_id'] ?? '';
+		$last_active = (int) ( $active['last_active'] ?? $active['started_at'] ?? 0 );
+		$threshold   = (int) apply_filters( 'sd/edi/interrupted_after_seconds', 2 * MINUTE_IN_SECONDS ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+		$stale       = '' !== $active_sid && ( time() - $last_active ) > $threshold;
+
+		// Only a genuinely-live session shields its run from the interrupted flag.
+		$live_sid = $stale ? '' : $active_sid;
 
 		// Cache keyed on the latest row id: any new log entry changes the key and
 		// misses the cache, so the runs view is never stale after a write, while
 		// repeated Status-page opens between imports are served from the transient.
-		$cache_key = 'sd_edi_runs_' . self::latestId() . '_' . $limit . '_' . ( '' !== $active_sid ? $active_sid : 'none' );
+		// The live session id is part of the key so the run flips to "interrupted"
+		// the moment its heartbeat clears, even though no new log row was written;
+		// while a live import is pending, a per-minute bucket bounds how long the
+		// "In progress" view can linger after the heartbeat actually goes stale.
+		$bucket    = '' !== $live_sid ? (int) floor( time() / MINUTE_IN_SECONDS ) : 0;
+		$cache_key = 'sd_edi_runs_' . self::latestId() . '_' . $limit . '_' . ( '' !== $live_sid ? $live_sid : 'none' ) . '_' . $bucket;
 		$cached    = get_transient( $cache_key );
 
 		if ( is_array( $cached ) ) {
@@ -344,7 +356,7 @@ final class ImportLogger {
 		// timeline reads top-to-bottom in the order things happened.
 		$runs = self::markInterruptedRuns(
 			self::groupRows( array_reverse( self::get( '', $limit ) ) ),
-			$active_sid
+			$live_sid
 		);
 
 		set_transient( $cache_key, $runs, 5 * MINUTE_IN_SECONDS );

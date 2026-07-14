@@ -219,6 +219,11 @@ abstract class ImporterAjax {
 			}
 
 			$this->sessionId = $posted_session_id;
+
+			// Heartbeat: this phase is genuine progress, so keep the session fresh.
+			// A silent (interrupted) import stops touching this and is flagged in
+			// the Import Log even before its 30-minute lock expires.
+			SessionManager::touch( $this->sessionId );
 		}
 
 		// Check if images import is needed.
