@@ -255,194 +255,198 @@ const AppRegenerate = () => {
 				/>
 
 				<div className="edi-content">
-					<div className="edi-container edi-regenerate">
-						<div className="edi-regenerate-card edi-fade-in">
-							<div className="edi-regenerate-icon">
-								<PictureOutlined />
-							</div>
-
-							<p className="edi-regenerate-intro">
-								{sdEdiAdminParams.regenIntro}
-							</p>
-
-							<div className="edi-regenerate-count">
-								{null === total ? (
-									<span className="edi-regenerate-count-num is-loading">
-										&nbsp;
-									</span>
-								) : (
-									<span className="edi-regenerate-count-num">
-										{fmt(total)}
-									</span>
-								)}
-								<span className="edi-regenerate-count-label">
-									{sdEdiAdminParams.regenImagesFound}
-								</span>
-							</div>
-
-							{!isEmpty && (
-								<div className="edi-regenerate-options">
-									<label className="edi-regenerate-option">
-										<Checkbox
-											checked={force}
-											disabled={running}
-											onChange={(e) =>
-												setForce(e.target.checked)
-											}
-										/>
-										<span className="edi-regenerate-option-text">
-											{sdEdiAdminParams.regenForceLabel}
-											<Tooltip
-												title={
-													sdEdiAdminParams.regenForceHint
-												}
-											>
-												<InfoCircleOutlined className="edi-regenerate-option-help" />
-											</Tooltip>
-										</span>
-									</label>
-
-									<label className="edi-regenerate-option">
-										<Checkbox
-											checked={single}
-											disabled={running}
-											onChange={(e) =>
-												setSingle(e.target.checked)
-											}
-										/>
-										<span className="edi-regenerate-option-text">
-											{sdEdiAdminParams.regenSingleLabel}
-											<Tooltip
-												title={
-													sdEdiAdminParams.regenSingleHint
-												}
-											>
-												<InfoCircleOutlined className="edi-regenerate-option-help" />
-											</Tooltip>
-										</span>
-									</label>
+					<div
+						className={`edi-container edi-regenerate${
+							items.length ? ' has-list' : ''
+						}`}
+					>
+						<div
+							className={`edi-regenerate-card edi-fade-in${
+								items.length ? ' has-list' : ''
+							}`}
+						>
+							<div className="edi-regenerate-main">
+								<div className="edi-regenerate-icon">
+									<PictureOutlined />
 								</div>
-							)}
 
-							{(running || done) && (
-								<div className="edi-regenerate-progress edi-fade-in">
-									<Progress
-										percent={percent}
-										status={done ? 'success' : 'active'}
-										strokeColor={{
-											from: 'rgb(45, 116, 213)',
-											to: 'rgb(121, 137, 212)',
-										}}
-									/>
-
-									<div className="edi-regenerate-stats">
-										{stats.map((s) => (
-											<div
-												className={`edi-regenerate-stat is-${s.key}`}
-												key={s.key}
-											>
-												<span className="edi-regenerate-stat-value">
-													{fmt(s.value)}
-												</span>
-												<span className="edi-regenerate-stat-label">
-													{statLabels[s.key]}
-												</span>
-											</div>
-										))}
-									</div>
-
-									{items.length > 0 && (
-										<div className="edi-regenerate-list-wrap">
-											<div className="edi-regenerate-list-head">
-												<span>
-													{
-														sdEdiAdminParams.regenListTitle
-													}
-												</span>
-												{overflowed && (
-													<span className="edi-regenerate-list-note">
-														{
-															sdEdiAdminParams.regenListOverflow
-														}
-													</span>
-												)}
-											</div>
-											<ul
-												className="edi-regenerate-list"
-												ref={listRef}
-											>
-												{items.map((it) => (
-													<li
-														className={`edi-regenerate-row is-${it.status}`}
-														key={it.id}
-													>
-														<span className="edi-regenerate-row-thumb">
-															{it.thumb ? (
-																<img
-																	src={
-																		it.thumb
-																	}
-																	alt=""
-																	loading="lazy"
-																/>
-															) : (
-																<PictureOutlined />
-															)}
-														</span>
-														<span className="edi-regenerate-row-title">
-															{it.title}
-														</span>
-														<span className="edi-regenerate-row-status">
-															{
-																statusIcon[
-																	it.status
-																]
-															}
-															{
-																statLabels[
-																	it.status
-																]
-															}
-														</span>
-													</li>
-												))}
-											</ul>
-										</div>
-									)}
-
-									<p className="edi-regenerate-message">
-										{done ? (
-											<>
-												<CheckCircleFilled className="is-done" />
-												{sdEdiAdminParams.regenComplete}
-											</>
-										) : (
-											sdEdiAdminParams.regenRunning
-										)}
-									</p>
-								</div>
-							)}
-
-							{phase === 'error' && (
-								<p className="edi-regenerate-error edi-fade-in">
-									{sdEdiAdminParams.regenError}
+								<p className="edi-regenerate-intro">
+									{sdEdiAdminParams.regenIntro}
 								</p>
-							)}
 
-							<div className="edi-regenerate-actions">
-								<Button
-									type="primary"
-									size="large"
-									icon={<ReloadOutlined spin={running} />}
-									loading={null === total}
-									disabled={running || isEmpty}
-									onClick={start}
-								>
-									{isEmpty
-										? sdEdiAdminParams.regenEmpty
-										: startLabel}
-								</Button>
+								<div className="edi-regenerate-count">
+									{null === total ? (
+										<span className="edi-regenerate-count-num is-loading">
+											&nbsp;
+										</span>
+									) : (
+										<span className="edi-regenerate-count-num">
+											{fmt(total)}
+										</span>
+									)}
+									<span className="edi-regenerate-count-label">
+										{sdEdiAdminParams.regenImagesFound}
+									</span>
+								</div>
+
+								{!isEmpty && (
+									<div className="edi-regenerate-options">
+										<label className="edi-regenerate-option">
+											<Checkbox
+												checked={force}
+												disabled={running}
+												onChange={(e) =>
+													setForce(e.target.checked)
+												}
+											/>
+											<span className="edi-regenerate-option-text">
+												{
+													sdEdiAdminParams.regenForceLabel
+												}
+												<Tooltip
+													title={
+														sdEdiAdminParams.regenForceHint
+													}
+												>
+													<InfoCircleOutlined className="edi-regenerate-option-help" />
+												</Tooltip>
+											</span>
+										</label>
+
+										<label className="edi-regenerate-option">
+											<Checkbox
+												checked={single}
+												disabled={running}
+												onChange={(e) =>
+													setSingle(e.target.checked)
+												}
+											/>
+											<span className="edi-regenerate-option-text">
+												{
+													sdEdiAdminParams.regenSingleLabel
+												}
+												<Tooltip
+													title={
+														sdEdiAdminParams.regenSingleHint
+													}
+												>
+													<InfoCircleOutlined className="edi-regenerate-option-help" />
+												</Tooltip>
+											</span>
+										</label>
+									</div>
+								)}
+
+								{(running || done) && (
+									<div className="edi-regenerate-progress edi-fade-in">
+										<Progress
+											percent={percent}
+											status={done ? 'success' : 'active'}
+											strokeColor={{
+												from: 'rgb(45, 116, 213)',
+												to: 'rgb(121, 137, 212)',
+											}}
+										/>
+
+										<div className="edi-regenerate-stats">
+											{stats.map((s) => (
+												<div
+													className={`edi-regenerate-stat is-${s.key}`}
+													key={s.key}
+												>
+													<span className="edi-regenerate-stat-value">
+														{fmt(s.value)}
+													</span>
+													<span className="edi-regenerate-stat-label">
+														{statLabels[s.key]}
+													</span>
+												</div>
+											))}
+										</div>
+
+										<p className="edi-regenerate-message">
+											{done ? (
+												<>
+													<CheckCircleFilled className="is-done" />
+													{
+														sdEdiAdminParams.regenComplete
+													}
+												</>
+											) : (
+												sdEdiAdminParams.regenRunning
+											)}
+										</p>
+									</div>
+								)}
+
+								{phase === 'error' && (
+									<p className="edi-regenerate-error edi-fade-in">
+										{sdEdiAdminParams.regenError}
+									</p>
+								)}
+
+								<div className="edi-regenerate-actions">
+									<Button
+										type="primary"
+										size="large"
+										icon={<ReloadOutlined spin={running} />}
+										loading={null === total}
+										disabled={running || isEmpty}
+										onClick={start}
+									>
+										{isEmpty
+											? sdEdiAdminParams.regenEmpty
+											: startLabel}
+									</Button>
+								</div>
 							</div>
+
+							{items.length > 0 && (
+								<div className="edi-regenerate-side edi-fade-in">
+									<div className="edi-regenerate-list-head">
+										<span>
+											{sdEdiAdminParams.regenListTitle}
+										</span>
+										{overflowed && (
+											<span className="edi-regenerate-list-note">
+												{
+													sdEdiAdminParams.regenListOverflow
+												}
+											</span>
+										)}
+									</div>
+									<ul
+										className="edi-regenerate-list"
+										ref={listRef}
+									>
+										{items.map((it) => (
+											<li
+												className={`edi-regenerate-row is-${it.status}`}
+												key={it.id}
+											>
+												<span className="edi-regenerate-row-thumb">
+													{it.thumb ? (
+														<img
+															src={it.thumb}
+															alt=""
+															loading="lazy"
+														/>
+													) : (
+														<PictureOutlined />
+													)}
+												</span>
+												<span className="edi-regenerate-row-title">
+													{it.title}
+												</span>
+												<span className="edi-regenerate-row-status">
+													{statusIcon[it.status]}
+													{statLabels[it.status]}
+												</span>
+											</li>
+										))}
+									</ul>
+								</div>
+							)}
 						</div>
 					</div>
 				</div>

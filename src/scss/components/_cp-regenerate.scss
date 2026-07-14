@@ -106,8 +106,63 @@
 		}
 	}
 
-	.edi-regenerate-list-wrap {
-		margin-top: 22px;
+	// Once the live log appears the card splits into two columns — controls on
+	// the left, the scrolling log on the right — so the card's height stays
+	// bounded instead of growing tall enough to scroll the whole page.
+	.edi-container.edi-regenerate.has-list {
+		max-width: 980px;
+	}
+
+	.edi-regenerate-card.has-list {
+		display: flex;
+		align-items: stretch;
+		gap: 34px;
+		padding: 40px;
+		text-align: left;
+
+		.edi-regenerate-main {
+			flex: 1 1 0;
+			min-width: 0;
+			text-align: center;
+		}
+
+		.edi-regenerate-side {
+			display: flex;
+			flex-direction: column;
+			flex: 0 0 360px;
+			min-width: 0;
+			min-height: 0;
+		}
+
+		// The list fills the side column and scrolls internally. The explicit
+		// cap keeps the card bounded (a stretch-to-match against the controls
+		// column can't bound it — the list is what makes the column tall), so
+		// the page no longer scrolls when the log fills up.
+		.edi-regenerate-list {
+			flex: 1 1 auto;
+			min-height: 0;
+			max-height: 460px;
+		}
+
+		// Progress/stats already sit in the main column; drop their top gap so
+		// the two columns line up at the same height.
+		.edi-regenerate-progress {
+			margin-top: 26px;
+		}
+	}
+
+	@media only screen and (max-width: 900px) {
+		.edi-regenerate-card.has-list {
+			flex-direction: column;
+
+			.edi-regenerate-side {
+				flex-basis: auto;
+			}
+
+			.edi-regenerate-list {
+				max-height: 280px;
+			}
+		}
 	}
 
 	.edi-regenerate-list-head {
