@@ -7,6 +7,7 @@ import {
 import { useEffect } from 'react';
 
 import AppStatus from './AppStatus';
+import AppRegenerate from './AppRegenerate';
 import AppDemoImporter from './AppDemoImporter';
 import ErrorBoundary from './components/ErrorBoundary';
 
@@ -63,6 +64,15 @@ const LayoutWithEffects = ({ children }) => {
 						.closest('li')
 						.classList.add('current', 'current_page_item');
 				}
+			} else if (activeHash.includes('regenerate_thumbnails')) {
+				const regenMenu = document.querySelector(
+					`a[href="${sdEdiAdminParams.regenPageUrl}"]`
+				);
+				if (regenMenu) {
+					regenMenu
+						.closest('li')
+						.classList.add('current', 'current_page_item');
+				}
 			} else if (demoImporterLink) {
 				demoImporterLink
 					.closest('li')
@@ -115,6 +125,16 @@ const routes = [
 			<ErrorBoundary>
 				<LayoutWithEffects>
 					<AppStatus defaultTab="log" />
+				</LayoutWithEffects>
+			</ErrorBoundary>
+		),
+	},
+	{
+		path: '/regenerate_thumbnails',
+		element: (
+			<ErrorBoundary>
+				<LayoutWithEffects>
+					<AppRegenerate />
 				</LayoutWithEffects>
 			</ErrorBoundary>
 		),

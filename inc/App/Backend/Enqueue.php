@@ -268,6 +268,27 @@ class Enqueue extends EnqueueBase {
 				'importPageUrl'              => admin_url( 'themes.php?page=sd-easy-demo-importer#/' ),
 				'importPageLink'             => 'themes.php?page=sd-easy-demo-importer',
 
+				// Regenerate Thumbnails page.
+				'regenAction'                => 'sd_edi_regen_thumbnails',
+				'regenNonce'                 => wp_create_nonce( 'sd_edi_regen_thumbnails' ),
+				'regenPageUrl'               => sd_edi()->getData()['regen_thumbs_page'],
+				'regenHeading'               => esc_html__( 'Regenerate Thumbnails', 'easy-demo-importer' ),
+				'regenIntro'                 => esc_html__( 'Rebuilds the intermediate image sizes across your whole media library. It runs in small, resumable batches, so it will not time out even on very large libraries.', 'easy-demo-importer' ),
+				'regenImagesFound'           => esc_html__( 'images in your media library', 'easy-demo-importer' ),
+				'regenForceLabel'            => esc_html__( 'Force-regenerate every size', 'easy-demo-importer' ),
+				'regenForceHint'             => esc_html__( 'Slower — use only when a registered image size changed dimensions. Otherwise only the missing sizes are created.', 'easy-demo-importer' ),
+				'regenStartBtn'              => esc_html__( 'Regenerate Thumbnails', 'easy-demo-importer' ),
+				'regenRunningBtn'            => esc_html__( 'Regenerating…', 'easy-demo-importer' ),
+				'regenDoneBtn'               => esc_html__( 'Regenerate Again', 'easy-demo-importer' ),
+				'regenRunning'               => esc_html__( 'Regenerating your images…', 'easy-demo-importer' ),
+				'regenComplete'              => esc_html__( 'All done! Your thumbnails have been regenerated.', 'easy-demo-importer' ),
+				'regenError'                 => esc_html__( 'Something went wrong. Please refresh the page and try again.', 'easy-demo-importer' ),
+				'regenEmpty'                 => esc_html__( 'No images found in your media library.', 'easy-demo-importer' ),
+				'regenStatProcessed'         => esc_html__( 'Processed', 'easy-demo-importer' ),
+				'regenStatRegenerated'       => esc_html__( 'Regenerated', 'easy-demo-importer' ),
+				'regenStatSkipped'           => esc_html__( 'Skipped', 'easy-demo-importer' ),
+				'regenStatFailed'            => esc_html__( 'Failed', 'easy-demo-importer' ),
+
 				// Button texts.
 				'btnLivePreview'             => esc_html__( 'Live Preview', 'easy-demo-importer' ),
 				'btnImport'                  => esc_html__( 'Import', 'easy-demo-importer' ),

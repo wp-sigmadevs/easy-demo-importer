@@ -1,0 +1,189 @@
+/**
+ * Component: Regenerate Thumbnails.
+ *
+ * A single centred card on the Easy Demo Importer screen (the page shell,
+ * header and floating "back" button are shared with the Status page).
+ */
+
+.appearance_page_sd-easy-demo-importer {
+	.edi-container.edi-regenerate {
+		max-width: 640px;
+		margin-top: 40px;
+	}
+
+	.edi-regenerate-card {
+		padding: 45px 45px 40px;
+		text-align: center;
+		background: #fff;
+		border-radius: 12px;
+		box-shadow: 0 4px 40px rgba(0, 0, 0, 0.08);
+	}
+
+	.edi-regenerate-icon {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 72px;
+		height: 72px;
+		margin-bottom: 22px;
+		border-radius: 50%;
+		font-size: 32px;
+		color: #fff;
+		background-image: linear-gradient(109.6deg, rgb(45, 116, 213) 11.2%, rgb(121, 137, 212) 91.2%);
+	}
+
+	.edi-regenerate-intro {
+		margin: 0 auto 26px;
+		max-width: 460px;
+		font-size: 15px;
+		line-height: 1.65;
+		color: #6b7280;
+	}
+
+	.edi-regenerate-count {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		row-gap: 4px;
+		margin-bottom: 26px;
+
+		.edi-regenerate-count-num {
+			font-size: 40px;
+			font-weight: 700;
+			line-height: 1;
+			color: #1f2937;
+
+			&.is-loading {
+				display: inline-block;
+				width: 90px;
+				height: 40px;
+				border-radius: 8px;
+				background: linear-gradient(90deg, #eef0f4 25%, #f6f7f9 37%, #eef0f4 63%);
+				background-size: 400% 100%;
+				animation: ediSkeletonLoading 1.4s ease infinite;
+			}
+		}
+
+		.edi-regenerate-count-label {
+			font-size: 13px;
+			text-transform: uppercase;
+			letter-spacing: 0.06em;
+			color: #98a2b3;
+		}
+	}
+
+	.edi-regenerate-force {
+		display: inline-flex;
+		align-items: center;
+		column-gap: 10px;
+		margin-bottom: 6px;
+		padding: 12px 18px;
+		border: 1px solid #eef0f4;
+		border-radius: 10px;
+		background: #fcfcfd;
+		cursor: pointer;
+
+		.edi-regenerate-force-text {
+			display: inline-flex;
+			align-items: center;
+			column-gap: 6px;
+			font-size: 13px;
+			font-weight: 500;
+			color: #4b5563;
+		}
+
+		.edi-regenerate-force-help {
+			color: #98a2b3;
+			cursor: help;
+		}
+	}
+
+	.edi-regenerate-progress {
+		margin-top: 30px;
+		padding-top: 26px;
+		border-top: 1px solid #eef0f4;
+		text-align: left;
+	}
+
+	.edi-regenerate-stats {
+		display: grid;
+		grid-template-columns: repeat(4, 1fr);
+		gap: 12px;
+		margin: 22px 0 4px;
+
+		@media only screen and (max-width: 575px) {
+			grid-template-columns: repeat(2, 1fr);
+		}
+	}
+
+	.edi-regenerate-stat {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		row-gap: 3px;
+		padding: 14px 8px;
+		border-radius: 10px;
+		background: #f7f8fa;
+
+		.edi-regenerate-stat-value {
+			font-size: 22px;
+			font-weight: 700;
+			line-height: 1;
+			color: #1f2937;
+		}
+
+		.edi-regenerate-stat-label {
+			font-size: 11px;
+			text-transform: uppercase;
+			letter-spacing: 0.05em;
+			color: #98a2b3;
+		}
+
+		&.is-regenerated .edi-regenerate-stat-value {
+			color: #52c41a;
+		}
+
+		&.is-failed .edi-regenerate-stat-value {
+			color: #ff4d4f;
+		}
+	}
+
+	.edi-regenerate-message {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		column-gap: 8px;
+		margin: 18px 0 0;
+		font-size: 14px;
+		font-weight: 500;
+		color: #4b5563;
+		text-align: center;
+
+		.is-done {
+			color: #52c41a;
+		}
+	}
+
+	.edi-regenerate-error {
+		margin: 24px 0 0;
+		padding: 12px 16px;
+		border-radius: 10px;
+		font-size: 14px;
+		color: #d63638;
+		background: rgba(255, 77, 79, 0.08);
+	}
+
+	.edi-regenerate-actions {
+		margin-top: 30px;
+
+		.ant-btn {
+			min-width: 220px;
+			height: 46px;
+			font-size: 15px;
+			font-weight: 500;
+			border-radius: 8px;
+
+			@extend %primary-btn;
+		}
+	}
+}
