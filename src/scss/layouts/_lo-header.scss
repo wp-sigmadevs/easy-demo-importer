@@ -13,25 +13,47 @@
 		margin: 0 0 0 -20px;
 	}
 
-	// Manual-import call to action — a right-aligned, intentional secondary
-	// action rather than a lone button floating above the demo grid.
-	.edi-manual-import-bar {
-		display: flex;
+	// Manual-import control — a subtle secondary action with a help tooltip,
+	// sitting inline in the demo-grid header beside the search.
+	.edi-manual-import-inline {
+		display: inline-flex;
 		align-items: center;
-		justify-content: flex-end;
-		gap: 12px;
-		margin: 4px 0 18px;
+		gap: 8px;
+		flex: 0 0 auto;
 
-		.edi-manual-import-hint {
-			font-size: 13px;
-			color: #6b7280;
-		}
-
-		.ant-btn {
-			height: 40px;
+		.edi-manual-import-btn {
+			height: 45px;
 			border-radius: 8px;
 			font-weight: 500;
+			color: #374151;
+
+			&:hover {
+				border-color: $color-primary;
+
+				@extend .edi-primary-color;
+			}
 		}
+
+		.edi-manual-import-help {
+			display: inline-flex;
+			align-items: center;
+			font-size: 16px;
+			color: #98a2b3;
+			cursor: help;
+			transition: color 0.2s;
+
+			&:hover {
+				color: $color-primary;
+			}
+		}
+	}
+
+	// When tabs and search are disabled, the control sits right-aligned above
+	// the grid instead of inside the (absent) search row.
+	.edi-grid-toolbar {
+		display: flex;
+		justify-content: flex-end;
+		margin: 0 0 20px;
 	}
 
 	// Restore-point notice — a clean card that matches the demo grid's white,
