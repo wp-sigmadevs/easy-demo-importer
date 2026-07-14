@@ -72,6 +72,17 @@ final class ImportLogger {
 	const ERROR   = 'error';
 
 	/**
+	 * Derived run status for an import that never reached a terminal (success or
+	 * error) entry and is no longer the active session — i.e. it was interrupted
+	 * (page reload, gateway timeout, abandoned). Never stored as an entry level;
+	 * computed at read time in getRuns().
+	 *
+	 * @var string
+	 * @since 1.2.0
+	 */
+	const INTERRUPTED = 'interrupted';
+
+	/**
 	 * Fully-qualified table name.
 	 *
 	 * @return string
@@ -312,10 +323,17 @@ final class ImportLogger {
 	 * @since 1.2.0
 	 */
 	public static function getRuns( int $limit = 1000 ): array {
+		// The active session id is part of the cache key: when an interrupted
+		// import's session finally clears (lock released or TTL expired) the run
+		// flips to "interrupted" even though no new log row was written, so the
+		// latest-id component alone would keep serving the stale "in progress" view.
+		$active     = SessionManager::get();
+		$active_sid = $active['session_id'] ?? '';
+
 		// Cache keyed on the latest row id: any new log entry changes the key and
 		// misses the cache, so the runs view is never stale after a write, while
 		// repeated Status-page opens between imports are served from the transient.
-		$cache_key = 'sd_edi_runs_' . self::latestId() . '_' . $limit;
+		$cache_key = 'sd_edi_runs_' . self::latestId() . '_' . $limit . '_' . ( '' !== $active_sid ? $active_sid : 'none' );
 		$cached    = get_transient( $cache_key );
 
 		if ( is_array( $cached ) ) {
@@ -324,7 +342,10 @@ final class ImportLogger {
 
 		// Pull entries oldest-first within the scanned window so each run's
 		// timeline reads top-to-bottom in the order things happened.
-		$runs = self::groupRows( array_reverse( self::get( '', $limit ) ) );
+		$runs = self::markInterruptedRuns(
+			self::groupRows( array_reverse( self::get( '', $limit ) ) ),
+			$active_sid
+		);
 
 		set_transient( $cache_key, $runs, 5 * MINUTE_IN_SECONDS );
 
@@ -413,6 +434,49 @@ final class ImportLogger {
 
 		// Newest run first.
 		return array_values( array_reverse( $runs, true ) );
+	}
+
+	/**
+	 * Flags never-finished runs as interrupted.
+	 *
+	 * A run whose status is still informational (no success and no error entry)
+	 * either is the import running right now or was interrupted before it could
+	 * finish. Any such run that is NOT the active session is, by definition, one
+	 * that stopped mid-flight, so it gets a closing "interrupted" entry appended
+	 * to its timeline and its status set to INTERRUPTED. The active session is
+	 * left untouched so a live import is never mislabelled.
+	 *
+	 * @param array<int,array{session_id:string,status:string,count:int,entries:array<int,array{logged_at:string,level:string,message:string}>}> $runs       Grouped runs, newest first.
+	 * @param string                                                                                                                              $active_sid Session id of the running import, or '' if none.
+	 *
+	 * @return array Runs with interrupted ones flagged.
+	 * @since 1.2.0
+	 */
+	public static function markInterruptedRuns( array $runs, string $active_sid ): array {
+		foreach ( $runs as &$run ) {
+			$is_active = '' !== $active_sid && $run['session_id'] === $active_sid;
+
+			if ( self::INFO !== $run['status'] || $is_active ) {
+				continue;
+			}
+
+			$entries = $run['entries'];
+			$last    = end( $entries );
+
+			$run['entries'][] = [
+				// Reuse the last real entry's timestamp so the closing line sits at
+				// the end of the timeline rather than jumping to "now" on every view.
+				'logged_at' => is_array( $last ) ? (string) $last['logged_at'] : (string) $run['started_at'],
+				'level'     => self::INTERRUPTED,
+				'message'   => __( 'Import was interrupted before it finished. Resume it, or start a new import.', 'easy-demo-importer' ),
+			];
+			++$run['count'];
+			$run['status'] = self::INTERRUPTED;
+		}
+
+		unset( $run );
+
+		return $runs;
 	}
 
 	/**

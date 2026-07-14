@@ -261,6 +261,7 @@ class Enqueue extends EnqueueBase {
 				'logWarning'                 => esc_html__( 'Completed with warnings', 'easy-demo-importer' ),
 				'logFailed'                  => esc_html__( 'Failed', 'easy-demo-importer' ),
 				'logInProgress'              => esc_html__( 'In progress', 'easy-demo-importer' ),
+				'logInterrupted'             => esc_html__( 'Interrupted', 'easy-demo-importer' ),
 				'logUnknownDemo'             => esc_html__( 'Import', 'easy-demo-importer' ),
 				'logEmpty'                   => esc_html__( 'No import activity has been logged yet.', 'easy-demo-importer' ),
 				'importPageBtnText'          => esc_html__( 'Back to Demo Importer', 'easy-demo-importer' ),

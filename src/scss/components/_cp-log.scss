@@ -162,6 +162,11 @@
 			color: #2d74d5;
 			background: #eff6ff;
 		}
+
+		&.is-interrupted {
+			color: #b54708;
+			background: #fff4e5;
+		}
 	}
 
 	.edi-log-run-count {
