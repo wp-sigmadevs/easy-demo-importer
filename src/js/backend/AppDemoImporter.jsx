@@ -246,6 +246,7 @@ const AppDemoImporter = () => {
 	 * Manual-import control — a subtle secondary action with a help tooltip,
 	 * shown inline in the demo-grid header (and above the grid when tabs and
 	 * search are disabled), so it stays discoverable without a separate strip.
+	 * @param e
 	 */
 	const manualImportControl = (
 		<Button
@@ -442,8 +443,6 @@ const AppDemoImporter = () => {
 					heading="Demo Importer"
 				/>
 
-				<RestorePointBanner />
-
 				<ManualImportModal
 					visible={manualVisible}
 					onClose={() => setManualVisible(false)}
@@ -458,6 +457,8 @@ const AppDemoImporter = () => {
 				)}
 
 				<div className="edi-content">
+					<RestorePointBanner />
+
 					<div className={containerClassName}>
 						{loading && !demoData ? (
 							<Row gutter={[30, 30]}>
