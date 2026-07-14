@@ -1,20 +1,9 @@
 import React, { useState } from 'react';
-import {
-	Modal,
-	Button,
-	Switch,
-	Steps,
-	Row,
-	Col,
-	Upload,
-	Tooltip,
-	Tabs,
-} from 'antd';
+import { Modal, Button, Switch, Steps, Row, Col, Upload, Tabs } from 'antd';
 import {
 	CloseOutlined,
 	DeleteOutlined,
 	DownloadOutlined,
-	QuestionCircleTwoTone,
 	CheckCircleFilled,
 	FileTextOutlined,
 	FileZipOutlined,
@@ -573,10 +562,10 @@ const ManualImportModal = ({ visible, onClose }) => {
 																	'Create a restore point'}
 															</h4>
 														</div>
-														<div className="option-details warn-text">
+														<div className="option-details">
 															<p>
-																{sdEdiAdminParams.manualWarning ||
-																	'This imports into your current site. Keep the restore point on so you can roll back.'}
+																{sdEdiAdminParams.snapshotDetails ||
+																	'Saves a full backup — content, media files, and settings — before importing. One click restores this exact state from the result screen or the restore-point banner. Rolling back also removes anything created after the import.'}
 															</p>
 														</div>
 													</div>
@@ -599,16 +588,12 @@ const ManualImportModal = ({ visible, onClose }) => {
 																{sdEdiAdminParams.importImagesTitle ||
 																	'Import Demo Images'}
 															</h4>
-															<Tooltip
-																title={
-																	sdEdiAdminParams.manualImportImagesHint ||
-																	'Downloads images referenced by the export. Automatically skipped when you provide an images .zip.'
-																}
-															>
-																<span className="manual-help">
-																	<QuestionCircleTwoTone />
-																</span>
-															</Tooltip>
+														</div>
+														<div className="option-details">
+															<p>
+																{sdEdiAdminParams.manualImportImagesHint ||
+																	'Downloads images referenced by the export. Automatically skipped when you provide an images .zip.'}
+															</p>
 														</div>
 													</div>
 												</div>
