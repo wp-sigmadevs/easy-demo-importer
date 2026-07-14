@@ -52,26 +52,36 @@ final class Preflight {
 	const RECOMMENDED_MEMORY = '256M';
 
 	/**
+	 * Recommended max_execution_time floor, in seconds. The chunked importer
+	 * works around a low limit, but anything under this is unusually tight.
+	 */
+	const RECOMMENDED_EXECUTION_TIME = 30;
+
+	/**
+	 * Recommended free disk space for demo media downloads.
+	 */
+	const RECOMMENDED_DISK_SPACE = '200M';
+
+	/**
 	 * Builds the full readiness report.
 	 *
-	 * @param array|null $config Demo config; fetched from sd_edi() when null.
+	 * Required-plugin status is deliberately not part of this report — it's
+	 * already shown in full by the Required Plugins list beside it, and isn't
+	 * an environment concern the way the checks below are.
 	 *
 	 * @return array{checks:array<int,array>,canProceed:bool}
 	 * @since 1.2.0
 	 */
-	public static function report( $config = null ): array {
-		if ( null === $config ) {
-			$config = sd_edi()->getDemoConfig();
-		}
-
+	public static function report(): array {
 		$checks = [
 			self::phpVersionCheck( PHP_VERSION, self::MIN_PHP ),
 			self::memoryCheck( (string) ini_get( 'memory_limit' ), self::RECOMMENDED_MEMORY ),
+			self::executionTimeCheck( (int) ini_get( 'max_execution_time' ) ),
 			self::extensionCheck( 'ZipArchive', class_exists( '\ZipArchive' ), true ),
 			self::extensionCheck( 'SimpleXML', extension_loaded( 'simplexml' ), true ),
 			self::imageLibraryCheck( extension_loaded( 'gd' ), extension_loaded( 'imagick' ) ),
 			self::uploadsWritableCheck(),
-			self::requiredPluginsCheck( is_array( $config ) ? $config : [] ),
+			self::diskSpaceCheck(),
 			self::proxyCheck(),
 		];
 
@@ -146,6 +156,38 @@ final class Preflight {
 		return self::check(
 			'memory_limit',
 			esc_html__( 'PHP memory limit', 'easy-demo-importer' ),
+			$ok ? self::PASS : self::WARN,
+			$message,
+			false
+		);
+	}
+
+	/**
+	 * max_execution_time check. A low limit warns rather than blocks — the
+	 * importer runs in resumable chunks specifically to survive this.
+	 *
+	 * @param int $current Current max_execution_time ini value, in seconds.
+	 *
+	 * @return array
+	 * @since 1.2.0
+	 */
+	public static function executionTimeCheck( int $current ): array {
+		// 0 means unlimited (common on CLI or hosts that don't enforce it).
+		$ok = 0 === $current || $current >= self::RECOMMENDED_EXECUTION_TIME;
+
+		if ( 0 === $current ) {
+			$message = esc_html__( 'Unlimited', 'easy-demo-importer' );
+		} elseif ( $ok ) {
+			/* translators: %d: seconds. */
+			$message = sprintf( esc_html__( '%d seconds', 'easy-demo-importer' ), $current );
+		} else {
+			/* translators: %d: seconds. */
+			$message = sprintf( esc_html__( '%d seconds — the import runs in resumable chunks to work around this, but a higher limit is safer.', 'easy-demo-importer' ), $current );
+		}
+
+		return self::check(
+			'execution_time',
+			esc_html__( 'PHP execution time', 'easy-demo-importer' ),
 			$ok ? self::PASS : self::WARN,
 			$message,
 			false
@@ -256,6 +298,52 @@ final class Preflight {
 				? esc_html__( 'Writable', 'easy-demo-importer' )
 				: esc_html__( 'The uploads folder is not writable. Fix its permissions before importing.', 'easy-demo-importer' ),
 			true
+		);
+	}
+
+	/**
+	 * Free disk space in the uploads directory. Not blocking — the importer
+	 * can't reliably tell in advance how much a demo's media will need — but
+	 * a near-full disk is a common, confusing cause of a failed media download.
+	 *
+	 * @return array
+	 * @since 1.2.0
+	 */
+	public static function diskSpaceCheck(): array {
+		$uploads = wp_get_upload_dir();
+		$path    = ! empty( $uploads['basedir'] ) ? $uploads['basedir'] : ABSPATH;
+		$free    = function_exists( 'disk_free_space' ) ? @disk_free_space( $path ) : false; // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+
+		if ( false === $free ) {
+			return self::check(
+				'disk_space',
+				esc_html__( 'Disk space', 'easy-demo-importer' ),
+				self::PASS,
+				esc_html__( 'Could not be determined — your host may restrict this check.', 'easy-demo-importer' ),
+				false
+			);
+		}
+
+		$required = self::toBytes( self::RECOMMENDED_DISK_SPACE );
+		$ok       = $free >= $required;
+
+		return self::check(
+			'disk_space',
+			esc_html__( 'Disk space', 'easy-demo-importer' ),
+			$ok ? self::PASS : self::WARN,
+			$ok
+				? sprintf(
+					/* translators: %s: free disk space. */
+					esc_html__( '%s free', 'easy-demo-importer' ),
+					size_format( $free )
+				)
+				: sprintf(
+					/* translators: 1: free disk space, 2: recommended minimum. */
+					esc_html__( 'Only %1$s free — %2$s or more is recommended for demo media downloads.', 'easy-demo-importer' ),
+					size_format( $free ),
+					self::RECOMMENDED_DISK_SPACE
+				),
+			false
 		);
 	}
 

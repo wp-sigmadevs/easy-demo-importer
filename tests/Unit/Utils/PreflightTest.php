@@ -59,6 +59,16 @@ final class PreflightTest extends UnitTestCase {
 		self::assertFalse( $warn['blocking'] );
 	}
 
+	public function test_execution_time_check_pass_warn_and_unlimited(): void {
+		self::assertSame( Preflight::PASS, Preflight::executionTimeCheck( 60 )['status'] );
+		self::assertSame( Preflight::PASS, Preflight::executionTimeCheck( 0 )['status'] );
+
+		$warn = Preflight::executionTimeCheck( 10 );
+		self::assertSame( Preflight::WARN, $warn['status'] );
+		// A low execution time warns but never blocks — the importer chunks around it.
+		self::assertFalse( $warn['blocking'] );
+	}
+
 	public function test_extension_check_present_and_absent(): void {
 		$present = Preflight::extensionCheck( 'ZipArchive', true, true );
 		self::assertSame( Preflight::PASS, $present['status'] );
