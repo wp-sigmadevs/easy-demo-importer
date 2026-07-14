@@ -216,43 +216,59 @@
 		justify-content: center;
 		margin-bottom: 28px;
 
-		.ant-segmented {
-			padding: 5px;
-			background: #fff;
-			border-radius: 999px;
-			box-shadow: 0 6px 22px rgba(16, 24, 40, 0.1);
-
-			// The sliding thumb and the selected item both carry the gradient
-			// pill; antd's default white thumb and its shadow are overridden.
-			.ant-segmented-thumb,
-			.ant-segmented-item-selected {
-				border-radius: 999px;
-				box-shadow: none;
-				background: linear-gradient(109.6deg, rgb(45, 116, 213) 11.2%, rgb(121, 137, 212) 91.2%);
+		// An antd Tabs bar used purely as a switcher, styled to match the Status
+		// page's top tabs so it looks AND behaves identically — same component,
+		// so hover-to-primary and the active-text colour transition come from
+		// antd's own tab defaults rather than being reimplemented here.
+		.ant-tabs {
+			// No tab panels — hide the empty content area.
+			.ant-tabs-content-holder {
+				display: none;
 			}
 
-			.ant-segmented-item {
-				border-radius: 999px;
-				color: #4b5563;
-				transition: color 0.2s;
+			.ant-tabs-nav {
+				margin: 0;
 
-				&:hover:not(.ant-segmented-item-selected) {
-					color: $color-primary;
-					background: transparent;
+				&::before {
+					display: none;
 				}
 
-				.ant-segmented-item-label {
-					min-width: 150px;
-					height: 40px;
-					line-height: 40px;
-					padding: 0 24px;
-					font-size: 15px;
-					font-weight: 500;
+				.ant-tabs-nav-wrap {
+					overflow: visible;
+				}
+
+				// White rounded pill hugging the tabs (as on the Status page).
+				.ant-tabs-nav-list {
+					background: #fff;
+					border-radius: 999px;
+					box-shadow: 0 6px 22px rgba(16, 24, 40, 0.1);
 				}
 			}
 
-			.ant-segmented-item-selected {
-				color: #fff;
+			// Gradient pill that slides under the active tab.
+			.ant-tabs-ink-bar {
+				height: 100%;
+				border-radius: 25px;
+				background-image: linear-gradient(109.6deg, rgb(45, 116, 213) 11.2%, rgb(121, 137, 212) 91.2%);
+				background-size: 200% auto;
+			}
+
+			.ant-tabs-tab {
+				z-index: 1;
+				height: 45px;
+				min-width: 150px;
+				padding: 0 24px;
+				justify-content: center;
+				font-size: 15px;
+				font-weight: 500;
+
+				+ .ant-tabs-tab {
+					margin: 0 !important;
+				}
+
+				&.ant-tabs-tab-active .ant-tabs-tab-btn {
+					@extend .edi-white-color;
+				}
 			}
 		}
 	}
