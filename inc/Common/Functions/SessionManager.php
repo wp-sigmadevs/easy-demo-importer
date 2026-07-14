@@ -137,6 +137,36 @@ class SessionManager {
 	}
 
 	/**
+	 * Marks a session's heartbeat as stale immediately.
+	 *
+	 * Called when the client knows the import has stopped (the page was reloaded
+	 * mid-import), so the Import Log can flag the run as interrupted right away
+	 * instead of waiting for the heartbeat to time out. The lock and the resumable
+	 * state are left intact — a subsequent resume touches the heartbeat live again.
+	 *
+	 * @param string $session_id Session to mark stale.
+	 *
+	 * @return void
+	 * @since 1.2.0
+	 */
+	public static function markStale( string $session_id ): void {
+		if ( '' === $session_id ) {
+			return;
+		}
+
+		$data = get_transient( static::SESSION_PREFIX . $session_id );
+
+		if ( ! is_array( $data ) ) {
+			return;
+		}
+
+		$data['last_active'] = 0;
+		$ttl                 = (int) apply_filters( 'sd/edi/lock_ttl', 30 * MINUTE_IN_SECONDS ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+
+		set_transient( static::SESSION_PREFIX . $session_id, $data, $ttl );
+	}
+
+	/**
 	 * Validate that a session ID matches the active lock.
 	 *
 	 * @param string $session_id Session ID to validate.

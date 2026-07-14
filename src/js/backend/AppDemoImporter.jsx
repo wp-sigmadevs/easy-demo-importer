@@ -1,3 +1,4 @@
+import Axios from 'axios';
 import Header from './Layouts/Header';
 import Support from './components/Support';
 import DemoCard from './components/DemoCard';
@@ -120,6 +121,21 @@ const AppDemoImporter = () => {
 
 		if (demos && resumeId && demos[resumeId]) {
 			resumeHandledRef.current = true;
+
+			// The page was reloaded mid-import, so the import is no longer running.
+			// Tell the server to flag this session interrupted now, so the Import Log
+			// reflects it immediately instead of after the heartbeat times out.
+			// Resuming refreshes the heartbeat back to live. Fire-and-forget.
+			if (resumeRequest.sessionId) {
+				const params = new FormData();
+				params.append('action', 'sd_edi_mark_interrupted');
+				params.append('sd_edi_nonce', sdEdiAdminParams.sd_edi_nonce);
+				// Bootstrap requires 'demo' in POST to load the Ajax\Backend classes.
+				params.append('demo', resumeId);
+				params.append('sessionId', resumeRequest.sessionId);
+				Axios.post(sdEdiAdminParams.ajaxUrl, params).catch(() => {});
+			}
+
 			setModalVisible(true);
 			// Match the shape DemoCard passes to showModal so the modal title and
 			// preview resolve (modalData.data.name), and Start Over behaves normally.

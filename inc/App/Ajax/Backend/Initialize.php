@@ -59,6 +59,32 @@ class Initialize extends ImporterAjax {
 
 		add_action( 'wp_ajax_sd_edi_install_demo', [ $this, 'response' ] );
 		add_action( 'wp_ajax_sd_edi_cancel_session', [ $this, 'cancelSession' ] );
+		add_action( 'wp_ajax_sd_edi_mark_interrupted', [ $this, 'markInterrupted' ] );
+	}
+
+	/**
+	 * Flag the active import session as interrupted.
+	 *
+	 * Called from the client when it detects an unfinished import on page load
+	 * (the interrupted-import prompt). Marks the session heartbeat stale so the
+	 * Import Log shows the run as interrupted immediately, rather than waiting for
+	 * the heartbeat to time out. The lock and resumable state are preserved so the
+	 * user can still resume — resuming refreshes the heartbeat back to live.
+	 *
+	 * @return void
+	 * @since 1.2.0
+	 */
+	public function markInterrupted() {
+		Helpers::verifyAjaxCall();
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$posted_session_id = ! empty( $_POST['sessionId'] ) ? sanitize_text_field( wp_unslash( $_POST['sessionId'] ) ) : '';
+
+		$active     = SessionManager::get();
+		$session_id = $active['session_id'] ?? $posted_session_id;
+
+		SessionManager::markStale( $session_id );
+		wp_send_json_success();
 	}
 
 	/**
