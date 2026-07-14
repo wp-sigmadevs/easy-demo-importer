@@ -5,31 +5,51 @@ import {
 	ReloadOutlined,
 	CheckCircleFilled,
 	InfoCircleOutlined,
+	CheckOutlined,
+	MinusOutlined,
+	CloseOutlined,
 } from '@ant-design/icons';
 import Header from './Layouts/Header';
 import Support from './components/Support';
 
 /* global sdEdiAdminParams */
 
-const emptyCounts = { after: 0, regenerated: 0, skipped: 0, failed: 0 };
+const emptyCounts = { regenerated: 0, skipped: 0, failed: 0 };
+
+// Newest images to keep in the DOM. The counts stay exact; only the rendered
+// list is windowed so a huge library doesn't grow an unbounded node tree.
+const MAX_ROWS = 120;
+
+const statusIcon = {
+	regenerated: <CheckOutlined />,
+	skipped: <MinusOutlined />,
+	failed: <CloseOutlined />,
+};
 
 /**
  * Regenerate Thumbnails page — a React route on the Easy Demo Importer screen.
  *
- * Drives the resumable, time-boxed `sd_edi_regen_thumbnails` AJAX handler in
- * small batches, so a large media library is processed without timing out.
- * Mirrors the Status page's shell (Header + wrapper + floating back button)
- * so it matches the rest of the plugin's admin UI.
+ * Drives the resumable, time-boxed `sd_edi_regen_thumbnails` AJAX handler and
+ * streams each processed image into a live log. Network responses arrive in
+ * batches, but a reveal queue drains them one image at a time so the percentage
+ * and list climb smoothly regardless of batch size (in one-at-a-time mode the
+ * server already returns a single image per request).
  */
 const AppRegenerate = () => {
 	// idle | running | done | error
 	const [phase, setPhase] = useState('idle');
 	const [total, setTotal] = useState(null);
 	const [counts, setCounts] = useState(emptyCounts);
+	const [items, setItems] = useState([]);
+	const [overflowed, setOverflowed] = useState(false);
 	const [force, setForce] = useState(false);
+	const [single, setSingle] = useState(false);
 
-	// Kept in a ref so a stale render never re-issues an already-superseded run.
 	const runningRef = useRef(false);
+	const queueRef = useRef([]);
+	const serverDoneRef = useRef(false);
+	const drainRef = useRef(null);
+	const listRef = useRef(null);
 
 	const post = useCallback((fields) => {
 		const body = new URLSearchParams({
@@ -43,6 +63,13 @@ const AppRegenerate = () => {
 			credentials: 'same-origin',
 			body,
 		}).then((r) => r.json());
+	}, []);
+
+	const stopDrain = useCallback(() => {
+		if (drainRef.current) {
+			clearInterval(drainRef.current);
+			drainRef.current = null;
+		}
 	}, []);
 
 	// Probe once on mount for the library size (no work done server-side).
@@ -60,8 +87,16 @@ const AppRegenerate = () => {
 		return () => {
 			alive = false;
 			runningRef.current = false;
+			stopDrain();
 		};
-	}, [post]);
+	}, [post, stopDrain]);
+
+	// Auto-scroll the log to the newest row.
+	useEffect(() => {
+		if (listRef.current) {
+			listRef.current.scrollTop = listRef.current.scrollHeight;
+		}
+	}, [items]);
 
 	const step = useCallback(
 		(state) => {
@@ -72,6 +107,7 @@ const AppRegenerate = () => {
 			post({
 				after: state.after,
 				force: force ? 'true' : 'false',
+				single: single ? 'true' : 'false',
 				regenerated: state.regenerated,
 				skipped: state.skipped,
 				failed: state.failed,
@@ -84,42 +120,86 @@ const AppRegenerate = () => {
 					if (!res || !res.success) {
 						setPhase('error');
 						runningRef.current = false;
+						stopDrain();
 						return;
 					}
 
 					const d = res.data;
-					const next = {
-						after: d.after,
-						regenerated: d.regenerated,
-						skipped: d.skipped,
-						failed: d.failed,
-					};
 
-					setCounts(next);
-					setTotal(d.total);
+					if (Array.isArray(d.items) && d.items.length) {
+						queueRef.current.push(...d.items);
+					}
 
 					if (d.done) {
-						setPhase('done');
+						// Let the drainer flush the remaining queue, then finish.
+						serverDoneRef.current = true;
 						runningRef.current = false;
 					} else {
-						step(next);
+						step({
+							after: d.after,
+							regenerated: d.regenerated,
+							skipped: d.skipped,
+							failed: d.failed,
+						});
 					}
 				})
 				.catch(() => {
 					if (runningRef.current) {
 						setPhase('error');
 						runningRef.current = false;
+						stopDrain();
 					}
 				});
 		},
-		[post, force]
+		[post, force, single, stopDrain]
 	);
 
 	const start = () => {
+		queueRef.current = [];
+		serverDoneRef.current = false;
 		setCounts(emptyCounts);
+		setItems([]);
+		setOverflowed(false);
 		setPhase('running');
 		runningRef.current = true;
-		step(emptyCounts);
+
+		stopDrain();
+		drainRef.current = setInterval(() => {
+			const queue = queueRef.current;
+
+			if (!queue.length) {
+				// Server finished and nothing left to reveal → we're done.
+				if (serverDoneRef.current) {
+					stopDrain();
+					setPhase('done');
+				}
+				return;
+			}
+
+			// Reveal faster when the queue is backed up, so the log keeps pace
+			// with fast batches without ever feeling like a single jump.
+			const take = Math.max(1, Math.ceil(queue.length / 15));
+			const chunk = queue.splice(0, take);
+
+			setCounts((prev) => {
+				const next = { ...prev };
+				chunk.forEach((it) => {
+					next[it.status] = (next[it.status] || 0) + 1;
+				});
+				return next;
+			});
+
+			setItems((prev) => {
+				const merged = prev.concat(chunk);
+				if (merged.length > MAX_ROWS) {
+					setOverflowed(true);
+					return merged.slice(-MAX_ROWS);
+				}
+				return merged;
+			});
+		}, 40);
+
+		step({ after: 0, regenerated: 0, skipped: 0, failed: 0 });
 	};
 
 	const handleBackBtn = () => {
@@ -139,28 +219,21 @@ const AppRegenerate = () => {
 			? sdEdiAdminParams.regenDoneBtn
 			: sdEdiAdminParams.regenStartBtn;
 
+	const statLabels = {
+		processed: sdEdiAdminParams.regenStatProcessed,
+		regenerated: sdEdiAdminParams.regenStatRegenerated,
+		skipped: sdEdiAdminParams.regenStatSkipped,
+		failed: sdEdiAdminParams.regenStatFailed,
+	};
+
 	const stats = [
-		{
-			key: 'processed',
-			label: sdEdiAdminParams.regenStatProcessed,
-			value: processed,
-		},
-		{
-			key: 'regenerated',
-			label: sdEdiAdminParams.regenStatRegenerated,
-			value: counts.regenerated,
-		},
-		{
-			key: 'skipped',
-			label: sdEdiAdminParams.regenStatSkipped,
-			value: counts.skipped,
-		},
-		{
-			key: 'failed',
-			label: sdEdiAdminParams.regenStatFailed,
-			value: counts.failed,
-		},
+		{ key: 'processed', value: processed },
+		{ key: 'regenerated', value: counts.regenerated },
+		{ key: 'skipped', value: counts.skipped },
+		{ key: 'failed', value: counts.failed },
 	];
+
+	const fmt = (n) => new Intl.NumberFormat().format(n);
 
 	return (
 		<>
@@ -190,7 +263,7 @@ const AppRegenerate = () => {
 									</span>
 								) : (
 									<span className="edi-regenerate-count-num">
-										{new Intl.NumberFormat().format(total)}
+										{fmt(total)}
 									</span>
 								)}
 								<span className="edi-regenerate-count-label">
@@ -199,25 +272,47 @@ const AppRegenerate = () => {
 							</div>
 
 							{!isEmpty && (
-								<label className="edi-regenerate-force">
-									<Checkbox
-										checked={force}
-										disabled={running}
-										onChange={(e) =>
-											setForce(e.target.checked)
-										}
-									/>
-									<span className="edi-regenerate-force-text">
-										{sdEdiAdminParams.regenForceLabel}
-										<Tooltip
-											title={
-												sdEdiAdminParams.regenForceHint
+								<div className="edi-regenerate-options">
+									<label className="edi-regenerate-option">
+										<Checkbox
+											checked={force}
+											disabled={running}
+											onChange={(e) =>
+												setForce(e.target.checked)
 											}
-										>
-											<InfoCircleOutlined className="edi-regenerate-force-help" />
-										</Tooltip>
-									</span>
-								</label>
+										/>
+										<span className="edi-regenerate-option-text">
+											{sdEdiAdminParams.regenForceLabel}
+											<Tooltip
+												title={
+													sdEdiAdminParams.regenForceHint
+												}
+											>
+												<InfoCircleOutlined className="edi-regenerate-option-help" />
+											</Tooltip>
+										</span>
+									</label>
+
+									<label className="edi-regenerate-option">
+										<Checkbox
+											checked={single}
+											disabled={running}
+											onChange={(e) =>
+												setSingle(e.target.checked)
+											}
+										/>
+										<span className="edi-regenerate-option-text">
+											{sdEdiAdminParams.regenSingleLabel}
+											<Tooltip
+												title={
+													sdEdiAdminParams.regenSingleHint
+												}
+											>
+												<InfoCircleOutlined className="edi-regenerate-option-help" />
+											</Tooltip>
+										</span>
+									</label>
+								</div>
 							)}
 
 							{(running || done) && (
@@ -238,16 +333,73 @@ const AppRegenerate = () => {
 												key={s.key}
 											>
 												<span className="edi-regenerate-stat-value">
-													{new Intl.NumberFormat().format(
-														s.value
-													)}
+													{fmt(s.value)}
 												</span>
 												<span className="edi-regenerate-stat-label">
-													{s.label}
+													{statLabels[s.key]}
 												</span>
 											</div>
 										))}
 									</div>
+
+									{items.length > 0 && (
+										<div className="edi-regenerate-list-wrap">
+											<div className="edi-regenerate-list-head">
+												<span>
+													{
+														sdEdiAdminParams.regenListTitle
+													}
+												</span>
+												{overflowed && (
+													<span className="edi-regenerate-list-note">
+														{
+															sdEdiAdminParams.regenListOverflow
+														}
+													</span>
+												)}
+											</div>
+											<ul
+												className="edi-regenerate-list"
+												ref={listRef}
+											>
+												{items.map((it) => (
+													<li
+														className={`edi-regenerate-row is-${it.status}`}
+														key={it.id}
+													>
+														<span className="edi-regenerate-row-thumb">
+															{it.thumb ? (
+																<img
+																	src={
+																		it.thumb
+																	}
+																	alt=""
+																	loading="lazy"
+																/>
+															) : (
+																<PictureOutlined />
+															)}
+														</span>
+														<span className="edi-regenerate-row-title">
+															{it.title}
+														</span>
+														<span className="edi-regenerate-row-status">
+															{
+																statusIcon[
+																	it.status
+																]
+															}
+															{
+																statLabels[
+																	it.status
+																]
+															}
+														</span>
+													</li>
+												))}
+											</ul>
+										</div>
+									)}
 
 									<p className="edi-regenerate-message">
 										{done ? (

@@ -90,6 +90,7 @@ class RegenerateThumbnails extends Base {
 
 		// phpcs:disable WordPress.Security.NonceVerification.Missing -- nonce verified above.
 		$probe       = isset( $_POST['probe'] ) && 'true' === sanitize_text_field( wp_unslash( $_POST['probe'] ) );
+		$single      = isset( $_POST['single'] ) && 'true' === sanitize_text_field( wp_unslash( $_POST['single'] ) );
 		$after       = isset( $_POST['after'] ) ? absint( wp_unslash( $_POST['after'] ) ) : 0;
 		$force       = isset( $_POST['force'] ) && 'true' === sanitize_text_field( wp_unslash( $_POST['force'] ) );
 		$regenerated = isset( $_POST['regenerated'] ) ? absint( wp_unslash( $_POST['regenerated'] ) ) : 0;
@@ -108,6 +109,7 @@ class RegenerateThumbnails extends Base {
 					'probe'       => true,
 					'after'       => 0,
 					'total'       => $total,
+					'items'       => [],
 					'regenerated' => 0,
 					'skipped'     => 0,
 					'failed'      => 0,
@@ -115,7 +117,10 @@ class RegenerateThumbnails extends Base {
 			);
 		}
 
-		$ids = $this->imageIdsAfter( $after, self::PAGE_LIMIT );
+		// One-at-a-time mode does exactly one image per request; the default
+		// batches a time-boxed page so large libraries finish in fewer round-trips.
+		$limit = $single ? 1 : self::PAGE_LIMIT;
+		$ids   = $this->imageIdsAfter( $after, $limit );
 
 		if ( empty( $ids ) ) {
 			wp_send_json_success(
@@ -123,6 +128,7 @@ class RegenerateThumbnails extends Base {
 					'done'        => true,
 					'after'       => $after,
 					'total'       => $total,
+					'items'       => [],
 					'regenerated' => $regenerated,
 					'skipped'     => $skipped,
 					'failed'      => $failed,
@@ -133,22 +139,29 @@ class RegenerateThumbnails extends Base {
 		$budget = (float) apply_filters( 'sd/edi/regen_tool_seconds', 15 ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 		$start  = microtime( true );
 		$last   = $after;
+		$items  = [];
 
 		foreach ( $ids as $id ) {
-			$regenerator = ThumbnailRegenerator::forAttachment( (int) $id );
+			$id          = (int) $id;
+			$regenerator = ThumbnailRegenerator::forAttachment( $id );
 
 			if ( null === $regenerator ) {
 				++$skipped;
+				$status = 'skipped';
 			} elseif ( $regenerator->regenerate( ! $force ) ) {
 				++$regenerated;
+				$status = 'regenerated';
 			} else {
 				++$failed;
+				$status = 'failed';
 			}
 
-			$last = (int) $id;
+			$last    = $id;
+			$items[] = $this->itemDetail( $id, $status );
 
-			// Finish the current image, then stop once over budget.
-			if ( ( microtime( true ) - $start ) >= $budget ) {
+			// Finish the current image, then stop once over budget (skipped in
+			// single mode, which already stops after one).
+			if ( ! $single && ( microtime( true ) - $start ) >= $budget ) {
 				break;
 			}
 		}
@@ -158,11 +171,37 @@ class RegenerateThumbnails extends Base {
 				'done'        => false,
 				'after'       => $last,
 				'total'       => $total,
+				'items'       => $items,
 				'regenerated' => $regenerated,
 				'skipped'     => $skipped,
 				'failed'      => $failed,
 			]
 		);
+	}
+
+	/**
+	 * Builds the per-image detail row surfaced in the live regeneration list.
+	 *
+	 * @param int    $id     Attachment ID.
+	 * @param string $status regenerated | skipped | failed.
+	 *
+	 * @return array
+	 * @since 1.2.0
+	 */
+	private function itemDetail( int $id, string $status ): array {
+		$title = get_the_title( $id );
+
+		if ( '' === $title ) {
+			$file  = get_attached_file( $id );
+			$title = $file ? wp_basename( $file ) : (string) $id;
+		}
+
+		return [
+			'id'     => $id,
+			'title'  => $title,
+			'thumb'  => (string) wp_get_attachment_image_url( $id, 'thumbnail' ),
+			'status' => $status,
+		];
 	}
 
 	/**
