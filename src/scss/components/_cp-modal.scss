@@ -287,13 +287,14 @@
 				background: rgba(45, 116, 213, 0.03);
 			}
 
-			// antd defaults this to `display: table`, which shrink-to-fits its
-			// content — a long hint then widened the flex body past the slot and
-			// pushed the Required/Optional tag into the next column. Force block
-			// + full width so the body is bounded and the text truncates/wraps.
+			// antd's default `display: table` shrink-to-fits its content, so a long
+			// hint widened the flex body past the slot and pushed the tag into the
+			// next column. Pinning the width with fixed table layout keeps it bounded
+			// WITHOUT dropping display:table — which antd's whole-slot click-to-browse
+			// relies on (an earlier `display: block` here broke click-to-upload).
 			.ant-upload-btn {
-				display: block !important;
 				width: 100%;
+				table-layout: fixed;
 				padding: 0;
 			}
 
