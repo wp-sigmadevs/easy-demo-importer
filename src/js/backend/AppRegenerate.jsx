@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Button, Progress, Checkbox, Tooltip } from 'antd';
+import { Button, Progress, Switch, Tooltip } from 'antd';
 import {
 	PictureOutlined,
 	ReloadOutlined,
@@ -292,13 +292,6 @@ const AppRegenerate = () => {
 								{!isEmpty && (
 									<div className="edi-regenerate-options">
 										<label className="edi-regenerate-option">
-											<Checkbox
-												checked={force}
-												disabled={running}
-												onChange={(e) =>
-													setForce(e.target.checked)
-												}
-											/>
 											<span className="edi-regenerate-option-text">
 												{
 													sdEdiAdminParams.regenForceLabel
@@ -311,16 +304,15 @@ const AppRegenerate = () => {
 													<InfoCircleOutlined className="edi-regenerate-option-help" />
 												</Tooltip>
 											</span>
+											<Switch
+												size="small"
+												checked={force}
+												disabled={running}
+												onChange={setForce}
+											/>
 										</label>
 
 										<label className="edi-regenerate-option">
-											<Checkbox
-												checked={single}
-												disabled={running}
-												onChange={(e) =>
-													setSingle(e.target.checked)
-												}
-											/>
 											<span className="edi-regenerate-option-text">
 												{
 													sdEdiAdminParams.regenSingleLabel
@@ -333,6 +325,12 @@ const AppRegenerate = () => {
 													<InfoCircleOutlined className="edi-regenerate-option-help" />
 												</Tooltip>
 											</span>
+											<Switch
+												size="small"
+												checked={single}
+												disabled={running}
+												onChange={setSingle}
+											/>
 										</label>
 									</div>
 								)}
@@ -403,48 +401,52 @@ const AppRegenerate = () => {
 
 							{items.length > 0 && (
 								<div className="edi-regenerate-side edi-fade-in">
-									<div className="edi-regenerate-list-head">
-										<span>
-											{sdEdiAdminParams.regenListTitle}
-										</span>
-										{overflowed && (
-											<span className="edi-regenerate-list-note">
+									<div className="edi-regenerate-side-inner">
+										<div className="edi-regenerate-list-head">
+											<span>
 												{
-													sdEdiAdminParams.regenListOverflow
+													sdEdiAdminParams.regenListTitle
 												}
 											</span>
-										)}
+											{overflowed && (
+												<span className="edi-regenerate-list-note">
+													{
+														sdEdiAdminParams.regenListOverflow
+													}
+												</span>
+											)}
+										</div>
+										<ul
+											className="edi-regenerate-list"
+											ref={listRef}
+										>
+											{items.map((it) => (
+												<li
+													className={`edi-regenerate-row is-${it.status}`}
+													key={it.id}
+												>
+													<span className="edi-regenerate-row-thumb">
+														{it.thumb ? (
+															<img
+																src={it.thumb}
+																alt=""
+																loading="lazy"
+															/>
+														) : (
+															<PictureOutlined />
+														)}
+													</span>
+													<span className="edi-regenerate-row-title">
+														{it.title}
+													</span>
+													<span className="edi-regenerate-row-status">
+														{statusIcon[it.status]}
+														{statLabels[it.status]}
+													</span>
+												</li>
+											))}
+										</ul>
 									</div>
-									<ul
-										className="edi-regenerate-list"
-										ref={listRef}
-									>
-										{items.map((it) => (
-											<li
-												className={`edi-regenerate-row is-${it.status}`}
-												key={it.id}
-											>
-												<span className="edi-regenerate-row-thumb">
-													{it.thumb ? (
-														<img
-															src={it.thumb}
-															alt=""
-															loading="lazy"
-														/>
-													) : (
-														<PictureOutlined />
-													)}
-												</span>
-												<span className="edi-regenerate-row-title">
-													{it.title}
-												</span>
-												<span className="edi-regenerate-row-status">
-													{statusIcon[it.status]}
-													{statLabels[it.status]}
-												</span>
-											</li>
-										))}
-									</ul>
 								</div>
 							)}
 						</div>

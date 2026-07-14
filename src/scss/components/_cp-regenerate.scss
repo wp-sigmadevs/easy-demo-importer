@@ -84,12 +84,18 @@
 	.edi-regenerate-option {
 		display: flex;
 		align-items: center;
-		column-gap: 10px;
+		justify-content: space-between;
+		column-gap: 14px;
 		padding: 12px 18px;
 		border: 1px solid #eef0f4;
 		border-radius: 10px;
 		background: #fcfcfd;
 		cursor: pointer;
+		transition: border-color 0.2s, background 0.2s;
+
+		&:hover {
+			border-color: #d7dde5;
+		}
 
 		.edi-regenerate-option-text {
 			display: inline-flex;
@@ -103,6 +109,15 @@
 		.edi-regenerate-option-help {
 			color: #98a2b3;
 			cursor: help;
+		}
+
+		// Brand-gradient the switch once it's on, to match the primary button.
+		.ant-switch.ant-switch-checked {
+			background: linear-gradient(109.6deg, rgb(45, 116, 213) 11.2%, rgb(121, 137, 212) 91.2%);
+
+			&:hover:not(.ant-switch-disabled) {
+				background: linear-gradient(109.6deg, rgb(45, 116, 213) 11.2%, rgb(121, 137, 212) 91.2%);
+			}
 		}
 	}
 
@@ -126,22 +141,27 @@
 			text-align: center;
 		}
 
+		// The side column stretches to the controls column's height (align-items:
+		// stretch). Its contents are absolutely filled so the list itself never
+		// forces the card taller — the log ends up exactly as tall as the left
+		// column and scrolls internally, so the two columns are always level.
 		.edi-regenerate-side {
-			display: flex;
-			flex-direction: column;
+			position: relative;
 			flex: 0 0 360px;
 			min-width: 0;
-			min-height: 0;
 		}
 
-		// The list fills the side column and scrolls internally. The explicit
-		// cap keeps the card bounded (a stretch-to-match against the controls
-		// column can't bound it — the list is what makes the column tall), so
-		// the page no longer scrolls when the log fills up.
+		.edi-regenerate-side-inner {
+			position: absolute;
+			inset: 0;
+			display: flex;
+			flex-direction: column;
+		}
+
 		.edi-regenerate-list {
 			flex: 1 1 auto;
 			min-height: 0;
-			max-height: 460px;
+			max-height: none;
 		}
 
 		// Progress/stats already sit in the main column; drop their top gap so
@@ -157,6 +177,12 @@
 
 			.edi-regenerate-side {
 				flex-basis: auto;
+			}
+
+			// Stacked: the column has no fixed height to fill, so drop the
+			// absolute fill and cap the list back to a scrollable block.
+			.edi-regenerate-side-inner {
+				position: static;
 			}
 
 			.edi-regenerate-list {
