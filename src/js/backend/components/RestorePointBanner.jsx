@@ -128,6 +128,7 @@ const RestorePointBanner = () => {
 				</Button>
 				<Button
 					className="edi-restore-rollback"
+					type="primary"
 					danger
 					loading={rolling}
 					disabled={discarding}
