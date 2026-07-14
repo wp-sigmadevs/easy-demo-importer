@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Collapse, Skeleton, Empty } from 'antd';
+import { PictureOutlined, DownloadOutlined } from '@ant-design/icons';
 import useSharedDataStore from '../utils/sharedDataStore';
 import { decodeEntities } from '../utils/decodeEntities';
 
 /* global sdEdiAdminParams */
+
+// Runs the thumbnail tool records under this slug, shown distinctly from imports.
+const REGEN_SLUG = 'thumbnail-regeneration';
 
 /**
  * Per-level accent colours for entry dots and the run status pill.
@@ -113,14 +117,22 @@ const runLabel = (run) => {
 	};
 
 	const status = statusText[run.status] || run.status;
+	const isRegen = run.demo_slug === REGEN_SLUG;
+
+	const name = isRegen
+		? sdEdiAdminParams.logRegenLabel || 'Thumbnail Regeneration'
+		: humanizeSlug(run.demo_slug) ||
+			sdEdiAdminParams.logUnknownDemo ||
+			'Import';
 
 	return (
 		<div className="edi-log-run" data-panel-key={run.session_id}>
-			<span className="edi-log-run-name">
-				{humanizeSlug(run.demo_slug) ||
-					sdEdiAdminParams.logUnknownDemo ||
-					'Import'}
+			<span
+				className={`edi-log-run-icon is-${isRegen ? 'regen' : 'import'}`}
+			>
+				{isRegen ? <PictureOutlined /> : <DownloadOutlined />}
 			</span>
+			<span className="edi-log-run-name">{name}</span>
 			<span className="edi-log-run-time">
 				{formatRunTime(run.started_at)}
 			</span>

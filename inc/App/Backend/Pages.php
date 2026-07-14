@@ -95,8 +95,8 @@ class Pages extends Base {
 		// whether the active theme ships a demo config.
 		$subPages[] = [
 			'parent_slug' => 'themes.php',
-			'page_title'  => esc_html__( 'Status & Logs', 'easy-demo-importer' ),
-			'menu_title'  => apply_filters( 'sd/edi/status_menu_title', esc_html__( 'Easy Status & Logs', 'easy-demo-importer' ) ), // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+			'page_title'  => esc_html__( 'Status & Activity', 'easy-demo-importer' ),
+			'menu_title'  => apply_filters( 'sd/edi/status_menu_title', esc_html__( 'Easy Status & Activity', 'easy-demo-importer' ) ), // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 			'capability'  => 'manage_options',
 			'menu_slug'   => esc_url( $this->plugin->data()['system_status_page'] ),
 			'callback'    => '',
