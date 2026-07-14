@@ -349,7 +349,11 @@ class InstallDemo extends ImporterAjax {
 			$this->unsetThumbnails();
 		}
 
-		ImportLogger::success(
+		// Content import is a mid-pipeline step, not the finish line (regeneration,
+		// menus, widgets and finalize still follow), so it logs as info. Only the
+		// terminal phase logs success — otherwise an import interrupted after this
+		// point but before finalize would be mis-recorded as a completed run.
+		ImportLogger::info(
 			esc_html__( 'Content import completed.', 'easy-demo-importer' ),
 			$this->sessionId,
 			$this->demoSlug
