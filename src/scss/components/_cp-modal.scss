@@ -193,19 +193,19 @@
 // option groups, action bar) is inherited from the shared modal styles.
 .edi-manual-modal {
 	// The safety card keeps the full column height (so it stays balanced with the
-	// taller files column), but its two toggles are centred in the panel so the
-	// extra room reads as even breathing room rather than dead space at the bottom.
+	// taller files column). The label stays in normal flow at the top and the two
+	// toggles are centred in the room below it with auto margins — no absolute
+	// positioning, so nothing overlaps when the card is short (bundle mode).
 	.import-options .configure-group.is-card {
-		position: relative;
 		display: flex;
 		flex-direction: column;
-		justify-content: center;
 
-		.configure-group-label {
-			// Pin the section label to the top; only the options are centred.
-			position: absolute;
-			top: 22px;
-			left: 24px;
+		.import-option:first-of-type {
+			margin-top: auto;
+		}
+
+		.import-option:last-of-type {
+			margin-bottom: auto;
 		}
 	}
 
@@ -404,7 +404,7 @@
 
 	.manual-slot-grid {
 		display: grid;
-		grid-template-columns: 1fr 1fr;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
 		gap: 12px;
 
 		.manual-slot.ant-upload-wrapper {
