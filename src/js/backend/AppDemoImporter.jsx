@@ -11,8 +11,8 @@ import ManualImportModal from './components/Modal/ManualImportModal';
 import useSharedDataStore from './utils/sharedDataStore';
 import ModalComponent from './components/Modal/ModalComponent';
 import ModalRequirements from './components/Modal/ModaRequirements';
-import { Row, Col, Button, Tabs, Skeleton, Input, Empty } from 'antd';
-import { UploadOutlined } from '@ant-design/icons';
+import { Row, Col, Button, Tabs, Skeleton, Input, Empty, Tooltip } from 'antd';
+import { UploadOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 
 /* global sdEdiAdminParams */
 
@@ -243,6 +243,33 @@ const AppDemoImporter = () => {
 	}
 
 	/**
+	 * Manual-import control — a subtle secondary action with a help tooltip,
+	 * shown inline in the demo-grid header (and above the grid when tabs and
+	 * search are disabled), so it stays discoverable without a separate strip.
+	 */
+	const manualImportControl = (
+		<div className="edi-manual-import-inline">
+			<Button
+				className="edi-manual-import-btn"
+				icon={<UploadOutlined />}
+				onClick={() => setManualVisible(true)}
+			>
+				{sdEdiAdminParams.manualImportButton || 'Manual Import'}
+			</Button>
+			<Tooltip
+				title={
+					sdEdiAdminParams.manualImportHint ||
+					'Have your own export? Import it manually.'
+				}
+			>
+				<span className="edi-manual-import-help">
+					<QuestionCircleOutlined />
+				</span>
+			</Tooltip>
+		</div>
+	);
+
+	/**
 	 * Extracting the server data.
 	 */
 	const serverInfo = serverData.success && serverData.data;
@@ -418,19 +445,6 @@ const AppDemoImporter = () => {
 
 				<RestorePointBanner />
 
-				<div className="edi-manual-import-bar">
-					<span className="edi-manual-import-hint">
-						{sdEdiAdminParams.manualImportHint ||
-							'Have your own export? Import it manually.'}
-					</span>
-					<Button
-						icon={<UploadOutlined />}
-						onClick={() => setManualVisible(true)}
-					>
-						{sdEdiAdminParams.manualImportButton || 'Manual Import'}
-					</Button>
-				</div>
-
 				<ManualImportModal
 					visible={manualVisible}
 					onClose={() => setManualVisible(false)}
@@ -495,6 +509,7 @@ const AppDemoImporter = () => {
 											<div className="edi-nav-wrapper">
 												<div className="edi-nav-tabs">
 													<div className="edi-nav-search">
+														{manualImportControl}
 														<Search
 															placeholder={
 																sdEdiAdminParams.searchPlaceholder
@@ -531,7 +546,12 @@ const AppDemoImporter = () => {
 												</div>
 											</div>
 										) : (
-											<>{generateAllDemoCards()}</>
+											<>
+												<div className="edi-grid-toolbar">
+													{manualImportControl}
+												</div>
+												{generateAllDemoCards()}
+											</>
 										)}
 									</>
 								)}
