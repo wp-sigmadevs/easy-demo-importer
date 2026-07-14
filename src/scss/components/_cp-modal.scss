@@ -192,11 +192,14 @@
 // Manual-import modal — its file slots. The rest of the chrome (steps,
 // option groups, action bar) is inherited from the shared modal styles.
 .edi-manual-modal {
-	// The safety card sizes to its own content instead of stretching to match the
-	// taller files column — the columns are independent heights. Its SAFETY label
-	// sits at the top, aligned with the FILES label of the left column.
-	.import-options .configure-group.is-card {
-		height: auto !important;
+	// The SAFETY label sits outside the box (like the FILES label above the file
+	// slots), so only the two toggles are wrapped in this bordered card. It sizes
+	// to its own content — the two columns are independent heights.
+	.safety-card {
+		padding: 20px 24px;
+		border: 1px solid rgba(5, 5, 5, 0.12);
+		border-radius: 10px;
+		background: #fcfcfd;
 	}
 
 	// Mode switcher, styled to match the Status page's top tab pill: a centred

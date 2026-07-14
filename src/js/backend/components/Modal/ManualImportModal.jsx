@@ -551,61 +551,65 @@ const ManualImportModal = ({ visible, onClose }) => {
 											lg={12}
 											xl={12}
 										>
-											<div className="configure-group is-card">
+											<div className="configure-group is-plain">
 												<h5 className="configure-group-label">
 													{sdEdiAdminParams.configureSafetyLabel ||
 														'Safety'}
 												</h5>
 
-												<div className="import-option">
-													<div className="choose edi-d-flex edi-align-items-center">
-														<Switch
-															checked={snapshot}
-															onChange={
-																setSnapshot
-															}
-														/>
-														<h4>
-															{sdEdiAdminParams.snapshotTitle ||
-																'Create a restore point'}
-														</h4>
+												<div className="safety-card">
+													<div className="import-option">
+														<div className="choose edi-d-flex edi-align-items-center">
+															<Switch
+																checked={
+																	snapshot
+																}
+																onChange={
+																	setSnapshot
+																}
+															/>
+															<h4>
+																{sdEdiAdminParams.snapshotTitle ||
+																	'Create a restore point'}
+															</h4>
+														</div>
+														<div className="option-details warn-text">
+															<p>
+																{sdEdiAdminParams.manualWarning ||
+																	'This imports into your current site. Keep the restore point on so you can roll back.'}
+															</p>
+														</div>
 													</div>
-													<div className="option-details warn-text">
-														<p>
-															{sdEdiAdminParams.manualWarning ||
-																'This imports into your current site. Keep the restore point on so you can roll back.'}
-														</p>
-													</div>
-												</div>
 
-												<div className="import-option last">
-													<div className="choose edi-d-flex edi-align-items-center">
-														<Switch
-															checked={
-																!excludeImages
-															}
-															onChange={(
-																checked
-															) =>
-																setExcludeImages(
-																	!checked
-																)
-															}
-														/>
-														<h4>
-															{sdEdiAdminParams.importImagesTitle ||
-																'Import Demo Images'}
-														</h4>
-														<Tooltip
-															title={
-																sdEdiAdminParams.manualImportImagesHint ||
-																'Downloads images referenced by the export. Automatically skipped when you provide an images .zip.'
-															}
-														>
-															<span className="manual-help">
-																<QuestionCircleTwoTone />
-															</span>
-														</Tooltip>
+													<div className="import-option last">
+														<div className="choose edi-d-flex edi-align-items-center">
+															<Switch
+																checked={
+																	!excludeImages
+																}
+																onChange={(
+																	checked
+																) =>
+																	setExcludeImages(
+																		!checked
+																	)
+																}
+															/>
+															<h4>
+																{sdEdiAdminParams.importImagesTitle ||
+																	'Import Demo Images'}
+															</h4>
+															<Tooltip
+																title={
+																	sdEdiAdminParams.manualImportImagesHint ||
+																	'Downloads images referenced by the export. Automatically skipped when you provide an images .zip.'
+																}
+															>
+																<span className="manual-help">
+																	<QuestionCircleTwoTone />
+																</span>
+															</Tooltip>
+														</div>
 													</div>
 												</div>
 											</div>
