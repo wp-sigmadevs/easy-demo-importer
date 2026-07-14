@@ -13,6 +13,7 @@ const LEVEL_COLORS = {
 	warning: '#dba617',
 	success: '#00a32a',
 	info: '#2d74d5',
+	interrupted: '#e8830c',
 };
 
 /**
@@ -108,6 +109,7 @@ const runLabel = (run) => {
 		warning: sdEdiAdminParams.logWarning || 'Completed with warnings',
 		error: sdEdiAdminParams.logFailed || 'Failed',
 		info: sdEdiAdminParams.logInProgress || 'In progress',
+		interrupted: sdEdiAdminParams.logInterrupted || 'Interrupted',
 	};
 
 	const status = statusText[run.status] || run.status;
