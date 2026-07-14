@@ -13,31 +13,24 @@
 		margin: 0 0 0 -20px;
 	}
 
-	// Manual-import control — a subtle secondary action with a help tooltip,
-	// sitting inline in the demo-grid header beside the search.
-	.edi-manual-import-inline {
-		display: inline-flex;
-		align-items: center;
-		gap: 8px;
+	// Manual-import control — a subtle secondary action sitting inline in the
+	// demo-grid header beside the search, with a help ? tooltip inside the button.
+	.edi-manual-import-btn {
 		flex: 0 0 auto;
+		height: 45px;
+		border-radius: 8px;
+		font-weight: 500;
+		color: #374151;
 
-		.edi-manual-import-btn {
-			height: 45px;
-			border-radius: 8px;
-			font-weight: 500;
-			color: #374151;
+		&:hover {
+			border-color: $color-primary;
 
-			&:hover {
-				border-color: $color-primary;
-
-				@extend .edi-primary-color;
-			}
+			@extend .edi-primary-color;
 		}
 
 		.edi-manual-import-help {
-			display: inline-flex;
-			align-items: center;
-			font-size: 16px;
+			margin-inline-start: 8px;
+			font-size: 14px;
 			color: #98a2b3;
 			cursor: help;
 			transition: color 0.2s;

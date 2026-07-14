@@ -248,25 +248,24 @@ const AppDemoImporter = () => {
 	 * search are disabled), so it stays discoverable without a separate strip.
 	 */
 	const manualImportControl = (
-		<div className="edi-manual-import-inline">
-			<Button
-				className="edi-manual-import-btn"
-				icon={<UploadOutlined />}
-				onClick={() => setManualVisible(true)}
-			>
-				{sdEdiAdminParams.manualImportButton || 'Manual Import'}
-			</Button>
+		<Button
+			className="edi-manual-import-btn"
+			icon={<UploadOutlined />}
+			onClick={() => setManualVisible(true)}
+		>
+			{sdEdiAdminParams.manualImportButton || 'Manual Import'}
 			<Tooltip
 				title={
 					sdEdiAdminParams.manualImportHint ||
 					'Have your own export? Import it manually.'
 				}
 			>
-				<span className="edi-manual-import-help">
-					<QuestionCircleOutlined />
-				</span>
+				<QuestionCircleOutlined
+					className="edi-manual-import-help"
+					onClick={(e) => e.stopPropagation()}
+				/>
 			</Tooltip>
-		</div>
+		</Button>
 	);
 
 	/**
