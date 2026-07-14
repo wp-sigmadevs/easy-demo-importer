@@ -18,6 +18,7 @@ namespace SigmaDevs\EasyDemoImporter\App\Tools;
 use SigmaDevs\EasyDemoImporter\Common\{
 	Abstracts\Base,
 	Traits\Singleton,
+	Functions\ImportLogger,
 	Importer\ThumbnailRegenerator
 };
 
@@ -54,6 +55,12 @@ class RegenerateThumbnails extends Base {
 	 * Image IDs fetched per request before the time-box is checked.
 	 */
 	const PAGE_LIMIT = 50;
+
+	/**
+	 * Slug the activity log groups regeneration runs under (rendered as
+	 * "Thumbnail Regeneration" in the Activity tab).
+	 */
+	const LOG_SLUG = 'thumbnail-regeneration';
 
 	/**
 	 * Registers the AJAX handler.
@@ -93,6 +100,7 @@ class RegenerateThumbnails extends Base {
 		$single      = isset( $_POST['single'] ) && 'true' === sanitize_text_field( wp_unslash( $_POST['single'] ) );
 		$after       = isset( $_POST['after'] ) ? absint( wp_unslash( $_POST['after'] ) ) : 0;
 		$force       = isset( $_POST['force'] ) && 'true' === sanitize_text_field( wp_unslash( $_POST['force'] ) );
+		$session     = isset( $_POST['session'] ) ? sanitize_text_field( wp_unslash( $_POST['session'] ) ) : '';
 		$regenerated = isset( $_POST['regenerated'] ) ? absint( wp_unslash( $_POST['regenerated'] ) ) : 0;
 		$skipped     = isset( $_POST['skipped'] ) ? absint( wp_unslash( $_POST['skipped'] ) ) : 0;
 		$failed      = isset( $_POST['failed'] ) ? absint( wp_unslash( $_POST['failed'] ) ) : 0;
@@ -107,6 +115,7 @@ class RegenerateThumbnails extends Base {
 				[
 					'done'        => false,
 					'probe'       => true,
+					'session'     => '',
 					'after'       => 0,
 					'total'       => $total,
 					'items'       => [],
@@ -117,15 +126,26 @@ class RegenerateThumbnails extends Base {
 			);
 		}
 
+		// An empty session marks the first request: mint an id and open the run
+		// in the activity log. The client round-trips it on every later request
+		// so start/finish entries all group under the one run.
+		if ( '' === $session ) {
+			$session = 'regen_' . substr( md5( uniqid( '', true ) ), 0, 16 );
+			$this->logStart( $session, $total, $force, $single );
+		}
+
 		// One-at-a-time mode does exactly one image per request; the default
 		// batches a time-boxed page so large libraries finish in fewer round-trips.
 		$limit = $single ? 1 : self::PAGE_LIMIT;
 		$ids   = $this->imageIdsAfter( $after, $limit );
 
 		if ( empty( $ids ) ) {
+			$this->logFinish( $session, $regenerated, $skipped, $failed );
+
 			wp_send_json_success(
 				[
 					'done'        => true,
+					'session'     => $session,
 					'after'       => $after,
 					'total'       => $total,
 					'items'       => [],
@@ -156,8 +176,21 @@ class RegenerateThumbnails extends Base {
 				$status = 'failed';
 			}
 
+			$item    = $this->itemDetail( $id, $status );
 			$last    = $id;
-			$items[] = $this->itemDetail( $id, $status );
+			$items[] = $item;
+
+			// Only failures are logged per-image — the full run stays a short
+			// summary in the activity log, while the live page list carries the
+			// complete image-by-image detail.
+			if ( 'failed' === $status ) {
+				ImportLogger::warning(
+					/* translators: %s: image title or filename. */
+					sprintf( esc_html__( 'Could not regenerate: %s', 'easy-demo-importer' ), $item['title'] ),
+					$session,
+					self::LOG_SLUG
+				);
+			}
 
 			// Finish the current image, then stop once over budget (skipped in
 			// single mode, which already stops after one).
@@ -169,6 +202,7 @@ class RegenerateThumbnails extends Base {
 		wp_send_json_success(
 			[
 				'done'        => false,
+				'session'     => $session,
 				'after'       => $last,
 				'total'       => $total,
 				'items'       => $items,
@@ -177,6 +211,68 @@ class RegenerateThumbnails extends Base {
 				'failed'      => $failed,
 			]
 		);
+	}
+
+	/**
+	 * Opens a regeneration run in the activity log.
+	 *
+	 * @param string $session Run session id.
+	 * @param int    $total   Images to process.
+	 * @param bool   $force   Whether every size is being re-created.
+	 * @param bool   $single  Whether running one image per request.
+	 *
+	 * @return void
+	 * @since 1.2.0
+	 */
+	private function logStart( string $session, int $total, bool $force, bool $single ): void {
+		ImportLogger::maybeInstall();
+
+		$modes = [];
+
+		if ( $force ) {
+			$modes[] = esc_html__( 'force every size', 'easy-demo-importer' );
+		}
+
+		if ( $single ) {
+			$modes[] = esc_html__( 'one at a time', 'easy-demo-importer' );
+		}
+
+		$message = sprintf(
+			/* translators: %s: number of images. */
+			esc_html__( 'Regenerating thumbnails for %s images.', 'easy-demo-importer' ),
+			number_format_i18n( $total )
+		);
+
+		if ( $modes ) {
+			$message .= ' (' . implode( ', ', $modes ) . ')';
+		}
+
+		ImportLogger::info( $message, $session, self::LOG_SLUG );
+	}
+
+	/**
+	 * Closes a regeneration run with a summary. Runs that never reach here (the
+	 * user left mid-way) are surfaced as "Interrupted" by the log's own
+	 * unfinished-run detection.
+	 *
+	 * @param string $session     Run session id.
+	 * @param int    $regenerated Count regenerated.
+	 * @param int    $skipped     Count skipped.
+	 * @param int    $failed      Count failed.
+	 *
+	 * @return void
+	 * @since 1.2.0
+	 */
+	private function logFinish( string $session, int $regenerated, int $skipped, int $failed ): void {
+		$message = sprintf(
+			/* translators: 1: regenerated count, 2: skipped count, 3: failed count. */
+			esc_html__( 'Regeneration complete — %1$s regenerated, %2$s skipped, %3$s failed.', 'easy-demo-importer' ),
+			number_format_i18n( $regenerated ),
+			number_format_i18n( $skipped ),
+			number_format_i18n( $failed )
+		);
+
+		ImportLogger::success( $message, $session, self::LOG_SLUG );
 	}
 
 	/**

@@ -121,6 +121,26 @@
 	flex-wrap: wrap;
 	width: 100%;
 
+	.edi-log-run-icon {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 26px;
+		height: 26px;
+		border-radius: 7px;
+		font-size: 13px;
+
+		&.is-import {
+			color: #2d74d5;
+			background: #eff6ff;
+		}
+
+		&.is-regen {
+			color: #7b3fe4;
+			background: #f4f0fe;
+		}
+	}
+
 	.edi-log-run-name {
 		font-size: 15px;
 		font-weight: 600;

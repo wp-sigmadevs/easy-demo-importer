@@ -50,6 +50,7 @@ const AppRegenerate = () => {
 	const serverDoneRef = useRef(false);
 	const drainRef = useRef(null);
 	const listRef = useRef(null);
+	const sessionRef = useRef('');
 
 	const post = useCallback((fields) => {
 		const body = new URLSearchParams({
@@ -108,6 +109,7 @@ const AppRegenerate = () => {
 				after: state.after,
 				force: force ? 'true' : 'false',
 				single: single ? 'true' : 'false',
+				session: sessionRef.current,
 				regenerated: state.regenerated,
 				skipped: state.skipped,
 				failed: state.failed,
@@ -125,6 +127,12 @@ const AppRegenerate = () => {
 					}
 
 					const d = res.data;
+
+					// The server mints the run id on the first request; keep it so
+					// every later request groups under the same activity-log run.
+					if (d.session) {
+						sessionRef.current = d.session;
+					}
 
 					if (Array.isArray(d.items) && d.items.length) {
 						queueRef.current.push(...d.items);
@@ -157,6 +165,7 @@ const AppRegenerate = () => {
 	const start = () => {
 		queueRef.current = [];
 		serverDoneRef.current = false;
+		sessionRef.current = '';
 		setCounts(emptyCounts);
 		setItems([]);
 		setOverflowed(false);
