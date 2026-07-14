@@ -2,7 +2,7 @@ import Header from './Layouts/Header';
 import Support from './components/Support';
 import DemoCard from './components/DemoCard';
 import { useShallow } from 'zustand/react/shallow';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import GridSkeleton from './components/GridSkeleton';
 import ErrorMessage from './components/ErrorMessage';
 import RestorePointBanner from './components/RestorePointBanner';
@@ -31,6 +31,13 @@ const AppDemoImporter = () => {
 	const resetStore = useSharedDataStore((state) => state.resetStore);
 
 	/**
+	 * Ensures the interrupted-import prompt auto-opens only once per page load.
+	 * Dismissing the prompt intentionally keeps resumeRequest, so without this
+	 * guard the modal would immediately re-open every time it is closed.
+	 */
+	const resumeHandledRef = useRef(false);
+
+	/**
 	 * Values from the shared data store.
 	 */
 	const {
@@ -42,6 +49,7 @@ const AppDemoImporter = () => {
 		modalVisible,
 		setModalVisible,
 		handleModalCancel,
+		resumeRequest,
 		searchQuery,
 		setSearchQuery,
 		filteredDemoData,
@@ -58,6 +66,7 @@ const AppDemoImporter = () => {
 			modalVisible: state.modalVisible,
 			setModalVisible: state.setModalVisible,
 			handleModalCancel: state.handleModalCancel,
+			resumeRequest: state.resumeRequest,
 			searchQuery: state.searchQuery,
 			setSearchQuery: state.setSearchQuery,
 			filteredDemoData: state.filteredDemoData,
@@ -91,6 +100,37 @@ const AppDemoImporter = () => {
 			}
 		})();
 	}, [fetchImportList]);
+
+	/**
+	 * Auto-open the interrupted-import prompt after a reload.
+	 *
+	 * A previous import that was interrupted (page reload, timeout) leaves a
+	 * persisted resumeRequest in the store. Once the demo list is available,
+	 * re-open that demo's modal so ModalComponent surfaces the Resume / Start
+	 * Over prompt automatically — otherwise the user lands on the plain grid
+	 * with no indication an import is still incomplete.
+	 */
+	useEffect(() => {
+		if (resumeHandledRef.current || !importList.success) {
+			return;
+		}
+
+		const demos = importList.data && importList.data.demoData;
+		const resumeId = resumeRequest && resumeRequest.demo;
+
+		if (demos && resumeId && demos[resumeId]) {
+			resumeHandledRef.current = true;
+			setModalVisible(true);
+			// Match the shape DemoCard passes to showModal so the modal title and
+			// preview resolve (modalData.data.name), and Start Over behaves normally.
+			setModalData({
+				id: resumeId,
+				data: demos[resumeId],
+				reset: true,
+				excludeImages: true,
+			});
+		}
+	}, [importList, resumeRequest, setModalVisible]);
 
 	/**
 	 * Set the error message if the import list is not successful.
