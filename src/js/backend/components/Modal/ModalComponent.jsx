@@ -74,7 +74,10 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 			);
 			setCurrentStep(5);
 		}
-	}, [visible]); // eslint-disable-line react-hooks/exhaustive-deps
+		// modalData?.id is a dependency: on auto-open after a reload, `visible`
+		// can flip true a render before modalData is populated, so the check must
+		// re-run once the demo data arrives — not only when `visible` changes.
+	}, [visible, modalData?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
 	/**
 	 * Fire-and-forget AJAX call to release the import session lock.
