@@ -8,7 +8,7 @@
  * sizes across the whole media library without timing out on large libraries.
  *
  * @package SigmaDevs\EasyDemoImporter
- * @since   1.2.0
+ * @since   2.0.0
  */
 
 declare( strict_types=1 );
@@ -30,14 +30,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Tools Class: RegenerateThumbnails
  *
- * @since 1.2.0
+ * @since 2.0.0
  */
 class RegenerateThumbnails extends Base {
 	/**
 	 * Singleton trait.
 	 *
 	 * @see Singleton
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	use Singleton;
 
@@ -70,7 +70,7 @@ class RegenerateThumbnails extends Base {
 	 * class only wires the batch-processing endpoint that route talks to.
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public function register() {
 		add_action( 'wp_ajax_' . self::ACTION, [ $this, 'handle' ] );
@@ -84,7 +84,7 @@ class RegenerateThumbnails extends Base {
 	 * for an already-processed image is safe, so a re-issue simply continues.
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public function handle() {
 		if ( ! check_ajax_referer( self::ACTION, 'nonce', false ) ) {
@@ -222,7 +222,7 @@ class RegenerateThumbnails extends Base {
 	 * @param bool   $single  Whether running one image per request.
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private function logStart( string $session, int $total, bool $force, bool $single ): void {
 		ImportLogger::maybeInstall();
@@ -261,7 +261,7 @@ class RegenerateThumbnails extends Base {
 	 * @param int    $failed      Count failed.
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private function logFinish( string $session, int $regenerated, int $skipped, int $failed ): void {
 		$message = sprintf(
@@ -282,7 +282,7 @@ class RegenerateThumbnails extends Base {
 	 * @param string $status regenerated | skipped | failed.
 	 *
 	 * @return array
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private function itemDetail( int $id, string $status ): array {
 		$title = get_the_title( $id );
@@ -304,7 +304,7 @@ class RegenerateThumbnails extends Base {
 	 * Total number of image attachments in the library.
 	 *
 	 * @return int
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private function totalImages(): int {
 		global $wpdb;
@@ -322,7 +322,7 @@ class RegenerateThumbnails extends Base {
 	 * @param int $limit Page size.
 	 *
 	 * @return int[]
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private function imageIdsAfter( int $after, int $limit ): array {
 		global $wpdb;

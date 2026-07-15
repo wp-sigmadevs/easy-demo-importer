@@ -31,7 +31,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	 * Whitelist of allowed view names for renderView().
 	 *
 	 * @var array
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private static $allowedViews = [
 		'demo-import',

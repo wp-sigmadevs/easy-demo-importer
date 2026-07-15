@@ -253,7 +253,7 @@ class InstallDemo extends ImporterAjax {
 	 * then advances to the finalize stage. Idempotent and safe to re-issue.
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public function importBatch() {
 		Helpers::verifyAjaxCall();
@@ -316,7 +316,7 @@ class InstallDemo extends ImporterAjax {
 	 * Ajax response: Stage 3 — resolve cross-post references and end the import.
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public function finalizeImport() {
 		Helpers::verifyAjaxCall();
@@ -447,7 +447,7 @@ class InstallDemo extends ImporterAjax {
 	 * attachment is safe, so a re-issued request simply continues.
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public function regenerateImages() {
 		Helpers::verifyAjaxCall();
@@ -565,7 +565,7 @@ class InstallDemo extends ImporterAjax {
 	 * without colliding.
 	 *
 	 * @return ImportState
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private function regenState(): ImportState {
 		return ImportState::forSession( $this->demoUploadDir( $this->demoDir() ), $this->sessionId, 'regen' );
@@ -582,7 +582,7 @@ class InstallDemo extends ImporterAjax {
 	 * completes.
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public function retryMedia() {
 		Helpers::verifyAjaxCall();
@@ -730,7 +730,7 @@ class InstallDemo extends ImporterAjax {
 	 * Whether the resumable chunked importer is enabled.
 	 *
 	 * @return bool
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private function chunkedEnabled(): bool {
 		return (bool) apply_filters( 'sd/edi/enable_chunked_import', true ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
@@ -743,7 +743,7 @@ class InstallDemo extends ImporterAjax {
 	 * it is stable across the prepare/batch/finalize requests of one import.
 	 *
 	 * @return ChunkedImport
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private function chunkedImporter(): ChunkedImport {
 		if ( ! defined( 'SD_EDI_LOAD_IMPORTERS' ) ) {
@@ -771,7 +771,7 @@ class InstallDemo extends ImporterAjax {
 	 * or off per demo. When empty, every attachment is fetched over HTTP as before.
 	 *
 	 * @return string
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private function bundledMediaDir(): string {
 		$dir = $this->demoUploadDir( $this->demoDir() ) . '/uploads';
@@ -793,7 +793,7 @@ class InstallDemo extends ImporterAjax {
 	 * vanish at request end, so this runs on every batch that downloads media.
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private function deferThumbnailGeneration(): void {
 		add_filter( 'intermediate_image_sizes_advanced', '__return_empty_array', 9999 );
@@ -811,7 +811,7 @@ class InstallDemo extends ImporterAjax {
 	 * @param string|false $output Captured output buffer contents.
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private function logImporterOutput( $output ): void {
 		if ( ! is_string( $output ) || '' === trim( $output ) ) {
@@ -852,7 +852,7 @@ class InstallDemo extends ImporterAjax {
 	 * @param string $line A single stripped, trimmed line of captured output.
 	 *
 	 * @return bool
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private function isBenignCompletionNotice( string $line ): bool {
 		static $notice = null;
@@ -881,7 +881,7 @@ class InstallDemo extends ImporterAjax {
 	 * @param string $line A single stripped, trimmed line of captured output.
 	 *
 	 * @return bool
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private function isImageSkippedNotice( string $line ): bool {
 		static $suffix = null;
@@ -913,7 +913,7 @@ class InstallDemo extends ImporterAjax {
 	 * try/finally cannot.
 	 *
 	 * @return bool True if the lock was acquired by this request.
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private function acquireMutex(): bool {
 		global $wpdb;
@@ -960,7 +960,7 @@ class InstallDemo extends ImporterAjax {
 	 * @param string $phase The AJAX action to retry.
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private function respondWaiting( string $phase ): void {
 		wp_send_json(
@@ -986,7 +986,7 @@ class InstallDemo extends ImporterAjax {
 	 * @param array $extra Fields overriding the defaults.
 	 *
 	 * @return array
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private function chunkPayload( array $extra ): array {
 		return array_merge(
@@ -1074,7 +1074,7 @@ class InstallDemo extends ImporterAjax {
 	 * every XML import so that a resume run always starts from a clean slate.
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private function clearNavMenus() {
 		global $wpdb;

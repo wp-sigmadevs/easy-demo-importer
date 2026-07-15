@@ -23,7 +23,7 @@
  * sites.
  *
  * @package SigmaDevs\EasyDemoImporter
- * @since   1.2.0
+ * @since   2.0.0
  */
 
 declare( strict_types=1 );
@@ -41,7 +41,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Utility Class: Snapshot
  *
- * @since 1.2.0
+ * @since 2.0.0
  */
 final class Snapshot {
 
@@ -65,7 +65,7 @@ final class Snapshot {
 	 * set identical so a rollback is complete.
 	 *
 	 * @return string[]
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private static function tables(): array {
 		global $wpdb;
@@ -110,7 +110,7 @@ final class Snapshot {
 	 * @param string $prefix Table prefix.
 	 *
 	 * @return bool
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private static function isExcluded( string $table, string $prefix ): bool {
 		$bare = ( '' !== $prefix && 0 === strpos( $table, $prefix ) )
@@ -142,7 +142,7 @@ final class Snapshot {
 	 * @param string $prefix Table prefix.
 	 *
 	 * @return string
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private static function liveFromShadow( string $shadow, string $prefix ): string {
 		$needle = $prefix . self::INFIX;
@@ -158,7 +158,7 @@ final class Snapshot {
 	 * of live tables, since an import can add or drop tables mid-run.
 	 *
 	 * @return string[]
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private static function shadowTables(): array {
 		global $wpdb;
@@ -180,7 +180,7 @@ final class Snapshot {
 	 * @param string $prefix     Table prefix.
 	 *
 	 * @return string
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public static function shadowName( string $live_table, string $prefix ): string {
 		$bare = ( '' !== $prefix && 0 === strpos( $live_table, $prefix ) )
@@ -194,7 +194,7 @@ final class Snapshot {
 	 * Whether a restore point currently exists.
 	 *
 	 * @return bool
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public static function exists(): bool {
 		return ! empty( self::shadowTables() );
@@ -208,7 +208,7 @@ final class Snapshot {
 	 * @param string $sessionId Current import session ID.
 	 *
 	 * @return bool
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public static function isForSession( string $sessionId ): bool {
 		return '' !== $sessionId && get_option( self::SESSION_OPTION ) === $sessionId;
@@ -228,7 +228,7 @@ final class Snapshot {
 	 * @param string $demoSlug  Demo slug, for the activity log.
 	 *
 	 * @return bool True on success.
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public static function create( string $sessionId = '', bool $reset = false, string $demoSlug = '' ): bool {
 		global $wpdb;
@@ -271,7 +271,7 @@ final class Snapshot {
 	 * Restores every live table from its shadow, then drops the shadows.
 	 *
 	 * @return bool True if a restore point existed and was applied.
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public static function restore(): bool {
 		global $wpdb;
@@ -329,7 +329,7 @@ final class Snapshot {
 	 * unchunked pass. Counts per table, short-circuiting once the cap is passed.
 	 *
 	 * @return bool
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private static function tooLargeToSnapshot(): bool {
 		global $wpdb;
@@ -358,7 +358,7 @@ final class Snapshot {
 	 * Drops every shadow table.
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public static function drop(): void {
 		global $wpdb;

@@ -13,7 +13,7 @@
  * the real values and assembles the checks from them.
  *
  * @package SigmaDevs\EasyDemoImporter
- * @since   1.2.0
+ * @since   2.0.0
  */
 
 declare( strict_types=1 );
@@ -30,7 +30,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Utility Class: Preflight
  *
- * @since 1.2.0
+ * @since 2.0.0
  */
 final class Preflight {
 
@@ -70,7 +70,7 @@ final class Preflight {
 	 * an environment concern the way the checks below are.
 	 *
 	 * @return array{checks:array<int,array>,canProceed:bool}
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public static function report(): array {
 		$checks = [
@@ -107,7 +107,7 @@ final class Preflight {
 	 * @param string $minimum Minimum required version.
 	 *
 	 * @return array
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public static function phpVersionCheck( string $current, string $minimum ): array {
 		$ok = version_compare( $current, $minimum, '>=' );
@@ -138,7 +138,7 @@ final class Preflight {
 	 * @param string $required Recommended memory floor.
 	 *
 	 * @return array
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public static function memoryCheck( string $current, string $required ): array {
 		$current_bytes = self::toBytes( $current );
@@ -169,7 +169,7 @@ final class Preflight {
 	 * @param int $current Current max_execution_time ini value, in seconds.
 	 *
 	 * @return array
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public static function executionTimeCheck( int $current ): array {
 		// 0 means unlimited (common on CLI or hosts that don't enforce it).
@@ -200,7 +200,7 @@ final class Preflight {
 	 * @param string $value Shorthand or numeric byte value.
 	 *
 	 * @return int Bytes; -1 is preserved (unlimited).
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public static function toBytes( string $value ): int {
 		$value = trim( $value );
@@ -238,7 +238,7 @@ final class Preflight {
 	 * @param bool   $blocking Whether absence blocks the import.
 	 *
 	 * @return array
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public static function extensionCheck( string $label, bool $present, bool $blocking ): array {
 		if ( $present ) {
@@ -264,7 +264,7 @@ final class Preflight {
 	 * @param bool $imagick Imagick present.
 	 *
 	 * @return array
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public static function imageLibraryCheck( bool $gd, bool $imagick ): array {
 		$ok = $gd || $imagick;
@@ -284,7 +284,7 @@ final class Preflight {
 	 * Uploads directory must be writable for media + demo files (blocking).
 	 *
 	 * @return array
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public static function uploadsWritableCheck(): array {
 		$uploads  = wp_get_upload_dir();
@@ -307,7 +307,7 @@ final class Preflight {
 	 * a near-full disk is a common, confusing cause of a failed media download.
 	 *
 	 * @return array
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public static function diskSpaceCheck(): array {
 		$uploads = wp_get_upload_dir();
@@ -354,7 +354,7 @@ final class Preflight {
 	 * @param array $config Demo config.
 	 *
 	 * @return array
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public static function requiredPluginsCheck( array $config ): array {
 		$plugins = self::collectPlugins( $config );
@@ -397,7 +397,7 @@ final class Preflight {
 	 * enforces a fixed request timeout the chunked importer is built to survive.
 	 *
 	 * @return array
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public static function proxyCheck(): array {
 		$behind = isset( $_SERVER['HTTP_CF_RAY'] ) || isset( $_SERVER['HTTP_CF_CONNECTING_IP'] );
@@ -420,7 +420,7 @@ final class Preflight {
 	 * @param array $config Demo config.
 	 *
 	 * @return array<int,array>
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public static function collectPlugins( array $config ): array {
 		$plugins = [];
@@ -450,7 +450,7 @@ final class Preflight {
 	 * @param bool   $blocking Whether a fail blocks the import.
 	 *
 	 * @return array
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private static function check( string $id, string $label, string $status, string $message, bool $blocking ): array {
 		return [

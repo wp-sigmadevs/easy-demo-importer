@@ -11,7 +11,7 @@
  * not declare them.
  *
  * @package SigmaDevs\EasyDemoImporter
- * @since   1.2.0
+ * @since   2.0.0
  */
 
 declare( strict_types=1 );
@@ -26,7 +26,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Utility Class: ManualContext
  *
- * @since 1.2.0
+ * @since 2.0.0
  */
 final class ManualContext {
 
@@ -46,7 +46,7 @@ final class ManualContext {
 	 * @param string $key Manual key.
 	 *
 	 * @return string
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public static function demoDir( string $key ): string {
 		return self::DIR_PREFIX . self::sanitizeKey( $key );
@@ -61,7 +61,7 @@ final class ManualContext {
 	 * @param string $key Manual key.
 	 *
 	 * @return array
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public static function configStub( string $key ): array {
 		return [
@@ -77,7 +77,7 @@ final class ManualContext {
 	 * @param string $key Raw key.
 	 *
 	 * @return string
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public static function sanitizeKey( string $key ): string {
 		return (string) preg_replace( '/[^a-f0-9]/', '', strtolower( $key ) );
@@ -87,7 +87,7 @@ final class ManualContext {
 	 * Whether the current request is flagged as a manual import.
 	 *
 	 * @return bool
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public static function isManual(): bool {
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- the caller verifies the nonce first.
@@ -98,7 +98,7 @@ final class ManualContext {
 	 * The manual key from the current request.
 	 *
 	 * @return string
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public static function requestKey(): string {
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- the caller verifies the nonce first.

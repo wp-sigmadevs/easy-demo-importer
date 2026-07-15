@@ -8,7 +8,7 @@
  * deleted when the import finalizes or the session is cancelled.
  *
  * @package SigmaDevs\EasyDemoImporter
- * @since   1.2.0
+ * @since   2.0.0
  */
 
 declare( strict_types=1 );
@@ -23,14 +23,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Importer Utility: ImportState
  *
- * @since 1.2.0
+ * @since 2.0.0
  */
 final class ImportState {
 	/**
 	 * Absolute path to the state file.
 	 *
 	 * @var string
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private $path;
 
@@ -39,7 +39,7 @@ final class ImportState {
 	 *
 	 * @param string $path Absolute path to the state file.
 	 *
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public function __construct( string $path ) {
 		$this->path = $path;
@@ -59,7 +59,7 @@ final class ImportState {
 	 *                          than one independent state file without colliding.
 	 *
 	 * @return ImportState
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public static function forSession( string $baseDir, string $sessionId, string $kind = 'import' ): ImportState {
 		$slug = $sessionId ? md5( $sessionId ) : 'default';
@@ -71,7 +71,7 @@ final class ImportState {
 	 * Absolute path to the backing file.
 	 *
 	 * @return string
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public function path(): string {
 		return $this->path;
@@ -81,7 +81,7 @@ final class ImportState {
 	 * Whether a persisted state file currently exists.
 	 *
 	 * @return bool
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public function exists(): bool {
 		return is_file( $this->path );
@@ -98,7 +98,7 @@ final class ImportState {
 	 * @param array $data State to persist.
 	 *
 	 * @return bool True on success.
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public function save( array $data ): bool {
 		return $this->write( $this->path, $data );
@@ -115,7 +115,7 @@ final class ImportState {
 	 * @param array $data Immutable state to persist.
 	 *
 	 * @return bool True on success.
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public function saveImmutable( array $data ): bool {
 		return $this->write( $this->immutablePath(), $data );
@@ -132,7 +132,7 @@ final class ImportState {
 	 * @param array $posts Posts in this chunk.
 	 *
 	 * @return bool True on success.
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public function savePostsChunk( int $index, array $posts ): bool {
 		return $this->write( $this->postsChunkPath( $index ), $posts );
@@ -144,7 +144,7 @@ final class ImportState {
 	 * @param int $index Zero-based chunk index.
 	 *
 	 * @return array|null Posts in the chunk, or null if absent/corrupt.
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public function loadPostsChunk( int $index ): ?array {
 		return $this->read( $this->postsChunkPath( $index ) );
@@ -157,7 +157,7 @@ final class ImportState {
 	 * @param array  $data Data to persist.
 	 *
 	 * @return bool True on success.
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private function write( string $path, array $data ): bool {
 		// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.serialize_serialize
@@ -175,7 +175,7 @@ final class ImportState {
 	 * scalars written by save().
 	 *
 	 * @return array|null Decoded state, or null if absent/unreadable/corrupt.
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public function load(): ?array {
 		return $this->read( $this->path );
@@ -185,7 +185,7 @@ final class ImportState {
 	 * Loads the write-once immutable parse output written by saveImmutable().
 	 *
 	 * @return array|null Decoded state, or null if absent/unreadable/corrupt.
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public function loadImmutable(): ?array {
 		return $this->read( $this->immutablePath() );
@@ -201,7 +201,7 @@ final class ImportState {
 	 * @param string $path Absolute path to read.
 	 *
 	 * @return array|null Decoded state, or null if absent/unreadable/corrupt.
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private function read( string $path ): ?array {
 		if ( ! is_file( $path ) ) {
@@ -228,7 +228,7 @@ final class ImportState {
 	 * Sibling path holding the write-once immutable parse output.
 	 *
 	 * @return string
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private function immutablePath(): string {
 		return $this->path . '.imm';
@@ -240,7 +240,7 @@ final class ImportState {
 	 * @param int $index Zero-based chunk index.
 	 *
 	 * @return string
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private function postsChunkPath( int $index ): string {
 		return $this->path . '.posts.' . $index;
@@ -250,7 +250,7 @@ final class ImportState {
 	 * Deletes the state file if present.
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public function delete(): void {
 		$paths = [ $this->path, $this->immutablePath() ];

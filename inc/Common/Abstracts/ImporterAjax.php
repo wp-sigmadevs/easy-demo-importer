@@ -66,7 +66,7 @@ abstract class ImporterAjax {
 	 * Skip image regeneration.
 	 *
 	 * @var bool
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public $skipImageRegeneration = false;
 
@@ -98,7 +98,7 @@ abstract class ImporterAjax {
 	 * Create a restore point (snapshot) before importing.
 	 *
 	 * @var bool
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public $snapshot = false;
 
@@ -106,7 +106,7 @@ abstract class ImporterAjax {
 	 * Whether this is a manual import (user-uploaded files, no theme config).
 	 *
 	 * @var bool
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public $manual = false;
 
@@ -114,7 +114,7 @@ abstract class ImporterAjax {
 	 * Manual import working-directory key.
 	 *
 	 * @var string
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public $manualKey = '';
 
@@ -122,7 +122,7 @@ abstract class ImporterAjax {
 	 * Import session ID.
 	 *
 	 * @var string
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public $sessionId = '';
 
@@ -422,7 +422,7 @@ abstract class ImporterAjax {
 	 * @param string   $customExtractDir Optional. The custom directory to extract files to. If null, a default is used.
 	 *
 	 * @return bool True if import was attempted and successful, false otherwise.
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	protected function unzipAndImportSlider( $sliderFileKey, $importCallback, $customExtractDir = null ) {
 		$slider = basename(

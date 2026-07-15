@@ -9,7 +9,7 @@
  * instead of that information vanishing into a discarded output buffer.
  *
  * @package SigmaDevs\EasyDemoImporter
- * @since   1.2.0
+ * @since   2.0.0
  */
 
 declare( strict_types=1 );
@@ -24,14 +24,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Class: ImportLogger
  *
- * @since 1.2.0
+ * @since 2.0.0
  */
 final class ImportLogger {
 	/**
 	 * Unprefixed table name.
 	 *
 	 * @var string
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	const TABLE = 'sd_edi_import_log';
 
@@ -40,7 +40,7 @@ final class ImportLogger {
 	 * the table without a full re-activation.
 	 *
 	 * @var string
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	const DB_VERSION_OPTION = 'sd_edi_log_db_version';
 
@@ -48,7 +48,7 @@ final class ImportLogger {
 	 * Current schema version. Bump to trigger a dbDelta on the next log call.
 	 *
 	 * @var string
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	const DB_VERSION = '2';
 
@@ -56,7 +56,7 @@ final class ImportLogger {
 	 * Days of history to keep; older entries are pruned on import start.
 	 *
 	 * @var int
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	const RETENTION_DAYS = 7;
 
@@ -64,7 +64,7 @@ final class ImportLogger {
 	 * Log levels.
 	 *
 	 * @var string
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	const INFO    = 'info';
 	const SUCCESS = 'success';
@@ -78,7 +78,7 @@ final class ImportLogger {
 	 * computed at read time in getRuns().
 	 *
 	 * @var string
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	const INTERRUPTED = 'interrupted';
 
@@ -86,7 +86,7 @@ final class ImportLogger {
 	 * Fully-qualified table name.
 	 *
 	 * @return string
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public static function tableName(): string {
 		global $wpdb;
@@ -98,7 +98,7 @@ final class ImportLogger {
 	 * Valid log levels.
 	 *
 	 * @return string[]
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public static function levels(): array {
 		return [ self::INFO, self::SUCCESS, self::WARNING, self::ERROR ];
@@ -110,7 +110,7 @@ final class ImportLogger {
 	 * @param string $level Candidate level.
 	 *
 	 * @return string A valid level, defaulting to INFO.
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public static function normalizeLevel( string $level ): string {
 		$level = strtolower( trim( $level ) );
@@ -125,7 +125,7 @@ final class ImportLogger {
 	 * current version is installed, so it is safe to call on every import start.
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public static function maybeInstall(): void {
 		if ( self::DB_VERSION === get_option( self::DB_VERSION_OPTION ) ) {
@@ -139,7 +139,7 @@ final class ImportLogger {
 	 * Creates (or upgrades) the log table via dbDelta.
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public static function install(): void {
 		global $wpdb;
@@ -181,7 +181,7 @@ final class ImportLogger {
 	 * @param string $demo_slug  Demo this run is importing (for grouping).
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public static function log( string $message, string $level = self::INFO, string $session_id = '', string $demo_slug = '' ): void {
 		$message = trim( wp_strip_all_tags( $message ) );
@@ -223,7 +223,7 @@ final class ImportLogger {
 	 * @param string $demo_slug  Demo slug.
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public static function info( string $message, string $session_id = '', string $demo_slug = '' ): void {
 		self::log( $message, self::INFO, $session_id, $demo_slug );
@@ -237,7 +237,7 @@ final class ImportLogger {
 	 * @param string $demo_slug  Demo slug.
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public static function success( string $message, string $session_id = '', string $demo_slug = '' ): void {
 		self::log( $message, self::SUCCESS, $session_id, $demo_slug );
@@ -251,7 +251,7 @@ final class ImportLogger {
 	 * @param string $demo_slug  Demo slug.
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public static function warning( string $message, string $session_id = '', string $demo_slug = '' ): void {
 		self::log( $message, self::WARNING, $session_id, $demo_slug );
@@ -265,7 +265,7 @@ final class ImportLogger {
 	 * @param string $demo_slug  Demo slug.
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public static function error( string $message, string $session_id = '', string $demo_slug = '' ): void {
 		self::log( $message, self::ERROR, $session_id, $demo_slug );
@@ -278,7 +278,7 @@ final class ImportLogger {
 	 * @param int    $limit      Maximum rows to return.
 	 *
 	 * @return array<int,array{id:int,session_id:string,demo_slug:string,logged_at:string,level:string,message:string}>
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public static function get( string $session_id = '', int $limit = 500 ): array {
 		global $wpdb;
@@ -320,7 +320,7 @@ final class ImportLogger {
 	 * @param int $limit Maximum entries to scan.
 	 *
 	 * @return array<int,array{session_id:string,demo_slug:string,started_at:string,status:string,count:int,entries:array<int,array{logged_at:string,level:string,message:string}>}>
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public static function getRuns( int $limit = 1000 ): array {
 		// A live import refreshes its session heartbeat every phase; one that was
@@ -371,7 +371,7 @@ final class ImportLogger {
 	 * it, so the cached run list can never outlive a fresh log write.
 	 *
 	 * @return int
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private static function latestId(): int {
 		global $wpdb;
@@ -388,7 +388,7 @@ final class ImportLogger {
 	 * @param array<int,array{session_id:string,demo_slug:string,logged_at:string,level:string,message:string}> $rows Oldest-first rows.
 	 *
 	 * @return array<int,array{session_id:string,demo_slug:string,started_at:string,status:string,count:int,entries:array<int,array{logged_at:string,level:string,message:string}>}>
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public static function groupRows( array $rows ): array {
 		$runs = [];
@@ -462,7 +462,7 @@ final class ImportLogger {
 	 * @param string                                                                                                                              $active_sid Session id of the running import, or '' if none.
 	 *
 	 * @return array Runs with interrupted ones flagged.
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public static function markInterruptedRuns( array $runs, string $active_sid ): array {
 		foreach ( $runs as &$run ) {
@@ -497,7 +497,7 @@ final class ImportLogger {
 	 * @param int $days Retention window in days.
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public static function prune( int $days = self::RETENTION_DAYS ): void {
 		global $wpdb;

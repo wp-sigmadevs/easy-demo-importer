@@ -22,7 +22,7 @@
  * restored and discarded together.
  *
  * @package SigmaDevs\EasyDemoImporter
- * @since   1.2.0
+ * @since   2.0.0
  */
 
 declare( strict_types=1 );
@@ -42,7 +42,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Utility Class: MediaSnapshot
  *
- * @since 1.2.0
+ * @since 2.0.0
  */
 final class MediaSnapshot {
 
@@ -56,7 +56,7 @@ final class MediaSnapshot {
 	 * Absolute path to the uploads base directory.
 	 *
 	 * @return string
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private static function baseDir(): string {
 		$uploads = wp_get_upload_dir();
@@ -70,7 +70,7 @@ final class MediaSnapshot {
 	 * copy).
 	 *
 	 * @return string
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private static function shadowRoot(): string {
 		return trailingslashit( dirname( self::baseDir() ) ) . 'sd-edi-restore';
@@ -86,7 +86,7 @@ final class MediaSnapshot {
 	 * @param string $demoSlug  Demo slug, for the activity log.
 	 *
 	 * @return bool True when a media restore point is in place.
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public static function create( string $sessionId, bool $reset, string $demoSlug = '' ): bool {
 		$base = self::baseDir();
@@ -117,7 +117,7 @@ final class MediaSnapshot {
 	 * @param string $demoSlug  Demo slug, for the activity log.
 	 *
 	 * @return bool
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private static function captureByMove( string $base, string $root, string $sessionId, string $demoSlug ): bool {
 		$shadow = trailingslashit( $root ) . 'uploads-' . $sessionId;
@@ -162,7 +162,7 @@ final class MediaSnapshot {
 	 * @param string $sessionId Import session ID.
 	 *
 	 * @return bool
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private static function captureByManifest( string $base, string $root, string $sessionId ): bool {
 		$manifest = trailingslashit( $root ) . 'manifest-' . $sessionId . '.txt';
@@ -200,7 +200,7 @@ final class MediaSnapshot {
 	 * it. Safe to call when none exists (returns false).
 	 *
 	 * @return bool True if a media restore point existed and was applied.
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public static function restore(): bool {
 		$state = get_option( self::OPTION );
@@ -257,7 +257,7 @@ final class MediaSnapshot {
 	 * forgets it. Called when a new snapshot supersedes it or after a restore.
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public static function discard(): void {
 		$state = get_option( self::OPTION );
@@ -282,7 +282,7 @@ final class MediaSnapshot {
 	 * @param string $base Directory to walk.
 	 *
 	 * @return string[]
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private static function files( string $base ): array {
 		if ( ! is_dir( $base ) ) {
@@ -313,7 +313,7 @@ final class MediaSnapshot {
 	 * @param string $dir Directory to remove.
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private static function rrmdir( string $dir ): void {
 		if ( ! is_dir( $dir ) ) {
@@ -346,7 +346,7 @@ final class MediaSnapshot {
 	 * @param string $base Uploads base directory (never itself removed).
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private static function pruneEmptyDirs( string $base ): void {
 		if ( ! is_dir( $base ) ) {

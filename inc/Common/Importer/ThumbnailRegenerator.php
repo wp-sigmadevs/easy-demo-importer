@@ -15,7 +15,7 @@
  *     regeneration this avoids re-encoding thumbnails that already exist.
  *
  * @package SigmaDevs\EasyDemoImporter
- * @since   1.2.0
+ * @since   2.0.0
  */
 
 declare( strict_types=1 );
@@ -30,14 +30,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Importer Utility: ThumbnailRegenerator
  *
- * @since 1.2.0
+ * @since 2.0.0
  */
 final class ThumbnailRegenerator {
 	/**
 	 * Attachment ID being regenerated.
 	 *
 	 * @var int
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private $attachmentId;
 
@@ -45,7 +45,7 @@ final class ThumbnailRegenerator {
 	 * Absolute path to the fullsize original image.
 	 *
 	 * @var string
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private $fullSizePath;
 
@@ -54,7 +54,7 @@ final class ThumbnailRegenerator {
 	 * that were skipped because their thumbnail already existed.
 	 *
 	 * @var array<string,mixed>
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private $oldMetadata = [];
 
@@ -62,7 +62,7 @@ final class ThumbnailRegenerator {
 	 * Size labels skipped this run because a matching thumbnail already existed.
 	 *
 	 * @var string[]
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private $skipped = [];
 
@@ -72,7 +72,7 @@ final class ThumbnailRegenerator {
 	 * @param int    $attachmentId Attachment ID.
 	 * @param string $fullSizePath Absolute path to the original image.
 	 *
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private function __construct( int $attachmentId, string $fullSizePath ) {
 		$this->attachmentId = $attachmentId;
@@ -89,7 +89,7 @@ final class ThumbnailRegenerator {
 	 * @param int $attachmentId Attachment ID.
 	 *
 	 * @return self|null
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public static function forAttachment( int $attachmentId ): ?self {
 		$attachment = get_post( $attachmentId );
@@ -126,7 +126,7 @@ final class ThumbnailRegenerator {
 	 *                          missing are (re)built; false forces every size.
 	 *
 	 * @return bool True when metadata was (re)generated and saved.
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public function regenerate( bool $onlyMissing = true ): bool {
 		if ( ! function_exists( 'wp_generate_attachment_metadata' ) ) {
@@ -181,7 +181,7 @@ final class ThumbnailRegenerator {
 	 * @param array{width?:int,height?:int,file?:string}             $fullSizeMetadata  Fullsize metadata.
 	 *
 	 * @return array<string,array{width?:int,height?:int,crop?:bool}>
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public function filterMissingSizes( $sizes, $fullSizeMetadata ) {
 		if ( empty( $sizes ) || empty( $this->oldMetadata['sizes'] ) ) {

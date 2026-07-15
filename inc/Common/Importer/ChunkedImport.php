@@ -16,7 +16,7 @@
  *                       delete the state file.
  *
  * @package SigmaDevs\EasyDemoImporter
- * @since   1.2.0
+ * @since   2.0.0
  */
 
 declare( strict_types=1 );
@@ -33,7 +33,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Importer Class: ChunkedImport
  *
- * @since 1.2.0
+ * @since 2.0.0
  */
 class ChunkedImport extends SD_EDI_WP_Import {
 	/**
@@ -46,7 +46,7 @@ class ChunkedImport extends SD_EDI_WP_Import {
 	 * chunked design.
 	 *
 	 * @var string[]
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private const IMMUTABLE_PROPS = [
 		'id',
@@ -62,7 +62,7 @@ class ChunkedImport extends SD_EDI_WP_Import {
 	 * `sd/edi/import_posts_chunk_size`; the value chosen at prepare() is frozen in
 	 * the immutable meta so every batch computes the same chunk boundaries.
 	 *
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private const DEFAULT_POSTS_CHUNK_SIZE = 100;
 
@@ -73,7 +73,7 @@ class ChunkedImport extends SD_EDI_WP_Import {
 	 * comments and URL remapping to resolve correctly at finalize().
 	 *
 	 * @var string[]
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private const MUTABLE_PROPS = [
 		'processed_authors',
@@ -96,7 +96,7 @@ class ChunkedImport extends SD_EDI_WP_Import {
 	 * State store.
 	 *
 	 * @var ImportState
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private $state;
 
@@ -104,7 +104,7 @@ class ChunkedImport extends SD_EDI_WP_Import {
 	 * Global index of the next post to process across all chunks.
 	 *
 	 * @var int
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private $offset = 0;
 
@@ -113,7 +113,7 @@ class ChunkedImport extends SD_EDI_WP_Import {
 	 * this instead of count( $this->posts ), which now holds only one chunk.
 	 *
 	 * @var int
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private $postsTotal = 0;
 
@@ -121,7 +121,7 @@ class ChunkedImport extends SD_EDI_WP_Import {
 	 * Posts-per-chunk size frozen at prepare(), read from the immutable meta.
 	 *
 	 * @var int
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private $chunkSize = 0;
 
@@ -130,7 +130,7 @@ class ChunkedImport extends SD_EDI_WP_Import {
 	 *
 	 * @param ImportState $state State store for this import session.
 	 *
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public function __construct( ImportState $state ) {
 		$this->state = $state;
@@ -146,7 +146,7 @@ class ChunkedImport extends SD_EDI_WP_Import {
 	 * @param string $file Absolute path to the WXR file.
 	 *
 	 * @return int Total number of posts queued for the batch stage.
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public function prepare( string $file ): int {
 		$this->addImportFilters();
@@ -196,7 +196,7 @@ class ChunkedImport extends SD_EDI_WP_Import {
 	 *
 	 * @return void
 	 * @throws \RuntimeException When the file is missing or cannot be parsed.
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public function import_start( $file ) {
 		if ( ! is_file( $file ) ) {
@@ -232,7 +232,7 @@ class ChunkedImport extends SD_EDI_WP_Import {
 	 * checks prevent duplicates if a request is retried after a timeout.
 	 *
 	 * @return array{processed:int,total:int,done:bool} Progress snapshot.
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public function processBatch(): array {
 		if ( ! $this->hydrate() ) {
@@ -318,7 +318,7 @@ class ChunkedImport extends SD_EDI_WP_Import {
 	 * recalculation), then deletes the state file.
 	 *
 	 * @return bool True if finalization ran; false if no state was found.
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public function finalize(): bool {
 		if ( ! $this->hydrate() ) {
@@ -358,7 +358,7 @@ class ChunkedImport extends SD_EDI_WP_Import {
 	 * only them. Each taxonomy's registered update_count_callback is honored.
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private function recountTerms(): void {
 		$post_ids = array_values( array_filter( array_map( 'intval', (array) $this->processed_posts ) ) );
@@ -406,7 +406,7 @@ class ChunkedImport extends SD_EDI_WP_Import {
 	 * The state store backing this import.
 	 *
 	 * @return ImportState
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public function state(): ImportState {
 		return $this->state;
@@ -422,7 +422,7 @@ class ChunkedImport extends SD_EDI_WP_Import {
 	 * remains valid after finalize() has deleted the state file.
 	 *
 	 * @return int[] New attachment post IDs.
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public function importedAttachmentIds(): array {
 		if ( empty( $this->processed_posts ) ) {
@@ -452,7 +452,7 @@ class ChunkedImport extends SD_EDI_WP_Import {
 	 * filters do not survive between AJAX calls.
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private function addImportFilters(): void {
 		add_filter( 'import_post_meta_key', [ $this, 'is_valid_meta_key' ] ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
@@ -464,7 +464,7 @@ class ChunkedImport extends SD_EDI_WP_Import {
 	 * at the end of prepare().
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private function persistImmutable(): void {
 		$data = [
@@ -484,7 +484,7 @@ class ChunkedImport extends SD_EDI_WP_Import {
 	 * the end of prepare().
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private function persistPosts(): void {
 		$index = 0;
@@ -500,7 +500,7 @@ class ChunkedImport extends SD_EDI_WP_Import {
 	 * the large immutable parse output is untouched.
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private function persist(): void {
 		$data = [ 'offset' => $this->offset ];
@@ -517,7 +517,7 @@ class ChunkedImport extends SD_EDI_WP_Import {
 	 * the mutable maps file onto this instance.
 	 *
 	 * @return bool True if both state files were found and applied; false otherwise.
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private function hydrate(): bool {
 		$immutable = $this->state->loadImmutable();

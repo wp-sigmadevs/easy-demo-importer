@@ -9,7 +9,7 @@
  * the importer layers existence checks and the filter on top.
  *
  * @package SigmaDevs\EasyDemoImporter
- * @since   1.2.0
+ * @since   2.0.0
  */
 
 declare( strict_types=1 );
@@ -24,7 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Importer Utility: BundledMedia
  *
- * @since 1.2.0
+ * @since 2.0.0
  */
 final class BundledMedia {
 	/**
@@ -45,7 +45,7 @@ final class BundledMedia {
 	 * @param string $url Attachment URL from the WXR file.
 	 *
 	 * @return string[] Uploads-relative paths to try, in priority order.
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public static function candidates( string $url ): array {
 		$path = wp_parse_url( $url, PHP_URL_PATH );

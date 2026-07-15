@@ -5,7 +5,7 @@
  * Initializes the LayerSlider import Process.
  *
  * @package SigmaDevs\EasyDemoImporter
- * @since   1.2.0
+ * @since   2.0.0
  */
 
 declare( strict_types=1 );
@@ -26,14 +26,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Backend Ajax Class: ImportLayerSlider
  *
- * @since 1.2.0
+ * @since 2.0.0
  */
 class ImportLayerSlider extends ImporterAjax {
 	/**
 	 * Singleton trait.
 	 *
 	 * @see Singleton
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	use Singleton;
 
@@ -44,7 +44,7 @@ class ImportLayerSlider extends ImporterAjax {
 	 * as requested in the Bootstrap class.
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 *
 	 * @see Bootstrap::registerServices
 	 * @see Requester::isAdminBackend()
@@ -59,7 +59,7 @@ class ImportLayerSlider extends ImporterAjax {
 	 * Ajax response.
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public function response() {
 		// Verifying AJAX call and user role.
@@ -86,7 +86,7 @@ class ImportLayerSlider extends ImporterAjax {
 	 * @param string $extractDir Directory where slider files were extracted.
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private function importLayerSlider( $extractDir ) {
 		if ( class_exists( 'LS_Sliders' ) && defined( 'LS_ROOT_PATH' ) ) {

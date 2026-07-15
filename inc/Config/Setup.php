@@ -169,7 +169,7 @@ class Setup {
 	 * @param string $dir Absolute directory path.
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public static function protectDirectory( $dir ) {
 		if ( ! is_dir( $dir ) ) {

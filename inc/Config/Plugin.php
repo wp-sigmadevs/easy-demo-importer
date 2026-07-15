@@ -29,7 +29,7 @@ final class Plugin {
 	 * Plugin data cache.
 	 *
 	 * @var array|null
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private $pluginData = null;
 

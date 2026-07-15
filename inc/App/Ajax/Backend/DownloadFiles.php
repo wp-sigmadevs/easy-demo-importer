@@ -255,7 +255,7 @@ class DownloadFiles extends ImporterAjax {
 	 * @param int $code HTTP status code.
 	 *
 	 * @return array{success: bool, message: string, hint: string}
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private function httpCodeToError( int $code ): array {
 		$messages = [
