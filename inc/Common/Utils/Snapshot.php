@@ -68,15 +68,40 @@ final class Snapshot {
 	 * @since 2.0.0
 	 */
 	private static function tables(): array {
+		return array_map(
+			static function ( $table ) {
+				return $table->Name;
+			},
+			self::tableStatus()
+		);
+	}
+
+	/**
+	 * `SHOW TABLE STATUS` rows for this install's prefixed, snapshot-eligible base
+	 * tables, memoized for the request. Each row carries ->Name and ->Rows (an
+	 * estimate on InnoDB). A snapshot is one logical operation per request and the
+	 * live table set does not change between create()'s calls, so caching is safe
+	 * and avoids re-running the status query (~2× per create).
+	 *
+	 * @return array<int,object>
+	 * @since 2.0.0
+	 */
+	private static function tableStatus(): array {
+		static $cache = null;
+
+		if ( null !== $cache ) {
+			return $cache;
+		}
+
 		global $wpdb;
 
-		$tables = [];
+		$cache = [];
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$status = $wpdb->get_results( 'SHOW TABLE STATUS' );
 
 		if ( ! is_array( $status ) ) {
-			return $tables;
+			return $cache;
 		}
 
 		foreach ( $status as $table ) {
@@ -93,10 +118,10 @@ final class Snapshot {
 				continue;
 			}
 
-			$tables[] = $table->Name;
+			$cache[] = $table;
 		}
 
-		return $tables;
+		return $cache;
 	}
 
 	/**
@@ -338,8 +363,6 @@ final class Snapshot {
 	 * @since 2.0.0
 	 */
 	private static function tooLargeToSnapshot(): bool {
-		global $wpdb;
-
 		$cap = (int) apply_filters( 'sd/edi/snapshot_max_rows', 500000 ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
 		if ( $cap <= 0 ) {
@@ -348,11 +371,12 @@ final class Snapshot {
 
 		$total = 0;
 
-		// `$table` is a prefix-derived identifier (see tables()), not user input;
-		// identifiers cannot be bound via prepare().
-		foreach ( self::tables() as $table ) {
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared
-			$total += (int) $wpdb->get_var( "SELECT COUNT(*) FROM `{$table}`" );
+		// Use the row estimate from SHOW TABLE STATUS (already fetched and cached
+		// by tableStatus()) rather than an exact COUNT(*) per table — COUNT(*) is a
+		// full index scan on a large InnoDB table (e.g. a multi-million-row
+		// postmeta), and an estimate is accurate enough for a safety cap.
+		foreach ( self::tableStatus() as $table ) {
+			$total += (int) $table->Rows;
 
 			if ( $total > $cap ) {
 				return true;
