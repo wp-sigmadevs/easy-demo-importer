@@ -827,6 +827,14 @@ class InstallDemo extends ImporterAjax {
 				continue;
 			}
 
+			// An item skipped because image import was turned off is expected,
+			// not a failure — log it at info level so it does not mark the run
+			// "Completed with warnings".
+			if ( $this->isImageSkippedNotice( $line ) ) {
+				ImportLogger::info( $line, $this->sessionId, $this->demoSlug );
+				continue;
+			}
+
 			ImportLogger::warning( $line, $this->sessionId, $this->demoSlug );
 		}
 	}
@@ -860,6 +868,36 @@ class InstallDemo extends ImporterAjax {
 		}
 
 		return $line === $notice;
+	}
+
+	/**
+	 * Whether a captured line is an "image import turned off" skip notice.
+	 *
+	 * The vendored importer prints these when the user disabled image import, so
+	 * every attachment is intentionally skipped. They are matched on the fixed
+	 * trailing phrase of the printed template (the item name varies) and routed
+	 * to the log at info level rather than warning.
+	 *
+	 * @param string $line A single stripped, trimmed line of captured output.
+	 *
+	 * @return bool
+	 * @since 1.2.0
+	 */
+	private function isImageSkippedNotice( string $line ): bool {
+		static $suffix = null;
+
+		if ( null === $suffix ) {
+			$template = trim(
+				wp_strip_all_tags(
+					esc_html__( 'Skipped %1$s &#8220;%2$s&#8221;: image import is turned off.', 'easy-demo-importer' )
+				)
+			);
+			$marker   = '&#8221;:';
+			$pos      = strpos( $template, $marker );
+			$suffix   = false === $pos ? $template : trim( substr( $template, $pos + strlen( $marker ) ) );
+		}
+
+		return '' !== $suffix && str_ends_with( $line, $suffix );
 	}
 
 	/**
