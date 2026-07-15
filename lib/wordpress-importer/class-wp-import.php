@@ -1112,6 +1112,28 @@ class SD_EDI_WP_Import extends WP_Importer {
 			$url = rtrim( $this->base_url, '/' ) . $url;
 		}
 
+		// The chunked importer persists its cursor only at batch end, so a request
+		// killed mid-batch (e.g. a tar-pitted image overran the FPM limit) replays
+		// the slice. post_exists() dedups posts but NOT attachments, so re-import
+		// this exact source and it duplicates. Reuse the attachment a prior run
+		// already created instead. Divergence from the vendored importer — keep it
+		// minimal for future upstream syncs.
+		$existing = $this->existing_source_attachment( $url );
+
+		if ( $existing ) {
+			$new_url = wp_get_attachment_url( $existing );
+
+			if ( $new_url ) {
+				$this->url_remap[ $url ] = $new_url;
+
+				if ( ! empty( $post['guid'] ) ) {
+					$this->url_remap[ $post['guid'] ] = $new_url;
+				}
+			}
+
+			return $existing;
+		}
+
 		$upload = $this->fetch_remote_file( $url, $post );
 		if ( is_wp_error( $upload ) ) {
 			return $upload;
@@ -1128,6 +1150,13 @@ class SD_EDI_WP_Import extends WP_Importer {
 
 		// as per wp-admin/includes/upload.php.
 		$post_id = wp_insert_attachment( $post, $upload['file'] );
+
+		if ( $post_id && ! is_wp_error( $post_id ) ) {
+			// Tag the source URL so a replayed batch detects and reuses this exact
+			// attachment (see existing_source_attachment()) instead of duplicating.
+			update_post_meta( $post_id, '_sd_edi_source_url', $url );
+		}
+
 		wp_update_attachment_metadata( $post_id, wp_generate_attachment_metadata( $post_id, $upload['file'] ) );
 
 		// remap resized image URLs, works by stripping the extension and remapping the URL stub.
@@ -1142,6 +1171,34 @@ class SD_EDI_WP_Import extends WP_Importer {
 		}
 
 		return $post_id;
+	}
+
+	/**
+	 * Finds an attachment previously imported from the same source URL.
+	 *
+	 * Used to keep attachment creation idempotent across a chunked-import replay:
+	 * process_attachment() tags each new attachment with its `_sd_edi_source_url`,
+	 * so a re-processed slice reuses the existing attachment instead of inserting
+	 * a duplicate. Divergence from the vendored importer — keep it minimal for
+	 * future upstream syncs.
+	 *
+	 * @param string $url Original attachment URL from the WXR.
+	 *
+	 * @return int Attachment ID, or 0 if none.
+	 * @since 2.0.0
+	 */
+	protected function existing_source_attachment( $url ) {
+		global $wpdb;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$id = (int) $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key = '_sd_edi_source_url' AND meta_value = %s ORDER BY post_id DESC LIMIT 1",
+				$url
+			)
+		);
+
+		return ( $id > 0 && 'attachment' === get_post_type( $id ) ) ? $id : 0;
 	}
 
 	/**
