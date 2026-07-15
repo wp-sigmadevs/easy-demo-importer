@@ -1419,6 +1419,20 @@ class SD_EDI_WP_Import extends WP_Importer {
 			return new WP_Error( 'import_file_error', esc_html__( 'Bundled media file not found.', 'easy-demo-importer' ) );
 		}
 
+		// A demo package is third-party content, so never copy a file WordPress
+		// itself would refuse into the (web-served) uploads directory. Gate on the
+		// site's own allowed mime types BEFORE the copy — this blocks a shipped
+		// `evil.php` referenced by the WXR, while still permitting whatever media
+		// types the site allows (SVG only if the site explicitly enables it).
+		$filetype = wp_check_filetype( wp_basename( $source ), null );
+
+		if ( empty( $filetype['type'] ) ) {
+			return new WP_Error(
+				'import_file_type_error',
+				esc_html__( 'Bundled media has a disallowed file type and was skipped.', 'easy-demo-importer' )
+			);
+		}
+
 		$upload_date = isset( $post['upload_date'] ) ? $post['upload_date'] : null;
 		$uploads     = wp_upload_dir( $upload_date );
 
@@ -1445,12 +1459,10 @@ class SD_EDI_WP_Import extends WP_Importer {
 			chmod( $new_file, $perms ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_chmod
 		}
 
-		$wp_filetype = wp_check_filetype( $file_name );
-
 		$upload = [
 			'file'  => $new_file,
 			'url'   => $uploads['url'] . "/$file_name",
-			'type'  => empty( $wp_filetype['type'] ) ? '' : $wp_filetype['type'],
+			'type'  => $filetype['type'],
 			'error' => false,
 		];
 
