@@ -140,20 +140,20 @@ const Readiness = ({ modalData, handleReset }) => {
 							</h3>
 							<p>
 								{sdEdiAdminParams.readinessIntro ||
-									'These checks confirm your server can run the import. Resolve any blocking issue before you continue.'}
+									'These checks confirm your server can run the import. Resolve any blocking issue before you continue.'}{' '}
+								{sdEdiAdminParams.serverPageUrl && (
+									<a
+										className="readiness-status-link"
+										href={sdEdiAdminParams.serverPageUrl}
+										target="_blank"
+										rel="noreferrer"
+									>
+										{sdEdiAdminParams.viewFullStatus ||
+											'View full system status'}
+										<ArrowRightOutlined />
+									</a>
+								)}
 							</p>
-							{sdEdiAdminParams.serverPageUrl && (
-								<a
-									className="readiness-status-link"
-									href={sdEdiAdminParams.serverPageUrl}
-									target="_blank"
-									rel="noreferrer"
-								>
-									{sdEdiAdminParams.viewFullStatus ||
-										'View full system status'}
-									<ArrowRightOutlined />
-								</a>
-							)}
 							{preflightChecks.length > 0 ? (
 								<PreflightPanel checks={preflightChecks} />
 							) : (

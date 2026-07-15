@@ -10,13 +10,13 @@
 	margin-top: 20px;
 }
 
-// A quiet secondary affordance, not a bold inline link buried in the
-// paragraph — its own line, small, with an arrow instead of an underline.
+// A quiet secondary affordance that trails the intro sentence inline — small,
+// with an arrow instead of an underline.
 .readiness-status-link {
 	display: inline-flex;
 	align-items: center;
 	gap: 4px;
-	margin-top: 4px;
+	white-space: nowrap;
 	font-size: 13px;
 	font-weight: 500;
 	color: $color-primary;
