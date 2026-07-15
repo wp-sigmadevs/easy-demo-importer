@@ -28,6 +28,10 @@ Are you tired of the complex and time-consuming process of setting up your WordP
 * **Based on WordPress XML Importer:** Built on the reliable WordPress XML Importer, our plugin ensures a robust import process.
 * **Full Site or Single Site Import:** Demo importer can be configured to import a whole demo or individual demos from a multipurpose theme.
 * **Complete Content Import:** Imports all contents and Customizer settings, including widgets, menus, options data, Redux Framework data, Slider Revolution slides, and more, ensuring your website mirrors the demo in both appearance and functionality.
+* **Resumable, Timeout-Proof Import:** Large and WooCommerce demos import in time-boxed batches that survive gateway timeouts and auto-resume if interrupted.
+* **Manual Import:** Upload your own content, media, and settings — as separate files or a single .zip bundle — without a theme configuration.
+* **One-Click Rollback:** Create a restore point before importing and revert your site with a single click.
+* **Activity Log:** Every import and thumbnail run is recorded with a live, per-item log for easy troubleshooting.
 * **User-Friendly Interface:** Our intuitive interface makes it easy for users of all skill levels to import demo data.
 * **Universal Theme Compatibility:** Can be configured to work seamlessly with a wide range of WordPress themes, ensuring broad compatibility.
 * **Developer Hooks:** offers a wide range of hooks that give theme developers full control to perform advanced custom actions. These hooks allow for precise adjustments and customizations in the import process.
@@ -137,36 +141,27 @@ For any inquiries, bug reports, or suggestions, please submit your request [here
 == Changelog ==
 
 = 2.0.0 (15-July-2026) =
-* Feature: Resumable, chunked WXR content import — large WooCommerce demos no longer fail with 524/503 gateway timeouts on Cloudflare or under strict PHP-FPM execution limits. The import now runs in time-boxed batches that survive across requests.
-* Feature: Determinate content-import progress bar, with automatic resume after transient connection drops or gateway timeouts during the import.
-* Feature: Added support for importing LayerSlider slides.
-* Feature: Import can now resume automatically if interrupted, thanks to the new Session Manager.
-* Feature: New Regenerate Thumbnails tool (Appearance → Easy Thumbnails) — rebuilds the intermediate image sizes across your whole media library in resumable, time-boxed batches that will not time out on large libraries. Includes a live image-by-image log, a Force-regenerate-every-size option, and an optional one-at-a-time mode.
-* Security: Improved protection against malicious archive extraction (ZipSlip).
-* Security: Added safeguards to prevent unsafe PHP file loading.
-* Security: Improved validation in the plugin installer for safer downloads.
-* Security: Closed a Stored XSS vulnerability in SVG upload handling where file-type detection and sanitization trusted the browser-supplied upload type instead of the file's actual content, and the REST media endpoint bypassed sanitization entirely (CVE-2024-9071).
-* Fix: Improved compatibility with Fluent Forms import logic.
-* Fix: Corrected settings validation during import.
-* Fix: Removed redundant error handlers that could cause unexpected behavior in AJAX requests.
-* Fix: Added verification to ensure demo files download correctly before import.
-* Fix: Improved input validation and sanitization across AJAX requests.
+* Feature: Resumable, chunked WXR import — large/WooCommerce demos no longer fail with 524/503 gateway timeouts.
+* Feature: Manual import — upload your own content, media, and settings as separate files or a single .zip bundle.
+* Feature: One-click rollback — a restore point is created before import so you can revert in one click.
+* Feature: Activity log — every import and thumbnail run is recorded with a live, per-item log.
+* Feature: Regenerate Thumbnails tool (Appearance → Easy Thumbnails) — resumable, with force-all-sizes and one-at-a-time modes.
+* Feature: Determinate progress bar that auto-resumes after connection drops or gateway timeouts.
+* Feature: LayerSlider import support.
+* Security: Fixed a Stored XSS in SVG upload handling (CVE-2024-9071).
+* Security: Hardened archive extraction (ZipSlip), plugin-installer downloads, and PHP file loading.
+* Fix: Manual import registers supplied images as real Media Library attachments (featured images and galleries resolve).
+* Fix: Elementor global settings (container width, colors, fonts) are applied correctly after import.
+* Fix: No-image imports are logged as "Skipped" and complete cleanly instead of being flagged with warnings.
+* Fix: Interrupted imports resurface on reload with a Resume / Start Over prompt.
+* Fix: Improved Fluent Forms import, settings validation, demo-file download verification, and AJAX input sanitization.
 * Fix: Prevented a JavaScript crash when network requests fail or time out.
-* Fix: An interrupted import now resurfaces automatically on reload — the demo importer reopens the affected demo with the Resume / Start Over prompt instead of returning to the demo grid with no indication the import was incomplete.
-* Fix: Manual import now adds the images you supply (an images .zip, or a single bundle with an uploads/ folder) to the Media Library as real attachments — so featured images, product galleries, and thumbnails resolve — instead of only copying the raw files to disk.
-* Fix: With image import turned off, media items are now recorded as "Skipped" in the Activity log rather than "Failed", so a deliberate no-image import completes cleanly instead of being flagged "Completed with warnings".
-* Fix: Elementor global settings (container width, colors, fonts) are now applied after import. The active kit could be left with a duplicate document type during chunked import, causing Elementor to treat it as a page and skip its global CSS; the kit type is now normalized and Elementor's CSS is regenerated so the front end matches the demo.
-* Fix: The Activity log now labels manual imports "Manual Import" instead of an internal placeholder, and renders quotation marks in log messages correctly rather than showing raw HTML entities.
-* Tweak: The Import Log now closes out an interrupted run with an "Import was interrupted" entry and an "Interrupted" status, instead of leaving it stuck on "In progress". Runs that stop after content import but before finishing are no longer mislabelled as successful.
-* Tweak: A new import no longer has to wait for an interrupted one to release its lock — an abandoned import is superseded automatically, while a genuinely-running import still blocks a second one.
-* Tweak: Thumbnail regeneration runs are now recorded alongside imports, and the Status page's log tab has been renamed from "Import Logs" to "Activity" to reflect that it covers all plugin activity.
-* Tweak: Refactored slider import logic to improve reliability and reduce duplicate code.
-* Tweak: Improved Widgets and database search-replace handling.
-* Tweak: Enhanced Customizer data import handling.
-* Tweak: Mapped HTTP status codes (408, 503, etc.) to human-readable messages and hints in the JS frontend.
-* Tweak: The readiness step now shows the "View full system status" link inline with the intro text.
-* Tweak: Improved uninstall cleanup to properly remove temporary import data.
-* Update: Updated i18n strings and translation template.
+* Tweak: Activity log labels manual runs "Manual Import" and renders quotation marks correctly.
+* Tweak: Interrupted runs are marked "Interrupted" instead of stuck on "In progress"; a new import supersedes an abandoned one.
+* Tweak: Renamed the log tab to "Activity" and mapped HTTP status codes to friendly messages.
+* Tweak: Improved Customizer, Widgets, and database search-replace handling; refactored slider import.
+* Tweak: Readiness step shows the "View full system status" link inline; improved uninstall cleanup.
+* Update: Tested up to WordPress 7.0; refreshed i18n strings and translation template.
 
 = 1.1.6 (28-February-2026) =
 * Add: Full compatibility with WordPress 6.9.
