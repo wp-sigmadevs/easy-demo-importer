@@ -104,7 +104,7 @@ final class MediaSnapshot {
 
 		return $reset
 			? self::captureByMove( $base, $root, $sessionId, $demoSlug )
-			: self::captureByManifest( $base, $root, $sessionId );
+			: self::captureByManifest( $base, $root, $sessionId, $demoSlug );
 	}
 
 	/**
@@ -131,13 +131,19 @@ final class MediaSnapshot {
 		// non-atomic copy-then-delete of the whole uploads tree.
 		// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.rename_rename
 		if ( ! @rename( $base, $shadow ) ) {
+			// captureByMove only runs for a reset import, which wipes the uploads
+			// folder next. A manifest (filename-only) snapshot records nothing it
+			// can restore, so falling back to one would silently lose the entire
+			// pre-existing media library on rollback. Refuse the media restore
+			// point instead: the database still rolls back; only the media library
+			// is not recoverable, and the warning says so accurately.
 			ImportLogger::warning(
-				esc_html__( 'Media could not be moved to the restore point (uploads may be on a separate disk); the database will still roll back, and new media added by this import will be removed.', 'easy-demo-importer' ),
+				esc_html__( 'Could not create a media restore point — the uploads folder is on a separate disk and cannot be captured before the database reset. Rolling back this import will restore the database but not the media library.', 'easy-demo-importer' ),
 				$sessionId,
 				$demoSlug
 			);
 
-			return self::captureByManifest( $base, $root, $sessionId );
+			return false;
 		}
 
 		wp_mkdir_p( $base );
@@ -166,8 +172,15 @@ final class MediaSnapshot {
 	 * @return bool
 	 * @since 2.0.0
 	 */
-	private static function captureByManifest( string $base, string $root, string $sessionId ): bool {
+	private static function captureByManifest( string $base, string $root, string $sessionId, string $demoSlug = '' ): bool {
 		$manifest = trailingslashit( $root ) . 'manifest-' . $sessionId . '.txt';
+
+		// The uploads walk is unbounded; on a very large library it would block the
+		// import request (and rollback walks it again). Cap it — like the database
+		// half's row cap — and skip the media restore point past the limit rather
+		// than risk a timeout. Filter `sd/edi/snapshot_max_media_files` to 0 to
+		// disable the cap.
+		$cap = (int) apply_filters( 'sd/edi/snapshot_max_media_files', 50000 ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
 		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
 		$handle = fopen( $manifest, 'wb' );
@@ -176,7 +189,23 @@ final class MediaSnapshot {
 			return false;
 		}
 
+		$count = 0;
+
 		foreach ( self::files( $base ) as $relative ) {
+			if ( $cap > 0 && ++$count > $cap ) {
+				// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
+				fclose( $handle );
+				wp_delete_file( $manifest );
+
+				ImportLogger::warning(
+					esc_html__( 'Media restore point skipped — this site has too many files to snapshot safely; the import will continue and the database can still be rolled back.', 'easy-demo-importer' ),
+					$sessionId,
+					$demoSlug
+				);
+
+				return false;
+			}
+
 			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fwrite
 			fwrite( $handle, $relative . "\n" );
 		}
