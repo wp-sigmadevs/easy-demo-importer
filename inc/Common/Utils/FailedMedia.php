@@ -9,7 +9,7 @@
  * stored record carries.
  *
  * @package SigmaDevs\EasyDemoImporter
- * @since   1.2.0
+ * @since   2.0.0
  */
 
 declare( strict_types=1 );
@@ -24,7 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Utility Class: FailedMedia
  *
- * @since 1.2.0
+ * @since 2.0.0
  */
 final class FailedMedia {
 
@@ -39,7 +39,7 @@ final class FailedMedia {
 	 * @param string $session_id Import session id.
 	 *
 	 * @return string
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private static function key( string $session_id ): string {
 		return self::PREFIX . md5( $session_id );
@@ -52,7 +52,7 @@ final class FailedMedia {
 	 * @param array  $items      Failed-media records ({url, data}).
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public static function save( string $session_id, array $items ): void {
 		if ( empty( $items ) ) {
@@ -69,7 +69,7 @@ final class FailedMedia {
 	 * @param string $session_id Import session id.
 	 *
 	 * @return array
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public static function get( string $session_id ): array {
 		$items = get_option( self::key( $session_id ), [] );
@@ -83,7 +83,7 @@ final class FailedMedia {
 	 * @param string $session_id Import session id.
 	 *
 	 * @return int
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public static function count( string $session_id ): int {
 		return count( self::get( $session_id ) );
@@ -95,7 +95,7 @@ final class FailedMedia {
 	 * @param string $session_id Import session id.
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public static function clear( string $session_id ): void {
 		delete_option( self::key( $session_id ) );

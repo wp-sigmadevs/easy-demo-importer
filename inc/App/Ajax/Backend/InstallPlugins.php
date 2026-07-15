@@ -63,7 +63,7 @@ class InstallPlugins extends ImporterAjax {
 	 * Plugin install errors.
 	 *
 	 * @var array
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private $installErrors = [];
 

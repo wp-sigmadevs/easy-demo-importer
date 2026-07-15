@@ -167,7 +167,7 @@ class SD_EDI_WP_Import extends WP_Importer {
 	 * batches via ChunkedImport::MUTABLE_PROPS.
 	 *
 	 * @var string
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public $bundled_media_dir = '';
 
@@ -177,7 +177,7 @@ class SD_EDI_WP_Import extends WP_Importer {
 	 * activity log.
 	 *
 	 * @var int
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public $bundled_media_imported = 0;
 
@@ -189,7 +189,7 @@ class SD_EDI_WP_Import extends WP_Importer {
 	 * chunked batches via ChunkedImport::MUTABLE_PROPS.
 	 *
 	 * @var array
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public $failed_attachments = [];
 
@@ -1376,7 +1376,7 @@ class SD_EDI_WP_Import extends WP_Importer {
 	 * @param string $url Attachment URL from the WXR file.
 	 *
 	 * @return string|null Absolute path to the bundled file, or null.
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public function resolve_bundled_media( $url ) {
 		if ( empty( $this->bundled_media_dir ) || ! is_dir( $this->bundled_media_dir ) ) {
@@ -1412,7 +1412,7 @@ class SD_EDI_WP_Import extends WP_Importer {
 	 * @param array  $post   Attachment details.
 	 *
 	 * @return array|WP_Error Upload details on success, WP_Error otherwise.
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public function import_local_file( $source, $url, $post ) {
 		if ( ! is_file( $source ) ) {

@@ -13,7 +13,7 @@
  * them cleanly.
  *
  * @package SigmaDevs\EasyDemoImporter
- * @since   1.2.0
+ * @since   2.0.0
  */
 
 declare( strict_types=1 );
@@ -36,14 +36,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * CLI Class: Commands
  *
- * @since 1.2.0
+ * @since 2.0.0
  */
 class Commands extends Base {
 	/**
 	 * Singleton trait.
 	 *
 	 * @see Singleton
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	use Singleton;
 
@@ -51,7 +51,7 @@ class Commands extends Base {
 	 * Registers the `wp edi` command when running under WP-CLI.
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public function register() {
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
@@ -85,7 +85,7 @@ class Commands extends Base {
 	 * @param array $assoc_args Associative args.
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public function demos( $args, $assoc_args ) {
 		$config = sd_edi()->getDemoConfig();
@@ -136,7 +136,7 @@ class Commands extends Base {
 	 * @param array $assoc_args Associative args.
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public function regenerate( $args, $assoc_args ) {
 		$force = isset( $assoc_args['force'] );
@@ -205,7 +205,7 @@ class Commands extends Base {
 	 * @param array $assoc_args Associative args.
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public function rollback( $args, $assoc_args ) {
 		if ( ! Snapshot::exists() ) {

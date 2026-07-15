@@ -123,7 +123,7 @@ class Filters {
 	 * @param array $file Uploaded file information.
 	 *
 	 * @return bool
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private static function looksLikeSVG( $file ) {
 		$filename = isset( $file['name'] ) && is_string( $file['name'] ) ? strtolower( $file['name'] ) : '';

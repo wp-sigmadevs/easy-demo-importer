@@ -15,7 +15,7 @@
  *   - Bundle: a single bundle.zip that is unpacked and mapped by extension.
  *
  * @package SigmaDevs\EasyDemoImporter
- * @since   1.2.0
+ * @since   2.0.0
  */
 
 declare( strict_types=1 );
@@ -39,14 +39,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Manual Class: ManualImport
  *
- * @since 1.2.0
+ * @since 2.0.0
  */
 class ManualImport extends Base {
 	/**
 	 * Singleton trait.
 	 *
 	 * @see Singleton
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	use Singleton;
 
@@ -64,7 +64,7 @@ class ManualImport extends Base {
 	 * Allowed upload targets → the filename each assembles into.
 	 *
 	 * @return string[]
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private function targets(): array {
 		return [
@@ -82,7 +82,7 @@ class ManualImport extends Base {
 	 * Image extensions extracted into the uploads folder.
 	 *
 	 * @return string[]
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private function imageExtensions(): array {
 		return [ 'jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'avif', 'ico', 'bmp' ];
@@ -92,7 +92,7 @@ class ManualImport extends Base {
 	 * Registers the upload handler + the daily cleanup sweep.
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public function register() {
 		add_action( 'wp_ajax_' . self::ACTION, [ $this, 'handleUpload' ] );
@@ -108,7 +108,7 @@ class ManualImport extends Base {
 	 * finished/imported). TTL filterable.
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public function cleanupStale() {
 		$base = trailingslashit( wp_get_upload_dir()['basedir'] ) . 'easy-demo-importer';
@@ -139,7 +139,7 @@ class ManualImport extends Base {
 	 * @param string $dir Absolute directory path.
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private function deleteDir( string $dir ) {
 		$this->fs()->delete( $dir, true );
@@ -149,7 +149,7 @@ class ManualImport extends Base {
 	 * Lazily boots and returns WP_Filesystem.
 	 *
 	 * @return \WP_Filesystem_Base|null
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private function fs() {
 		global $wp_filesystem;
@@ -166,7 +166,7 @@ class ManualImport extends Base {
 	 * Entry point: gate the request, then either assemble a chunk or finalize.
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public function handleUpload() {
 		if ( ! check_ajax_referer( Helpers::nonceText(), Helpers::nonceId(), false ) ) {
@@ -196,7 +196,7 @@ class ManualImport extends Base {
 	 * Resolves (and creates) the working directory for an upload session.
 	 *
 	 * @return array{key:string,dir:string} Manual key + absolute working dir.
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private function workingDir(): array {
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- verified in handleUpload().
@@ -225,7 +225,7 @@ class ManualImport extends Base {
 	 * Appends one chunk of a target file, renaming it into place on the last one.
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private function assembleChunk() {
 		// phpcs:disable WordPress.Security.NonceVerification.Missing -- verified in handleUpload().
@@ -301,7 +301,7 @@ class ManualImport extends Base {
 	 * session and returns the manual key.
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private function finalize() {
 		$context     = $this->workingDir();
@@ -345,7 +345,7 @@ class ManualImport extends Base {
 	 * @param string $dir Working directory (holds bundle.zip).
 	 *
 	 * @return bool Whether any bundled media was staged for import.
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private function routeBundle( string $dir ): bool {
 		$extract = $dir . '/_bundle';
@@ -418,7 +418,7 @@ class ManualImport extends Base {
 	 * @param string $dir Working directory.
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private function expandSettingsZip( string $zip, string $dir ) {
 		$extract = $dir . '/_settings';
@@ -449,7 +449,7 @@ class ManualImport extends Base {
 	 * @param array  $settings Settings map, by reference.
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private function collectSettingJson( string $name, string $path, array &$settings ) {
 		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents, WordPress.WP.AlternativeFunctions.file_system_operations_file_get_contents
@@ -476,7 +476,7 @@ class ManualImport extends Base {
 	 * @param string $dest     Destination path.
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private function writeSettings( array $settings, string $dest ) {
 		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
@@ -494,7 +494,7 @@ class ManualImport extends Base {
 	 * @param string $dir Working directory.
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private function extractImages( string $zip, string $dir ) {
 		$staging = $dir . '/uploads';
@@ -512,7 +512,7 @@ class ManualImport extends Base {
 	 * @param string $dest Destination directory.
 	 *
 	 * @return true|\WP_Error
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private function unzip( string $zip, string $dest ) {
 		require_once ABSPATH . 'wp-admin/includes/file.php';
@@ -528,7 +528,7 @@ class ManualImport extends Base {
 	 * @param bool   $hasImages Whether bundled media was extracted into uploads.
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private function finish( string $key, bool $hasImages = false ) {
 		$session = SessionManager::start();
@@ -548,7 +548,7 @@ class ManualImport extends Base {
 	 * @param array $file Raw $_FILES entry.
 	 *
 	 * @return array{name:string,tmp_name:string,size:int,error:int}
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private function normalizeFile( array $file ): array {
 		return [
@@ -565,7 +565,7 @@ class ManualImport extends Base {
 	 * @param string $path File path.
 	 *
 	 * @return bool
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private function looksLikeWxrContent( string $path ): bool {
 		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents, WordPress.WP.AlternativeFunctions.file_system_operations_file_get_contents
@@ -585,7 +585,7 @@ class ManualImport extends Base {
 	 * @param int    $code    HTTP status.
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private function fail( string $message, int $code = 400 ) {
 		wp_send_json_error( [ 'message' => $message ], $code );

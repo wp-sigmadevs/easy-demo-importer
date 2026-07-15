@@ -6,7 +6,7 @@
  * WordPress calls this file automatically if it exists in the plugin root.
  *
  * @package SigmaDevs\EasyDemoImporter
- * @since   1.2.0
+ * @since   2.0.0
  */
 
 // Do not allow directly accessing this file.

@@ -158,7 +158,7 @@ class RestEndpoints extends Base {
 	 * Add Rollback route (restore the pre-import snapshot).
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public function addRollbackEndpoint() {
 		register_rest_route(
@@ -176,7 +176,7 @@ class RestEndpoints extends Base {
 	 * Restores the pre-import snapshot, reverting the site to before the import.
 	 *
 	 * @return WP_REST_Response
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public function rollback() {
 		if ( ! Snapshot::exists() ) {
@@ -194,7 +194,7 @@ class RestEndpoints extends Base {
 	 * Add Discard route (drop the restore point to reclaim disk).
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public function addDiscardEndpoint() {
 		register_rest_route(
@@ -214,7 +214,7 @@ class RestEndpoints extends Base {
 	 * The site itself is untouched.
 	 *
 	 * @return WP_REST_Response
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public function discardRestorePoint() {
 		Snapshot::drop();
@@ -226,7 +226,7 @@ class RestEndpoints extends Base {
 	 * Add Failed-media count route.
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public function addFailedMediaEndpoint() {
 		register_rest_route(
@@ -251,7 +251,7 @@ class RestEndpoints extends Base {
 	 * @param WP_REST_Request $request REST request object.
 	 *
 	 * @return WP_REST_Response
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public function failedMedia( WP_REST_Request $request ) {
 		$session_id = (string) $request->get_param( 'session_id' );
@@ -269,7 +269,7 @@ class RestEndpoints extends Base {
 	 * Add Preflight (import readiness) route.
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public function addPreflightEndpoint() {
 		register_rest_route(
@@ -287,7 +287,7 @@ class RestEndpoints extends Base {
 	 * Returns the pre-import readiness report.
 	 *
 	 * @return WP_REST_Response
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public function preflight() {
 		$cache_key = 'sd_edi_preflight';
@@ -371,7 +371,7 @@ class RestEndpoints extends Base {
 	 * Add Import Log Route.
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public function addImportLogEndpoint() {
 		register_rest_route(
@@ -408,7 +408,7 @@ class RestEndpoints extends Base {
 	 * @param WP_REST_Request $request REST request.
 	 *
 	 * @return WP_REST_Response
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public function importLog( WP_REST_Request $request ) {
 		$sessionId = (string) $request->get_param( 'session_id' );

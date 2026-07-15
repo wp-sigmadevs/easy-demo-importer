@@ -5,7 +5,7 @@
  * Manages import sessions and concurrent-import mutex lock.
  *
  * @package SigmaDevs\EasyDemoImporter
- * @since   1.2.0
+ * @since   2.0.0
  */
 
 declare( strict_types=1 );
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Class: SessionManager
  *
- * @since 1.2.0
+ * @since 2.0.0
  */
 class SessionManager {
 	/**
@@ -44,7 +44,7 @@ class SessionManager {
 	 * and acquires the mutex lock. Cleans up any orphaned previous session first.
 	 *
 	 * @return array{session_id: string, user_id: int, started_at: int} The new session data.
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public static function start(): array {
 		// Clean up any orphaned session from a previous crashed import.
@@ -76,7 +76,7 @@ class SessionManager {
 	 * Get the currently active session.
 	 *
 	 * @return array{session_id: string, user_id: int, started_at: int}|null Session data or null if no active session.
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public static function get(): ?array {
 		$session_id = get_option( static::LOCK_KEY, '' );
@@ -100,7 +100,7 @@ class SessionManager {
 	 * Check whether an import is currently locked (running).
 	 *
 	 * @return bool
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public static function isLocked(): bool {
 		return null !== static::get();
@@ -115,7 +115,7 @@ class SessionManager {
 	 * a running import. Uses the same staleness window as the Import Log.
 	 *
 	 * @return bool
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public static function isLive(): bool {
 		$session = static::get();
@@ -141,7 +141,7 @@ class SessionManager {
 	 * @param string $session_id Session to touch.
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public static function touch( string $session_id ): void {
 		if ( '' === $session_id ) {
@@ -171,7 +171,7 @@ class SessionManager {
 	 * @param string $session_id Session to mark stale.
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public static function markStale( string $session_id ): void {
 		if ( '' === $session_id ) {
@@ -196,7 +196,7 @@ class SessionManager {
 	 * @param string $session_id Session ID to validate.
 	 *
 	 * @return bool
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public static function isValid( string $session_id ): bool {
 		$active = static::get();
@@ -215,7 +215,7 @@ class SessionManager {
 	 * @param string $session_id Session ID to release.
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public static function release( string $session_id ): void {
 		delete_transient( static::SESSION_PREFIX . $session_id );
@@ -236,7 +236,7 @@ class SessionManager {
 	 * the user explicitly requests a reset via "Start Over".
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public static function forceRelease(): void {
 		$session_id = get_option( static::LOCK_KEY, '' );
@@ -252,7 +252,7 @@ class SessionManager {
 	 * Clean up any orphaned session data from a previous crashed import.
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public static function cleanup(): void {
 		$session_id = get_option( static::LOCK_KEY, '' );

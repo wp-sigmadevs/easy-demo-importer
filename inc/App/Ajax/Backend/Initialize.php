@@ -72,7 +72,7 @@ class Initialize extends ImporterAjax {
 	 * user can still resume — resuming refreshes the heartbeat back to live.
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public function markInterrupted() {
 		Helpers::verifyAjaxCall();
@@ -94,7 +94,7 @@ class Initialize extends ImporterAjax {
 	 * without waiting for the 30-minute lock TTL to expire.
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public function cancelSession() {
 		Helpers::verifyAjaxCall();
