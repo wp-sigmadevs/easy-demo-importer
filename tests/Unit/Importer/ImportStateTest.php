@@ -31,6 +31,10 @@ final class ImportStateTest extends UnitTestCase {
 	protected function set_up() {
 		parent::set_up();
 		$this->path = sys_get_temp_dir() . '/sd-edi-test-' . uniqid( '', true ) . '.dat';
+
+		// ImportState::delete() uses wp_delete_file(); alias it to the native
+		// unlink so the file-removal assertions still exercise real deletion.
+		Functions\when( 'wp_delete_file' )->alias( 'unlink' );
 	}
 
 	/**
