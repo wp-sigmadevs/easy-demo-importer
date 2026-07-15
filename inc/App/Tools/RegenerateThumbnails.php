@@ -104,9 +104,14 @@ class RegenerateThumbnails extends Base {
 		$regenerated = isset( $_POST['regenerated'] ) ? absint( wp_unslash( $_POST['regenerated'] ) ) : 0;
 		$skipped     = isset( $_POST['skipped'] ) ? absint( wp_unslash( $_POST['skipped'] ) ) : 0;
 		$failed      = isset( $_POST['failed'] ) ? absint( wp_unslash( $_POST['failed'] ) ) : 0;
+		$postedTotal = isset( $_POST['total'] ) ? absint( wp_unslash( $_POST['total'] ) ) : 0;
 		// phpcs:enable WordPress.Security.NonceVerification.Missing
 
-		$total = $this->totalImages();
+		// The library size is fixed for a run, so compute it once — on the probe
+		// and on the first request (empty session) — and round-trip it on later
+		// requests (the client already returns session/after/counts) instead of
+		// re-running a COUNT scan on every batch.
+		$total = ( $probe || '' === $session ) ? $this->totalImages() : $postedTotal;
 
 		// The React page probes once on mount to show the library size before
 		// the user starts — return just the count, do no work.
