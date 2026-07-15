@@ -149,10 +149,10 @@ For any inquiries, bug reports, or suggestions, please submit your request [here
 * Feature: Determinate progress bar that auto-resumes after connection drops or gateway timeouts.
 * Feature: Interrupted imports resurface on reload with a Resume / Start Over prompt.
 * Feature: LayerSlider import support.
-* Feature: WP-CLI support — `wp edi demos`, `wp edi regenerate`, and `wp edi rollback`.
-* Feature: Pre-import readiness checks — PHP version, memory, execution time, extensions, plugins, and disk space are verified before Start Import is enabled.
-* Feature: Retry failed media — downloads that fail during import are tracked per session and can be retried individually from the result screen.
-* Feature: Bundled media import — demo images are imported from a bundled uploads folder when the demo package includes one, instead of being downloaded remotely.
+* Feature: WP-CLI support — `wp edi demos`, `regenerate`, and `rollback`.
+* Feature: Pre-import readiness checks gate Start Import until the server is ready.
+* Feature: Retry individual failed media downloads from the result screen.
+* Feature: Bundled media import — demo images load from the package instead of downloading.
 * Add: Full compatibility with WordPress 7.0.
 * Security: Fixed a Stored XSS in SVG upload handling (CVE-2024-9071).
 * Security: Hardened archive extraction (ZipSlip), plugin-installer downloads, and PHP file loading.
