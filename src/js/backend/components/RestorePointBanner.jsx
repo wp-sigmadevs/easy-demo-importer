@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Button, Modal } from 'antd';
 import {
 	RollbackOutlined,
@@ -6,6 +6,7 @@ import {
 	HistoryOutlined,
 } from '@ant-design/icons';
 import { Api } from '../utils/Api';
+import useSharedDataStore from '../utils/sharedDataStore';
 
 /* global sdEdiAdminParams */
 
@@ -13,28 +14,57 @@ import { Api } from '../utils/Api';
  * Persistent notice on the importer page whenever a pre-import restore point
  * exists, so a rollback is reachable outside the one-time result screen.
  *
+ * @param {Object} props            - Component props.
+ * @param {number} props.refreshKey - Bumped by the parent when a modal closes,
+ *                                    so a just-created restore point shows
+ *                                    without a page reload.
  * @return {JSX.Element|null} The banner, or null when no restore point exists.
  */
-const RestorePointBanner = () => {
+const RestorePointBanner = ({ refreshKey = 0 }) => {
 	const [available, setAvailable] = useState(false);
 	const [rolling, setRolling] = useState(false);
 	const [discarding, setDiscarding] = useState(false);
 
-	useEffect(() => {
-		let ignore = false;
+	// The wizard modal's visibility lives in the shared store; re-check the
+	// restore point when it closes so a snapshot created during that import
+	// surfaces immediately. The manual modal is covered by refreshKey.
+	const modalVisible = useSharedDataStore((state) => state.modalVisible);
 
+	const mounted = useRef(true);
+	const prevModalVisible = useRef(modalVisible);
+
+	const refresh = useCallback(() => {
 		Api.get('/sd/edi/v1/failed-media', { params: { session_id: '' } })
 			.then((res) => {
-				if (!ignore && res?.data?.success) {
+				if (mounted.current && res?.data?.success) {
 					setAvailable(!!res.data.data.rollbackAvailable);
 				}
 			})
 			.catch(() => {});
+	}, []);
+
+	useEffect(() => {
+		mounted.current = true;
 
 		return () => {
-			ignore = true;
+			mounted.current = false;
 		};
 	}, []);
+
+	// Initial load, and again each time the parent bumps refreshKey (a modal
+	// just closed).
+	useEffect(() => {
+		refresh();
+	}, [refresh, refreshKey]);
+
+	// Re-check when the wizard modal transitions from open to closed.
+	useEffect(() => {
+		if (prevModalVisible.current && !modalVisible) {
+			refresh();
+		}
+
+		prevModalVisible.current = modalVisible;
+	}, [modalVisible, refresh]);
 
 	if (!available) {
 		return null;
