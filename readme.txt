@@ -147,21 +147,20 @@ For any inquiries, bug reports, or suggestions, please submit your request [here
 * Feature: Activity log — every import and thumbnail run is recorded with a live, per-item log.
 * Feature: Regenerate Thumbnails tool (Appearance → Easy Thumbnails) — resumable, with force-all-sizes and one-at-a-time modes.
 * Feature: Determinate progress bar that auto-resumes after connection drops or gateway timeouts.
+* Feature: Interrupted imports resurface on reload with a Resume / Start Over prompt.
 * Feature: LayerSlider import support.
+* Feature: WP-CLI support — `wp edi demos`, `wp edi regenerate`, and `wp edi rollback`.
+* Feature: Pre-import readiness checks — PHP version, memory, execution time, extensions, plugins, and disk space are verified before Start Import is enabled.
+* Feature: Retry failed media — downloads that fail during import are tracked per session and can be retried individually from the result screen.
+* Feature: Bundled media import — demo images are imported from a bundled uploads folder when the demo package includes one, instead of being downloaded remotely.
+* Add: Full compatibility with WordPress 7.0.
 * Security: Fixed a Stored XSS in SVG upload handling (CVE-2024-9071).
 * Security: Hardened archive extraction (ZipSlip), plugin-installer downloads, and PHP file loading.
-* Fix: Manual import registers supplied images as real Media Library attachments (featured images and galleries resolve).
 * Fix: Elementor global settings (container width, colors, fonts) are applied correctly after import.
-* Fix: No-image imports are logged as "Skipped" and complete cleanly instead of being flagged with warnings.
-* Fix: Interrupted imports resurface on reload with a Resume / Start Over prompt.
 * Fix: Improved Fluent Forms import, settings validation, demo-file download verification, and AJAX input sanitization.
 * Fix: Prevented a JavaScript crash when network requests fail or time out.
-* Tweak: Activity log labels manual runs "Manual Import" and renders quotation marks correctly.
-* Tweak: Interrupted runs are marked "Interrupted" instead of stuck on "In progress"; a new import supersedes an abandoned one.
-* Tweak: Renamed the log tab to "Activity" and mapped HTTP status codes to friendly messages.
 * Tweak: Improved Customizer, Widgets, and database search-replace handling; refactored slider import.
-* Tweak: Readiness step shows the "View full system status" link inline; improved uninstall cleanup.
-* Update: Tested up to WordPress 7.0; refreshed i18n strings and translation template.
+* Tweak: A readiness step shows the "View full system status" link inline; improved uninstall cleanup.
 
 = 1.1.6 (28-February-2026) =
 * Add: Full compatibility with WordPress 6.9.
