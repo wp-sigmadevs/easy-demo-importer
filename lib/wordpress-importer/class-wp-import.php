@@ -767,6 +767,21 @@ class SD_EDI_WP_Import extends WP_Importer {
 				}
 
 				if ( is_wp_error( $post_id ) ) {
+					// Images were intentionally disabled for this import, so the
+					// attachment was skipped, not failed. Log it as a skip and move
+					// on. Divergence from the vendored importer — keep it minimal
+					// for future upstream syncs.
+					if ( 'attachment_fetch_disabled' === $post_id->get_error_code() ) {
+						printf(
+							/* translators: 1. Singular Name, 2. Post Title */
+							esc_html__( 'Skipped %1$s &#8220;%2$s&#8221;: image import is turned off.', 'easy-demo-importer' ),
+							esc_html( $post_type_object->labels->singular_name ),
+							esc_html( $post['post_title'] )
+						);
+						echo '<br />';
+						continue;
+					}
+
 					// Record a failed attachment download so it can be retried later
 					// without re-running the whole import. A failed fetch never
 					// created an attachment, so we keep the source URL + the post
@@ -1083,8 +1098,11 @@ class SD_EDI_WP_Import extends WP_Importer {
 	 */
 	public function process_attachment( $post, $url ) {
 		if ( ! $this->fetch_attachments ) {
+			// A distinct code so the caller can log this as an intentional skip
+			// (images disabled) rather than a failure. Divergence from the
+			// vendored importer — keep it minimal for future upstream syncs.
 			return new WP_Error(
-				'attachment_processing_error',
+				'attachment_fetch_disabled',
 				esc_html__( 'Fetching attachments is not enabled', 'easy-demo-importer' )
 			);
 		}
