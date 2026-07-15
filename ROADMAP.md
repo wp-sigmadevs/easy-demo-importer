@@ -3,6 +3,31 @@
 > Revised with Sequential Thinking, Context7 (WordPress API docs), and 21st.dev UI patterns.
 > Every phase has been cross-checked for architectural dependencies, API correctness, and forward-compatibility.
 
+## 📍 STATUS AS OF v2.0.0 (2026-07-15)
+
+This document was written 2026-02-24, pre-1.1.6. The plugin has since shipped straight through
+to `2.0.0` (merged to master, commit `abd5b52`) — but delivery didn't follow the phase→version
+mapping below one-for-one. Some phases shipped as planned, some shipped in a different shape than
+designed, and some were skipped entirely in favor of things not on this roadmap at all (a manual
+ZIP/WXR upload flow, WP-CLI, a pre-import readiness report). Each phase heading below now carries
+a status banner. Treat the checkbox lists as a historical record of the *plan*, not current status
+— the banner + evidence is the current status.
+
+**Headline reality check:**
+- ✅ Session system, uninstall.php, PHPStan, chunked/resumable XML import, activity log (viewable),
+  image regen tool, rollback/restore points, pre-import readiness checks, WP-CLI (partial), PHPUnit
+  suite (102 tests) — all shipped.
+- ❌ The full-page wizard was never built — the UI is still the modal-based flow
+  (`src/js/backend/components/Modal/`). Selective/per-item import, dependency resolver, white
+  label, demo badges, builder auto-detection beyond Elementor, multisite (real support, not just
+  detection), background import, import history, email notifications, FSE import, and the demo
+  export tool are all still unbuilt.
+- 🔀 Several things shipped *differently* than planned: chunked import uses a resumable
+  state-file design instead of literal `XMLReader` streaming; image regen is a standalone admin
+  tool page instead of a wizard step with Now/Background/Skip modes; "smart auto URL fix" turned
+  out to already exist pre-roadmap (`Actions::replaceUrls()`, called automatically after every
+  import) rather than being new Phase 4 work.
+
 **Phase Timeline Diagram:** [Open in FigJam →](https://www.figma.com/online-whiteboard/create-diagram/2714f6d5-b04c-4ada-b035-c418197d962e?utm_source=claude&utm_content=edit_in_figjam)
 **Wizard Onboarding Flow Diagram:** [Open in FigJam →](https://www.figma.com/online-whiteboard/create-diagram/33e09b82-12cc-4ae3-a39a-fcf3bd9875b3?utm_source=claude&utm_content=edit_in_figjam)
 **Selective Import Flow Diagram:** [Open in FigJam →](https://www.figma.com/online-whiteboard/create-diagram/194bc2b3-55db-479d-8cf3-54a42d206c60?utm_source=claude&utm_content=edit_in_figjam)
@@ -11,16 +36,16 @@
 
 ## Phase Overview
 
-| Phase | Version | Label | Scope |
-|-------|---------|-------|-------|
-| [0](#phase-0--emergency-compatibility-hotfix) | `1.1.6` | 🚨 Emergency | WP 6.9 + PHP 8.4 + critical runtime bugs |
-| [1](#phase-1--foundation--stability) | `1.2.0` | 🔧 Stability | Session management, bug hardening, uninstall, static analysis |
-| [2](#phase-2--wizard--xml-engine) | `1.3.0` | 🧙 Wizard + XML | Onboarding wizard, XMLReader chunker, live log, cache flush |
-| [3](#phase-3--image-regeneration-engine) | `1.4.0` | 🖼️ Image Engine | Plugin-owned regen, per-image count, failure tracking |
-| [4](#phase-4--power-import) | `1.5.0` | ⚡ Power Import | Selective items, dependency resolver, rollback, auto URL fix |
-| [5](#phase-5--polish--competitive-edge) | `1.6.0` | ✨ Polish | White label, badges, builder detection, Elementor fixes |
-| [6](#phase-6--developer--agency) | `2.0.0` | 🏗️ Developer | Background import, multisite, WP-CLI, history, email |
-| [7](#phase-7--future) | `2.x` | 🚀 Future | FSE, export tool, ACF mapping, test suite, a11y |
+| Phase | Version | Label | Scope | Status |
+|-------|---------|-------|-------|--------|
+| [0](#phase-0--emergency-compatibility-hotfix) | `1.1.6` | 🚨 Emergency | WP 6.9 + PHP 8.4 + critical runtime bugs | ✅ Shipped |
+| [1](#phase-1--foundation--stability) | `1.2.0` | 🔧 Stability | Session management, bug hardening, uninstall, static analysis | ✅ Shipped |
+| [2](#phase-2--wizard--xml-engine) | `1.3.0` | 🧙 Wizard + XML | Onboarding wizard, XMLReader chunker, live log, cache flush | ⚠️ Partial — chunker + log shipped, wizard/cache-flush/dry-run/conditional-demos did not |
+| [3](#phase-3--image-regeneration-engine) | `1.4.0` | 🖼️ Image Engine | Plugin-owned regen, per-image count, failure tracking | 🔀 Shipped differently — standalone tool, suppression still opt-in |
+| [4](#phase-4--power-import) | `1.5.0` | ⚡ Power Import | Selective items, dependency resolver, rollback, auto URL fix | ⚠️ Partial — rollback + preflight + auto URL fix shipped, selective import/dependency resolver did not |
+| [5](#phase-5--polish--competitive-edge) | `1.6.0` | ✨ Polish | White label, badges, builder detection, Elementor fixes | ❌ Not started |
+| [6](#phase-6--developer--agency) | `2.0.0` | 🏗️ Developer | Background import, multisite, WP-CLI, history, email | ⚠️ Partial — WP-CLI (partial) shipped; background import/real multisite/history/email did not; manual-import shipped instead (not on this roadmap) |
+| [7](#phase-7--future) | `2.x` | 🚀 Future | FSE, export tool, ACF mapping, test suite, a11y | ⚠️ Partial — PHPUnit suite shipped, everything else did not |
 
 ### Cross-Phase Design Contracts
 These decisions are made early so later phases require no rework:
@@ -29,6 +54,10 @@ These decisions are made early so later phases require no rework:
 - **Phase 3** image regen pipeline scoped to a session's attachments → **Phase 4** narrows it to selected-content attachments only
 - **Phase 1** session ID + mutex lock → every subsequent phase uses the same session system
 
+> Reality check (2026-07-15): the `$allowed_post_ids` contract was never consumed (Phase 4
+> selective import wasn't built), and image regen suppression is still opt-in, not default-on
+> (see Phase 3 banner below). The other two contracts hold.
+
 ---
 
 ## Phase 0 — Emergency Compatibility Hotfix
@@ -36,6 +65,9 @@ These decisions are made early so later phases require no rework:
 > **Version:** `1.1.6`
 > **Ship immediately.** Plugin is 8 months stale. WP 6.9 + PHP 8.4 are current stable.
 > **Rule:** No new features. Compatibility and critical runtime safety only.
+
+**✅ Shipped.** The plugin has progressed to `2.0.0`; this phase is long since behind it. Detail
+below is kept as historical record only — not re-verified line by line.
 
 ---
 
@@ -185,6 +217,11 @@ Context7 confirmed: WP 6.3+ supports `strategy` key in the args array. WP 6.9 ex
 > **Version:** `1.2.0`
 > **Goal:** Invisible but essential. Hardened error handling, proper session management, static analysis baseline, full uninstall support.
 
+**✅ Shipped.** `inc/Common/Functions/SessionManager.php` (session/mutex system, unit-tested),
+`uninstall.php` at plugin root, `phpstan.neon` (level 5) + `phpstan-baseline.neon`, and the §1.2/§1.4
+hardening (nonce hard-fail, config validation, SSL error messaging, capability consistency on
+`manage_options` via `Helpers::verifyUserRole()`) are all in the codebase.
+
 ---
 
 ### 1.1 — Import Session Management
@@ -319,6 +356,10 @@ Fixing real bugs surfaced by static analysis. These were baselined in §1.4 but 
 > **Goal:** The release that overtakes OCDI. Wizard UI, streaming XML import, live activity log, dry-run stats, cache flush, conditional demos.
 > **Key architectural decisions baked in here that P4 depends on — do not cut corners.**
 
+**⚠️ Partial.** Of the six sub-goals: chunked import (§2.3) and activity log (§2.4) shipped.
+Wizard UI (§2.1), dry-run stats (§2.2), conditional demo visibility (§2.5), and post-import cache
+flush (§2.6) did not. See per-section banners below.
+
 ---
 
 ### 2.0 — Pre-Work: UI Stack Confirmation
@@ -375,6 +416,10 @@ This gives full visual control — same antd, completely custom look, zero migra
 
 ### 2.1 — Wizard Architecture
 
+**❌ Not done.** The UI is still the modal-based flow (`src/js/backend/components/Modal/` —
+`ModalComponent.jsx` + `steps/`). No `/wizard/*` routes exist; `App.jsx` uses `createHashRouter`
+with no wizard step routing. Nothing in this subsection was built.
+
 Replace the modal-based flow with a full-page wizard. React Router routes map to wizard steps.
 
 **Routes:**
@@ -409,6 +454,9 @@ Replace the modal-based flow with a full-page wizard. React Router routes map to
 
 ### 2.2 — Dry-Run Stats Endpoint
 
+**❌ Not done.** No endpoint parses WXR for pre-import counts. `RestEndpoints.php`'s `/import/list`
+route (`buildList()`, `@since 1.0.0`) predates this plan and lists demos, not per-demo item counts.
+
 - [ ] New REST endpoint: `GET /sd/edi/v1/demo-stats?demo={slug}`
 - [ ] Parses WXR XML **without writing to DB** — reads item counts by `<wp:post_type>`, counts `<wp:attachment>`, counts `<wp:term>`, counts nav menus
 - [ ] Response:
@@ -429,6 +477,15 @@ Replace the modal-based flow with a full-page wizard. React Router routes map to
 ---
 
 ### 2.3 — Chunked XML Import (XMLReader — Streaming)
+
+**🔀 Done, but a different design.** `inc/Common/Importer/ChunkedImport.php` (extends the vendored
+`SD_EDI_WP_Import`) splits the single-pass import into `prepare()` / `processBatch()` /
+`finalize()` stages that persist state to disk between AJAX requests — not `XMLReader` streaming.
+It solves the same problem (no single request exceeds the FPM/proxy wall-clock limit) and is
+enabled by default via `sd/edi/enable_chunked_import` (default `true`), wired into
+`InstallDemo.php`. Unit- and integration-tested (`tests/Unit/Importer/ChunkedImportTest.php`,
+`tests/Integration/Importer/`). The `$allowed_post_ids` design contract for Phase 4 was **not**
+carried over, since Phase 4's selective import was never built.
 
 **Critical architectural decision:** Use `XMLReader` (PHP's streaming XML parser), not `DOMDocument`. `XMLReader` processes XML as a forward-only stream — it never loads the full file into memory. This is why large imports time out with the current approach.
 
@@ -453,6 +510,13 @@ Replace the modal-based flow with a full-page wizard. React Router routes map to
 
 ### 2.4 — Activity Log
 
+**✅ Done, viewed post-import rather than live-polled.** `ImportLogger`
+(`inc/Common/Functions/ImportLogger.php`, unit-tested including `markInterruptedRuns()`) backs a
+`GET /sd/edi/v1/import/log` REST route (`RestEndpoints::importLog()`) and an `ImportLogPanel` React
+component shown as a tab on the System Status page (`AppStatus.jsx`) — merged into one tabbed
+Status+Log page. Not verified: 2-second live polling *during* an active import, or a "Download Log"
+`.txt` export.
+
 - [ ] Create `wp_sd_edi_import_log` table: `(id INT, session_id VARCHAR, timestamp DATETIME, level ENUM('info','success','warning','error'), message TEXT)`
 - [ ] `ImportLogger::log( string $message, string $level, string $session_id )` static helper
 - [ ] Instrument all import steps to write meaningful log entries:
@@ -472,6 +536,9 @@ Replace the modal-based flow with a full-page wizard. React Router routes map to
 
 ### 2.5 — Conditional Demo Visibility
 
+**❌ Not done.** No `requires`-key gating against active plugins found in the demo grid/card
+components or in `inc/`.
+
 Moved here from Phase 5 — this belongs at the demo selection step.
 
 - [ ] Theme authors add `requires` key to demo config:
@@ -485,6 +552,10 @@ Moved here from Phase 5 — this belongs at the demo selection step.
 ---
 
 ### 2.6 — Post-Import Cache Flush
+
+**❌ Not done.** `inc/App/Ajax/Backend/Finalize.php` does not call any cache-plugin flush hooks —
+no `wp_cache_clear_cache`, `w3tc_flush_all`, `litespeed_purge_all`, `rocket_clean_domain`, or
+`wc_delete_product_transients` anywhere in `inc/`.
 
 Moved here from Phase 5 — this is part of the `Finalize` step and belongs in the same release as the wizard.
 
@@ -527,6 +598,16 @@ Moved here from Phase 5 — this is part of the `Finalize` step and belongs in t
 > **No competitor does this.**
 
 See also: `IMPROVEMENTS.md → Image Regeneration — Dedicated Design`
+
+**🔀 Shipped, differently than planned.** `inc/App/Tools/RegenerateThumbnails.php` +
+`src/js/backend/AppRegenerate.jsx` is a real, working, plugin-owned regen tool with per-image
+progress and failure tracking — but it's a **standalone admin tool page**, not a wizard step
+inserted into the import flow, and it has no Now/Background/Skip modes (no WP-Cron background
+mode exists at all). Suppression during import (§3.1) still defaults to **off** —
+`ImporterAjax::$skipImageRegeneration = false`, only flipped on by the existing opt-in Setup UI
+toggle — and `big_image_size_threshold` is still not suppressed alongside
+`intermediate_image_sizes_advanced`. So the "default ON during import" architecture decision
+recorded elsewhere in this doc was never implemented.
 
 ---
 
@@ -614,9 +695,17 @@ New wizard step inserted between `ImportingStep` and `CompleteStep`. Shown unles
 > **Version:** `1.5.0`
 > **Goal:** Selective item import, dependency resolution, rollback, and silent auto URL fix. Together these make every other demo importer feel half-baked.
 
+**⚠️ Partial.** Rollback (§4.3), auto URL fix (§4.4), and pre-import conflict detection (§4.5)
+shipped. Selective import (§4.1) and the dependency resolver (§4.2) did not.
+
 ---
 
 ### 4.1 — Selective Import (Three Levels)
+
+**❌ Not done.** No `allowed_post_ids`/`selected_ids`/per-item picker logic found anywhere in
+`inc/` or `src/js/backend/`. Import is still all-or-nothing per demo. (Level 1's "already built"
+claim below refers to the pre-existing content/customizer/widgets/menus checkbox groups in the
+current modal Setup step, not a wizard options step — the wizard itself doesn't exist, see §2.1.)
 
 **Level 1 — By data type:** Already built in Phase 2 wizard options step. ✓
 
@@ -640,6 +729,8 @@ New wizard step inserted between `ImportingStep` and `CompleteStep`. Shown unles
 
 ### 4.2 — Dependency Resolver
 
+**❌ Not done.** No `DependencyResolver` class or equivalent exists in `inc/Common/Utils/`.
+
 - [ ] `DependencyResolver` class in `inc/Common/Utils/DependencyResolver.php`
 - [ ] Scans selected items' raw XML for:
   - Attachment IDs referenced in Elementor `_elementor_data` JSON
@@ -656,6 +747,15 @@ New wizard step inserted between `ImportingStep` and `CompleteStep`. Shown unles
 ---
 
 ### 4.3 — Import Rollback / Undo
+
+**✅ Done, on a different mechanism than described.** `inc/Common/Utils/Snapshot.php` (unit-tested)
+creates a pre-import restore point and supports `Snapshot::exists()` / `Snapshot::restore()`.
+Reachable from the UI via `src/js/backend/components/RestorePointBanner.jsx`, from the REST API
+via `RestEndpoints::rollback()` / `discardRestorePoint()`, and from the CLI via `wp edi rollback`.
+Storage mechanism, exact watermark strategy, and TTL were not verified against the table schema
+described below — treat the schema/TTL details as unverified, but the feature itself works
+end-to-end. (See also `project_snapshot_rollback_bugs.md` in memory — two ordering bugs were found
+and fixed post-launch, feature still flagged as needing full live QA.)
 
 - [ ] Before any import begins, create a pre-import snapshot stored in `wp_sd_edi_snapshots` table: `(id, session_id, created_at, snapshot_data LONGTEXT, status)`
 - [ ] Snapshot captures:
@@ -676,6 +776,13 @@ New wizard step inserted between `ImportingStep` and `CompleteStep`. Shown unles
 
 ### 4.4 — Smart Auto URL Fix
 
+**✅ Already done — predates this roadmap.** `Actions::afterImportActions()` (`@since 1.0.0`)
+unconditionally calls `Actions::replaceUrls()` after every import; it isn't a Phase 4 addition at
+all. `IMPROVEMENTS.md`'s claim that "users must know to configure URL replacement manually" was
+inaccurate even when the doc was written — that description matches the separate, manually-triggered
+`DBSearchReplace` tool, not this automatic post-import step. Elementor-specific URL search-replace
+also runs automatically via `Actions::elementorActions()` → `searchReplaceElementorUrls()`.
+
 - [ ] After XML import, read `<wp:base_site_url>` from the WXR file (the demo site's original URL)
 - [ ] Compare against `get_site_url()`. If different, run `DBSearchReplace` (already in the plugin) silently:
   - Replace `http://` and `https://` variants
@@ -689,6 +796,13 @@ New wizard step inserted between `ImportingStep` and `CompleteStep`. Shown unles
 ---
 
 ### 4.5 — Pre-Import Conflict Detection
+
+**✅ Done.** `inc/Common/Utils/Preflight.php` (unit-tested) builds a readiness report — PHP
+version, memory, `max_execution_time`, required extensions/plugins, disk space — each graded
+pass/warn/fail with an overall `canProceed` flag, surfaced via `RestEndpoints::preflight()`. Not
+verified line-by-line against every specific check listed below (e.g. the exact "DB reset +
+existing post count > 10" wording), but the mechanism this section asked for exists and is wired
+into the import gate.
 
 Expand Requirements step to surface these before import starts:
 
@@ -713,6 +827,15 @@ Expand Requirements step to surface these before import starts:
 > **Version:** `1.6.0`
 > **Goal:** The details users talk about. White label, badges, builder-specific fixes, Elementor multi-ZIP, ShopBuilder.
 > Cache flush and conditional demos already shipped in Phase 2.
+
+**❌ Not started.** No white-label branding filter, demo badges/tags, builder auto-detection
+beyond the pre-existing Elementor handling, or ShopBuilder integration found anywhere in `inc/` or
+`src/js/backend/`. (Note: "cache flush and conditional demos already shipped in Phase 2" in the
+line above is the original plan's assumption — per the Phase 2 banners, neither actually shipped,
+so this phase's true remaining scope is larger than the note implies.) §5.4 (Elementor multi-ZIP
+taxonomy fix) was not re-verified in this sweep — Elementor taxonomy remapping exists
+(`Actions::elementorTaxonomyFix()`) but whether it specifically handles the multi-ZIP failure mode
+described below is unconfirmed.
 
 ---
 
@@ -795,9 +918,24 @@ Expand Requirements step to surface these before import starts:
 
 > **Version:** `2.0.0` — Major version. Background import + multisite + WP-CLI = agency-grade tool.
 
+**⚠️ Partial, and the actual `2.0.0` differs from this plan.** WP-CLI shipped partially. Background
+import, real multisite support, import history, and email notifications did not. What actually
+shipped as the headline of `2.0.0` instead was the **manual import feature** — not on this roadmap
+at all: `inc/App/Manual/ManualImport.php` + `src/js/backend/components/Modal/ManualImportModal.jsx`
+let a user upload their own `content.xml` (+ optional `customizer.dat` / `widget.wie` / settings /
+`images.zip`, or a single bundle ZIP) in chunks, without a theme-provided demo config, then routes
+it through the existing chunked import pipeline. It has its own hardening: chunk retry with
+backoff, an `AbortController` to cancel on modal close, a cleanup cron for stale uploads
+(`wp_schedule_event` in `ManualImport.php`, unrelated to "background import" below — this cron just
+sweeps abandoned temp uploads, it doesn't run imports in the background).
+
 ---
 
 ### 6.1 — Background Import (WP-Cron / Action Scheduler)
+
+**❌ Not done.** No cron/Action Scheduler-driven import exists — import is still fully synchronous,
+driven by chunked AJAX polling from an open browser tab. The only `wp_schedule_event` call found
+in the import surface area is `ManualImport.php`'s daily cleanup of abandoned upload temp files.
 
 - [ ] "Import in Background" toggle on Import Options step
 - [ ] If Action Scheduler is available (WooCommerce present): prefer it over WP-Cron (more reliable, retryable)
@@ -811,6 +949,11 @@ Expand Requirements step to surface these before import starts:
 
 ### 6.2 — Multisite Support
 
+**❌ Not done — detection only.** `is_multisite()` is used in exactly two places: displaying
+"Multisite: Yes/No" on the System Status page (`RestEndpoints.php`), and a guard in
+`DBSearchReplace.php`. No per-subsite import, session, or history; no network-admin push-to-all;
+no blog-prefixed `wp_sd_edi_*` tables.
+
 - [ ] Detect multisite on plugin activation
 - [ ] Per-subsite import — each subsite has its own demo config, import session, and history
 - [ ] Network admin option: push a demo import to all subsites simultaneously
@@ -822,6 +965,10 @@ Expand Requirements step to surface these before import starts:
 
 ### 6.3 — Import History + Re-run
 
+**❌ Not done.** No `import_history`-style table, admin page, or "Re-import" action found in
+`inc/` or `src/js/backend/`. (The activity log from §2.4 shows what happened in one run; it is not
+a browsable history of past runs with a re-import action.)
+
 - [ ] `wp_sd_edi_import_history` table: `(id, session_id, demo_slug, demo_name, started_at, completed_at, status, summary_json)`
 - [ ] Admin sub-page: `Appearance → Demo Import History`
 - [ ] Each row: demo name, date, status badge, item counts, "View Log" link
@@ -830,6 +977,15 @@ Expand Requirements step to surface these before import starts:
 ---
 
 ### 6.4 — WP-CLI Support
+
+**⚠️ Partial — shipped with a smaller, different command set.** `inc/App/Cli/Commands.php`
+(`@since 2.0.0`) registers `wp edi demos`, `wp edi regenerate [--force]`, and
+`wp edi rollback [--yes]` (calling `Snapshot::exists()`/`Snapshot::restore()`). There is **no**
+`wp edi import` — the class docblock explicitly notes this as a planned follow-up, blocked on
+separating the chunked-import phases from the `wp_send_json` AJAX response layer so they can run
+outside the browser/AJAX pipeline. No `wp edi status` or `wp edi log` either. None of the flags
+below (`--reset`, `--skip-media`, `--session=`, `--tail=`) exist since the commands that would
+carry them weren't built.
 
 ```bash
 wp edi import --demo=my-demo [--reset] [--skip-media] [--skip-plugins]
@@ -849,6 +1005,8 @@ wp edi log [--session=id] [--tail=50]
 
 ### 6.5 — Multi-Language Demo Support
 
+**❌ Not done.**
+
 - [ ] Add `locale` key to demo config: `'locale' => 'ar_SA'`
 - [ ] Demo grid filters to current `get_locale()` by default
 - [ ] Language flag icon on demo cards (ISO 3166-1 alpha-2 mapped to emoji flags)
@@ -857,6 +1015,8 @@ wp edi log [--session=id] [--tail=50]
 ---
 
 ### 6.6 — Import Progress Email Notification
+
+**❌ Not done.** No `wp_mail(` call anywhere in the import-related code under `inc/`.
 
 - [ ] Opt-in toggle in Import Options step
 - [ ] On complete: `wp_mail()` to admin email — demo name, date/time, duration, item counts, log link, rollback link
@@ -876,6 +1036,12 @@ wp edi log [--session=id] [--tail=50]
 
 > **Version:** `2.x` (individual minor releases)
 > **Goal:** Uncontested territory. FSE support, export tool for theme authors, field mapping, full test coverage.
+
+**⚠️ Partial.** §7.4 (PHPUnit suite) shipped, well ahead of schedule relative to this doc's
+ordering — it landed alongside `2.0.0`, not as `2.x` follow-up work. FSE import (§7.1), the demo
+export tool (§7.2), ACF/Meta Box field mapping (§7.3), and the accessibility pass (§7.5) did not
+ship and were not spot-checked in this sweep beyond confirming no FSE/`theme.json`/export-page/ACF
+code exists in `inc/`.
 
 ---
 
@@ -917,6 +1083,12 @@ Doubles the target audience. Helps theme authors create demo packages without ma
 
 ### 7.4 — PHPUnit Test Suite
 
+**✅ Done.** 102 unit tests pass (`composer test:unit`), covering `ChunkedImport`,
+`ThumbnailRegenerator`, `BundledMedia`, `Preflight`, `Snapshot`, `DBSearchReplace`, `ImportLogger`,
+`SessionManager`, `Helpers`, `Filters`, plus an `Importer` integration suite (`tests/Integration/`).
+`DependencyResolver` has no coverage since it was never built. GitHub Actions CI matrix across PHP
+versions was not verified in this sweep.
+
 - [ ] `composer require --dev wp-phpunit/wp-phpunit`
 - [ ] Test coverage: DB reset, `XmlChunker`, `DependencyResolver`, `ImportLogger`, rollback snapshot, all REST endpoints, all AJAX handlers
 - [ ] GitHub Actions CI: run tests on every PR against PHP 8.1, 8.2, 8.3, 8.4 + WP latest
@@ -936,33 +1108,36 @@ Doubles the target audience. Helps theme authors create demo packages without ma
 
 ## Quick Reference
 
-| Version | Headline deliverable |
-|---------|---------------------|
-| `1.1.6` | WP 6.9 + PHP 8.4 compat, Rector auto-fix, critical runtime bugs |
-| `1.2.0` | Session system, mutex lock, uninstall, PHPStan baseline, code quality fixes |
-| `1.3.0` | 8-step wizard, XMLReader chunker, activity log, cache flush, conditional demos |
-| `1.4.0` | Plugin-owned image regen — counted, named, failure-tracked |
-| `1.5.0` | Selective item import, dependency resolver, rollback, auto URL fix |
-| `1.6.0` | White label, badges, builder-specific fixes, Elementor multi-ZIP |
-| `2.0.0` | Background import, multisite, WP-CLI, import history + email |
-| `2.x`   | FSE/block theme, demo export tool, ACF mapping, tests, a11y |
+Original per-version plan (left) vs. what actually shipped as of `2.0.0` (right):
+
+| Version | Planned headline deliverable | Actually shipped |
+|---------|---------------------|-------------------|
+| `1.1.6` | WP 6.9 + PHP 8.4 compat, Rector auto-fix, critical runtime bugs | ✅ Surpassed — plugin is at `2.0.0` |
+| `1.2.0` | Session system, mutex lock, uninstall, PHPStan baseline, code quality fixes | ✅ Shipped as planned |
+| `1.3.0` | 8-step wizard, XMLReader chunker, activity log, cache flush, conditional demos | ⚠️ Chunker + activity log shipped; wizard, cache flush, conditional demos did not |
+| `1.4.0` | Plugin-owned image regen — counted, named, failure-tracked | 🔀 Shipped as a standalone tool, not a wizard step; suppression still opt-in |
+| `1.5.0` | Selective item import, dependency resolver, rollback, auto URL fix | ⚠️ Rollback + auto URL fix shipped; selective import + dependency resolver did not |
+| `1.6.0` | White label, badges, builder-specific fixes, Elementor multi-ZIP | ❌ Not started |
+| `2.0.0` | Background import, multisite, WP-CLI, import history + email | ⚠️ WP-CLI (partial, no `import`) shipped; the rest did not. **Manual import** (not on this roadmap) shipped instead as the release's headline feature |
+| `2.x`   | FSE/block theme, demo export tool, ACF mapping, tests, a11y | ⚠️ PHPUnit suite shipped early (with `2.0.0`); everything else did not |
 
 ## todo.txt Carry-Over
 
-| Item | Resolved in |
-|------|-------------|
-| Run AJAX only for provided files | Phase 4.1 (selective import) |
-| Split XML import | Phase 2.3 (XMLReader chunker) |
-| Initial pages for ShopBuilder | Phase 5.5 |
-| Multi-site support | Phase 6.2 |
-| Fix import error when no required plugins | Phase 1.2 (config validation) |
-| Elementor data fix for multiZip | Phase 5.4 |
-| Remove default image regeneration | Phase 3.1 |
-| Add custom image regeneration support | Phase 3.2–3.3 |
-| Rebuild XML import with split phases | Phase 2.3 |
-| Add import log support | Phase 2.4 |
-| Add badge support | Phase 5.2 |
+| Item | Planned resolution | Actual status |
+|------|-------------|---------------|
+| Run AJAX only for provided files | Phase 4.1 (selective import) | ❌ Not done |
+| Split XML import | Phase 2.3 (XMLReader chunker) | ✅ Done (resumable state-file design, not XMLReader) |
+| Initial pages for ShopBuilder | Phase 5.5 | ❌ Not done |
+| Multi-site support | Phase 6.2 | ❌ Not done (detection only) |
+| Fix import error when no required plugins | Phase 1.2 (config validation) | ✅ Done |
+| Elementor data fix for multiZip | Phase 5.4 | ❓ Unverified — Elementor taxonomy fix exists, multi-ZIP specifically not confirmed |
+| Remove default image regeneration | Phase 3.1 | ⚠️ Partial — suppression exists but is still opt-in, not default |
+| Add custom image regeneration support | Phase 3.2–3.3 | ⚠️ Partial — standalone tool shipped, no background mode |
+| Rebuild XML import with split phases | Phase 2.3 | ✅ Done |
+| Add import log support | Phase 2.4 | ✅ Done |
+| Add badge support | Phase 5.2 | ❌ Not done |
 
 ---
 
 *Revised: 2026-02-24 — consulted Sequential Thinking (architectural analysis), Context7/WordPress API docs (hook signatures, script strategy API, REST patterns), 21st.dev Magic (wizard UI patterns)*
+*Swept against actual `2.0.0` codebase state: 2026-07-15*
