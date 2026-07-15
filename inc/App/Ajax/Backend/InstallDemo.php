@@ -606,6 +606,20 @@ class InstallDemo extends ImporterAjax {
 		$still_failed  = isset( $_POST['stillFailed'] ) ? absint( wp_unslash( $_POST['stillFailed'] ) ) : 0;
 		// phpcs:enable WordPress.Security.NonceVerification.Missing
 
+		// A slice can recover records and then lose its response to a gateway
+		// timeout; the client would retry from its stale cursor and re-import the
+		// already-recovered attachments (process_attachment does not dedup
+		// attachments). Persist the server-side position and clamp the client's
+		// cursor up to it so recovered records are never processed twice.
+		$state_key = 'sd_edi_retry_state_' . md5( $retry_session );
+		$saved     = get_option( $state_key, [] );
+
+		if ( is_array( $saved ) && isset( $saved['cursor'] ) && (int) $saved['cursor'] > $cursor ) {
+			$cursor       = (int) $saved['cursor'];
+			$recovered    = isset( $saved['recovered'] ) ? (int) $saved['recovered'] : $recovered;
+			$still_failed = isset( $saved['stillFailed'] ) ? (int) $saved['stillFailed'] : $still_failed;
+		}
+
 		// The importer failing to load is a real error, not a completed retry —
 		// report it rather than a silent "finished".
 		if ( ! class_exists( 'SD_EDI_WP_Import' ) ) {
@@ -620,6 +634,7 @@ class InstallDemo extends ImporterAjax {
 
 		if ( empty( $items ) ) {
 			FailedMedia::clear( $retry_session );
+			delete_option( $state_key );
 			wp_send_json_success(
 				[
 					'done'        => true,
@@ -659,6 +674,18 @@ class InstallDemo extends ImporterAjax {
 			}
 
 			++$cursor;
+
+			// Persist the position after every record so a killed response can
+			// never cause a re-import on the client's retry.
+			update_option(
+				$state_key,
+				[
+					'cursor'      => $cursor,
+					'recovered'   => $recovered,
+					'stillFailed' => $still_failed,
+				],
+				false
+			);
 
 			if ( ( microtime( true ) - $start ) >= $budget ) {
 				break;
@@ -701,8 +728,9 @@ class InstallDemo extends ImporterAjax {
 
 		delete_option( $remap_key );
 
-		// One pass complete — clear the stored list.
+		// One pass complete — clear the stored list and the resume state.
 		FailedMedia::clear( $retry_session );
+		delete_option( $state_key );
 
 		ImportLogger::info(
 			sprintf(
