@@ -652,6 +652,13 @@ class Actions {
 			// Taxonomy mapping.
 			->elementorTaxonomyFix( $obj );
 
+		// Flush Elementor's compiled CSS so the freshly-imported kit and pages
+		// regenerate their files — otherwise global settings such as the container
+		// width are never written out and the front end falls back to defaults.
+		if ( class_exists( '\Elementor\Plugin' ) && isset( \Elementor\Plugin::$instance->files_manager ) ) {
+			\Elementor\Plugin::$instance->files_manager->clear_cache();
+		}
+
 		return new static();
 	}
 
@@ -696,6 +703,18 @@ class Actions {
 
 			// Update `elementor_active_kit` page.
 			if ( $pageId > 0 ) {
+				// Normalize the kit's document type. During a chunked import the
+				// kit post is inserted in a later request than the one that fired
+				// `import_start`, so Elementor's save_post guard does not apply and
+				// it stamps `_elementor_template_type = page`; the WXR value `kit`
+				// is then appended, leaving two values. Elementor reads the first
+				// (`page`) and treats the active kit as a Page — skipping its global
+				// CSS (container width, colors, fonts). Collapse it to a single
+				// `kit` so the kit renders its settings again.
+				delete_post_meta( $pageId, '_elementor_template_type' );
+				update_post_meta( $pageId, '_elementor_template_type', 'kit' );
+				update_post_meta( $pageId, '_elementor_edit_mode', 'builder' );
+
 				wp_update_post(
 					[
 						'ID'        => $pageId,
