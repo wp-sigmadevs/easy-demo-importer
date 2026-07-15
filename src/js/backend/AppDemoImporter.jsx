@@ -29,6 +29,7 @@ const AppDemoImporter = () => {
 	const [errorMessage, setErrorMessage] = useState(null);
 	const [isModalVisible, setIsModalVisible] = useState(false);
 	const [manualVisible, setManualVisible] = useState(false);
+	const [restoreRefresh, setRestoreRefresh] = useState(0);
 	const resetStore = useSharedDataStore((state) => state.resetStore);
 
 	/**
@@ -445,7 +446,10 @@ const AppDemoImporter = () => {
 
 				<ManualImportModal
 					visible={manualVisible}
-					onClose={() => setManualVisible(false)}
+					onClose={() => {
+						setManualVisible(false);
+						setRestoreRefresh((n) => n + 1);
+					}}
 				/>
 
 				{importList.success && hasErrors(serverInfo) && (
@@ -457,7 +461,7 @@ const AppDemoImporter = () => {
 				)}
 
 				<div className="edi-content">
-					<RestorePointBanner />
+					<RestorePointBanner refreshKey={restoreRefresh} />
 
 					<div className={containerClassName}>
 						{loading && !demoData ? (
