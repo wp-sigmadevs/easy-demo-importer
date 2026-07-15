@@ -153,6 +153,8 @@ For any inquiries, bug reports, or suggestions, please submit your request [here
 * Fix: Improved input validation and sanitization across AJAX requests.
 * Fix: Prevented a JavaScript crash when network requests fail or time out.
 * Fix: An interrupted import now resurfaces automatically on reload — the demo importer reopens the affected demo with the Resume / Start Over prompt instead of returning to the demo grid with no indication the import was incomplete.
+* Fix: Manual import now adds the images you supply (an images .zip, or a single bundle with an uploads/ folder) to the Media Library as real attachments — so featured images, product galleries, and thumbnails resolve — instead of only copying the raw files to disk.
+* Fix: With image import turned off, media items are now recorded as "Skipped" in the Activity log rather than "Failed", so a deliberate no-image import completes cleanly instead of being flagged "Completed with warnings".
 * Tweak: The Import Log now closes out an interrupted run with an "Import was interrupted" entry and an "Interrupted" status, instead of leaving it stuck on "In progress". Runs that stop after content import but before finishing are no longer mislabelled as successful.
 * Tweak: A new import no longer has to wait for an interrupted one to release its lock — an abandoned import is superseded automatically, while a genuinely-running import still blocks a second one.
 * Tweak: Thumbnail regeneration runs are now recorded alongside imports, and the Status page's log tab has been renamed from "Import Logs" to "Activity" to reflect that it covers all plugin activity.
