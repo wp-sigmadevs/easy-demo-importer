@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Modal, Button, Switch, Steps, Row, Col, Upload, Tabs } from 'antd';
 import {
 	CloseOutlined,
@@ -80,7 +80,16 @@ const ManualImportModal = ({ visible, onClose }) => {
 		setBundleFile(null);
 	};
 
+	// Aborts an in-flight chunk upload when the modal is closed mid-transfer, so
+	// the fetch chain and progress updates stop instead of running detached.
+	const abortRef = useRef(null);
+
 	const handleClose = () => {
+		if (abortRef.current) {
+			abortRef.current.abort();
+			abortRef.current = null;
+		}
+
 		reset();
 		onClose();
 	};
@@ -134,11 +143,26 @@ const ManualImportModal = ({ visible, onClose }) => {
 
 	// Uploads one file to its named target, chunk by chunk. Resolves when the
 	// server has assembled the whole file; rejects with a message on failure.
-	const uploadFile = (file, target, uploadId, onProgress) =>
+	const MAX_CHUNK_RETRIES = 3;
+
+	const uploadFile = (file, target, uploadId, onProgress, signal) =>
 		new Promise((resolve, reject) => {
 			const total = Math.max(1, Math.ceil(file.size / CHUNK_SIZE));
 
-			const send = (i) => {
+			// A single transient failure (flaky network, one bad server response)
+			// must not throw away a multi-hundred-MB upload — retry the same chunk
+			// a few times with backoff before giving up.
+			const retry = (i, attempt) => {
+				if (attempt >= MAX_CHUNK_RETRIES) {
+					return false;
+				}
+
+				setTimeout(() => send(i, attempt + 1), 600 * (attempt + 1));
+
+				return true;
+			};
+
+			const send = (i, attempt = 0) => {
 				const blob = file.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
 				const fd = new FormData();
 				fd.append('action', 'sd_edi_manual_upload');
@@ -153,11 +177,14 @@ const ManualImportModal = ({ visible, onClose }) => {
 					method: 'POST',
 					body: fd,
 					credentials: 'same-origin',
+					signal,
 				})
 					.then((r) => r.json())
 					.then((res) => {
 						if (!res?.success) {
-							reject(res?.data?.message || 'Upload failed.');
+							if (!retry(i, attempt)) {
+								reject(res?.data?.message || 'Upload failed.');
+							}
 							return;
 						}
 						onProgress((i + 1) / total);
@@ -167,7 +194,16 @@ const ManualImportModal = ({ visible, onClose }) => {
 							send(i + 1);
 						}
 					})
-					.catch(() => reject('Upload failed.'));
+					.catch((err) => {
+						// A deliberate abort (modal closed) is final, not retried.
+						if (err && 'AbortError' === err.name) {
+							reject('aborted');
+							return;
+						}
+						if (!retry(i, attempt)) {
+							reject('Upload failed.');
+						}
+					});
 			};
 
 			send(0);
@@ -240,13 +276,24 @@ const ManualImportModal = ({ visible, onClose }) => {
 		setBusy(true);
 		setUploadPct(0);
 
+		const controller = new AbortController();
+		abortRef.current = controller;
+
 		try {
 			for (let n = 0; n < files.length; n++) {
 				const [file, target] = files[n];
 				// eslint-disable-next-line no-await-in-loop
-				await uploadFile(file, target, uploadId, (p) => {
-					setUploadPct(Math.round(((n + p) / files.length) * 100));
-				});
+				await uploadFile(
+					file,
+					target,
+					uploadId,
+					(p) => {
+						setUploadPct(
+							Math.round(((n + p) / files.length) * 100)
+						);
+					},
+					controller.signal
+				);
 			}
 
 			const res = await finalizeUpload(uploadId);
@@ -263,8 +310,17 @@ const ManualImportModal = ({ visible, onClose }) => {
 				!!res.data.hasImages
 			);
 		} catch (e) {
+			// A deliberate abort (the user closed the modal) is not an error.
+			if ('aborted' === e || controller.signal.aborted) {
+				return;
+			}
+
 			setBusy(false);
 			setError(typeof e === 'string' ? e : 'Upload failed.');
+		} finally {
+			if (abortRef.current === controller) {
+				abortRef.current = null;
+			}
 		}
 	};
 
