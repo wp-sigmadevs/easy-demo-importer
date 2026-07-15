@@ -1,6 +1,7 @@
 /**
- * Decodes the small, fixed set of HTML entities that WordPress's esc_html*()
- * family emits (&amp; &lt; &gt; &quot; &#039;).
+ * Decodes the HTML entities that WordPress's esc_html*() family emits
+ * (&amp; &lt; &gt; &quot;) plus any numeric entity — decimal (&#8220;) or hex
+ * (&#x201C;) — such as the curly quotes the importer wraps around item titles.
  *
  * Progress and activity-log messages are escaped server-side for an HTML
  * context, then sent as JSON and rendered by React as text nodes — which
@@ -22,8 +23,12 @@ export const decodeEntities = (value) => {
 		.replace(/&lt;/g, '<')
 		.replace(/&gt;/g, '>')
 		.replace(/&quot;/g, '"')
-		.replace(/&#0*39;/g, "'")
-		.replace(/&#x27;/gi, "'")
+		.replace(/&#x([0-9a-f]+);/gi, (_match, hex) =>
+			String.fromCodePoint(parseInt(hex, 16))
+		)
+		.replace(/&#(\d+);/g, (_match, dec) =>
+			String.fromCodePoint(parseInt(dec, 10))
+		)
 		.replace(/&amp;/g, '&');
 };
 

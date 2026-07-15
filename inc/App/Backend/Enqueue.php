@@ -204,6 +204,7 @@ class Enqueue extends EnqueueBase {
 				'statusTabLabel'             => esc_html__( 'System Status', 'easy-demo-importer' ),
 				'logTabLabel'                => esc_html__( 'Activity', 'easy-demo-importer' ),
 				'logRegenLabel'              => esc_html__( 'Thumbnail Regeneration', 'easy-demo-importer' ),
+				'logManualLabel'             => esc_html__( 'Manual Import', 'easy-demo-importer' ),
 				'statusLogHeading'           => esc_html__( 'System Status & Activity', 'easy-demo-importer' ),
 				'logDetailsLabel'            => esc_html__( 'Import details', 'easy-demo-importer' ),
 				'viewFullLog'                => esc_html__( 'View full log', 'easy-demo-importer' ),
