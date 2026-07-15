@@ -8,6 +8,7 @@ import { decodeEntities } from '../utils/decodeEntities';
 
 // Runs the thumbnail tool records under this slug, shown distinctly from imports.
 const REGEN_SLUG = 'thumbnail-regeneration';
+const MANUAL_SLUG = '__manual__';
 
 /**
  * Per-level accent colours for entry dots and the run status pill.
@@ -118,12 +119,19 @@ const runLabel = (run) => {
 
 	const status = statusText[run.status] || run.status;
 	const isRegen = run.demo_slug === REGEN_SLUG;
+	const isManual = run.demo_slug === MANUAL_SLUG;
 
-	const name = isRegen
-		? sdEdiAdminParams.logRegenLabel || 'Thumbnail Regeneration'
-		: humanizeSlug(run.demo_slug) ||
+	let name;
+	if (isRegen) {
+		name = sdEdiAdminParams.logRegenLabel || 'Thumbnail Regeneration';
+	} else if (isManual) {
+		name = sdEdiAdminParams.logManualLabel || 'Manual Import';
+	} else {
+		name =
+			humanizeSlug(run.demo_slug) ||
 			sdEdiAdminParams.logUnknownDemo ||
 			'Import';
+	}
 
 	return (
 		<div className="edi-log-run" data-panel-key={run.session_id}>
