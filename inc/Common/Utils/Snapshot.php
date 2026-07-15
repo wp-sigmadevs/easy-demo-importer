@@ -251,6 +251,10 @@ final class Snapshot {
 			return false;
 		}
 
+		// The `$table`/`$shadow` names below are table identifiers built from
+		// $wpdb->prefix + constants (see tables()/shadowName()), never user input.
+		// A table identifier cannot be bound with $wpdb->prepare() (%s would quote
+		// it and break the statement), so it is interpolated directly — safely.
 		foreach ( self::tables() as $table ) {
 			$shadow = self::shadowName( $table, $wpdb->prefix );
 
@@ -297,6 +301,8 @@ final class Snapshot {
 			return $media_restored;
 		}
 
+		// Identifiers are $wpdb->prefix + constants (see shadowTables()/
+		// liveFromShadow()), not user input, and cannot be bound via prepare().
 		foreach ( $shadows as $shadow ) {
 			$table = self::liveFromShadow( $shadow, $wpdb->prefix );
 
@@ -342,6 +348,8 @@ final class Snapshot {
 
 		$total = 0;
 
+		// `$table` is a prefix-derived identifier (see tables()), not user input;
+		// identifiers cannot be bound via prepare().
 		foreach ( self::tables() as $table ) {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared
 			$total += (int) $wpdb->get_var( "SELECT COUNT(*) FROM `{$table}`" );
@@ -363,6 +371,8 @@ final class Snapshot {
 	public static function drop(): void {
 		global $wpdb;
 
+		// `$shadow` is a prefix-derived identifier (see shadowTables()), not user
+		// input; identifiers cannot be bound via prepare().
 		foreach ( self::shadowTables() as $shadow ) {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared
 			$wpdb->query( "DROP TABLE IF EXISTS `{$shadow}`" );

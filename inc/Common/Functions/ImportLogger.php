@@ -283,6 +283,9 @@ final class ImportLogger {
 	public static function get( string $session_id = '', int $limit = 500 ): array {
 		global $wpdb;
 
+		// `$table` below is a prefix-derived identifier (see tableName()), not
+		// user input; only the identifier is interpolated into the SQL — every
+		// value (session_id, limit) is passed through $wpdb->prepare().
 		$table = self::tableName();
 		$limit = max( 1, $limit );
 
@@ -376,6 +379,8 @@ final class ImportLogger {
 	private static function latestId(): int {
 		global $wpdb;
 
+		// `$table` is $wpdb->prefix + a constant (see tableName()), never user
+		// input; a table identifier cannot be bound via $wpdb->prepare().
 		$table = self::tableName();
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
@@ -506,6 +511,8 @@ final class ImportLogger {
 		$days   = max( 1, $days );
 		$cutoff = gmdate( 'Y-m-d H:i:s', time() - ( $days * DAY_IN_SECONDS ) );
 
+		// `$table` is a prefix-derived identifier (see tableName()), not user
+		// input; only the identifier is interpolated — the value is prepared.
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQLPlaceholders.UnquotedComplexPlaceholder, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$wpdb->query(
 			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
