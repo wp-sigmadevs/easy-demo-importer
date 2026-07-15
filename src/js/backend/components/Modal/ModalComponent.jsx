@@ -1,4 +1,5 @@
 import Begin from './steps/Begin';
+import Readiness from './steps/Readiness';
 import Setup from './steps/Setup';
 import Imports from './steps/Imports';
 import Success from './steps/Success';
@@ -26,6 +27,7 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 	const {
 		reset,
 		setReset,
+		snapshot,
 		excludeImages,
 		setExcludeImages,
 		skipImageRegeneration,
@@ -49,6 +51,10 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 	const [importStatus, setImportStatus] = useState('');
 	const [showImportProgress, setShowImportProgress] = useState(false);
 	const [importProgress, setImportProgress] = useState([]);
+	const [importPercent, setImportPercent] = useState(null);
+	// Session of the just-finished run, kept for the result screen's retry-media
+	// action (activeSessionId is cleared on success, so we track it separately).
+	const [resultSessionId, setResultSessionId] = useState('');
 
 	/**
 	 * When the modal opens and there is a saved resume request (from a previous interrupted
@@ -59,15 +65,19 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 	useEffect(() => {
 		if (visible && resumeRequest && resumeRequest.demo === modalData?.id) {
 			setMessage(
-				sdEdiAdminParams.importInterruptedTitle || 'Import was interrupted.'
+				sdEdiAdminParams.importInterruptedTitle ||
+					'Import was interrupted.'
 			);
 			setHint(
 				sdEdiAdminParams.importInterruptedHint ||
 					'Your previous import did not complete. Resume from where it left off, or start over to begin fresh.'
 			);
-			setCurrentStep(4);
+			setCurrentStep(5);
 		}
-	}, [visible]); // eslint-disable-line react-hooks/exhaustive-deps
+		// modalData?.id is a dependency: on auto-open after a reload, `visible`
+		// can flip true a render before modalData is populated, so the check must
+		// re-run once the demo data arrives — not only when `visible` changes.
+	}, [visible, modalData?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
 	/**
 	 * Fire-and-forget AJAX call to release the import session lock.
@@ -116,6 +126,7 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 				const request = {
 					demo: id,
 					reset,
+					snapshot,
 					excludeImages,
 					skipImageRegeneration,
 					nextPhase: 'sd_edi_install_demo',
@@ -123,12 +134,14 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 				};
 
 				try {
-					setCurrentStep(3);
+					setCurrentStep(4);
 					setShowImportProgress(true);
 
 					// Start the import process
 					const initialProgress = [{ message: importInitMessage }];
 					setImportProgress(initialProgress);
+					setImportPercent(null);
+					setResultSessionId('');
 
 					setTimeout(function () {
 						doAxios(
@@ -138,7 +151,8 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 							handleImportResponse,
 							setMessage,
 							setHint,
-							setResumeRequest
+							setResumeRequest,
+							setImportPercent
 						);
 					}, 2000);
 				} catch (error) {
@@ -159,6 +173,9 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 		// Track the session ID from every step so handleReset can release the lock.
 		if (response.data.sessionId) {
 			setActiveSessionId(response.data.sessionId);
+			// Persist it separately so the result screen can retry failed media
+			// after activeSessionId is cleared on completion.
+			setResultSessionId(response.data.sessionId);
 		}
 
 		if (!response.data.error) {
@@ -202,6 +219,8 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 		setExcludeImages(false);
 		setReset(true);
 		setImportProgress([]);
+		setImportPercent(null);
+		setResultSessionId('');
 		setImportComplete(false);
 	};
 
@@ -210,11 +229,19 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 	 * The session lock is still held, so no re-initialisation needed.
 	 */
 	const handleResume = () => {
-		if (!resumeRequest) return;
+		if (!resumeRequest) {
+			return;
+		}
 
-		setCurrentStep(3);
+		setCurrentStep(4);
 		setShowImportProgress(true);
-		setImportProgress([{ message: sdEdiAdminParams.resumingImport || 'Resuming import...' }]);
+		setImportProgress([
+			{
+				message:
+					sdEdiAdminParams.resumingImport || 'Resuming import...',
+			},
+		]);
+		setImportPercent(null);
 
 		doAxios(
 			resumeRequest,
@@ -223,7 +250,8 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 			handleImportResponse,
 			setMessage,
 			setHint,
-			setResumeRequest
+			setResumeRequest,
+			setImportPercent
 		);
 	};
 
@@ -282,7 +310,8 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 										status: getCurrentStatus(
 											currentStep,
 											importComplete,
-											index
+											index,
+											steps.length
 										),
 									}))}
 								/>
@@ -305,6 +334,18 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 								}`}
 							>
 								{currentStep === 2 && (
+									<Readiness
+										modalData={modalData}
+										handleReset={handleReset}
+									/>
+								)}
+							</div>
+							<div
+								className={`modal-content step ${
+									currentStep === 3 ? 'fade-in' : 'fade-out'
+								}`}
+							>
+								{currentStep === 3 && (
 									<Setup
 										modalData={modalData}
 										handleImport={handleImport}
@@ -314,13 +355,14 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 							</div>
 							<div
 								className={`modal-content step import-step ${
-									currentStep === 3 ? 'fade-in' : 'fade-out'
+									currentStep === 4 ? 'fade-in' : 'fade-out'
 								}`}
 							>
-								{currentStep === 3 && (
+								{currentStep === 4 && (
 									<Imports
 										importStatus={importStatus}
 										importProgress={importProgress}
+										importPercent={importPercent}
 										showImportProgress={showImportProgress}
 										handleImport={handleImport}
 									/>
@@ -328,10 +370,10 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 							</div>
 							<div
 								className={`modal-content step ${
-									currentStep === 4 ? 'fade-in' : 'fade-out'
+									currentStep === 5 ? 'fade-in' : 'fade-out'
 								}`}
 							>
-								{currentStep === 4 && (
+								{currentStep === 5 && (
 									<Success
 										importComplete={importComplete}
 										handleReset={handleReset}
@@ -340,6 +382,8 @@ const ModalComponent = ({ visible, onCancel, modalData }) => {
 										canResume={!!resumeRequest}
 										message={message}
 										hint={hint}
+										demo={modalData?.id || ''}
+										sessionId={resultSessionId}
 									/>
 								)}
 							</div>

@@ -118,11 +118,16 @@ class ImportWidgets extends ImporterAjax {
 			$nextMessage = esc_html__( 'Finalizing demo data import.', 'easy-demo-importer' );
 		}
 
-		// Response.
+		// Response. Friendlier text in the modal; the log keeps the neutral
+		// equivalent.
 		$this->prepareResponse(
 			$nextPhase,
 			$nextMessage,
-			$fileExists ? esc_html__( 'Widgets successfully imported.', 'easy-demo-importer' ) : esc_html__( 'No widgets import needed.', 'easy-demo-importer' )
+			$fileExists ? esc_html__( 'Widgets imported!', 'easy-demo-importer' ) : esc_html__( 'No widgets import needed.', 'easy-demo-importer' ),
+			false,
+			'',
+			'',
+			$fileExists ? esc_html__( 'Widgets imported.', 'easy-demo-importer' ) : null
 		);
 	}
 }

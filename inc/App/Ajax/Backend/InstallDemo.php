@@ -16,7 +16,13 @@ use SD_EDI_WP_Import;
 use SigmaDevs\EasyDemoImporter\Common\{
 	Traits\Singleton,
 	Functions\Helpers,
-	Abstracts\ImporterAjax
+	Functions\ImportLogger,
+	Abstracts\ImporterAjax,
+	Importer\ChunkedImport,
+	Importer\ImportState,
+	Importer\ThumbnailRegenerator,
+	Utils\FailedMedia,
+	Utils\Snapshot
 };
 
 // Do not allow directly accessing this file.
@@ -54,6 +60,10 @@ class InstallDemo extends ImporterAjax {
 		parent::register();
 
 		add_action( 'wp_ajax_sd_edi_import_xml', [ $this, 'response' ] );
+		add_action( 'wp_ajax_sd_edi_import_xml_batch', [ $this, 'importBatch' ] );
+		add_action( 'wp_ajax_sd_edi_import_xml_finalize', [ $this, 'finalizeImport' ] );
+		add_action( 'wp_ajax_sd_edi_regenerate_images', [ $this, 'regenerateImages' ] );
+		add_action( 'wp_ajax_sd_edi_retry_media', [ $this, 'retryMedia' ] );
 	}
 
 	/**
@@ -66,93 +76,315 @@ class InstallDemo extends ImporterAjax {
 		// Verifying AJAX call and user role.
 		Helpers::verifyAjaxCall();
 
-		global $wpdb;
-
-		// ── Step-level mutex ────────────────────────────────────────────────────────
-		// When the user reloads mid-import, PHP keeps running in the background (output
-		// is buffered so the disconnect is never detected).  If the user then resumes,
-		// a second request reaches this method while the first is still executing,
-		// which causes two parallel XML imports and duplicated content.
-		//
-		// INSERT IGNORE on wp_options is atomic: MySQL's unique key on option_name
-		// guarantees exactly one process gets the row.  The other gets 0 rows affected
-		// and must wait before retrying.
-		//
-		// Stale-lock guard: if the mutex has been held for more than 30 minutes, the
-		// original process likely crashed — force-release so the site isn't stuck.
-		$mutex_option = 'sd_edi_xml_import_mutex';
-		$mutex_ts     = (int) get_option( $mutex_option, 0 );
-
-		if ( $mutex_ts && ( time() - $mutex_ts ) > 30 * MINUTE_IN_SECONDS ) {
-			delete_option( $mutex_option );
-			$mutex_ts = 0;
+		if ( ! $this->acquireMutex() ) {
+			$this->respondWaiting( 'sd_edi_import_xml' );
+			return;
 		}
 
-		if ( ! $mutex_ts ) {
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			$mutex_acquired = (bool) $wpdb->query(
-				$wpdb->prepare(
-					"INSERT IGNORE INTO {$wpdb->options} (option_name, option_value, autoload) VALUES (%s, %s, 'no')",
-					$mutex_option,
-					(string) time()
-				)
-			);
-		} else {
-			$mutex_acquired = false;
-		}
+		$xmlFile = $this->demoUploadDir( $this->demoDir() ) . '/content.xml';
 
-		if ( ! $mutex_acquired ) {
-			// Background XML import is still running.  Ask the client to wait 5 s and retry.
-			wp_send_json(
-				[
-					'demo'                  => $this->demoSlug,
-					'excludeImages'         => $this->excludeImages,
-					'skipImageRegeneration' => $this->skipImageRegeneration,
-					'reset'                 => $this->reset,
-					'sessionId'             => $this->sessionId,
-					'nextPhase'             => 'sd_edi_import_xml',
-					'nextPhaseMessage'      => esc_html__( 'Waiting for previous import to finish…', 'easy-demo-importer' ),
-					'completedMessage'      => '',
-					'error'                 => false,
-					'retry'                 => true,
-					'retryAfter'            => 5,
-				]
+		if ( ! file_exists( $xmlFile ) ) {
+			$this->prepareResponse(
+				'',
+				'',
+				'',
+				true,
+				esc_html__( 'Demo import process failed. No content file found.', 'easy-demo-importer' )
 			);
 			return;
 		}
 
-		// ── Register shutdown-based mutex release ───────────────────────────────────
-		// IMPORTANT: wp_send_json() calls wp_die() which calls die() / exit().
-		// PHP's try/finally blocks do NOT run after die() / exit(), so we cannot use
-		// try/finally to release the mutex.  register_shutdown_function() is the
-		// correct mechanism — it fires after die(), after PHP timeouts, and after
-		// fatal errors, covering every exit path.
-		register_shutdown_function(
-			static function ( string $opt ) {
-				delete_option( $opt );
-			},
-			$mutex_option
+		// Activity log: ensure the table exists (covers existing installs that
+		// pre-date the log), prune old entries, and record the start of this run.
+		ImportLogger::maybeInstall();
+		ImportLogger::prune();
+		ImportLogger::info(
+			sprintf(
+				/* translators: %s: demo name. */
+				esc_html__( 'Content import started for “%s”.', 'easy-demo-importer' ),
+				$this->demoSlug
+			),
+			$this->sessionId,
+			$this->demoSlug
 		);
 
-		// ── Run the import ──────────────────────────────────────────────────────────
-		$xmlFile    = $this->demoUploadDir( $this->demoDir() ) . '/content.xml';
-		$fileExists = file_exists( $xmlFile );
+		// Opt-in restore point for the MANUAL import path, which enters the
+		// pipeline here (nextPhase 'sd_edi_import_xml') and skips Initialize
+		// entirely, so Initialize's pre-reset snapshot never runs for it.
+		// Manual import uses reset=false, so the tables still hold the
+		// pre-import state at this point. The regular (Initialize) path already
+		// created the snapshot before its database reset; the per-session guard
+		// makes this a no-op there (and on the repeated per-chunk calls) so a
+		// snapshot is taken once per import and never twice.
+		if ( $this->snapshot && ! Snapshot::isForSession( $this->sessionId ) ) {
+			if ( Snapshot::create( $this->sessionId, $this->reset, $this->demoSlug ) ) {
+				ImportLogger::info(
+					esc_html__( 'Restore point created — this import can be rolled back.', 'easy-demo-importer' ),
+					$this->sessionId,
+					$this->demoSlug
+				);
+			} else {
+				ImportLogger::warning(
+					esc_html__( 'Restore point skipped — this site is too large to snapshot safely; the import will continue without rollback.', 'easy-demo-importer' ),
+					$this->sessionId,
+					$this->demoSlug
+				);
+			}
+		}
 
 		/**
 		 * Action Hook: 'sd/edi/before_import'
 		 *
-		 * Performs special actions before demo import.
+		 * Performs special actions before demo import. Fired at the start of
+		 * every chunk request (prepare/batch/finalize) so the resource boost in
+		 * beforeImportActions() applies to each request, not just the first.
 		 *
 		 * @since 1.0.0
 		 */
 		do_action( 'sd/edi/before_import', $xmlFile, $this ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
-		if ( $fileExists ) {
-			// Clear any nav menus left by a previous (possibly partial) run so the
-			// importer always starts from a clean slate.
-			$this->clearNavMenus();
+		// Clear any nav menus left by a previous (possibly partial) run so the
+		// importer always starts from a clean slate.
+		$this->clearNavMenus();
+
+		// ── Legacy single-shot fallback ─────────────────────────────────────────────
+		// Disabled by returning false from the filter, or used automatically if the
+		// chunked prepare stage cannot start. Preserves the pre-1.2.0 behavior for
+		// small demos / non-proxied hosts.
+		if ( ! $this->chunkedEnabled() ) {
+			$this->importDemoContent( $xmlFile, $this->excludeImages, $this->skipImageRegeneration );
+
+			/** This action is documented in finalizeImport(). */
+			do_action( 'sd/edi/after_content_import', $xmlFile, $this ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+
+			$this->prepareResponse(
+				'sd_edi_import_customizer',
+				esc_html__( 'Importing Customizer settings.', 'easy-demo-importer' ),
+				esc_html__( 'Content imported — smooth sailing!', 'easy-demo-importer' ),
+				false,
+				'',
+				'',
+				esc_html__( 'Content imported.', 'easy-demo-importer' )
+			);
+			return;
+		}
+
+		// ── Chunked import — Stage 1: prepare ───────────────────────────────────────
+		try {
+			$importer                    = $this->chunkedImporter();
+			$importer->fetch_attachments = ( 'true' !== $this->excludeImages );
+			$importer->bundled_media_dir = $this->bundledMediaDir();
+
+			if ( $importer->bundled_media_dir && 'true' !== $this->excludeImages ) {
+				ImportLogger::info(
+					esc_html__( 'Bundled media detected — images will be imported from the demo package instead of downloaded.', 'easy-demo-importer' ),
+					$this->sessionId,
+					$this->demoSlug
+				);
+			}
+
+			ob_start();
+			$total = $importer->prepare( $xmlFile );
+			$this->logImporterOutput( ob_get_clean() );
+		} catch ( \Throwable $e ) {
+			// Parsing/preparation failed — fall back to the single-shot importer so
+			// the import still runs (just without resumability).
+			if ( isset( $importer ) ) {
+				$importer->state()->delete();
+			}
+
+			ImportLogger::error(
+				sprintf(
+					/* translators: %s: error message. */
+					esc_html__( 'Chunked import could not start (%s). Falling back to single-shot import.', 'easy-demo-importer' ),
+					$e->getMessage()
+				),
+				$this->sessionId,
+				$this->demoSlug
+			);
 
 			$this->importDemoContent( $xmlFile, $this->excludeImages, $this->skipImageRegeneration );
+
+			/** This action is documented in finalizeImport(). */
+			do_action( 'sd/edi/after_content_import', $xmlFile, $this ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+
+			$this->prepareResponse(
+				'sd_edi_import_customizer',
+				esc_html__( 'Importing Customizer settings.', 'easy-demo-importer' ),
+				esc_html__( 'Content imported — smooth sailing!', 'easy-demo-importer' ),
+				false,
+				'',
+				'',
+				esc_html__( 'Content imported.', 'easy-demo-importer' )
+			);
+			return;
+		}
+
+		ImportLogger::info(
+			sprintf(
+				/* translators: %d: number of items queued. */
+				esc_html__( 'WXR parsed — %d items queued for import.', 'easy-demo-importer' ),
+				(int) $total
+			),
+			$this->sessionId,
+			$this->demoSlug
+		);
+
+		wp_send_json(
+			$this->chunkPayload(
+				[
+					'nextPhase'        => 'sd_edi_import_xml_batch',
+					// Internal sub-phase of content import — no user-facing card.
+					// The single "Importing content…" card from the download step
+					// persists across prepare → batch → finalize. No progress is
+					// reported here on purpose: the bar shimmers (indeterminate)
+					// until the first batch reports a real percentage, so it never
+					// jumps in at a high value after a silent parse.
+					'nextPhaseMessage' => '',
+				]
+			)
+		);
+	}
+
+	/**
+	 * Ajax response: Stage 2 — process one time-boxed batch of posts.
+	 *
+	 * Re-fires itself (via the retry protocol) until every post is processed,
+	 * then advances to the finalize stage. Idempotent and safe to re-issue.
+	 *
+	 * @return void
+	 * @since 2.0.0
+	 */
+	public function importBatch() {
+		Helpers::verifyAjaxCall();
+
+		if ( ! $this->acquireMutex() ) {
+			$this->respondWaiting( 'sd_edi_import_xml_batch' );
+			return;
+		}
+
+		$xmlFile = $this->demoUploadDir( $this->demoDir() ) . '/content.xml';
+
+		/** This action is documented in response(); re-applies the per-request resource boost. */
+		do_action( 'sd/edi/before_import', $xmlFile, $this ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+
+		// Attachment downloads happen in this stage. Chunked imports always land
+		// originals only and defer intermediate sizes to the dedicated
+		// regeneration phase, keeping each batch well under the gateway limit.
+		$this->deferThumbnailGeneration();
+
+		ob_start();
+		$result = $this->chunkedImporter()->processBatch();
+		$this->logImporterOutput( ob_get_clean() );
+
+		$progress = [
+			'processed' => (int) $result['processed'],
+			'total'     => (int) $result['total'],
+		];
+
+		if ( empty( $result['done'] ) ) {
+			// Not finished: re-fire this same phase immediately. retryAfter:0 keeps
+			// the loop tight (the client sends no delay when retryAfter is 0).
+			wp_send_json(
+				$this->chunkPayload(
+					[
+						'nextPhase'  => 'sd_edi_import_xml_batch',
+						'retry'      => true,
+						'retryAfter' => 0,
+						'progress'   => $progress,
+					]
+				)
+			);
+			return;
+		}
+
+		wp_send_json(
+			$this->chunkPayload(
+				[
+					'nextPhase'        => 'sd_edi_import_xml_finalize',
+					// Internal sub-phase — no user-facing card. Progress is kept so
+					// the single content card's bar holds near 100% through the
+					// reference-fixup step instead of resetting.
+					'nextPhaseMessage' => '',
+					'progress'         => $progress,
+				]
+			)
+		);
+	}
+
+	/**
+	 * Ajax response: Stage 3 — resolve cross-post references and end the import.
+	 *
+	 * @return void
+	 * @since 2.0.0
+	 */
+	public function finalizeImport() {
+		Helpers::verifyAjaxCall();
+
+		if ( ! $this->acquireMutex() ) {
+			$this->respondWaiting( 'sd_edi_import_xml_finalize' );
+			return;
+		}
+
+		$xmlFile = $this->demoUploadDir( $this->demoDir() ) . '/content.xml';
+
+		/** This action is documented in response(); re-applies the per-request resource boost. */
+		do_action( 'sd/edi/before_import', $xmlFile, $this ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+
+		$importer = $this->chunkedImporter();
+
+		// finalize() -> import_end() prints the vendored importer's own "All done.
+		// Have fun!" notice. It's the only thing this call ever echoes (the
+		// backfill/remap/recount steps before it are silent), and it would only
+		// duplicate the explicit success entry logged just below — including it
+		// as a warning would misleadingly surface a normal completion in
+		// wp-content/debug.log. Discard rather than route through
+		// logImporterOutput().
+		ob_start();
+		$importer->finalize();
+		ob_end_clean();
+
+		// When images were excluded, strip the now-dangling featured-image links.
+		if ( 'true' === $this->excludeImages ) {
+			$this->unsetThumbnails();
+		}
+
+		// Content import is a mid-pipeline step, not the finish line (regeneration,
+		// menus, widgets and finalize still follow), so it logs as info. Only the
+		// terminal phase logs success — otherwise an import interrupted after this
+		// point but before finalize would be mis-recorded as a completed run.
+		ImportLogger::info(
+			esc_html__( 'Content import completed.', 'easy-demo-importer' ),
+			$this->sessionId,
+			$this->demoSlug
+		);
+
+		if ( $importer->bundled_media_imported > 0 ) {
+			ImportLogger::info(
+				sprintf(
+					/* translators: %d: number of media files. */
+					esc_html__( '%d media files imported from the demo package.', 'easy-demo-importer' ),
+					(int) $importer->bundled_media_imported
+				),
+				$this->sessionId,
+				$this->demoSlug
+			);
+		}
+
+		// Persist any attachments whose download failed so the user can retry just
+		// those from the result screen, without re-running the whole import.
+		FailedMedia::save( $this->sessionId, (array) $importer->failed_attachments );
+
+		if ( ! empty( $importer->failed_attachments ) ) {
+			ImportLogger::warning(
+				sprintf(
+					/* translators: %d: number of failed media files. */
+					esc_html__( '%d media file(s) could not be downloaded — you can retry them from the result screen.', 'easy-demo-importer' ),
+					count( $importer->failed_attachments )
+				),
+				$this->sessionId,
+				$this->demoSlug
+			);
 		}
 
 		/**
@@ -164,13 +396,616 @@ class InstallDemo extends ImporterAjax {
 		 */
 		do_action( 'sd/edi/after_content_import', $xmlFile, $this ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
-		// Response.
+		// The batch loop imported originals only. If regeneration wasn't skipped
+		// and this run actually imported media, hand the new attachment IDs to the
+		// dedicated, resumable regeneration phase before moving on to customizer.
+		$attachmentIds = ( $this->skipImageRegeneration || 'true' === $this->excludeImages )
+			? []
+			: $importer->importedAttachmentIds();
+
+		if ( ! empty( $attachmentIds ) ) {
+			$this->regenState()->save(
+				[
+					'ids'    => $attachmentIds,
+					'cursor' => 0,
+				]
+			);
+
+			$this->prepareResponse(
+				'sd_edi_regenerate_images',
+				esc_html__( 'Regenerating images — sit tight!', 'easy-demo-importer' ),
+				esc_html__( 'Content imported — smooth sailing!', 'easy-demo-importer' ),
+				false,
+				'',
+				'',
+				esc_html__( 'Content imported.', 'easy-demo-importer' )
+			);
+			return;
+		}
+
 		$this->prepareResponse(
-			$fileExists ? 'sd_edi_import_customizer' : '',
-			$fileExists ? esc_html__( 'Importing Customizer settings.', 'easy-demo-importer' ) : '',
-			$fileExists ? esc_html__( 'Everything has been imported smoothly.', 'easy-demo-importer' ) : '',
-			! $fileExists,
-			! $fileExists ? esc_html__( 'Demo import process failed. No content file found.', 'easy-demo-importer' ) : '',
+			'sd_edi_import_customizer',
+			esc_html__( 'Importing Customizer settings.', 'easy-demo-importer' ),
+			esc_html__( 'Content imported — smooth sailing!', 'easy-demo-importer' ),
+			false,
+			'',
+			'',
+			esc_html__( 'Content imported.', 'easy-demo-importer' )
+		);
+	}
+
+	/**
+	 * Ajax response: dedicated image-regeneration phase.
+	 *
+	 * Runs after content import (which imported originals only), before the
+	 * customizer phase. Rebuilds the intermediate image sizes for the attachments
+	 * imported by this run, in time-boxed, resumable slices driven by the same
+	 * cursor + retry/progress protocol as the batch phase — so a large media
+	 * library never overruns the gateway wall-clock limit. Only touches this
+	 * run's attachment IDs; a site's pre-existing media is never regenerated.
+	 * Idempotent: re-running metadata generation for an already-processed
+	 * attachment is safe, so a re-issued request simply continues.
+	 *
+	 * @return void
+	 * @since 2.0.0
+	 */
+	public function regenerateImages() {
+		Helpers::verifyAjaxCall();
+
+		if ( ! $this->acquireMutex() ) {
+			$this->respondWaiting( 'sd_edi_regenerate_images' );
+			return;
+		}
+
+		// wp_generate_attachment_metadata() lives in wp-admin/includes/image.php,
+		// which is not guaranteed to be loaded during an AJAX request.
+		if ( ! function_exists( 'wp_generate_attachment_metadata' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/image.php';
+		}
+
+		$state = $this->regenState();
+		$data  = $state->load();
+
+		// No IDs to process (missing/stale state) — nothing to do, move on.
+		if ( null === $data || empty( $data['ids'] ) ) {
+			$state->delete();
+			$this->prepareResponse(
+				'sd_edi_import_customizer',
+				esc_html__( 'Importing Customizer settings.', 'easy-demo-importer' ),
+				esc_html__( 'No images to regenerate — skipping.', 'easy-demo-importer' ),
+				false,
+				'',
+				'',
+				esc_html__( 'No images to regenerate. Skipping.', 'easy-demo-importer' )
+			);
+			return;
+		}
+
+		$ids    = array_values( array_map( 'intval', (array) $data['ids'] ) );
+		$total  = count( $ids );
+		$cursor = isset( $data['cursor'] ) ? (int) $data['cursor'] : 0;
+
+		// Kept short (matching the content batch budget) so regeneration returns
+		// progress frequently and the bar advances in small steps rather than
+		// sitting on the indeterminate shimmer until a single long window
+		// finishes. Smaller is also further under the gateway wall-clock limit;
+		// the trade-off is more (cheap, immediately re-fired) round-trips.
+		$budget = (float) apply_filters( 'sd/edi/regen_chunk_seconds', 10 ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+		$start  = microtime( true );
+
+		while ( $cursor < $total ) {
+			$regenerator = ThumbnailRegenerator::forAttachment( $ids[ $cursor ] );
+
+			if ( null !== $regenerator ) {
+				$regenerator->regenerate();
+			}
+
+			++$cursor;
+
+			// Finish the current attachment, then stop once over budget.
+			if ( ( microtime( true ) - $start ) >= $budget ) {
+				break;
+			}
+		}
+
+		$progress = [
+			'processed' => $cursor,
+			'total'     => $total,
+		];
+
+		if ( $cursor < $total ) {
+			$state->save(
+				[
+					'ids'    => $ids,
+					'cursor' => $cursor,
+				]
+			);
+
+			// Not finished: re-fire this same phase immediately.
+			wp_send_json(
+				$this->chunkPayload(
+					[
+						'nextPhase'  => 'sd_edi_regenerate_images',
+						'retry'      => true,
+						'retryAfter' => 0,
+						'progress'   => $progress,
+					]
+				)
+			);
+			return;
+		}
+
+		$state->delete();
+
+		ImportLogger::info(
+			sprintf(
+				/* translators: %d: number of attachments. */
+				esc_html__( 'Regenerated images for %d attachments.', 'easy-demo-importer' ),
+				$total
+			),
+			$this->sessionId,
+			$this->demoSlug
+		);
+
+		$this->prepareResponse(
+			'sd_edi_import_customizer',
+			esc_html__( 'Importing Customizer settings.', 'easy-demo-importer' ),
+			esc_html__( 'Images regenerated — looking sharp!', 'easy-demo-importer' ),
+			false,
+			'',
+			'',
+			esc_html__( 'Images regenerated.', 'easy-demo-importer' )
+		);
+	}
+
+	/**
+	 * State store for the image-regeneration phase of this session.
+	 *
+	 * Separate from the content-import state so both can coexist for one session
+	 * without colliding.
+	 *
+	 * @return ImportState
+	 * @since 2.0.0
+	 */
+	private function regenState(): ImportState {
+		return ImportState::forSession( $this->demoUploadDir( $this->demoDir() ), $this->sessionId, 'regen' );
+	}
+
+	/**
+	 * Ajax: retry the media downloads that failed during a run.
+	 *
+	 * Reads the failed-attachment list saved at finalize (keyed by the original
+	 * import session, passed as retrySession so it bypasses the live-import
+	 * session guard), re-attempts each in time-boxed, resumable slices via a fresh
+	 * importer, and rewrites the content URLs for whatever succeeds. The cursor +
+	 * tallies round-trip through the request; the storage is cleared when the pass
+	 * completes.
+	 *
+	 * @return void
+	 * @since 2.0.0
+	 */
+	public function retryMedia() {
+		Helpers::verifyAjaxCall();
+
+		if ( ! defined( 'SD_EDI_LOAD_IMPORTERS' ) ) {
+			define( 'SD_EDI_LOAD_IMPORTERS', true );
+		}
+
+		if ( ! class_exists( 'SD_EDI_WP_Import' ) ) {
+			$wpImporter = sd_edi()->getPluginPath() . '/lib/wordpress-importer/wordpress-importer.php';
+
+			if ( file_exists( $wpImporter ) ) {
+				require_once $wpImporter;
+			}
+		}
+
+		// phpcs:disable WordPress.Security.NonceVerification.Missing -- verifyAjaxCall() checked the nonce.
+		$retry_session = isset( $_POST['retrySession'] ) ? sanitize_text_field( wp_unslash( $_POST['retrySession'] ) ) : '';
+		$cursor        = isset( $_POST['retryCursor'] ) ? absint( wp_unslash( $_POST['retryCursor'] ) ) : 0;
+		$recovered     = isset( $_POST['recovered'] ) ? absint( wp_unslash( $_POST['recovered'] ) ) : 0;
+		$still_failed  = isset( $_POST['stillFailed'] ) ? absint( wp_unslash( $_POST['stillFailed'] ) ) : 0;
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
+
+		// The importer failing to load is a real error, not a completed retry —
+		// report it rather than a silent "finished".
+		if ( ! class_exists( 'SD_EDI_WP_Import' ) ) {
+			wp_send_json_error(
+				[ 'message' => esc_html__( 'The importer could not be loaded. Please try again.', 'easy-demo-importer' ) ],
+				500
+			);
+		}
+
+		$items = FailedMedia::get( $retry_session );
+		$total = count( $items );
+
+		if ( empty( $items ) ) {
+			FailedMedia::clear( $retry_session );
+			wp_send_json_success(
+				[
+					'done'        => true,
+					'cursor'      => $cursor,
+					'total'       => $total,
+					'recovered'   => $recovered,
+					'stillFailed' => $still_failed,
+				]
+			);
+		}
+
+		/** This action is documented in response(); re-applies the per-request resource boost. */
+		do_action( 'sd/edi/before_import', '', $this ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+
+		$importer                    = new SD_EDI_WP_Import();
+		$importer->fetch_attachments = true;
+		$importer->bundled_media_dir = $this->bundledMediaDir();
+
+		$budget = (float) apply_filters( 'sd/edi/retry_chunk_seconds', 20 ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+		$start  = microtime( true );
+
+		ob_start();
+
+		while ( $cursor < $total ) {
+			$record = isset( $items[ $cursor ] ) ? $items[ $cursor ] : [];
+			$data   = isset( $record['data'] ) ? (array) $record['data'] : [];
+			$url    = isset( $record['url'] ) ? (string) $record['url'] : '';
+
+			$result = ( '' !== $url && ! empty( $data ) )
+				? $importer->process_attachment( $data, $url )
+				: new \WP_Error( 'sd_edi_retry_invalid', 'Invalid record.' );
+
+			if ( is_wp_error( $result ) ) {
+				++$still_failed;
+			} else {
+				++$recovered;
+			}
+
+			++$cursor;
+
+			if ( ( microtime( true ) - $start ) >= $budget ) {
+				break;
+			}
+		}
+
+		// Accumulate this slice's URL remaps rather than back-filling now: a
+		// full-table REPLACE per slice repeats costly posts/postmeta scans and can
+		// itself exceed the gateway timeout. All remaps are applied once, below,
+		// on the final slice.
+		$remap_key = 'sd_edi_retry_remap_' . md5( $retry_session );
+
+		if ( ! empty( $importer->url_remap ) ) {
+			$accumulated = get_option( $remap_key, [] );
+			$accumulated = is_array( $accumulated ) ? $accumulated : [];
+			update_option( $remap_key, array_merge( $accumulated, $importer->url_remap ), false );
+		}
+
+		$this->logImporterOutput( ob_get_clean() );
+
+		if ( $cursor < $total ) {
+			wp_send_json_success(
+				[
+					'done'        => false,
+					'cursor'      => $cursor,
+					'total'       => $total,
+					'recovered'   => $recovered,
+					'stillFailed' => $still_failed,
+				]
+			);
+		}
+
+		// Final slice: apply every accumulated remap in a single backfill pass.
+		$accumulated = get_option( $remap_key, [] );
+
+		if ( is_array( $accumulated ) && ! empty( $accumulated ) ) {
+			$importer->url_remap = $accumulated;
+			$importer->backfill_attachment_urls();
+		}
+
+		delete_option( $remap_key );
+
+		// One pass complete — clear the stored list.
+		FailedMedia::clear( $retry_session );
+
+		ImportLogger::info(
+			sprintf(
+				/* translators: 1: recovered count, 2: still-failed count. */
+				esc_html__( 'Media retry finished — %1$d recovered, %2$d still failed.', 'easy-demo-importer' ),
+				$recovered,
+				$still_failed
+			),
+			$retry_session,
+			$this->demoSlug
+		);
+
+		wp_send_json_success(
+			[
+				'done'        => true,
+				'cursor'      => $cursor,
+				'total'       => $total,
+				'recovered'   => $recovered,
+				'stillFailed' => $still_failed,
+			]
+		);
+	}
+
+	/**
+	 * Whether the resumable chunked importer is enabled.
+	 *
+	 * @return bool
+	 * @since 2.0.0
+	 */
+	private function chunkedEnabled(): bool {
+		return (bool) apply_filters( 'sd/edi/enable_chunked_import', true ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+	}
+
+	/**
+	 * Builds a ChunkedImport bound to this session's state store.
+	 *
+	 * The state path is derived from the demo working directory + session id, so
+	 * it is stable across the prepare/batch/finalize requests of one import.
+	 *
+	 * @return ChunkedImport
+	 * @since 2.0.0
+	 */
+	private function chunkedImporter(): ChunkedImport {
+		if ( ! defined( 'SD_EDI_LOAD_IMPORTERS' ) ) {
+			define( 'SD_EDI_LOAD_IMPORTERS', true );
+		}
+
+		if ( ! class_exists( 'SD_EDI_WP_Import' ) ) {
+			$wpImporter = sd_edi()->getPluginPath() . '/lib/wordpress-importer/wordpress-importer.php';
+
+			if ( file_exists( $wpImporter ) ) {
+				require_once $wpImporter;
+			}
+		}
+
+		$state = ImportState::forSession( $this->demoUploadDir( $this->demoDir() ), $this->sessionId );
+
+		return new ChunkedImport( $state );
+	}
+
+	/**
+	 * Absolute path to this demo's bundled `uploads/` folder, or '' if none.
+	 *
+	 * Bundled-media mode turns on automatically when the extracted demo package
+	 * contains an `uploads/` folder. Filterable so a theme author can force it on
+	 * or off per demo. When empty, every attachment is fetched over HTTP as before.
+	 *
+	 * @return string
+	 * @since 2.0.0
+	 */
+	private function bundledMediaDir(): string {
+		$dir = $this->demoUploadDir( $this->demoDir() ) . '/uploads';
+
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+		$enabled = (bool) apply_filters( 'sd/edi/importer/bundled_media_enabled', is_dir( $dir ), $this->demoSlug, $this->config );
+
+		return ( $enabled && is_dir( $dir ) ) ? $dir : '';
+	}
+
+	/**
+	 * Suppresses inline intermediate-size generation during the batch loop.
+	 *
+	 * Chunked imports download originals only and (re)build the resized sub-sizes
+	 * in the dedicated regeneration phase, so each attachment stays cheap and no
+	 * batch overruns the gateway wall-clock limit. Only the sub-sizes are
+	 * deferred — base attachment metadata (dimensions, file) is still written, so
+	 * every image works at full size between phases. Request-scoped: filters
+	 * vanish at request end, so this runs on every batch that downloads media.
+	 *
+	 * @return void
+	 * @since 2.0.0
+	 */
+	private function deferThumbnailGeneration(): void {
+		add_filter( 'intermediate_image_sizes_advanced', '__return_empty_array', 9999 );
+	}
+
+	/**
+	 * Records the bundled importer's printed output to the activity log.
+	 *
+	 * The vendored WXR importer reports per-item failures (e.g. an image that
+	 * could not be downloaded) by printing HTML rather than returning them, and
+	 * those prints are otherwise captured and discarded to keep the AJAX JSON
+	 * response clean. Each printed line is surfaced here as a warning so the
+	 * reason a post or attachment was skipped is visible to the user.
+	 *
+	 * @param string|false $output Captured output buffer contents.
+	 *
+	 * @return void
+	 * @since 2.0.0
+	 */
+	private function logImporterOutput( $output ): void {
+		if ( ! is_string( $output ) || '' === trim( $output ) ) {
+			return;
+		}
+
+		$lines = preg_split( '/<br\s*\/?>|\r\n|\r|\n/i', $output );
+
+		foreach ( (array) $lines as $line ) {
+			$line = trim( wp_strip_all_tags( $line ) );
+
+			if ( '' === $line || $this->isBenignCompletionNotice( $line ) ) {
+				continue;
+			}
+
+			// An item skipped because image import was turned off is expected,
+			// not a failure — log it at info level so it does not mark the run
+			// "Completed with warnings".
+			if ( $this->isImageSkippedNotice( $line ) ) {
+				ImportLogger::info( $line, $this->sessionId, $this->demoSlug );
+				continue;
+			}
+
+			ImportLogger::warning( $line, $this->sessionId, $this->demoSlug );
+		}
+	}
+
+	/**
+	 * Whether a captured output line is the vendored importer's own "done" notice.
+	 *
+	 * The import_end() method unconditionally prints two adjacent paragraphs (no
+	 * line break between them, so they land as a single line here) announcing a normal,
+	 * successful finish. Logging it as a warning would misleadingly surface a
+	 * routine completion in wp-content/debug.log (WARNING/ERROR entries are
+	 * mirrored there). Built from the same translation calls import_end() uses,
+	 * so the match holds under any locale.
+	 *
+	 * @param string $line A single stripped, trimmed line of captured output.
+	 *
+	 * @return bool
+	 * @since 2.0.0
+	 */
+	private function isBenignCompletionNotice( string $line ): bool {
+		static $notice = null;
+
+		if ( null === $notice ) {
+			$notice = trim(
+				wp_strip_all_tags(
+					esc_html__( 'All done.', 'easy-demo-importer' ) . ' ' .
+					esc_html__( 'Have fun!', 'easy-demo-importer' ) .
+					esc_html__( 'Remember to update the passwords and roles of imported users.', 'easy-demo-importer' )
+				)
+			);
+		}
+
+		return $line === $notice;
+	}
+
+	/**
+	 * Whether a captured line is an "image import turned off" skip notice.
+	 *
+	 * The vendored importer prints these when the user disabled image import, so
+	 * every attachment is intentionally skipped. They are matched on the fixed
+	 * trailing phrase of the printed template (the item name varies) and routed
+	 * to the log at info level rather than warning.
+	 *
+	 * @param string $line A single stripped, trimmed line of captured output.
+	 *
+	 * @return bool
+	 * @since 2.0.0
+	 */
+	private function isImageSkippedNotice( string $line ): bool {
+		static $suffix = null;
+
+		if ( null === $suffix ) {
+			/* translators: 1: item type (e.g. Media), 2: item title. */
+			$message  = esc_html__( 'Skipped %1$s &#8220;%2$s&#8221;: image import is turned off.', 'easy-demo-importer' );
+			$template = trim( wp_strip_all_tags( $message ) );
+			$marker   = '&#8221;:';
+			$pos      = strpos( $template, $marker );
+			$suffix   = false === $pos ? $template : trim( substr( $template, $pos + strlen( $marker ) ) );
+		}
+
+		$length = strlen( $suffix );
+
+		// substr()-based tail match rather than str_ends_with(), which is only
+		// polyfilled from WordPress 5.9 (this plugin supports 5.5+).
+		return $length > 0 && substr( $line, -$length ) === $suffix;
+	}
+
+	/**
+	 * Acquires the cross-request import mutex.
+	 *
+	 * INSERT IGNORE on wp_options is atomic: MySQL's unique key on option_name
+	 * guarantees exactly one process holds the row. A stale lock (held > 30 min,
+	 * i.e. the holder crashed) is force-released so the site is never stuck — the
+	 * session state file is left intact so the import can resume. On success a
+	 * shutdown handler releases the lock, covering die()/timeout/fatal exits that
+	 * try/finally cannot.
+	 *
+	 * @return bool True if the lock was acquired by this request.
+	 * @since 2.0.0
+	 */
+	private function acquireMutex(): bool {
+		global $wpdb;
+
+		$mutex_option = 'sd_edi_xml_import_mutex';
+		$mutex_ts     = (int) get_option( $mutex_option, 0 );
+
+		if ( $mutex_ts && ( time() - $mutex_ts ) > 30 * MINUTE_IN_SECONDS ) {
+			delete_option( $mutex_option );
+			$mutex_ts = 0;
+		}
+
+		if ( $mutex_ts ) {
+			return false;
+		}
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$acquired = (bool) $wpdb->query(
+			$wpdb->prepare(
+				"INSERT IGNORE INTO {$wpdb->options} (option_name, option_value, autoload) VALUES (%s, %s, 'no')",
+				$mutex_option,
+				(string) time()
+			)
+		);
+
+		if ( $acquired ) {
+			register_shutdown_function(
+				static function ( string $opt ) {
+					delete_option( $opt );
+				},
+				$mutex_option
+			);
+		}
+
+		return $acquired;
+	}
+
+	/**
+	 * Emits a "waiting for the previous request to finish" retry response.
+	 *
+	 * The client re-sends the same request after retryAfter seconds without
+	 * advancing the pipeline.
+	 *
+	 * @param string $phase The AJAX action to retry.
+	 *
+	 * @return void
+	 * @since 2.0.0
+	 */
+	private function respondWaiting( string $phase ): void {
+		wp_send_json(
+			$this->chunkPayload(
+				[
+					'nextPhase'        => $phase,
+					'nextPhaseMessage' => esc_html__( 'Waiting for previous import to finish…', 'easy-demo-importer' ),
+					'retry'            => true,
+					// Kept short: the common case here is a benign timing overlap in
+					// the tight batch loop (the previous request's shutdown handler
+					// has not released the lock yet), not real contention — so a brief
+					// re-check avoids a jarring multi-second stall. Genuine concurrent
+					// imports simply poll every 2s until the other finishes.
+					'retryAfter'       => 2,
+				]
+			)
+		);
+	}
+
+	/**
+	 * Builds a chunk-phase response payload, merged over shared defaults.
+	 *
+	 * @param array $extra Fields overriding the defaults.
+	 *
+	 * @return array
+	 * @since 2.0.0
+	 */
+	private function chunkPayload( array $extra ): array {
+		return array_merge(
+			[
+				'demo'                  => $this->demoSlug,
+				'excludeImages'         => $this->excludeImages,
+				'skipImageRegeneration' => $this->skipImageRegeneration,
+				'reset'                 => $this->reset,
+				'snapshot'              => $this->snapshot,
+				'manual'                => $this->manual ? 'true' : 'false',
+				'manualKey'             => $this->manualKey,
+				'sessionId'             => $this->sessionId,
+				'nextPhase'             => '',
+				'nextPhaseMessage'      => '',
+				'completedMessage'      => '',
+				'error'                 => false,
+				'retry'                 => false,
+			],
+			$extra
 		);
 	}
 
@@ -204,6 +1039,7 @@ class InstallDemo extends ImporterAjax {
 			if ( file_exists( $xmlFilePath ) ) {
 				$wp_import                    = new SD_EDI_WP_Import();
 				$wp_import->fetch_attachments = $excludeImages;
+				$wp_import->bundled_media_dir = $this->bundledMediaDir();
 
 				if ( $skipImageRegeneration ) {
 					add_filter( 'intermediate_image_sizes_advanced', '__return_empty_array', 9999 );
@@ -213,7 +1049,10 @@ class InstallDemo extends ImporterAjax {
 				// Import XML.
 				ob_start();
 				$wp_import->import( $xmlFilePath );
-				ob_end_clean();
+				$this->logImporterOutput( ob_get_clean() );
+
+				// Persist failed attachment downloads for the retry flow.
+				FailedMedia::save( $this->sessionId, (array) $wp_import->failed_attachments );
 
 				if ( ! $excludeImages ) {
 					$this->unsetThumbnails();
@@ -235,7 +1074,7 @@ class InstallDemo extends ImporterAjax {
 	 * every XML import so that a resume run always starts from a clean slate.
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private function clearNavMenus() {
 		global $wpdb;

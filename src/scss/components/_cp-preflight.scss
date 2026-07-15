@@ -1,0 +1,83 @@
+// ================================
+//	Pre-import readiness panel.
+//	Plain list matching the Required Plugins list beside it — no box,
+//	no collapse. Shared column chrome (bottom fade, list height, intro
+//	paragraph size) lives with .required-plugins in _lo-modal.scss so both
+//	columns stay pixel-identical.
+// ================================
+
+.preflight-row {
+	margin-top: 20px;
+}
+
+// A quiet secondary affordance that trails the intro sentence inline — small,
+// with an arrow instead of an underline.
+.readiness-status-link {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	white-space: nowrap;
+	font-size: 13px;
+	font-weight: 500;
+	color: $color-primary;
+	text-decoration: none;
+
+	.anticon {
+		font-size: 11px;
+		transition: transform 0.15s ease;
+	}
+
+	&:hover {
+		text-decoration: underline;
+		color: $color-primary;
+
+		.anticon {
+			transform: translateX(2px);
+		}
+	}
+}
+
+.edi-preflight {
+	$c-fail: #d63638;
+	$c-warn: #8a6d1a;
+
+	// Preview: label stacked above message, like the Required Plugins list.
+	.ant-list-item {
+		display: grid;
+		grid-template-columns: auto 1fr;
+		column-gap: 16px;
+		align-items: start;
+	}
+
+	// Same icon size as the Required Plugins list beside it.
+	.edi-preflight-item-icon {
+		grid-row: 1 / 3;
+		font-size: 20px;
+		top: -2px;
+
+		@extend .edi-pos-r;
+	}
+
+	.edi-preflight-item-label {
+		grid-column: 2;
+		font-weight: 600;
+		color: #1d2327;
+		margin: 0 0 4px 0;
+	}
+
+	// Same muted tone as the Required Plugins list's description line.
+	.edi-preflight-item-msg {
+		grid-column: 2;
+		color: rgba(0, 0, 0, 0.45);
+	}
+
+	// Draw attention to the rows that actually need action.
+	.ant-list-item.is-fail .edi-preflight-item-msg {
+		color: $c-fail;
+		font-weight: 600;
+	}
+
+	.ant-list-item.is-warn .edi-preflight-item-msg {
+		color: $c-warn;
+	}
+}

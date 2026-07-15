@@ -95,10 +95,20 @@ class CustomizerImport extends ImporterAjax {
 		}
 
 		// Response.
+		// The next-phase message must always be present: it is the client's signal
+		// to advance the pipeline. Leaving it empty when there is no customizer
+		// file halts the whole import at the result screen (with a blank title)
+		// and skips menus/settings/widgets/finalize. Only the "completed" message
+		// (third arg) is conditional on whether customizer data was imported.
+		// Friendlier text in the modal; the log keeps the neutral equivalent.
 		$this->prepareResponse(
 			'sd_edi_import_menus',
-			$fileExists ? esc_html__( 'Working on the menus, just a sec!', 'easy-demo-importer' ) : '',
-			$fileExists ? esc_html__( 'Customizer settings in place – all set!', 'easy-demo-importer' ) : esc_html__( 'Skipping the fancy customizer settings import!.', 'easy-demo-importer' )
+			esc_html__( 'Working on your menus — just a sec!', 'easy-demo-importer' ),
+			$fileExists ? esc_html__( 'Customizer settings are all set!', 'easy-demo-importer' ) : esc_html__( 'No customizer settings found — skipping.', 'easy-demo-importer' ),
+			false,
+			'',
+			'',
+			$fileExists ? esc_html__( 'Customizer settings imported.', 'easy-demo-importer' ) : esc_html__( 'No customizer settings to import. Skipping.', 'easy-demo-importer' )
 		);
 	}
 }

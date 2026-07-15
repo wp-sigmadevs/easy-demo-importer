@@ -29,7 +29,7 @@ final class Plugin {
 	 * Plugin data cache.
 	 *
 	 * @var array|null
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	private $pluginData = null;
 
@@ -67,6 +67,8 @@ final class Plugin {
 			'plugin_active_file'  => plugin_basename( SD_EDI_ROOT_FILE ),
 			'demo_import_page'    => 'sd-easy-demo-importer',
 			'system_status_page'  => admin_url( 'themes.php?page=sd-easy-demo-importer#/system_status_page' ),
+			'import_log_page'     => admin_url( 'themes.php?page=sd-easy-demo-importer#/import_log' ),
+			'regen_thumbs_page'   => admin_url( 'themes.php?page=sd-easy-demo-importer#/regenerate_thumbnails' ),
 			'views_folder'        => 'views',
 			'template_folder'     => 'templates',
 			'ext_template_folder' => 'sd-edi-templates',

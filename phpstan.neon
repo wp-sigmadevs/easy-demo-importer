@@ -8,3 +8,4 @@ parameters:
         - inc
     bootstrapFiles:
         - vendor/php-stubs/wordpress-stubs/wordpress-stubs.php
+        - lib/wordpress-importer/class-wp-import.php

@@ -6,7 +6,7 @@
  * WordPress calls this file automatically if it exists in the plugin root.
  *
  * @package SigmaDevs\EasyDemoImporter
- * @since   1.2.0
+ * @since   2.0.0
  */
 
 // Do not allow directly accessing this file.
@@ -28,10 +28,16 @@ $wpdb->query(
 	"DELETE FROM {$wpdb->options} WHERE option_name LIKE '\_transient\_sd\_edi\_%' OR option_name LIKE '\_transient\_timeout\_sd\_edi\_%'"
 );
 
-// Drop the taxonomy import tracking table.
-$table_name = $wpdb->prefix . 'sd_edi_taxonomy_import'; // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
-// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQLPlaceholders.UnquotedComplexPlaceholder
-$wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %1$s', $table_name ) );
+// Drop the plugin's tables (taxonomy import tracking + activity log).
+$edi_tables = [ // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
+	$wpdb->prefix . 'sd_edi_taxonomy_import',
+	$wpdb->prefix . 'sd_edi_import_log',
+];
+
+foreach ( $edi_tables as $table_name ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQLPlaceholders.UnquotedComplexPlaceholder
+	$wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %1$s', $table_name ) );
+}
 
 // Clear any scheduled cron events registered by the plugin.
 // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound

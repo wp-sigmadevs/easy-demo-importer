@@ -121,4 +121,17 @@
 	&:hover {
 		background-position: right center;
 	}
+
+	// Without this the gradient stays painted under antd's disabled state,
+	// leaving a washed-out blue button with faded dark text. Render it as a
+	// proper, clearly-inactive grey button instead.
+	&:disabled,
+	&.ant-btn-disabled {
+		background-image: none;
+		background-color: rgba(0, 0, 0, 0.04);
+		border-color: #d9d9d9;
+		color: rgba(0, 0, 0, 0.25);
+		box-shadow: none;
+		cursor: not-allowed;
+	}
 }

@@ -14,8 +14,10 @@ namespace SigmaDevs\EasyDemoImporter\Common\Abstracts;
 
 use SigmaDevs\EasyDemoImporter\Common\Functions\{
 	Helpers,
+	ImportLogger,
 	SessionManager
 };
+use SigmaDevs\EasyDemoImporter\Common\Utils\ManualContext;
 
 // Do not allow directly accessing this file.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -64,7 +66,7 @@ abstract class ImporterAjax {
 	 * Skip image regeneration.
 	 *
 	 * @var bool
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public $skipImageRegeneration = false;
 
@@ -93,10 +95,34 @@ abstract class ImporterAjax {
 	public $reset;
 
 	/**
+	 * Create a restore point (snapshot) before importing.
+	 *
+	 * @var bool
+	 * @since 2.0.0
+	 */
+	public $snapshot = false;
+
+	/**
+	 * Whether this is a manual import (user-uploaded files, no theme config).
+	 *
+	 * @var bool
+	 * @since 2.0.0
+	 */
+	public $manual = false;
+
+	/**
+	 * Manual import working-directory key.
+	 *
+	 * @var string
+	 * @since 2.0.0
+	 */
+	public $manualKey = '';
+
+	/**
 	 * Import session ID.
 	 *
 	 * @var string
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public $sessionId = '';
 
@@ -137,17 +163,30 @@ abstract class ImporterAjax {
 			);
 		}
 
-		// Theme config.
-		$this->config = sd_edi()->getDemoConfig();
+		// Theme config — or, for a manual import (user-uploaded files, no theme
+		// demo config), a minimal stub pointing the phases at the uploaded working
+		// directory. The stub deliberately declares nothing beyond the working
+		// directory, so the settings/slider/fluent-forms phases no-op.
+		if ( ManualContext::isManual() ) {
+			$this->config = ManualContext::configStub( ManualContext::requestKey() );
+		} else {
+			$this->config = sd_edi()->getDemoConfig();
 
-		if ( empty( $this->config ) ) {
-			wp_send_json_error(
-				[
-					'errorMessage' => esc_html__( 'Demo configuration is missing or empty.', 'easy-demo-importer' ),
-					'errorHint'    => esc_html__( 'Make sure your theme is calling the sd/edi/importer/config filter and returning a valid configuration array.', 'easy-demo-importer' ),
-				],
-				500
-			);
+			if ( empty( $this->config ) ) {
+				ImportLogger::error(
+					esc_html__( 'Demo configuration is missing or empty.', 'easy-demo-importer' ),
+					$this->sessionId,
+					$this->demoSlug
+				);
+
+				wp_send_json_error(
+					[
+						'errorMessage' => esc_html__( 'Demo configuration is missing or empty.', 'easy-demo-importer' ),
+						'errorHint'    => esc_html__( 'Make sure your theme is calling the sd/edi/importer/config filter and returning a valid configuration array.', 'easy-demo-importer' ),
+					],
+					500
+				);
+			}
 		}
 
 		// Uploads Directory.
@@ -164,6 +203,12 @@ abstract class ImporterAjax {
 
 		if ( ! empty( $posted_session_id ) ) {
 			if ( ! SessionManager::isValid( $posted_session_id ) ) {
+				ImportLogger::error(
+					esc_html__( 'The import session is no longer valid.', 'easy-demo-importer' ),
+					$posted_session_id,
+					$this->demoSlug
+				);
+
 				wp_send_json_error(
 					[
 						'errorMessage' => esc_html__( 'The import session is no longer valid.', 'easy-demo-importer' ),
@@ -174,6 +219,11 @@ abstract class ImporterAjax {
 			}
 
 			$this->sessionId = $posted_session_id;
+
+			// Heartbeat: this phase is genuine progress, so keep the session fresh.
+			// A silent (interrupted) import stops touching this and is flagged in
+			// the Import Log even before its 30-minute lock expires.
+			SessionManager::touch( $this->sessionId );
 		}
 
 		// Check if images import is needed.
@@ -184,6 +234,30 @@ abstract class ImporterAjax {
 
 		// Check if database reset needed.
 		$this->reset = isset( $_POST['reset'] ) && 'true' === sanitize_text_field( wp_unslash( $_POST['reset'] ) );
+
+		// Check if a pre-import restore point (snapshot) was requested.
+		$this->snapshot = isset( $_POST['snapshot'] ) && 'true' === sanitize_text_field( wp_unslash( $_POST['snapshot'] ) );
+
+		// Manual-import flags (carried across every phase so the config stub +
+		// working directory resolve on each request).
+		$this->manual    = ManualContext::isManual();
+		$this->manualKey = ManualContext::requestKey();
+
+		// A manual import that shipped its own media (an images .zip, or a bundle
+		// with an uploads/ folder) stages those files under <working-dir>/uploads.
+		// The UI hides the "Import Demo Images" toggle in that case, so
+		// excludeImages arrives as 'true' and would skip every attachment. Force
+		// it off so the bundled-media path attaches the staged files locally —
+		// creating real Media Library entries — instead of dropping raw files on
+		// disk. Applied on every phase so the content-import and regeneration
+		// steps agree.
+		if ( $this->manual ) {
+			$staged = $this->demoUploadDir( $this->demoDir() ) . '/uploads';
+
+			if ( is_dir( $staged ) && ( new \FilesystemIterator( $staged ) )->valid() ) {
+				$this->excludeImages = 'false';
+			}
+		}
 	}
 
 	/**
@@ -216,22 +290,30 @@ abstract class ImporterAjax {
 	/**
 	 * Prepare ajax response.
 	 *
-	 * @param string $nextPhase Next phase.
-	 * @param string $nextPhaseMessage Next phase message.
-	 * @param string $complete Completed message.
-	 * @param bool   $error Error.
-	 * @param string $errorMessage Error message.
-	 * @param string $errorHint Error hint.
+	 * @param string      $nextPhase Next phase.
+	 * @param string      $nextPhaseMessage Next phase message.
+	 * @param string      $complete Completed message, shown as the modal card text.
+	 * @param bool        $error Error.
+	 * @param string      $errorMessage Error message.
+	 * @param string      $errorHint Error hint.
+	 * @param string|null $logMessage Activity-log text for this completion, if it
+	 *                                should read differently there than the modal's
+	 *                                friendlier $complete text (e.g. no idioms, since
+	 *                                the log is a technical record). Defaults to
+	 *                                $complete when omitted.
 	 *
 	 * @return void
 	 * @since 1.0.0
 	 */
-	public function prepareResponse( $nextPhase, $nextPhaseMessage, $complete = '', $error = false, $errorMessage = '', $errorHint = '' ) {
+	public function prepareResponse( $nextPhase, $nextPhaseMessage, $complete = '', $error = false, $errorMessage = '', $errorHint = '', $logMessage = null ) {
 		$this->response = [
 			'demo'                  => $this->demoSlug,
 			'excludeImages'         => $this->excludeImages,
 			'skipImageRegeneration' => $this->skipImageRegeneration,
 			'reset'                 => $this->reset,
+			'snapshot'              => $this->snapshot,
+			'manual'                => $this->manual ? 'true' : 'false',
+			'manualKey'             => $this->manualKey,
 			'sessionId'             => $this->sessionId,
 			'nextPhase'             => $nextPhase,
 			'nextPhaseMessage'      => $nextPhaseMessage,
@@ -240,6 +322,23 @@ abstract class ImporterAjax {
 			'errorMessage'          => $errorMessage,
 			'errorHint'             => $errorHint,
 		];
+
+		// Mirror every phase outcome to the activity log — one place covers all
+		// wizard phases. Errors log as error; the terminal completion (no next
+		// phase) logs as success; every other completed step logs as info.
+		if ( $error ) {
+			if ( '' !== $errorMessage ) {
+				ImportLogger::error( $errorMessage, $this->sessionId, $this->demoSlug );
+			}
+		} elseif ( '' !== $complete ) {
+			$logText = $logMessage ?? $complete;
+
+			if ( '' === $nextPhase ) {
+				ImportLogger::success( $logText, $this->sessionId, $this->demoSlug );
+			} else {
+				ImportLogger::info( $logText, $this->sessionId, $this->demoSlug );
+			}
+		}
 
 		$this->sendResponse();
 	}
@@ -323,7 +422,7 @@ abstract class ImporterAjax {
 	 * @param string   $customExtractDir Optional. The custom directory to extract files to. If null, a default is used.
 	 *
 	 * @return bool True if import was attempted and successful, false otherwise.
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	protected function unzipAndImportSlider( $sliderFileKey, $importCallback, $customExtractDir = null ) {
 		$slider = basename(

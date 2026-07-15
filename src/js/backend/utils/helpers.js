@@ -58,13 +58,16 @@ export const getPluginText = (status) => {
  * @param {number}  currentStep    - The current step in the import process.
  * @param {boolean} importComplete - The import complete status.
  * @param {number}  index          - The index of the step.
+ * @param {number}  total          - Total number of steps.
  */
-export const getCurrentStatus = (currentStep, importComplete, index) => {
+export const getCurrentStatus = (currentStep, importComplete, index, total) => {
+	const lastIndex = (total || 5) - 1;
+
 	if (index === currentStep - 1) {
 		return 'process';
 	} else if (index < currentStep) {
 		return 'finish';
-	} else if (index === 3 && importComplete) {
+	} else if (index === lastIndex && importComplete) {
 		return 'finish';
 	}
 
@@ -76,7 +79,7 @@ export const getCurrentStatus = (currentStep, importComplete, index) => {
  */
 export const progressSteps = () => {
 	return sdEdiAdminParams && sdEdiAdminParams.stepTitles
-		? Object.entries(sdEdiAdminParams.stepTitles).map(([key, value]) => ({
+		? Object.entries(sdEdiAdminParams.stepTitles).map(([, value]) => ({
 				title: value,
 			}))
 		: [

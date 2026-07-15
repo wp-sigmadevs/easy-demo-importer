@@ -135,3 +135,306 @@
 		}
 	}
 }
+
+// Success screen's "More…" dropdown items (Roll Back, Discard Backup).
+// Portaled to <body>, so styled at the root rather than under the modal.
+// antd v5's own CSS-in-JS rules for .ant-dropdown-menu-item can land after
+// ours in the stylesheet, so color/background need !important to win.
+.edi-menu-item-primary {
+	color: $color-primary !important;
+
+	.anticon,
+	.edi-menu-help-icon {
+		color: $color-primary !important;
+	}
+
+	&:hover,
+	&.ant-dropdown-menu-item-active {
+		background-image: linear-gradient(109.6deg, rgb(45, 116, 213) 11.2%, rgb(121, 137, 212) 91.2%) !important;
+		color: #fff !important;
+
+		.anticon,
+		.edi-menu-help-icon {
+			color: #fff !important;
+		}
+	}
+}
+
+.edi-menu-item-danger {
+	.edi-menu-help-icon {
+		color: #ff4d4f !important;
+	}
+
+	&:hover,
+	&.ant-dropdown-menu-item-active {
+		background-image: linear-gradient(109.6deg, #ff4d4f 11.2%, #a44f51 91.2%) !important;
+		color: #fff !important;
+
+		.anticon,
+		.edi-menu-help-icon {
+			color: #fff !important;
+		}
+	}
+}
+
+// Label + help-icon row — icon pinned to the item's right edge.
+.edi-menu-item-label {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	width: 100%;
+}
+
+.edi-menu-help-icon {
+	margin-inline-start: 12px;
+}
+
+// Manual-import modal — its file slots. The rest of the chrome (steps,
+// option groups, action bar) is inherited from the shared modal styles.
+// Safety options card — shared by the manual-import modal and the Configure step.
+// The SAFETY label sits OUTSIDE the box (like the FILES / Performance label above
+// its own column), so only the toggles are wrapped in this bordered card. It sizes
+// to its own content, so the two columns are independent heights.
+.import-options .safety-card {
+	padding: 20px 24px;
+	border: 1px solid rgba(5, 5, 5, 0.12);
+	border-radius: 10px;
+	background: #fcfcfd;
+}
+
+.edi-manual-modal {
+	// Mode switcher, styled to match the Status page's top tab pill: a centred
+	// white rounded bar with the brand-gradient pill marking the active mode.
+	.manual-mode-switch {
+		display: flex;
+		justify-content: center;
+		margin-bottom: 28px;
+
+		// An antd Tabs bar used purely as a switcher, styled to match the Status
+		// page's top tabs so it looks AND behaves identically — same component,
+		// so hover-to-primary and the active-text colour transition come from
+		// antd's own tab defaults rather than being reimplemented here.
+		.ant-tabs {
+			// No tab panels — hide the empty content area.
+			.ant-tabs-content-holder {
+				display: none;
+			}
+
+			.ant-tabs-nav {
+				margin: 0;
+
+				&::before {
+					display: none;
+				}
+
+				.ant-tabs-nav-wrap {
+					overflow: visible;
+				}
+
+				// White rounded pill hugging the tabs (as on the Status page).
+				.ant-tabs-nav-list {
+					background: #fff;
+					border-radius: 999px;
+					box-shadow: 0 6px 22px rgba(16, 24, 40, 0.1);
+				}
+			}
+
+			// Gradient pill that slides under the active tab.
+			.ant-tabs-ink-bar {
+				height: 100%;
+				border-radius: 25px;
+				background-image: linear-gradient(109.6deg, rgb(45, 116, 213) 11.2%, rgb(121, 137, 212) 91.2%);
+				background-size: 200% auto;
+			}
+
+			.ant-tabs-tab {
+				z-index: 1;
+				height: 45px;
+				min-width: 150px;
+				padding: 0 24px;
+				justify-content: center;
+				font-size: 15px;
+				font-weight: 500;
+
+				+ .ant-tabs-tab {
+					margin: 0 !important;
+				}
+
+				&.ant-tabs-tab-active .ant-tabs-tab-btn {
+					@extend .edi-white-color;
+				}
+			}
+		}
+	}
+
+	// Each slot is an antd Dragger restyled into a compact card, so every
+	// file type accepts both drag-and-drop and click-to-browse.
+	.manual-slot {
+		&.ant-upload-wrapper {
+			display: block;
+			margin-bottom: 12px;
+		}
+
+		.ant-upload-drag {
+			border-radius: 10px;
+			border: 1px dashed rgba(5, 5, 5, 0.22);
+			background: #fcfcfd;
+			transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+
+			&:hover,
+			&.ant-upload-drag-hover {
+				border-color: $color-primary;
+				background: rgba(45, 116, 213, 0.03);
+			}
+
+			// antd's default `display: table` shrink-to-fits its content, so a long
+			// hint widened the flex body past the slot and pushed the tag into the
+			// next column. Pinning the width with fixed table layout keeps it bounded
+			// WITHOUT dropping display:table — which antd's whole-slot click-to-browse
+			// relies on (an earlier `display: block` here broke click-to-upload).
+			.ant-upload-btn {
+				width: 100%;
+				table-layout: fixed;
+				padding: 0;
+			}
+
+			.ant-upload-drag-container {
+				display: block;
+			}
+		}
+
+		// Hero (wide) slots have room for the full description, so let the hint
+		// wrap instead of truncating to a single ellipsised line.
+		&.is-wide .manual-slot-hint {
+			white-space: normal;
+		}
+
+		.manual-slot-body {
+			display: flex;
+			align-items: center;
+			column-gap: 12px;
+			padding: 12px 14px;
+			text-align: left;
+		}
+
+		.manual-slot-icon {
+			flex: 0 0 auto;
+			display: inline-flex;
+			font-size: 20px;
+			color: $color-primary;
+		}
+
+		.manual-slot-meta {
+			flex: 1;
+			min-width: 0;
+			display: flex;
+			flex-direction: column;
+			row-gap: 1px;
+		}
+
+		.manual-slot-title {
+			font-size: 13px;
+			font-weight: 600;
+			color: #333;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+
+		.manual-slot-hint {
+			font-size: 11.5px;
+			color: #8a8f94;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+
+		.manual-slot-tag {
+			flex: 0 0 auto;
+			padding: 2px 9px;
+			border-radius: 999px;
+			font-size: 10px;
+			font-weight: 600;
+			letter-spacing: 0.05em;
+			text-transform: uppercase;
+			background: rgba(5, 5, 5, 0.05);
+			color: #8a8f94;
+
+			&.is-required {
+				background: rgba(45, 116, 213, 0.1);
+				color: $color-primary;
+			}
+		}
+
+		.manual-slot-remove {
+			flex: 0 0 auto;
+			color: #999;
+
+			&:hover {
+				color: #ff4d4f;
+			}
+		}
+
+		// A chosen file: solid primary border + green check.
+		&.is-filled {
+			.ant-upload-drag {
+				border-style: solid;
+				border-color: rgba(45, 116, 213, 0.45);
+				background: rgba(45, 116, 213, 0.04);
+			}
+
+			.manual-slot-icon {
+				color: #52c41a;
+			}
+		}
+
+		// Hero variant — the required content slot / the bundle dropzone.
+		&.is-wide {
+			.manual-slot-body {
+				padding: 20px;
+			}
+
+			.manual-slot-icon {
+				font-size: 30px;
+			}
+
+			.manual-slot-title {
+				font-size: 14px;
+				white-space: normal;
+			}
+
+			.manual-slot-drop-hint {
+				margin: -10px 0 0;
+				padding: 0 20px 16px 62px;
+				font-size: 12px;
+				color: #8a8f94;
+				text-align: left;
+			}
+		}
+	}
+
+	.manual-slot-grid {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+		gap: 12px;
+
+		.manual-slot.ant-upload-wrapper {
+			margin-bottom: 0;
+
+			&.is-full {
+				grid-column: 1 / -1;
+			}
+		}
+
+		@media only screen and (max-width: 575px) {
+			grid-template-columns: 1fr;
+		}
+	}
+
+	.manual-help {
+		margin-left: 8px;
+		cursor: pointer;
+		font-size: 18px;
+		display: inline-flex;
+	}
+}

@@ -161,6 +161,39 @@ class SD_EDI_WP_Import extends WP_Importer {
 	public $fetch_attachments = false;
 
 	/**
+	 * Absolute path to the demo package's bundled `uploads/` folder, when the
+	 * package shipped its media on disk. Empty disables bundled-media mode and
+	 * every attachment is fetched over HTTP as before. Persisted across chunked
+	 * batches via ChunkedImport::MUTABLE_PROPS.
+	 *
+	 * @var string
+	 * @since 2.0.0
+	 */
+	public $bundled_media_dir = '';
+
+	/**
+	 * Count of attachments installed from the bundled `uploads/` folder (rather
+	 * than fetched remotely). Persisted across batches and surfaced in the
+	 * activity log.
+	 *
+	 * @var int
+	 * @since 2.0.0
+	 */
+	public $bundled_media_imported = 0;
+
+	/**
+	 * Attachments whose download failed during import — each is
+	 * ['url' => source URL, 'data' => the slashed attachment post array] so the
+	 * retry-failed-media flow can re-attempt exactly those, without an attachment
+	 * having been created (a failed fetch never inserts one). Persisted across
+	 * chunked batches via ChunkedImport::MUTABLE_PROPS.
+	 *
+	 * @var array
+	 * @since 2.0.0
+	 */
+	public $failed_attachments = [];
+
+	/**
 	 * URL Remap
 	 *
 	 * @var array
@@ -591,10 +624,17 @@ class SD_EDI_WP_Import extends WP_Importer {
 	 * @return void
 	 * @since 1.0.0
 	 */
-	public function process_posts() {
+	public function process_posts( $offset = 0, $limit = 0 ) {
 		$this->posts = apply_filters( 'wp_import_posts', $this->posts );
 
-		foreach ( $this->posts as $post ) {
+		// Chunked import: operate on a slice so the post loop can resume across
+		// separate requests. $limit === 0 preserves the original single-shot
+		// behavior exactly (process every post, in order).
+		$posts = ( $limit > 0 )
+			? array_slice( $this->posts, $offset, $limit, true )
+			: $this->posts;
+
+		foreach ( $posts as $post ) {
 			$post = apply_filters( 'wp_import_post_data_raw', $post );
 
 			if ( ! post_type_exists( $post['post_type'] ) ) {
@@ -727,11 +767,43 @@ class SD_EDI_WP_Import extends WP_Importer {
 				}
 
 				if ( is_wp_error( $post_id ) ) {
+					// Images were intentionally disabled for this import, so the
+					// attachment was skipped, not failed. Log it as a skip and move
+					// on. Divergence from the vendored importer — keep it minimal
+					// for future upstream syncs.
+					if ( 'attachment_fetch_disabled' === $post_id->get_error_code() ) {
+						printf(
+							/* translators: 1. Singular Name, 2. Post Title */
+							esc_html__( 'Skipped %1$s &#8220;%2$s&#8221;: image import is turned off.', 'easy-demo-importer' ),
+							esc_html( $post_type_object->labels->singular_name ),
+							esc_html( $post['post_title'] )
+						);
+						echo '<br />';
+						continue;
+					}
+
+					// Record a failed attachment download so it can be retried later
+					// without re-running the whole import. A failed fetch never
+					// created an attachment, so we keep the source URL + the post
+					// data needed to re-attempt exactly this one. Divergence from the
+					// vendored importer — keep it minimal for future upstream syncs.
+					if ( 'attachment' === $postdata['post_type'] && $this->fetch_attachments && ! empty( $remote_url ) ) {
+						$this->failed_attachments[] = [
+							'url'  => $remote_url,
+							'data' => $postdata,
+						];
+					}
+
+					// Include the WP_Error reason (e.g. a failed image download) so the
+					// plugin's activity log can surface *why* the item was skipped, not
+					// just that it was. Divergence from the vendored importer — keep it
+					// minimal for future upstream syncs.
 					printf(
-						/* translators: 1. Singular Name, 2. Post Title */
-						esc_html__( 'Failed to import %1$s &#8220;%2$s&#8221;', 'easy-demo-importer' ),
+						/* translators: 1. Singular Name, 2. Post Title, 3. Error reason */
+						esc_html__( 'Failed to import %1$s &#8220;%2$s&#8221;: %3$s', 'easy-demo-importer' ),
 						esc_html( $post_type_object->labels->singular_name ),
-						esc_html( $post['post_title'] )
+						esc_html( $post['post_title'] ),
+						esc_html( $post_id->get_error_message() )
 					);
 					echo '<br />';
 					continue;
@@ -882,7 +954,12 @@ class SD_EDI_WP_Import extends WP_Importer {
 			}
 		}
 
-		unset( $this->posts );
+		// Only release the parsed posts in single-shot mode. Chunked mode needs
+		// them preserved across batches (state is re-hydrated each request), and
+		// releases them when the session state file is deleted in finalize().
+		if ( 0 === $limit ) {
+			unset( $this->posts );
+		}
 	}
 
 	/**
@@ -1021,8 +1098,11 @@ class SD_EDI_WP_Import extends WP_Importer {
 	 */
 	public function process_attachment( $post, $url ) {
 		if ( ! $this->fetch_attachments ) {
+			// A distinct code so the caller can log this as an intentional skip
+			// (images disabled) rather than a failure. Divergence from the
+			// vendored importer — keep it minimal for future upstream syncs.
 			return new WP_Error(
-				'attachment_processing_error',
+				'attachment_fetch_disabled',
 				esc_html__( 'Fetching attachments is not enabled', 'easy-demo-importer' )
 			);
 		}
@@ -1074,6 +1154,21 @@ class SD_EDI_WP_Import extends WP_Importer {
 	 * @since 1.0.0
 	 */
 	public function fetch_remote_file( $url, $post ) {
+		// Bundled-media short-circuit: when the demo package shipped this file on
+		// disk, install it from the local copy instead of fetching over HTTP —
+		// Cloudflare-proof and far faster. Falls through to the remote fetch below
+		// when the file is not bundled or the local copy fails. Divergence from the
+		// vendored importer — kept minimal for future upstream syncs.
+		$bundled_file = $this->resolve_bundled_media( $url );
+
+		if ( $bundled_file ) {
+			$local = $this->import_local_file( $bundled_file, $url, $post );
+
+			if ( ! is_wp_error( $local ) ) {
+				return $local;
+			}
+		}
+
 		// Extract the file name from the URL.
 		$path      = wp_parse_url( $url, PHP_URL_PATH );
 		$file_name = '';
@@ -1092,17 +1187,41 @@ class SD_EDI_WP_Import extends WP_Importer {
 		}
 
 		// Fetch the remote URL and write it to the placeholder file.
-		$remote_response = wp_safe_remote_get(
-			$url,
+		//
+		// Some demo-image hosts run bot-mitigation (e.g. Cloudflare) that rejects
+		// WordPress's default HTTP client signature with a 418/403 even though the
+		// same image loads fine in a browser. The user-agent and Referer (set to
+		// the WXR's own base_url — genuinely where these images were referenced
+		// from) are filterable so a theme author whose host does this can adjust
+		// them without patching the importer. Divergence from the vendored
+		// importer — keep it minimal for future upstream syncs.
+		$request_args = apply_filters( // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+			'sd/edi/importer/attachment_request_args',
 			[
-				'timeout'  => 300,
-				'stream'   => true,
-				'filename' => $tmp_file_name,
-				'headers'  => [
+				// A blocked/tarpitted image (e.g. behind a Cloudflare challenge)
+				// can hold the connection open until this timeout. A chunked batch
+				// cannot interrupt a blocking wp_safe_remote_get(), so a long
+				// timeout lets one bad image run the whole request past the
+				// reverse-proxy / FPM wall-clock limit and abort the import. Keep it
+				// short so a bad image fails fast and the import skips it and moves
+				// on. Filterable for hosts that legitimately serve large media.
+				'timeout'    => (int) apply_filters( 'sd/edi/importer/attachment_timeout', 40 ), // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+				'stream'     => true,
+				'filename'   => $tmp_file_name,
+				'user-agent' => apply_filters( // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+					'sd/edi/importer/attachment_user_agent',
+					'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36'
+				),
+				'headers'    => [
 					'Accept-Encoding' => 'identity',
+					'Referer'         => apply_filters( 'sd/edi/importer/attachment_referer', $this->base_url ), // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 				],
-			]
+			],
+			$url,
+			$post
 		);
+
+		$remote_response = wp_safe_remote_get( $url, $request_args );
 
 		if ( is_wp_error( $remote_response ) ) {
 			@unlink( $tmp_file_name ); // phpcs:ignore WordPress.WP.AlternativeFunctions.unlink_unlink
@@ -1247,6 +1366,107 @@ class SD_EDI_WP_Import extends WP_Importer {
 	}
 
 	/**
+	 * Resolve an attachment URL to a bundled file on disk, if present.
+	 *
+	 * Uses the pure URL→path mapping in BundledMedia to build uploads-relative
+	 * candidates, then returns the first that exists under $bundled_media_dir.
+	 * Filterable via 'sd/edi/importer/bundled_media_path' so a theme author can
+	 * override resolution (e.g. a basename fallback) for edge cases.
+	 *
+	 * @param string $url Attachment URL from the WXR file.
+	 *
+	 * @return string|null Absolute path to the bundled file, or null.
+	 * @since 2.0.0
+	 */
+	public function resolve_bundled_media( $url ) {
+		if ( empty( $this->bundled_media_dir ) || ! is_dir( $this->bundled_media_dir ) ) {
+			return null;
+		}
+
+		$base  = trailingslashit( $this->bundled_media_dir );
+		$found = null;
+
+		foreach ( \SigmaDevs\EasyDemoImporter\Common\Importer\BundledMedia::candidates( $url ) as $relative ) {
+			$candidate = $base . $relative;
+
+			if ( is_file( $candidate ) ) {
+				$found = $candidate;
+				break;
+			}
+		}
+
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+		return apply_filters( 'sd/edi/importer/bundled_media_path', $found, $url, $this->bundled_media_dir );
+	}
+
+	/**
+	 * Install a bundled file into the uploads directory.
+	 *
+	 * Mirrors the success contract of fetch_remote_file() — copies the file into
+	 * WP's uploads dir, returns the same ['file','url','type','error'] shape, and
+	 * records the old→new URL remaps so post content is rewritten to the local
+	 * URL. No HTTP, no timeout, no bot challenge.
+	 *
+	 * @param string $source Absolute path to the bundled file.
+	 * @param string $url    Original attachment URL (for URL remapping).
+	 * @param array  $post   Attachment details.
+	 *
+	 * @return array|WP_Error Upload details on success, WP_Error otherwise.
+	 * @since 2.0.0
+	 */
+	public function import_local_file( $source, $url, $post ) {
+		if ( ! is_file( $source ) ) {
+			return new WP_Error( 'import_file_error', esc_html__( 'Bundled media file not found.', 'easy-demo-importer' ) );
+		}
+
+		$upload_date = isset( $post['upload_date'] ) ? $post['upload_date'] : null;
+		$uploads     = wp_upload_dir( $upload_date );
+
+		if ( ! ( $uploads && false === $uploads['error'] ) ) {
+			return new WP_Error( 'upload_dir_error', $uploads['error'] );
+		}
+
+		$file_name = wp_unique_filename( $uploads['path'], wp_basename( $source ) );
+		$new_file  = $uploads['path'] . "/$file_name";
+
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_copy
+		if ( ! copy( $source, $new_file ) ) {
+			return new WP_Error( 'import_file_error', esc_html__( 'The bundled file could not be copied into the uploads directory.', 'easy-demo-importer' ) );
+		}
+
+		// Match the surrounding uploads' permissions, as fetch_remote_file() does.
+		// Guard the stat(): if it fails (dir race / open_basedir) we must NOT fall
+		// through to chmod( $new_file, 0 ), which would strip all permissions and
+		// make the just-copied media unreadable by the web server.
+		$stat = stat( dirname( $new_file ) );
+
+		if ( false !== $stat ) {
+			$perms = $stat['mode'] & 0000666;
+			chmod( $new_file, $perms ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_chmod
+		}
+
+		$wp_filetype = wp_check_filetype( $file_name );
+
+		$upload = [
+			'file'  => $new_file,
+			'url'   => $uploads['url'] . "/$file_name",
+			'type'  => empty( $wp_filetype['type'] ) ? '' : $wp_filetype['type'],
+			'error' => false,
+		];
+
+		// Keep track of the old and new URLs so we can substitute them later.
+		$this->url_remap[ $url ] = $upload['url'];
+
+		if ( ! empty( $post['guid'] ) ) {
+			$this->url_remap[ $post['guid'] ] = $upload['url'];
+		}
+
+		++$this->bundled_media_imported;
+
+		return $upload;
+	}
+
+	/**
 	 * Attempt to associate posts and menu items with previously missing parents
 	 *
 	 * An imported post's parent may not have been imported when it was first created
@@ -1351,7 +1571,7 @@ class SD_EDI_WP_Import extends WP_Importer {
 	 *
 	 * @param string $file Path to WXR file for parsing.
 	 *
-	 * @return array Information gathered from the WXR file
+	 * @return array|\WP_Error Information gathered from the WXR file, or an error on failure.
 	 * @since 1.0.0
 	 */
 	public function parse( $file ) {

@@ -16,15 +16,25 @@
 
 		.edi-nav-search {
 			@extend .edi-pos-s;
+			display: flex;
+			align-items: center;
+			gap: 14px;
 			margin-bottom: 20px;
-			width: 60%;
+			width: 100%;
 
 			@media only screen and (min-width: 1200px) {
 				position: absolute !important;
 				right: 0;
-				width: 30%;
+				width: 48%;
 				margin-bottom: 0;
 				z-index: 10;
+			}
+
+			// The search field takes the remaining width; the manual-import
+			// control keeps its natural size on the left of it.
+			.ant-input-search {
+				flex: 1 1 auto;
+				min-width: 0;
 			}
 
 			.ant-input-affix-wrapper {

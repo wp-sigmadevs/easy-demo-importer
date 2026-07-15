@@ -83,6 +83,8 @@ const useSharedDataStore = create((set) => ({
 	importList: {},
 	pluginList: {},
 	serverData: {},
+	logData: {},
+	preflightData: {},
 	loading: true,
 	currentStep: 1,
 	modalVisible: false,
@@ -90,6 +92,9 @@ const useSharedDataStore = create((set) => ({
 	skipImageRegeneration: false,
 	importComplete: false,
 	reset: true,
+	// On by default: reset is on by default and is destructive, so the restore
+	// point (the parachute) should be armed too rather than left off.
+	snapshot: true,
 	message: '',
 	hint: '',
 	resumeRequest: loadResumeRequest(),
@@ -118,7 +123,52 @@ const useSharedDataStore = create((set) => ({
 			const response = await Api.get(endpoint, {});
 			set({ serverData: response.data, loading: false });
 		} catch (error) {
-			console.error(error);
+			// Surface the failure so the panel can show an error state instead of
+			// a misleading empty one.
+			set({
+				serverData: {
+					success: false,
+					message:
+						error?.response?.data?.message ||
+						'Could not load server status. Please refresh and try again.',
+				},
+				loading: false,
+			});
+		}
+	},
+	fetchPreflightData: async (endpoint) => {
+		try {
+			const response = await Api.get(endpoint, {});
+			set({ preflightData: response.data });
+		} catch (error) {
+			// Never block the import on a failed readiness check — surface it as
+			// an error entry but let the user proceed.
+			set({
+				preflightData: {
+					success: false,
+					message:
+						error?.response?.data?.message ||
+						'Could not run the readiness check.',
+				},
+			});
+		}
+	},
+	fetchLogData: async (endpoint) => {
+		try {
+			const response = await Api.get(endpoint, {});
+			set({ logData: response.data, loading: false });
+		} catch (error) {
+			// Surface the failure so the panel renders its error state rather than
+			// the "no activity yet" empty state on a real transport error.
+			set({
+				logData: {
+					success: false,
+					message:
+						error?.response?.data?.message ||
+						'Could not load the import log. Please refresh and try again.',
+				},
+				loading: false,
+			});
 		}
 	},
 	setCurrentStep: (step) => set({ currentStep: step }),
@@ -127,6 +177,7 @@ const useSharedDataStore = create((set) => ({
 	setExcludeImages: (value) => set({ excludeImages: value }),
 	setSkipImageRegeneration: (value) => set({ skipImageRegeneration: value }),
 	setReset: (value) => set({ reset: value }),
+	setSnapshot: (value) => set({ snapshot: value }),
 	setLoading: (value) => set({ loading: value }),
 	setImportComplete: (value) => set({ importComplete: value }),
 	setMessage: (message) => set(() => ({ message })),
@@ -147,6 +198,7 @@ const useSharedDataStore = create((set) => ({
 			skipImageRegeneration: false,
 			importComplete: false,
 			reset: true,
+			snapshot: true,
 			message: '',
 			hint: '',
 			// resumeRequest is intentionally persisted across page reloads — do not clear it here.
