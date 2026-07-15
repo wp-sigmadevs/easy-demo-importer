@@ -4,7 +4,7 @@ Donate link:
 Tags: demo importer, one click demo importer, theme demo importer, WordPress demo importer, content import plugin
 Requires at least: 5.5
 Tested up to: 7.0
-Stable tag: 1.2.0
+Stable tag: 2.0.0
 Requires PHP: 7.4
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -136,7 +136,7 @@ For any inquiries, bug reports, or suggestions, please submit your request [here
 
 == Changelog ==
 
-= 1.2.0 (08-July-2026) =
+= 2.0.0 (15-July-2026) =
 * Feature: Resumable, chunked WXR content import — large WooCommerce demos no longer fail with 524/503 gateway timeouts on Cloudflare or under strict PHP-FPM execution limits. The import now runs in time-boxed batches that survive across requests.
 * Feature: Determinate content-import progress bar, with automatic resume after transient connection drops or gateway timeouts during the import.
 * Feature: Added support for importing LayerSlider slides.
@@ -156,6 +156,7 @@ For any inquiries, bug reports, or suggestions, please submit your request [here
 * Fix: Manual import now adds the images you supply (an images .zip, or a single bundle with an uploads/ folder) to the Media Library as real attachments — so featured images, product galleries, and thumbnails resolve — instead of only copying the raw files to disk.
 * Fix: With image import turned off, media items are now recorded as "Skipped" in the Activity log rather than "Failed", so a deliberate no-image import completes cleanly instead of being flagged "Completed with warnings".
 * Fix: Elementor global settings (container width, colors, fonts) are now applied after import. The active kit could be left with a duplicate document type during chunked import, causing Elementor to treat it as a page and skip its global CSS; the kit type is now normalized and Elementor's CSS is regenerated so the front end matches the demo.
+* Fix: The Activity log now labels manual imports "Manual Import" instead of an internal placeholder, and renders quotation marks in log messages correctly rather than showing raw HTML entities.
 * Tweak: The Import Log now closes out an interrupted run with an "Import was interrupted" entry and an "Interrupted" status, instead of leaving it stuck on "In progress". Runs that stop after content import but before finishing are no longer mislabelled as successful.
 * Tweak: A new import no longer has to wait for an interrupted one to release its lock — an abandoned import is superseded automatically, while a genuinely-running import still blocks a second one.
 * Tweak: Thumbnail regeneration runs are now recorded alongside imports, and the Status page's log tab has been renamed from "Import Logs" to "Activity" to reflect that it covers all plugin activity.
@@ -163,6 +164,7 @@ For any inquiries, bug reports, or suggestions, please submit your request [here
 * Tweak: Improved Widgets and database search-replace handling.
 * Tweak: Enhanced Customizer data import handling.
 * Tweak: Mapped HTTP status codes (408, 503, etc.) to human-readable messages and hints in the JS frontend.
+* Tweak: The readiness step now shows the "View full system status" link inline with the intro text.
 * Tweak: Improved uninstall cleanup to properly remove temporary import data.
 * Update: Updated i18n strings and translation template.
 
