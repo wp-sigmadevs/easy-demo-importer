@@ -503,6 +503,44 @@ class ManualImport extends Base {
 		if ( is_wp_error( $this->unzip( $zip, $staging ) ) ) {
 			$this->fail( esc_html__( 'The images .zip could not be unpacked into the uploads folder.', 'easy-demo-importer' ) );
 		}
+
+		// The staging folder is served from wp-content/uploads and is only guarded
+		// by an .htaccess (ignored by nginx), so a script smuggled into the images
+		// .zip would be briefly web-executable. Delete every extracted entry whose
+		// extension is not a known media type — only real media needs to reach the
+		// bundled-media importer.
+		$this->pruneNonMedia( $staging );
+	}
+
+	/**
+	 * Removes any file under a directory whose extension is not a media type.
+	 *
+	 * @param string $dir Directory to sweep (recursively).
+	 *
+	 * @return void
+	 * @since 2.0.0
+	 */
+	private function pruneNonMedia( string $dir ) {
+		if ( ! is_dir( $dir ) ) {
+			return;
+		}
+
+		$allowed  = $this->imageExtensions();
+		$iterator = new \RecursiveIteratorIterator(
+			new \RecursiveDirectoryIterator( $dir, \FilesystemIterator::SKIP_DOTS )
+		);
+
+		foreach ( $iterator as $file ) {
+			if ( ! $file->isFile() ) {
+				continue;
+			}
+
+			$ext = strtolower( pathinfo( $file->getFilename(), PATHINFO_EXTENSION ) );
+
+			if ( ! in_array( $ext, $allowed, true ) ) {
+				wp_delete_file( $file->getPathname() );
+			}
+		}
 	}
 
 	/**
