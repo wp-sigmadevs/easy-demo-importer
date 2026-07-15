@@ -73,11 +73,16 @@ class ImportMenus extends ImporterAjax {
 			$this->setMenu( $menus );
 		}
 
-		// Response.
+		// Response. Friendlier text in the modal; the log keeps the neutral
+		// equivalent.
 		$this->prepareResponse(
 			'sd_edi_import_settings',
 			esc_html__( 'Importing theme settings.', 'easy-demo-importer' ),
-			$menus ? esc_html__( 'Nav Menus are locked and loaded.', 'easy-demo-importer' ) : esc_html__( 'Skipping the nav menus import!.', 'easy-demo-importer' )
+			$menus ? esc_html__( 'Navigation menus are ready!', 'easy-demo-importer' ) : esc_html__( 'No navigation menus found — skipping.', 'easy-demo-importer' ),
+			false,
+			'',
+			'',
+			$menus ? esc_html__( 'Navigation menus imported.', 'easy-demo-importer' ) : esc_html__( 'No navigation menus to import. Skipping.', 'easy-demo-importer' )
 		);
 	}
 

@@ -2,6 +2,47 @@
  * Layout: Import Progress.
  */
 
+// Indeterminate progress shimmer — a 40%-wide fill sweeps across the track
+// while the active phase has no numeric percentage yet.
+@keyframes ediBarIndeterminate {
+	0% {
+		transform: translateX(-120%);
+	}
+
+	100% {
+		transform: translateX(320%);
+	}
+}
+
+// Moving diagonal stripes over the determinate fill (one 14px stripe cycle).
+@keyframes ediBarStripes {
+	0% {
+		background-position: 0 0, 0 0;
+	}
+
+	100% {
+		background-position: 14px 0, 0 0;
+	}
+}
+
+// Card entrance — slides up + fades in. The active slot's resting transform
+// is always translateZ(0) translateY(0) (see :nth-last-child(1) below); both
+// keyframe states keep that same translateZ(0) so the animation never drops
+// the 3D stack's Z position mid-flight (a bare translateY() here previously
+// overrode it, snapping the card to full size before settling — the "grow"
+// bug this was rewritten to avoid).
+@keyframes ediCardEnter {
+	from {
+		opacity: 0;
+		transform: translateZ(0) translateY(50%);
+	}
+
+	to {
+		opacity: 1;
+		transform: translateZ(0) translateY(0);
+	}
+}
+
 .appearance_page_sd-easy-demo-importer {
 	.modal-content {
 		&.import-step {
@@ -36,9 +77,8 @@
 
 				.ant-timeline-item {
 					display: none;
-					transition: opacity 0.5s, tramsform 0.5s;
+					transition: opacity 0.3s cubic-bezier(0.22, 0.61, 0.36, 1), transform 0.3s cubic-bezier(0.22, 0.61, 0.36, 1);
 					font-size: 20px !important;
-					animation: ediFadeInUp 0.5s ease;
 
 					@extend .edi-pos-r;
 
@@ -65,7 +105,7 @@
 
 					&:nth-last-child(1) {
 						transform: translateZ(0) translateY(0);
-						transition: 0.5s;
+						transition: 0.3s cubic-bezier(0.22, 0.61, 0.36, 1);
 					}
 
 					&:nth-last-child(2) {
@@ -119,8 +159,93 @@
 						min-height: auto;
 					}
 
+					// Progress bar + percentage for the active message card. In
+					// normal flow, directly under the message text inside the card —
+					// no absolute positioning, so it's immune to antd's
+					// runtime-injected .ant-timeline-item-content positioning (the
+					// reason earlier edge-hugging attempts drifted). Collapses
+					// (height + opacity) once the phase finishes so a completed card
+					// keeps just its checkmark, animating away instead of the card's
+					// height snapping.
+					.sd-edi-import-progress {
+						display: flex;
+						align-items: center;
+						gap: 10px;
+						margin-top: 10px;
+						max-height: 40px;
+						overflow: hidden;
+						transition: max-height 0.5s ease, margin-top 0.5s ease,
+							opacity 0.4s ease;
+
+						&.is-collapsed {
+							max-height: 0;
+							margin-top: 0;
+							opacity: 0;
+						}
+					}
+
+					// Shimmers (indeterminate) until a real percentage arrives, then
+					// fills 0 → 100%. Fill uses the same brand gradient as the top
+					// step line, with a moving diagonal stripe overlay.
+					.sd-edi-import-bar {
+						position: relative;
+						flex: 1 1 auto;
+						overflow: hidden;
+						height: 6px;
+						border-radius: 3px;
+						// Primary tint at ~15%. rgba fallback first for browsers
+						// without color-mix; the token-driven mix wins where supported.
+						background: rgba(45, 116, 213, 0.15);
+						background: color-mix(
+							in srgb,
+							#{$color-primary} 15%,
+							transparent
+						);
+
+						.sd-edi-import-bar-fill {
+							width: 0;
+							height: 100%;
+							border-radius: 3px;
+							background-image: linear-gradient(
+									45deg,
+									rgba(255, 255, 255, 0.22) 25%,
+									transparent 25%,
+									transparent 50%,
+									rgba(255, 255, 255, 0.22) 50%,
+									rgba(255, 255, 255, 0.22) 75%,
+									transparent 75%,
+									transparent
+								),
+								linear-gradient(
+									109.6deg,
+									#{$color-primary} 11.2%,
+									#{$color-primary-light} 91.2%
+								);
+							background-size: 14px 14px, 100% 100%;
+							animation: ediBarStripes 0.8s linear infinite;
+							transition: width 0.4s ease;
+						}
+
+						&.is-indeterminate .sd-edi-import-bar-fill {
+							width: 40%;
+							animation: ediBarIndeterminate 1.2s
+								ease-in-out infinite alternate;
+						}
+					}
+
+					.sd-edi-import-percent {
+						flex: 0 0 auto;
+						min-width: 34px;
+						font-size: 13px;
+						font-weight: 600;
+						line-height: 1;
+						color: $color-primary;
+						text-align: right;
+						font-variant-numeric: tabular-nums;
+					}
+
 					&.active {
-						animation: ediFadeInUp 0.5s ease;
+						animation: ediCardEnter 0.5s ease;
 
 						.ant-timeline-item-head {
 							&::before {

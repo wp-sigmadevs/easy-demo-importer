@@ -16,7 +16,10 @@ use WP_Filesystem_Direct;
 use SigmaDevs\EasyDemoImporter\Common\{
 	Traits\Singleton,
 	Functions\Helpers,
+	Functions\ImportLogger,
 	Functions\SessionManager,
+	Importer\ImportState,
+	Utils\Snapshot,
 	Abstracts\ImporterAjax
 };
 
@@ -56,6 +59,32 @@ class Initialize extends ImporterAjax {
 
 		add_action( 'wp_ajax_sd_edi_install_demo', [ $this, 'response' ] );
 		add_action( 'wp_ajax_sd_edi_cancel_session', [ $this, 'cancelSession' ] );
+		add_action( 'wp_ajax_sd_edi_mark_interrupted', [ $this, 'markInterrupted' ] );
+	}
+
+	/**
+	 * Flag the active import session as interrupted.
+	 *
+	 * Called from the client when it detects an unfinished import on page load
+	 * (the interrupted-import prompt). Marks the session heartbeat stale so the
+	 * Import Log shows the run as interrupted immediately, rather than waiting for
+	 * the heartbeat to time out. The lock and resumable state are preserved so the
+	 * user can still resume — resuming refreshes the heartbeat back to live.
+	 *
+	 * @return void
+	 * @since 2.0.0
+	 */
+	public function markInterrupted() {
+		Helpers::verifyAjaxCall();
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$posted_session_id = ! empty( $_POST['sessionId'] ) ? sanitize_text_field( wp_unslash( $_POST['sessionId'] ) ) : '';
+
+		$active     = SessionManager::get();
+		$session_id = $active['session_id'] ?? $posted_session_id;
+
+		SessionManager::markStale( $session_id );
+		wp_send_json_success();
 	}
 
 	/**
@@ -65,26 +94,30 @@ class Initialize extends ImporterAjax {
 	 * without waiting for the 30-minute lock TTL to expire.
 	 *
 	 * @return void
-	 * @since 1.2.0
+	 * @since 2.0.0
 	 */
 	public function cancelSession() {
 		Helpers::verifyAjaxCall();
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$session_id = ! empty( $_POST['sessionId'] ) ? sanitize_text_field( wp_unslash( $_POST['sessionId'] ) ) : '';
+		$posted_session_id = ! empty( $_POST['sessionId'] ) ? sanitize_text_field( wp_unslash( $_POST['sessionId'] ) ) : '';
 
-		if ( empty( $session_id ) ) {
-			wp_send_json_error( [ 'errorMessage' => __( 'Missing session ID.', 'easy-demo-importer' ) ], 400 );
-			return;
+		// The client's copy of the session ID can be stale or missing entirely —
+		// e.g. the page's own request was rejected by the lock check before a
+		// session ever existed for it, so it has nothing valid to send. The
+		// server always knows the actual locked session regardless of what the
+		// client sent, so resolve it from there and force-release it: this
+		// handler exists specifically for the user to break out of a stuck lock.
+		$active     = SessionManager::get();
+		$session_id = $active['session_id'] ?? $posted_session_id;
+
+		if ( '' !== $session_id ) {
+			// Discard any resumable chunked-import state for this session so a
+			// cancelled import cannot be resumed with stale content.
+			ImportState::forSession( $this->demoUploadDir( $this->demoDir() ), $session_id )->delete();
 		}
 
-		if ( ! SessionManager::isValid( $session_id ) ) {
-			wp_send_json_error( [ 'errorMessage' => __( 'Session does not belong to you or has expired.', 'easy-demo-importer' ) ], 403 );
-			// @phpstan-ignore deadCode.unreachable
-			return;
-		}
-
-		SessionManager::release( $session_id );
+		SessionManager::forceRelease();
 		wp_send_json_success();
 	}
 
@@ -98,22 +131,55 @@ class Initialize extends ImporterAjax {
 		// Verifying AJAX call and user role.
 		Helpers::verifyAjaxCall();
 
-		// Reject if another import is already running.
-		if ( SessionManager::isLocked() ) {
+		// Ensure the activity-log table exists before anything below can log to
+		// it — this is the earliest point in the pipeline a message can be
+		// logged (e.g. the lock rejection just below), so it can't wait for
+		// InstallDemo's lazy install on installs that never re-ran activation.
+		ImportLogger::maybeInstall();
+
+		// Reject only if an import is genuinely running (a fresh heartbeat). A lock
+		// held by an interrupted import — its heartbeat has gone quiet — must not
+		// block a new one, so it is superseded below.
+		if ( SessionManager::isLive() ) {
 			$this->prepareResponse(
 				'',
 				'',
 				'',
 				true,
 				esc_html__( 'Another import is already in progress.', 'easy-demo-importer' ),
-				esc_html__( 'Wait for the current import to finish before starting a new one. If you believe the previous import has crashed, wait 30 minutes for the lock to expire automatically, then try again.', 'easy-demo-importer' )
+				esc_html__( 'Wait for the current import to finish before starting a new one. If you believe the previous import has crashed, wait a couple of minutes for it to be released automatically, then try again.', 'easy-demo-importer' )
 			);
 			return;
 		}
 
+		// Release any stale (interrupted) lock so it does not block this import.
+		// A live import was already caught above, so this only clears abandoned ones.
+		SessionManager::forceRelease();
+
 		// Start a new import session and acquire the mutex lock.
 		$session         = SessionManager::start();
 		$this->sessionId = $session['session_id'];
+
+		// Opt-in restore point: snapshot the content/options tables here, at the
+		// very start of the pipeline — BEFORE the database reset below wipes them.
+		// Taken in InstallDemo previously, which runs after this reset, so a
+		// reset import snapshotted the already-emptied tables and a rollback
+		// restored the site to that empty state. Guarded so it runs once.
+		if ( $this->snapshot && ! Snapshot::isForSession( $this->sessionId ) ) {
+			if ( Snapshot::create( $this->sessionId, $this->reset, $this->demoSlug ) ) {
+				ImportLogger::info(
+					esc_html__( 'Restore point created — this import can be rolled back.', 'easy-demo-importer' ),
+					$this->sessionId,
+					$this->demoSlug
+				);
+			} else {
+				ImportLogger::warning(
+					esc_html__( 'Restore point skipped — this site is too large to snapshot safely; the import will continue without rollback.', 'easy-demo-importer' ),
+					$this->sessionId,
+					$this->demoSlug
+				);
+			}
+		}
 
 		// Resetting database.
 		if ( $this->reset ) {
@@ -137,11 +203,18 @@ class Initialize extends ImporterAjax {
 		 */
 		do_action( 'sd/edi/importer_init', $this ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
-		// Response.
+		// Response. The modal gets a friendlier "Cleanup done!" for the
+		// non-reset branch; the activity log keeps the neutral "Cleanup
+		// completed." (the reset branch's text is already neutral, so it's
+		// used as-is in both places — passing null for logMessage there).
 		$this->prepareResponse(
 			'sd_edi_install_plugins',
-			esc_html__( 'Let us install the required plugins.', 'easy-demo-importer' ),
-			( $this->reset ) ? esc_html__( 'Database reset completed.', 'easy-demo-importer' ) : esc_html__( 'Minor cleanups done.', 'easy-demo-importer' )
+			esc_html__( 'Installing your plugins...', 'easy-demo-importer' ),
+			( $this->reset ) ? esc_html__( 'Database reset completed.', 'easy-demo-importer' ) : esc_html__( 'Cleanup done!', 'easy-demo-importer' ),
+			false,
+			'',
+			'',
+			( $this->reset ) ? null : esc_html__( 'Cleanup completed.', 'easy-demo-importer' )
 		);
 	}
 
@@ -184,7 +257,12 @@ class Initialize extends ImporterAjax {
 			'termmeta',
 			'terms',
 		];
-		$excludeTables = [ 'options', 'usermeta', 'users' ];
+		// sd_edi_import_log is the plugin's persistent activity log (see
+		// ImportLogger) — it's meant to survive across imports so each run
+		// appends its own accordion on the Import Log tab, not get wiped by a
+		// "reset database" import. Listed unprefixed like the rest: the
+		// array_map below adds $wpdb->prefix to every entry once.
+		$excludeTables = [ 'options', 'usermeta', 'users', ImportLogger::TABLE ];
 
 		$coreTables = array_map(
 			function ( $tbl ) {
@@ -209,6 +287,13 @@ class Initialize extends ImporterAjax {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$tableStatus = $wpdb->get_results( 'SHOW TABLE STATUS' );
 
+		// Snapshot shadow tables ({prefix}sd_edi_snap_*) hold the pre-import
+		// restore point, which is created (in response(), above) BEFORE this
+		// reset runs. They must never be swept into the truncate list below —
+		// doing so empties the restore point, so a later rollback would wipe the
+		// site instead of reverting it.
+		$snapshotInfix = $wpdb->prefix . Snapshot::INFIX;
+
 		if ( is_array( $tableStatus ) ) {
 			foreach ( $tableStatus as $table ) {
 				if ( 0 !== stripos( $table->Name, $wpdb->prefix ) ) {
@@ -216,6 +301,10 @@ class Initialize extends ImporterAjax {
 				}
 
 				if ( empty( $table->Engine ) ) {
+					continue;
+				}
+
+				if ( 0 === stripos( $table->Name, $snapshotInfix ) ) {
 					continue;
 				}
 

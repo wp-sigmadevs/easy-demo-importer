@@ -89,24 +89,29 @@ class Pages extends Base {
 			'callback'    => [ Callbacks::class, 'renderDemoImportPage' ],
 		];
 
-		$themeConfig     = sd_edi()->getDemoConfig();
-		$activeTheme     = sd_edi()->activeTheme();
-		$supportedThemes = sd_edi()->supportedThemes();
+		// System Status and Import Log are two tabs of a single page (rendered by
+		// the React app on the status route), so only one submenu is registered.
+		// Always available — the Import Log tab must stay reachable regardless of
+		// whether the active theme ships a demo config.
+		$subPages[] = [
+			'parent_slug' => 'themes.php',
+			'page_title'  => esc_html__( 'Status & Activity', 'easy-demo-importer' ),
+			'menu_title'  => apply_filters( 'sd/edi/status_menu_title', esc_html__( 'Easy Activity', 'easy-demo-importer' ) ), // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+			'capability'  => 'manage_options',
+			'menu_slug'   => esc_url( $this->plugin->data()['system_status_page'] ),
+			'callback'    => '',
+		];
 
-		if ( ! in_array( $activeTheme, $supportedThemes, true ) ) {
-			$themeConfig = [];
-		}
-
-		if ( ! empty( $themeConfig ) ) {
-			$subPages[] = [
-				'parent_slug' => 'themes.php',
-				'page_title'  => esc_html__( 'System Status Report', 'easy-demo-importer' ),
-				'menu_title'  => apply_filters( 'sd/edi/status_menu_title', esc_html__( 'Easy System Status', 'easy-demo-importer' ) ), // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
-				'capability'  => 'manage_options',
-				'menu_slug'   => esc_url( $this->plugin->data()['system_status_page'] ),
-				'callback'    => '',
-			];
-		}
+		// Regenerate Thumbnails is a React route on the same page (like the
+		// status/log tabs), so it's registered as a URL submenu with no callback.
+		$subPages[] = [
+			'parent_slug' => 'themes.php',
+			'page_title'  => esc_html__( 'Regenerate Thumbnails', 'easy-demo-importer' ),
+			'menu_title'  => apply_filters( 'sd/edi/regen_menu_title', esc_html__( 'Easy Thumbnails', 'easy-demo-importer' ) ), // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+			'capability'  => 'manage_options',
+			'menu_slug'   => esc_url( $this->plugin->data()['regen_thumbs_page'] ),
+			'callback'    => '',
+		];
 
 		return $subPages;
 	}

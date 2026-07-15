@@ -6,7 +6,8 @@ import {
 } from 'react-router-dom';
 import { useEffect } from 'react';
 
-import AppServer from './AppServer';
+import AppStatus from './AppStatus';
+import AppRegenerate from './AppRegenerate';
 import AppDemoImporter from './AppDemoImporter';
 import ErrorBoundary from './components/ErrorBoundary';
 
@@ -30,7 +31,7 @@ const LayoutWithEffects = ({ children }) => {
 		 */
 		const updateMenuLink = () => {
 			const demoImporterLink = document.querySelector(
-				`a[href*="${sdEdiAdminParams.importPageLink}"]`
+				`#adminmenu #menu-appearance .wp-submenu a[href*="${sdEdiAdminParams.importPageLink}"]`
 			);
 
 			if (demoImporterLink && !demoImporterLink.href.includes('#/')) {
@@ -49,13 +50,26 @@ const LayoutWithEffects = ({ children }) => {
 				}
 			});
 
-			// Check for the active hash
-			if (activeHash.includes('system_status_page')) {
+			// The status + log tabs live under a single admin menu item, so both
+			// hashes highlight the System Status menu.
+			if (
+				activeHash.includes('system_status_page') ||
+				activeHash.includes('import_log')
+			) {
 				const systemStatusMenu = document.querySelector(
 					`a[href="${sdEdiAdminParams.serverPageUrl}"]`
 				);
 				if (systemStatusMenu) {
 					systemStatusMenu
+						.closest('li')
+						.classList.add('current', 'current_page_item');
+				}
+			} else if (activeHash.includes('regenerate_thumbnails')) {
+				const regenMenu = document.querySelector(
+					`a[href="${sdEdiAdminParams.regenPageUrl}"]`
+				);
+				if (regenMenu) {
+					regenMenu
 						.closest('li')
 						.classList.add('current', 'current_page_item');
 				}
@@ -100,7 +114,27 @@ const routes = [
 		element: (
 			<ErrorBoundary>
 				<LayoutWithEffects>
-					<AppServer />
+					<AppStatus defaultTab="status" />
+				</LayoutWithEffects>
+			</ErrorBoundary>
+		),
+	},
+	{
+		path: '/import_log',
+		element: (
+			<ErrorBoundary>
+				<LayoutWithEffects>
+					<AppStatus defaultTab="log" />
+				</LayoutWithEffects>
+			</ErrorBoundary>
+		),
+	},
+	{
+		path: '/regenerate_thumbnails',
+		element: (
+			<ErrorBoundary>
+				<LayoutWithEffects>
+					<AppRegenerate />
 				</LayoutWithEffects>
 			</ErrorBoundary>
 		),

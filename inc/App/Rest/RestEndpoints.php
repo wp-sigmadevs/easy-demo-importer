@@ -18,7 +18,11 @@ use WP_REST_Response;
 use SigmaDevs\EasyDemoImporter\Common\{
 	Abstracts\Base,
 	Traits\Singleton,
-	Functions\Helpers
+	Utils\Preflight,
+	Utils\FailedMedia,
+	Utils\Snapshot,
+	Functions\Helpers,
+	Functions\ImportLogger
 };
 
 // Do not allow directly accessing this file.
@@ -143,6 +147,163 @@ class RestEndpoints extends Base {
 		$this->addDemoDataEndpoint();
 		$this->addPluginStatusEndpoint();
 		$this->addServerStatusEndpoint();
+		$this->addImportLogEndpoint();
+		$this->addPreflightEndpoint();
+		$this->addFailedMediaEndpoint();
+		$this->addRollbackEndpoint();
+		$this->addDiscardEndpoint();
+	}
+
+	/**
+	 * Add Rollback route (restore the pre-import snapshot).
+	 *
+	 * @return void
+	 * @since 2.0.0
+	 */
+	public function addRollbackEndpoint() {
+		register_rest_route(
+			$this->getNamespace(),
+			'/rollback',
+			[
+				'methods'             => 'POST',
+				'callback'            => [ $this, 'rollback' ],
+				'permission_callback' => [ $this, 'permission' ],
+			]
+		);
+	}
+
+	/**
+	 * Restores the pre-import snapshot, reverting the site to before the import.
+	 *
+	 * @return WP_REST_Response
+	 * @since 2.0.0
+	 */
+	public function rollback() {
+		if ( ! Snapshot::exists() ) {
+			return $this->sendError( esc_html__( 'No restore point is available to roll back to.', 'easy-demo-importer' ), [], 404 );
+		}
+
+		if ( ! Snapshot::restore() ) {
+			return $this->sendError( esc_html__( 'Rollback failed. Your site was not changed.', 'easy-demo-importer' ), [], 500 );
+		}
+
+		return $this->sendResponse( [ 'done' => true ], esc_html__( 'Site rolled back.', 'easy-demo-importer' ) );
+	}
+
+	/**
+	 * Add Discard route (drop the restore point to reclaim disk).
+	 *
+	 * @return void
+	 * @since 2.0.0
+	 */
+	public function addDiscardEndpoint() {
+		register_rest_route(
+			$this->getNamespace(),
+			'/discard-restore-point',
+			[
+				'methods'             => 'POST',
+				'callback'            => [ $this, 'discardRestorePoint' ],
+				'permission_callback' => [ $this, 'permission' ],
+			]
+		);
+	}
+
+	/**
+	 * Discards the restore point — drops the shadow tables and the moved-aside
+	 * media copy — when the user is happy with the import and wants the disk back.
+	 * The site itself is untouched.
+	 *
+	 * @return WP_REST_Response
+	 * @since 2.0.0
+	 */
+	public function discardRestorePoint() {
+		Snapshot::drop();
+
+		return $this->sendResponse( [ 'done' => true ], esc_html__( 'Restore point discarded.', 'easy-demo-importer' ) );
+	}
+
+	/**
+	 * Add Failed-media count route.
+	 *
+	 * @return void
+	 * @since 2.0.0
+	 */
+	public function addFailedMediaEndpoint() {
+		register_rest_route(
+			$this->getNamespace(),
+			'/failed-media',
+			[
+				'methods'             => 'GET',
+				'callback'            => [ $this, 'failedMedia' ],
+				'permission_callback' => [ $this, 'permission' ],
+				'args'                => [
+					'session_id' => [
+						'sanitize_callback' => 'sanitize_text_field',
+					],
+				],
+			]
+		);
+	}
+
+	/**
+	 * Returns how many media downloads failed for a session (retry-able).
+	 *
+	 * @param WP_REST_Request $request REST request object.
+	 *
+	 * @return WP_REST_Response
+	 * @since 2.0.0
+	 */
+	public function failedMedia( WP_REST_Request $request ) {
+		$session_id = (string) $request->get_param( 'session_id' );
+
+		return $this->sendResponse(
+			[
+				'count'             => FailedMedia::count( $session_id ),
+				'rollbackAvailable' => Snapshot::exists(),
+			],
+			esc_html__( 'Data is ready to fetch', 'easy-demo-importer' )
+		);
+	}
+
+	/**
+	 * Add Preflight (import readiness) route.
+	 *
+	 * @return void
+	 * @since 2.0.0
+	 */
+	public function addPreflightEndpoint() {
+		register_rest_route(
+			$this->getNamespace(),
+			'/preflight',
+			[
+				'methods'             => 'GET',
+				'callback'            => [ $this, 'preflight' ],
+				'permission_callback' => [ $this, 'permission' ],
+			]
+		);
+	}
+
+	/**
+	 * Returns the pre-import readiness report.
+	 *
+	 * @return WP_REST_Response
+	 * @since 2.0.0
+	 */
+	public function preflight() {
+		$cache_key = 'sd_edi_preflight';
+		$report    = get_transient( $cache_key );
+
+		if ( false === $report ) {
+			// Short cache so the uploads write-probe + per-plugin status lookups
+			// don't repeat on every page load; still fresh enough for a gate.
+			$report = Preflight::report();
+			set_transient( $cache_key, $report, MINUTE_IN_SECONDS );
+		}
+
+		return $this->sendResponse(
+			$report,
+			esc_html__( 'Data is ready to fetch', 'easy-demo-importer' )
+		);
 	}
 
 	/**
@@ -204,6 +365,64 @@ class RestEndpoints extends Base {
 				],
 			]
 		);
+	}
+
+	/**
+	 * Add Import Log Route.
+	 *
+	 * @return void
+	 * @since 2.0.0
+	 */
+	public function addImportLogEndpoint() {
+		register_rest_route(
+			$this->getNamespace(),
+			'/import/log',
+			[
+				'methods'             => 'GET',
+				'callback'            => [ $this, 'importLog' ],
+				'permission_callback' => [ $this, 'permission' ],
+				'args'                => [
+					'session_id' => [
+						'type'              => 'string',
+						'default'           => '',
+						'sanitize_callback' => 'sanitize_text_field',
+					],
+					'group'      => [
+						'type'              => 'boolean',
+						'default'           => false,
+						'sanitize_callback' => 'rest_sanitize_boolean',
+					],
+					'limit'      => [
+						'type'              => 'integer',
+						'default'           => 500,
+						'sanitize_callback' => 'absint',
+					],
+				],
+			]
+		);
+	}
+
+	/**
+	 * Returns activity-log entries, newest first.
+	 *
+	 * @param WP_REST_Request $request REST request.
+	 *
+	 * @return WP_REST_Response
+	 * @since 2.0.0
+	 */
+	public function importLog( WP_REST_Request $request ) {
+		$sessionId = (string) $request->get_param( 'session_id' );
+		$group     = (bool) $request->get_param( 'group' );
+		$limit     = (int) $request->get_param( 'limit' );
+		$limit     = $limit > 0 ? $limit : 500;
+
+		// Grouped view (admin page): runs, newest first. Flat view (modal result
+		// screen): entries for a single session, or all when no session given.
+		$data = $group
+			? ImportLogger::getRuns( $limit )
+			: ImportLogger::get( $sessionId, $limit );
+
+		return $this->sendResponse( $data, esc_html__( 'Import log fetched.', 'easy-demo-importer' ) );
 	}
 
 	/**

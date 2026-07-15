@@ -1,14 +1,18 @@
+import Axios from 'axios';
 import Header from './Layouts/Header';
 import Support from './components/Support';
 import DemoCard from './components/DemoCard';
 import { useShallow } from 'zustand/react/shallow';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import GridSkeleton from './components/GridSkeleton';
 import ErrorMessage from './components/ErrorMessage';
+import RestorePointBanner from './components/RestorePointBanner';
+import ManualImportModal from './components/Modal/ManualImportModal';
 import useSharedDataStore from './utils/sharedDataStore';
 import ModalComponent from './components/Modal/ModalComponent';
 import ModalRequirements from './components/Modal/ModaRequirements';
-import { Row, Col, Button, Tabs, Skeleton, Input, Empty } from 'antd';
+import { Row, Col, Button, Tabs, Skeleton, Input, Empty, Tooltip } from 'antd';
+import { UploadOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 
 /* global sdEdiAdminParams */
 
@@ -24,7 +28,16 @@ const AppDemoImporter = () => {
 	const [modalData, setModalData] = useState(null);
 	const [errorMessage, setErrorMessage] = useState(null);
 	const [isModalVisible, setIsModalVisible] = useState(false);
+	const [manualVisible, setManualVisible] = useState(false);
+	const [restoreRefresh, setRestoreRefresh] = useState(0);
 	const resetStore = useSharedDataStore((state) => state.resetStore);
+
+	/**
+	 * Ensures the interrupted-import prompt auto-opens only once per page load.
+	 * Dismissing the prompt intentionally keeps resumeRequest, so without this
+	 * guard the modal would immediately re-open every time it is closed.
+	 */
+	const resumeHandledRef = useRef(false);
 
 	/**
 	 * Values from the shared data store.
@@ -38,6 +51,7 @@ const AppDemoImporter = () => {
 		modalVisible,
 		setModalVisible,
 		handleModalCancel,
+		resumeRequest,
 		searchQuery,
 		setSearchQuery,
 		filteredDemoData,
@@ -54,6 +68,7 @@ const AppDemoImporter = () => {
 			modalVisible: state.modalVisible,
 			setModalVisible: state.setModalVisible,
 			handleModalCancel: state.handleModalCancel,
+			resumeRequest: state.resumeRequest,
 			searchQuery: state.searchQuery,
 			setSearchQuery: state.setSearchQuery,
 			filteredDemoData: state.filteredDemoData,
@@ -87,6 +102,52 @@ const AppDemoImporter = () => {
 			}
 		})();
 	}, [fetchImportList]);
+
+	/**
+	 * Auto-open the interrupted-import prompt after a reload.
+	 *
+	 * A previous import that was interrupted (page reload, timeout) leaves a
+	 * persisted resumeRequest in the store. Once the demo list is available,
+	 * re-open that demo's modal so ModalComponent surfaces the Resume / Start
+	 * Over prompt automatically — otherwise the user lands on the plain grid
+	 * with no indication an import is still incomplete.
+	 */
+	useEffect(() => {
+		if (resumeHandledRef.current || !importList.success) {
+			return;
+		}
+
+		const demos = importList.data && importList.data.demoData;
+		const resumeId = resumeRequest && resumeRequest.demo;
+
+		if (demos && resumeId && demos[resumeId]) {
+			resumeHandledRef.current = true;
+
+			// The page was reloaded mid-import, so the import is no longer running.
+			// Tell the server to flag this session interrupted now, so the Import Log
+			// reflects it immediately instead of after the heartbeat times out.
+			// Resuming refreshes the heartbeat back to live. Fire-and-forget.
+			if (resumeRequest.sessionId) {
+				const params = new FormData();
+				params.append('action', 'sd_edi_mark_interrupted');
+				params.append('sd_edi_nonce', sdEdiAdminParams.sd_edi_nonce);
+				// Bootstrap requires 'demo' in POST to load the Ajax\Backend classes.
+				params.append('demo', resumeId);
+				params.append('sessionId', resumeRequest.sessionId);
+				Axios.post(sdEdiAdminParams.ajaxUrl, params).catch(() => {});
+			}
+
+			setModalVisible(true);
+			// Match the shape DemoCard passes to showModal so the modal title and
+			// preview resolve (modalData.data.name), and Start Over behaves normally.
+			setModalData({
+				id: resumeId,
+				data: demos[resumeId],
+				reset: true,
+				excludeImages: true,
+			});
+		}
+	}, [importList, resumeRequest, setModalVisible]);
 
 	/**
 	 * Set the error message if the import list is not successful.
@@ -181,6 +242,33 @@ const AppDemoImporter = () => {
 			});
 		}
 	}
+
+	/**
+	 * Manual-import control — a subtle secondary action with a help tooltip,
+	 * shown inline in the demo-grid header (and above the grid when tabs and
+	 * search are disabled), so it stays discoverable without a separate strip.
+	 * @param e
+	 */
+	const manualImportControl = (
+		<Button
+			className="edi-manual-import-btn"
+			icon={<UploadOutlined />}
+			onClick={() => setManualVisible(true)}
+		>
+			{sdEdiAdminParams.manualImportButton || 'Manual Import'}
+			<Tooltip
+				title={
+					sdEdiAdminParams.manualImportHint ||
+					'Have your own export? Import it manually.'
+				}
+			>
+				<QuestionCircleOutlined
+					className="edi-manual-import-help"
+					onClick={(e) => e.stopPropagation()}
+				/>
+			</Tooltip>
+		</Button>
+	);
 
 	/**
 	 * Extracting the server data.
@@ -356,6 +444,14 @@ const AppDemoImporter = () => {
 					heading="Demo Importer"
 				/>
 
+				<ManualImportModal
+					visible={manualVisible}
+					onClose={() => {
+						setManualVisible(false);
+						setRestoreRefresh((n) => n + 1);
+					}}
+				/>
+
 				{importList.success && hasErrors(serverInfo) && (
 					<ModalRequirements
 						isVisible={isModalVisible}
@@ -365,6 +461,8 @@ const AppDemoImporter = () => {
 				)}
 
 				<div className="edi-content">
+					<RestorePointBanner refreshKey={restoreRefresh} />
+
 					<div className={containerClassName}>
 						{loading && !demoData ? (
 							<Row gutter={[30, 30]}>
@@ -415,6 +513,7 @@ const AppDemoImporter = () => {
 											<div className="edi-nav-wrapper">
 												<div className="edi-nav-tabs">
 													<div className="edi-nav-search">
+														{manualImportControl}
 														<Search
 															placeholder={
 																sdEdiAdminParams.searchPlaceholder
@@ -451,7 +550,12 @@ const AppDemoImporter = () => {
 												</div>
 											</div>
 										) : (
-											<>{generateAllDemoCards()}</>
+											<>
+												<div className="edi-grid-toolbar">
+													{manualImportControl}
+												</div>
+												{generateAllDemoCards()}
+											</>
 										)}
 									</>
 								)}

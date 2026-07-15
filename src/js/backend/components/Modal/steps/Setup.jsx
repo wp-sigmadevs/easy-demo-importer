@@ -1,91 +1,47 @@
 import ModalHeader from '../ModalHeader';
-import React, { useEffect } from 'react';
-import PluginList from '../../PluginList';
-import { Button, Col, Row, Skeleton, Switch, Tooltip } from 'antd';
+import React from 'react';
+import { Button, Col, Row, Switch } from 'antd';
 import useSharedDataStore from '../../../utils/sharedDataStore';
 import {
 	ArrowLeftOutlined,
 	CloseOutlined,
 	DownloadOutlined,
-	QuestionCircleTwoTone,
 } from '@ant-design/icons';
 
 /* global sdEdiAdminParams */
 
 /**
- * Component representing the setup step in the modal.
+ * Configure step: the import options only. The required-plugins list and the
+ * environment checklist moved to the preceding Readiness step, so this step is
+ * just the user's choices, laid out in two columns — media options on the left,
+ * safety options (restore point, reset) on the right.
  *
- * @param            modalData.modalData
- * @param {Object}   modalData              - The data for the modal.
- * @param {Function} handleImport           - Function to handle the import process.
- * @param {Function} handleReset            - Handles resetting the modal.
- * @param            modalData.handleImport
- * @param            modalData.handleReset
+ * @param {Object}   props              - Component props.
+ * @param {Function} props.handleImport - Starts the import process.
+ * @param {Function} props.handleReset  - Closes/resets the modal.
  */
-const Setup = ({ modalData, handleImport, handleReset }) => {
-	/**
-	 * Values from the shared data store.
-	 */
+const Setup = ({ handleImport, handleReset }) => {
 	const {
 		excludeImages,
 		setExcludeImages,
 		reset,
 		setReset,
-		pluginList,
-		fetchPluginList,
-		loading,
-		setLoading,
 		currentStep,
 		setCurrentStep,
 		skipImageRegeneration,
 		setSkipImageRegeneration,
+		snapshot,
+		setSnapshot,
+		preflightData,
 	} = useSharedDataStore();
 
 	/**
-	 * Sets the loading state to true.
+	 * Whether a blocking readiness check failed. The checklist itself lives on the
+	 * Readiness step; here we only read the result to keep Start Import gated.
 	 */
-	useEffect(() => {
-		setLoading(true);
-	}, [setLoading]);
+	const preflight = preflightData?.success && preflightData.data;
+	const importBlocked = preflight ? !preflight.canProceed : false;
 
-	/**
-	 * Fetches the plugin list from the server.
-	 */
-	useEffect(() => {
-		(async () => {
-			try {
-				await fetchPluginList('/sd/edi/v1/plugin/list');
-			} catch (error) {
-				console.error(error);
-			}
-		})();
-	}, [fetchPluginList]);
-
-	const demoPluginData = pluginList.success ? pluginList.data : [];
-
-	/**
-	 * Array of plugin data objects.
-	 */
-	const pluginDataArray = Object.entries(demoPluginData).map(
-		([key, value]) => ({
-			key,
-			...value,
-		})
-	);
-
-	/**
-	 * Filtered array of plugin data objects based on modal data.
-	 */
-	const filteredPluginDataArray =
-		Object.keys(modalData?.data?.plugins || {}).length > 0
-			? pluginDataArray.filter(
-					(plugin) => modalData.data.plugins[plugin.key] !== undefined
-				)
-			: pluginDataArray;
-
-	/**
-	 * Function to handle the previous step action.
-	 */
 	const handlePrevious = () => {
 		setCurrentStep(currentStep - 1);
 	};
@@ -95,150 +51,129 @@ const Setup = ({ modalData, handleImport, handleReset }) => {
 			<ModalHeader currentStep={currentStep} />
 
 			<div className="modal-content-inner">
-				<Row gutter={[30, 30]}>
-					<Col
-						className="gutter-row"
-						xs={24}
-						sm={24}
-						md={12}
-						lg={12}
-						xl={12}
-					>
-						<div className="required-plugins">
-							<h3>{sdEdiAdminParams.requiredPluginsTitle}</h3>
-							<p>{sdEdiAdminParams.requiredPluginsIntro}</p>
-							{loading ? (
-								<div className="skeleton-list">
-									<Skeleton
-										active
-										avatar
-										paragraph={{ rows: 1, width: '25%' }}
-										style={{
-											borderBottom:
-												'1px solid rgba(5, 5, 5, 0.06)',
-										}}
-									/>
-									<Skeleton
-										active
-										avatar
-										paragraph={{ rows: 1, width: '25%' }}
-									/>
-								</div>
-							) : (
-								<PluginList plugins={filteredPluginDataArray} />
-							)}
-						</div>
-					</Col>
-					<Col
-						className="gutter-row configure-col"
-						xs={24}
-						sm={24}
-						md={12}
-						lg={12}
-						xl={12}
-					>
-						<div className="import-options">
-							<h3>{sdEdiAdminParams.configureImportTitle}</h3>
-							<div className="import-option new">
-								<div className="choose exclude-images edi-d-flex edi-align-items-center edi-pos-r">
-									<Switch
-										checked={excludeImages}
-										onChange={(checked) =>
-											setExcludeImages(checked)
-										}
-									/>
-									<h4
-										className="edi-d-flex edi-align-items-center"
-										style={{ margin: 0 }}
-									>
-										{sdEdiAdminParams.excludeImagesTitle}
-									</h4>
-									<Tooltip
-										title={
-											sdEdiAdminParams.excludeImagesHint
-										}
-									>
-										<span
-											style={{
-												marginLeft: 8,
-												cursor: 'pointer',
-												fontSize: 20,
-												position: 'absolute',
-												right: 0,
-											}}
-										>
-											<QuestionCircleTwoTone />
-										</span>
-									</Tooltip>
-								</div>
-							</div>
-							{!excludeImages && (
-								<div className="import-option new">
-									<div className="choose exclude-images edi-d-flex edi-align-items-center edi-pos-r">
+				<div className="import-options">
+					<h3>{sdEdiAdminParams.configureImportTitle}</h3>
+
+					<Row gutter={[30, 24]}>
+						<Col xs={24} sm={24} md={12} lg={12} xl={12}>
+							<div className="configure-group is-plain">
+								<h5 className="configure-group-label">
+									{sdEdiAdminParams.configurePerformanceLabel ||
+										'Performance'}
+								</h5>
+
+								<div className="import-option">
+									<div className="choose edi-d-flex edi-align-items-center">
 										<Switch
-											checked={skipImageRegeneration}
+											checked={!excludeImages}
 											onChange={(checked) =>
-												setSkipImageRegeneration(
-													checked
-												)
+												setExcludeImages(!checked)
 											}
 										/>
-										<h4
-											className="edi-d-flex edi-align-items-center"
-											style={{ margin: 0 }}
-										>
-											{
-												sdEdiAdminParams.skipImageRegenerationTitle
-											}
+										<h4>
+											{sdEdiAdminParams.importImagesTitle ||
+												'Import Demo Images'}
 										</h4>
-										<Tooltip
-											title={
-												sdEdiAdminParams.skipImageRegenerationHint
-											}
-										>
-											<span
-												style={{
-													marginLeft: 8,
-													cursor: 'pointer',
-													fontSize: 20,
-													position: 'absolute',
-													right: 0,
-												}}
-											>
-												<QuestionCircleTwoTone />
-											</span>
-										</Tooltip>
+									</div>
+									<div className="option-details">
+										<p>
+											{sdEdiAdminParams.importImagesHint ||
+												'Downloads the demo images. Turn off for a faster import, or if the import fails repeatedly.'}
+										</p>
 									</div>
 								</div>
-							)}
-							<div className="import-option last">
-								<div className="choose reset-db edi-d-flex edi-align-items-center">
-									<Switch
-										checked={reset}
-										onChange={(checked) =>
-											setReset(checked)
-										}
-									/>
-									<h4>
-										{sdEdiAdminParams.resetDatabaseTitle}
-									</h4>
-								</div>
-								<div className="option-details warn-text">
-									<p>
-										<b>
-											<i>
-												{
-													sdEdiAdminParams.resetDatabaseWarning
+
+								{!excludeImages && (
+									<div className="import-option">
+										<div className="choose edi-d-flex edi-align-items-center">
+											<Switch
+												checked={!skipImageRegeneration}
+												onChange={(checked) =>
+													setSkipImageRegeneration(
+														!checked
+													)
 												}
-											</i>
-										</b>
-										{sdEdiAdminParams.resetDatabaseHint}
-									</p>
+											/>
+											<h4>
+												{sdEdiAdminParams.regenerateImagesTitle ||
+													'Regenerate Images'}
+											</h4>
+										</div>
+										<div className="option-details">
+											<p>
+												{sdEdiAdminParams.regenerateImagesHint ||
+													'Regenerates thumbnail sizes during import. Turn off for a faster import; you can regenerate later from Tools.'}
+											</p>
+										</div>
+									</div>
+								)}
+							</div>
+						</Col>
+
+						<Col xs={24} sm={24} md={12} lg={12} xl={12}>
+							<div className="configure-group is-plain">
+								<h5 className="configure-group-label">
+									{sdEdiAdminParams.configureSafetyLabel ||
+										'Safety'}
+								</h5>
+
+								<div className="safety-card">
+									<div className="import-option">
+										<div className="choose edi-d-flex edi-align-items-center">
+											<Switch
+												checked={snapshot}
+												onChange={(checked) =>
+													setSnapshot(checked)
+												}
+											/>
+											<h4>
+												{sdEdiAdminParams.snapshotTitle ||
+													'Create a restore point'}
+											</h4>
+										</div>
+										<div className="option-details">
+											<p>
+												{sdEdiAdminParams.snapshotDetails ||
+													'Saves a full backup — content, media files, and settings — before importing. One click restores this exact state from the result screen or the restore-point banner. Rolling back also removes anything created after the import.'}
+											</p>
+										</div>
+									</div>
+
+									<div className="import-option last">
+										<div className="choose edi-d-flex edi-align-items-center">
+											<Switch
+												checked={reset}
+												onChange={(checked) =>
+													setReset(checked)
+												}
+											/>
+											<h4>
+												{
+													sdEdiAdminParams.resetDatabaseTitle
+												}
+											</h4>
+										</div>
+										<div className="option-details warn-text">
+											<p>
+												<b>
+													<i>
+														{
+															sdEdiAdminParams.resetDatabaseWarning
+														}
+													</i>
+												</b>
+												{
+													sdEdiAdminParams.resetDatabaseHint
+												}
+											</p>
+										</div>
+									</div>
 								</div>
 							</div>
-						</div>
-					</Col>
-				</Row>
+						</Col>
+					</Row>
+				</div>
+
 				<div className="step-actions">
 					<div className="actions-left">
 						<Button type="primary" onClick={handleReset}>
@@ -247,13 +182,15 @@ const Setup = ({ modalData, handleImport, handleReset }) => {
 						</Button>
 					</div>
 					<div className="actions-right edi-d-flex edi-align-items-center">
-						{currentStep > 1 && (
-							<Button type="primary" onClick={handlePrevious}>
-								<ArrowLeftOutlined />
-								<span>{sdEdiAdminParams.btnPrevious}</span>
-							</Button>
-						)}
-						<Button type="primary" onClick={handleImport}>
+						<Button type="primary" onClick={handlePrevious}>
+							<ArrowLeftOutlined />
+							<span>{sdEdiAdminParams.btnPrevious}</span>
+						</Button>
+						<Button
+							type="primary"
+							onClick={handleImport}
+							disabled={importBlocked}
+						>
 							<span>{sdEdiAdminParams.btnStartImport}</span>
 							<DownloadOutlined />
 						</Button>

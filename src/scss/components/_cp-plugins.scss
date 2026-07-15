@@ -3,16 +3,23 @@
  */
 
 .required-plugins {
-	.skeleton-list {
+	// The skeleton and the loaded list share one fixed, scrollable height so the
+	// left column's height never changes between loading and loaded states — and
+	// stays taller than the right options panel. A stable, taller left column
+	// keeps the vertically centered "Configure Your Import" panel from jumping
+	// when the plugin list finishes loading. Long lists scroll inside the box.
+	.skeleton-list,
+	.ant-list {
 		margin-top: 30px;
-		height: 145px;
+		height: 260px;
+		overflow-y: auto;
 
 		@media only screen and (min-height: 680px) {
-			height: 195px;
+			height: 340px;
 		}
 
 		@media only screen and (min-height: 765px) {
-			height: 220px;
+			height: 400px;
 		}
 	}
 

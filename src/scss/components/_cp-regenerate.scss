@@ -1,0 +1,403 @@
+/**
+ * Component: Regenerate Thumbnails.
+ *
+ * A single centred card on the Easy Demo Importer screen (the page shell,
+ * header and floating "back" button are shared with the Status page).
+ */
+
+.appearance_page_sd-easy-demo-importer {
+	.edi-container.edi-regenerate {
+		max-width: 640px;
+		margin-top: 40px;
+	}
+
+	.edi-regenerate-card {
+		padding: 45px 45px 40px;
+		text-align: center;
+		background: #fff;
+		border-radius: 12px;
+		box-shadow: 0 4px 40px rgba(0, 0, 0, 0.08);
+	}
+
+	.edi-regenerate-icon {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 72px;
+		height: 72px;
+		margin-bottom: 22px;
+		border-radius: 50%;
+		font-size: 32px;
+		color: #fff;
+		background-image: linear-gradient(109.6deg, rgb(45, 116, 213) 11.2%, rgb(121, 137, 212) 91.2%);
+	}
+
+	.edi-regenerate-intro {
+		margin: 0 auto 26px;
+		max-width: 460px;
+		font-size: 15px;
+		line-height: 1.65;
+		color: #6b7280;
+	}
+
+	.edi-regenerate-count {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		row-gap: 4px;
+		margin-bottom: 26px;
+
+		.edi-regenerate-count-num {
+			font-size: 40px;
+			font-weight: 700;
+			line-height: 1;
+			color: #1f2937;
+
+			&.is-loading {
+				display: inline-block;
+				width: 90px;
+				height: 40px;
+				border-radius: 8px;
+				background: linear-gradient(90deg, #eef0f4 25%, #f6f7f9 37%, #eef0f4 63%);
+				background-size: 400% 100%;
+				animation: ediSkeletonLoading 1.4s ease infinite;
+			}
+		}
+
+		.edi-regenerate-count-label {
+			font-size: 13px;
+			text-transform: uppercase;
+			letter-spacing: 0.06em;
+			color: #98a2b3;
+		}
+	}
+
+	.edi-regenerate-options {
+		display: flex;
+		flex-direction: column;
+		align-items: stretch;
+		row-gap: 10px;
+		max-width: 420px;
+		margin: 0 auto;
+	}
+
+	.edi-regenerate-option {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		column-gap: 14px;
+		padding: 12px 18px;
+		border: 1px solid #eef0f4;
+		border-radius: 10px;
+		background: #fcfcfd;
+		cursor: pointer;
+		transition: border-color 0.2s, background 0.2s;
+
+		&:hover {
+			border-color: #d7dde5;
+		}
+
+		.edi-regenerate-option-text {
+			display: inline-flex;
+			align-items: center;
+			column-gap: 6px;
+			font-size: 13px;
+			font-weight: 500;
+			color: #4b5563;
+		}
+
+		.edi-regenerate-option-help {
+			color: #98a2b3;
+			cursor: help;
+		}
+
+		// Brand-gradient the switch once it's on, to match the primary button.
+		.ant-switch.ant-switch-checked {
+			background: linear-gradient(109.6deg, rgb(45, 116, 213) 11.2%, rgb(121, 137, 212) 91.2%);
+
+			&:hover:not(.ant-switch-disabled) {
+				background: linear-gradient(109.6deg, rgb(45, 116, 213) 11.2%, rgb(121, 137, 212) 91.2%);
+			}
+		}
+	}
+
+	// Once the live log appears the card splits into two columns — controls on
+	// the left, the scrolling log on the right — so the card's height stays
+	// bounded instead of growing tall enough to scroll the whole page.
+	.edi-container.edi-regenerate.has-list {
+		max-width: 980px;
+	}
+
+	.edi-regenerate-card.has-list {
+		display: flex;
+		align-items: stretch;
+		gap: 34px;
+		padding: 40px;
+		text-align: left;
+
+		.edi-regenerate-main {
+			flex: 1 1 0;
+			min-width: 0;
+			text-align: center;
+		}
+
+		// The side column stretches to the controls column's height (align-items:
+		// stretch). Its contents are absolutely filled so the list itself never
+		// forces the card taller — the log ends up exactly as tall as the left
+		// column and scrolls internally, so the two columns are always level.
+		.edi-regenerate-side {
+			position: relative;
+			flex: 0 0 360px;
+			min-width: 0;
+		}
+
+		.edi-regenerate-side-inner {
+			position: absolute;
+			inset: 0;
+			display: flex;
+			flex-direction: column;
+		}
+
+		.edi-regenerate-list {
+			flex: 1 1 auto;
+			min-height: 0;
+			max-height: none;
+		}
+
+		// Progress/stats already sit in the main column; drop their top gap so
+		// the two columns line up at the same height.
+		.edi-regenerate-progress {
+			margin-top: 26px;
+		}
+	}
+
+	@media only screen and (max-width: 900px) {
+		.edi-regenerate-card.has-list {
+			flex-direction: column;
+
+			.edi-regenerate-side {
+				flex-basis: auto;
+			}
+
+			// Stacked: the column has no fixed height to fill, so drop the
+			// absolute fill and cap the list back to a scrollable block.
+			.edi-regenerate-side-inner {
+				position: static;
+			}
+
+			.edi-regenerate-list {
+				max-height: 280px;
+			}
+		}
+	}
+
+	.edi-regenerate-list-head {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+		margin-bottom: 8px;
+		font-size: 12px;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		color: #6b7280;
+
+		.edi-regenerate-list-note {
+			font-weight: 500;
+			text-transform: none;
+			letter-spacing: 0;
+			color: #98a2b3;
+		}
+	}
+
+	.edi-regenerate-list {
+		max-height: 280px;
+		margin: 0;
+		padding: 6px;
+		overflow-y: auto;
+		list-style: none;
+		border: 1px solid #eef0f4;
+		border-radius: 10px;
+		background: #fcfcfd;
+		scroll-behavior: smooth;
+	}
+
+	.edi-regenerate-row {
+		display: flex;
+		align-items: center;
+		column-gap: 12px;
+		margin: 0;
+		padding: 7px 10px;
+		border-radius: 8px;
+		animation: ediRegenRowIn 0.25s ease both;
+
+		+ .edi-regenerate-row {
+			margin-top: 2px;
+		}
+
+		&:hover {
+			background: #f2f4f7;
+		}
+
+		.edi-regenerate-row-thumb {
+			flex: 0 0 auto;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			width: 34px;
+			height: 34px;
+			overflow: hidden;
+			border-radius: 6px;
+			background: #eef0f4;
+			color: #98a2b3;
+			font-size: 15px;
+
+			img {
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+			}
+		}
+
+		.edi-regenerate-row-title {
+			flex: 1;
+			min-width: 0;
+			overflow: hidden;
+			font-size: 13px;
+			color: #374151;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+
+		.edi-regenerate-row-status {
+			flex: 0 0 auto;
+			display: inline-flex;
+			align-items: center;
+			column-gap: 5px;
+			padding: 3px 10px;
+			border-radius: 999px;
+			font-size: 11px;
+			font-weight: 600;
+
+			.anticon {
+				font-size: 10px;
+			}
+		}
+
+		&.is-regenerated .edi-regenerate-row-status {
+			color: #389e0d;
+			background: rgba(82, 196, 26, 0.12);
+		}
+
+		&.is-skipped .edi-regenerate-row-status {
+			color: #8a8f94;
+			background: rgba(5, 5, 5, 0.05);
+		}
+
+		&.is-failed .edi-regenerate-row-status {
+			color: #cf1322;
+			background: rgba(255, 77, 79, 0.12);
+		}
+	}
+
+	.edi-regenerate-progress {
+		margin-top: 30px;
+		padding-top: 26px;
+		border-top: 1px solid #eef0f4;
+		text-align: left;
+	}
+
+	.edi-regenerate-stats {
+		display: grid;
+		grid-template-columns: repeat(4, 1fr);
+		gap: 12px;
+		margin: 22px 0 4px;
+
+		@media only screen and (max-width: 575px) {
+			grid-template-columns: repeat(2, 1fr);
+		}
+	}
+
+	.edi-regenerate-stat {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		row-gap: 3px;
+		padding: 14px 8px;
+		border-radius: 10px;
+		background: #f7f8fa;
+
+		.edi-regenerate-stat-value {
+			font-size: 22px;
+			font-weight: 700;
+			line-height: 1;
+			color: #1f2937;
+		}
+
+		.edi-regenerate-stat-label {
+			font-size: 11px;
+			text-transform: uppercase;
+			letter-spacing: 0.05em;
+			color: #98a2b3;
+		}
+
+		&.is-regenerated .edi-regenerate-stat-value {
+			color: #52c41a;
+		}
+
+		&.is-failed .edi-regenerate-stat-value {
+			color: #ff4d4f;
+		}
+	}
+
+	.edi-regenerate-message {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		column-gap: 8px;
+		margin: 18px 0 0;
+		font-size: 14px;
+		font-weight: 500;
+		color: #4b5563;
+		text-align: center;
+
+		.is-done {
+			color: #52c41a;
+		}
+	}
+
+	.edi-regenerate-error {
+		margin: 24px 0 0;
+		padding: 12px 16px;
+		border-radius: 10px;
+		font-size: 14px;
+		color: #d63638;
+		background: rgba(255, 77, 79, 0.08);
+	}
+
+	.edi-regenerate-actions {
+		margin-top: 30px;
+
+		.ant-btn {
+			min-width: 220px;
+			height: 46px;
+			font-size: 15px;
+			font-weight: 500;
+			border-radius: 8px;
+
+			@extend %primary-btn;
+		}
+	}
+}
+
+@keyframes ediRegenRowIn {
+	from {
+		opacity: 0;
+		transform: translateY(4px);
+	}
+
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}

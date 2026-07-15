@@ -1,0 +1,549 @@
+<?php
+/**
+ * Importer Class: ChunkedImport
+ *
+ * A resumable wrapper around the bundled WXR importer (SD_EDI_WP_Import). Splits
+ * the single-pass import() into three stages that survive across separate AJAX
+ * requests, so no one request exceeds a reverse-proxy / FPM wall-clock limit
+ * (the cause of the 524/503 failures on large WooCommerce demos):
+ *
+ *   1. prepare()      — parse the WXR once, import authors/categories/tags/terms,
+ *                       persist the parsed posts + all remap maps to a state file.
+ *   2. processBatch() — hydrate state, process posts in a time-boxed slice,
+ *                       persist the advanced cursor + maps. Called repeatedly.
+ *   3. finalize()     — hydrate state, run the cross-post backfills (parents,
+ *                       attachment URLs, featured images), end the import, and
+ *                       delete the state file.
+ *
+ * @package SigmaDevs\EasyDemoImporter
+ * @since   2.0.0
+ */
+
+declare( strict_types=1 );
+
+namespace SigmaDevs\EasyDemoImporter\Common\Importer;
+
+use SD_EDI_WP_Import;
+
+// Do not allow directly accessing this file.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit( 'This script cannot be accessed directly.' );
+}
+
+/**
+ * Importer Class: ChunkedImport
+ *
+ * @since 2.0.0
+ */
+class ChunkedImport extends SD_EDI_WP_Import {
+	/**
+	 * Write-once parse output. Set by import_start() from the parsed WXR and
+	 * never mutated afterwards, so it is persisted to its own file exactly once
+	 * during prepare() and loaded read-only on every subsequent batch/finalize —
+	 * rather than being re-serialized and rewritten alongside the mutable maps on
+	 * each batch. `posts` alone can be tens of megabytes on a large WooCommerce
+	 * demo; not rewriting it per batch removes the dominant disk-I/O cost of the
+	 * chunked design.
+	 *
+	 * @var string[]
+	 * @since 2.0.0
+	 */
+	private const IMMUTABLE_PROPS = [
+		'id',
+		'version',
+		'authors',
+		'base_url',
+	];
+
+	/**
+	 * Default number of parsed posts per on-disk chunk file. Chosen so a batch
+	 * loads only a small slice of the parse output per request (not the whole
+	 * post array), while keeping the chunk-file count modest. Filterable via
+	 * `sd/edi/import_posts_chunk_size`; the value chosen at prepare() is frozen in
+	 * the immutable meta so every batch computes the same chunk boundaries.
+	 *
+	 * @since 2.0.0
+	 */
+	private const DEFAULT_POSTS_CHUNK_SIZE = 100;
+
+	/**
+	 * Mutable cross-request state: the cursor and the ID/orphan/remap maps that
+	 * grow as posts are processed. Small and fast-changing, so persisted on every
+	 * batch. Must be carried between batches for parents, menus, featured images,
+	 * comments and URL remapping to resolve correctly at finalize().
+	 *
+	 * @var string[]
+	 * @since 2.0.0
+	 */
+	private const MUTABLE_PROPS = [
+		'processed_authors',
+		'author_mapping',
+		'processed_terms',
+		'processed_posts',
+		'post_orphans',
+		'processed_menu_items',
+		'menu_item_orphans',
+		'missing_menu_items',
+		'url_remap',
+		'featured_images',
+		'fetch_attachments',
+		'bundled_media_dir',
+		'bundled_media_imported',
+		'failed_attachments',
+	];
+
+	/**
+	 * State store.
+	 *
+	 * @var ImportState
+	 * @since 2.0.0
+	 */
+	private $state;
+
+	/**
+	 * Global index of the next post to process across all chunks.
+	 *
+	 * @var int
+	 * @since 2.0.0
+	 */
+	private $offset = 0;
+
+	/**
+	 * Total number of parsed posts, read from the immutable meta. Batches use
+	 * this instead of count( $this->posts ), which now holds only one chunk.
+	 *
+	 * @var int
+	 * @since 2.0.0
+	 */
+	private $postsTotal = 0;
+
+	/**
+	 * Posts-per-chunk size frozen at prepare(), read from the immutable meta.
+	 *
+	 * @var int
+	 * @since 2.0.0
+	 */
+	private $chunkSize = 0;
+
+	/**
+	 * Constructor.
+	 *
+	 * @param ImportState $state State store for this import session.
+	 *
+	 * @since 2.0.0
+	 */
+	public function __construct( ImportState $state ) {
+		$this->state = $state;
+	}
+
+	/**
+	 * Stage 1: parse the WXR and import everything the posts depend on.
+	 *
+	 * Runs once. Imports authors, categories, tags and terms (cheap, and every
+	 * post references them), then persists the parsed posts and all remap maps
+	 * so the batch stage can resume without re-parsing.
+	 *
+	 * @param string $file Absolute path to the WXR file.
+	 *
+	 * @return int Total number of posts queued for the batch stage.
+	 * @since 2.0.0
+	 */
+	public function prepare( string $file ): int {
+		$this->addImportFilters();
+
+		// Parses the file into $this->posts/terms/categories/tags/authors and
+		// fires 'import_start'. Also enables deferred term/comment counting.
+		$this->import_start( $file );
+
+		wp_suspend_cache_invalidation( true );
+		$this->process_categories();
+		$this->process_tags();
+		$this->process_terms();
+		wp_suspend_cache_invalidation( false );
+
+		// import_start() deferred term & comment counting for the taxonomy pass
+		// above; flush it now (counts are trivial here — no posts are assigned
+		// yet). Batches re-defer term counting per request and finalize()
+		// recomputes every taxonomy authoritatively, so the expensive per-post
+		// term counting never runs live during the post loop.
+		wp_defer_term_counting( false );
+		wp_defer_comment_counting( false );
+
+		$this->offset     = 0;
+		$this->postsTotal = count( $this->posts );
+		$this->chunkSize  = max( 1, (int) apply_filters( 'sd/edi/import_posts_chunk_size', self::DEFAULT_POSTS_CHUNK_SIZE ) ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+
+		// Write the parse output once, split into per-chunk files; batches only
+		// rewrite the small mutable maps. Then free the in-memory post array.
+		$this->persistImmutable();
+		$this->persistPosts();
+		$this->persist();
+
+		$this->posts = [];
+
+		return $this->postsTotal;
+	}
+
+	/**
+	 * Parses the WXR and seeds the importer state.
+	 *
+	 * Overrides the parent, which echoes an error and calls die() on a missing or
+	 * unparseable file — that would kill the AJAX request and bypass the caller's
+	 * single-shot fallback. Throwing instead lets InstallDemo catch the failure
+	 * and fall back gracefully.
+	 *
+	 * @param string $file Absolute path to the WXR file.
+	 *
+	 * @return void
+	 * @throws \RuntimeException When the file is missing or cannot be parsed.
+	 * @since 2.0.0
+	 */
+	public function import_start( $file ) {
+		if ( ! is_file( $file ) ) {
+			throw new \RuntimeException( 'WXR file not found.' );
+		}
+
+		$import_data = $this->parse( $file );
+
+		if ( is_wp_error( $import_data ) ) {
+			throw new \RuntimeException( 'WXR could not be parsed: ' . esc_html( $import_data->get_error_message() ) );
+		}
+
+		$this->version = $import_data['version'];
+		$this->get_authors_from_import( $import_data );
+		$this->posts      = $import_data['posts'];
+		$this->terms      = $import_data['terms'];
+		$this->categories = $import_data['categories'];
+		$this->tags       = $import_data['tags'];
+		$this->base_url   = esc_url( $import_data['base_url'] );
+
+		wp_defer_term_counting( true );
+		wp_defer_comment_counting( true );
+
+		do_action( 'import_start' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+	}
+
+	/**
+	 * Stage 2: process a time-boxed slice of posts.
+	 *
+	 * Hydrates state, processes posts in small steps until the per-request time
+	 * budget is reached, then persists the advanced cursor and maps. Idempotent
+	 * and safe to re-issue: the cursor and the importer's own post_exists()
+	 * checks prevent duplicates if a request is retried after a timeout.
+	 *
+	 * @return array{processed:int,total:int,done:bool} Progress snapshot.
+	 * @since 2.0.0
+	 */
+	public function processBatch(): array {
+		if ( ! $this->hydrate() ) {
+			return [
+				'processed' => 0,
+				'total'     => 0,
+				'done'      => true,
+			];
+		}
+
+		$this->addImportFilters();
+
+		// Defer term counting for this request. Each post assignment would
+		// otherwise trigger a live COUNT+UPDATE per taxonomy — the dominant cost
+		// on WooCommerce demos (product_cat, product_tag, pa_* attributes). The
+		// deferred queue is a per-process static that dies with this request; it
+		// is never flushed here on purpose. finalize() recounts authoritatively
+		// from DB state, so a batch that times out mid-loop still ends correct.
+		wp_defer_term_counting( true );
+
+		$total = $this->postsTotal;
+
+		// Kept short so the batch returns progress frequently — the client bar
+		// advances in many small steps instead of one big jump. Smaller is also
+		// further under the gateway wall-clock limit; the trade-off is more
+		// (cheap, immediately re-fired) round-trips. Raise via the filter to
+		// minimise request count at the cost of coarser progress.
+		$budget = (float) apply_filters( 'sd/edi/import_chunk_seconds', 10 ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+		$step   = max( 1, (int) apply_filters( 'sd/edi/import_chunk_posts', 5 ) ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+		$start  = microtime( true );
+
+		wp_suspend_cache_invalidation( true );
+
+		// Walk the global cursor across the per-chunk files, holding only the
+		// chunk currently being processed in memory. Each chunk file is read once,
+		// except one that straddles a request boundary (re-read on resume) — the
+		// importer's post_exists() keeps the re-processed head idempotent.
+		while ( $this->offset < $total ) {
+			$chunk_index = intdiv( $this->offset, $this->chunkSize );
+			$chunk       = $this->state->loadPostsChunk( $chunk_index );
+
+			// A missing/corrupt chunk cannot be processed; stop rather than loop.
+			if ( ! is_array( $chunk ) ) {
+				$this->offset = $total;
+				break;
+			}
+
+			$this->posts = $chunk;
+			$chunk_count = count( $chunk );
+			$local       = $this->offset - ( $chunk_index * $this->chunkSize );
+
+			while ( $local < $chunk_count ) {
+				$this->process_posts( $local, $step );
+				$local        = min( $local + $step, $chunk_count );
+				$this->offset = ( $chunk_index * $this->chunkSize ) + $local;
+
+				// Always finish the current step, then stop once over budget so the
+				// request returns well under the gateway wall-clock limit.
+				if ( ( microtime( true ) - $start ) >= $budget ) {
+					break 2;
+				}
+			}
+		}
+
+		wp_suspend_cache_invalidation( false );
+
+		$done        = $this->offset >= $total;
+		$this->posts = [];
+		$this->persist();
+
+		return [
+			'processed' => $this->offset,
+			'total'     => $total,
+			'done'      => $done,
+		];
+	}
+
+	/**
+	 * Stage 3: resolve cross-post references and end the import.
+	 *
+	 * Runs once, after every post is processed. Backfills post parents, remaps
+	 * attachment URLs and featured images, ends the import (cache flush + count
+	 * recalculation), then deletes the state file.
+	 *
+	 * @return bool True if finalization ran; false if no state was found.
+	 * @since 2.0.0
+	 */
+	public function finalize(): bool {
+		if ( ! $this->hydrate() ) {
+			return false;
+		}
+
+		$this->addImportFilters();
+
+		$this->backfill_parents();
+		$this->backfill_attachment_urls();
+		$this->remap_featured_images();
+
+		$this->recountTerms();
+
+		$this->import_end();
+
+		$this->state->delete();
+
+		return true;
+	}
+
+	/**
+	 * Authoritatively recomputes term counts for the terms this import touched.
+	 *
+	 * Batches defer term counting (see processBatch), and that deferred queue
+	 * cannot survive between the separate batch requests — so rather than relying
+	 * on it flushing, this recounts from actual DB state once, at the end. It is
+	 * correct regardless of what any batch flushed, so a batch that died and was
+	 * re-issued still leaves accurate counts.
+	 *
+	 * The import only ever *adds* posts, so only the terms attached to this run's
+	 * imported posts can have a changed count. Rather than recounting every term
+	 * in every registered taxonomy — which on a large existing catalogue can
+	 * itself approach the wall-clock budget the chunking exists to avoid — this
+	 * gathers just those terms (plus the ancestors of hierarchical terms, whose
+	 * counts roll up children in e.g. WooCommerce product categories) and updates
+	 * only them. Each taxonomy's registered update_count_callback is honored.
+	 *
+	 * @return void
+	 * @since 2.0.0
+	 */
+	private function recountTerms(): void {
+		$post_ids = array_values( array_filter( array_map( 'intval', (array) $this->processed_posts ) ) );
+
+		if ( empty( $post_ids ) ) {
+			return;
+		}
+
+		global $wpdb;
+
+		// $in is a comma-joined list of intval'd post IDs — safe to interpolate.
+		$in = implode( ',', $post_ids );
+
+		// Terms (grouped by taxonomy) attached to any post imported this run.
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$sql = "SELECT tt.taxonomy AS taxonomy, tt.term_id AS term_id FROM {$wpdb->term_relationships} tr INNER JOIN {$wpdb->term_taxonomy} tt ON tt.term_taxonomy_id = tr.term_taxonomy_id WHERE tr.object_id IN ({$in}) GROUP BY tt.taxonomy, tt.term_id";
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+		$rows = $wpdb->get_results( $sql );
+
+		if ( empty( $rows ) ) {
+			return;
+		}
+
+		$by_taxonomy = [];
+
+		foreach ( $rows as $row ) {
+			$by_taxonomy[ $row->taxonomy ][] = (int) $row->term_id;
+		}
+
+		foreach ( $by_taxonomy as $taxonomy => $term_ids ) {
+			// A hierarchical term's count rolls up its descendants, so an affected
+			// child means its ancestors must be recounted too.
+			if ( is_taxonomy_hierarchical( $taxonomy ) ) {
+				foreach ( $term_ids as $term_id ) {
+					$term_ids = array_merge( $term_ids, get_ancestors( $term_id, $taxonomy, 'taxonomy' ) );
+				}
+			}
+
+			wp_update_term_count_now( array_values( array_unique( array_map( 'intval', $term_ids ) ) ), $taxonomy );
+		}
+	}
+
+	/**
+	 * The state store backing this import.
+	 *
+	 * @return ImportState
+	 * @since 2.0.0
+	 */
+	public function state(): ImportState {
+		return $this->state;
+	}
+
+	/**
+	 * Attachment post IDs created by this import run.
+	 *
+	 * Filters the importer's old-to-new post map down to the rows that are
+	 * actually attachments, in a single query. Used to drive the dedicated
+	 * image-regeneration phase so it only touches media imported by this run and
+	 * never a site's pre-existing attachments. Read from in-memory state, so it
+	 * remains valid after finalize() has deleted the state file.
+	 *
+	 * @return int[] New attachment post IDs.
+	 * @since 2.0.0
+	 */
+	public function importedAttachmentIds(): array {
+		if ( empty( $this->processed_posts ) ) {
+			return [];
+		}
+
+		$ids = array_values( array_filter( array_map( 'intval', (array) $this->processed_posts ) ) );
+
+		if ( empty( $ids ) ) {
+			return [];
+		}
+
+		global $wpdb;
+
+		$in = implode( ',', $ids );
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$found = $wpdb->get_col( "SELECT ID FROM {$wpdb->posts} WHERE post_type = 'attachment' AND ID IN ({$in})" );
+
+		return array_map( 'intval', (array) $found );
+	}
+
+	/**
+	 * Registers the import filters that import() normally adds up-front.
+	 *
+	 * Must run at the start of every request that touches importer logic, since
+	 * filters do not survive between AJAX calls.
+	 *
+	 * @return void
+	 * @since 2.0.0
+	 */
+	private function addImportFilters(): void {
+		add_filter( 'import_post_meta_key', [ $this, 'is_valid_meta_key' ] ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+		add_filter( 'http_request_timeout', [ &$this, 'bump_request_timeout' ] );
+	}
+
+	/**
+	 * Writes the write-once immutable parse output to its own file. Called once,
+	 * at the end of prepare().
+	 *
+	 * @return void
+	 * @since 2.0.0
+	 */
+	private function persistImmutable(): void {
+		$data = [
+			'posts_total' => $this->postsTotal,
+			'chunk_size'  => $this->chunkSize,
+		];
+
+		foreach ( self::IMMUTABLE_PROPS as $prop ) {
+			$data[ $prop ] = $this->$prop;
+		}
+
+		$this->state->saveImmutable( $data );
+	}
+
+	/**
+	 * Splits the parsed post array into fixed-size chunk files. Called once, at
+	 * the end of prepare().
+	 *
+	 * @return void
+	 * @since 2.0.0
+	 */
+	private function persistPosts(): void {
+		$index = 0;
+
+		foreach ( array_chunk( $this->posts, $this->chunkSize ) as $chunk ) {
+			$this->state->savePostsChunk( $index, $chunk );
+			++$index;
+		}
+	}
+
+	/**
+	 * Serializes the mutable cursor + maps to the store. Called once per batch;
+	 * the large immutable parse output is untouched.
+	 *
+	 * @return void
+	 * @since 2.0.0
+	 */
+	private function persist(): void {
+		$data = [ 'offset' => $this->offset ];
+
+		foreach ( self::MUTABLE_PROPS as $prop ) {
+			$data[ $prop ] = $this->$prop;
+		}
+
+		$this->state->save( $data );
+	}
+
+	/**
+	 * Restores cross-request state by reading both the immutable parse file and
+	 * the mutable maps file onto this instance.
+	 *
+	 * @return bool True if both state files were found and applied; false otherwise.
+	 * @since 2.0.0
+	 */
+	private function hydrate(): bool {
+		$immutable = $this->state->loadImmutable();
+		$mutable   = $this->state->load();
+
+		if ( null === $immutable || null === $mutable ) {
+			return false;
+		}
+
+		foreach ( self::IMMUTABLE_PROPS as $prop ) {
+			if ( array_key_exists( $prop, $immutable ) ) {
+				$this->$prop = $immutable[ $prop ];
+			}
+		}
+
+		$this->postsTotal = (int) ( $immutable['posts_total'] ?? 0 );
+		$this->chunkSize  = max( 1, (int) ( $immutable['chunk_size'] ?? self::DEFAULT_POSTS_CHUNK_SIZE ) );
+
+		foreach ( self::MUTABLE_PROPS as $prop ) {
+			if ( array_key_exists( $prop, $mutable ) ) {
+				$this->$prop = $mutable[ $prop ];
+			}
+		}
+
+		$this->offset = isset( $mutable['offset'] ) ? (int) $mutable['offset'] : 0;
+
+		return true;
+	}
+}
