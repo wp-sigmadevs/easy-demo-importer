@@ -264,8 +264,7 @@ final class ImportState {
 
 		foreach ( $paths as $path ) {
 			if ( is_file( $path ) ) {
-				// phpcs:ignore WordPress.WP.AlternativeFunctions.unlink_unlink
-				@unlink( $path ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+				wp_delete_file( $path );
 			}
 		}
 	}

@@ -122,12 +122,14 @@ final class MediaSnapshot {
 	private static function captureByMove( string $base, string $root, string $sessionId, string $demoSlug ): bool {
 		$shadow = trailingslashit( $root ) . 'uploads-' . $sessionId;
 
-		// A same-filesystem rename is instant; a failure means uploads live on a
-		// different device (custom UPLOADS path). Rather than a slow, timeout-prone
-		// recursive copy inside the import request, fall back to a manifest so the
-		// import's own new media is still removable on rollback — the pre-existing
-		// files simply are not moved, and stay live.
-		// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		// A same-filesystem rename is instant and atomic; a failure means uploads
+		// live on a different device (custom UPLOADS path). Rather than a slow,
+		// timeout-prone recursive copy inside the import request, fall back to a
+		// manifest so the import's own new media is still removable on rollback —
+		// the pre-existing files simply are not moved, and stay live. rename() is
+		// used deliberately over WP_Filesystem::move(), which can degrade to a
+		// non-atomic copy-then-delete of the whole uploads tree.
+		// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.rename_rename
 		if ( ! @rename( $base, $shadow ) ) {
 			ImportLogger::warning(
 				esc_html__( 'Media could not be moved to the restore point (uploads may be on a separate disk); the database will still roll back, and new media added by this import will be removed.', 'easy-demo-importer' ),
@@ -224,10 +226,12 @@ final class MediaSnapshot {
 				return false;
 			}
 
-			// Drop the import's media, then move the original library back.
+			// Drop the import's media, then move the original library back. An
+			// atomic same-filesystem rename, deliberately over WP_Filesystem::move()
+			// (which can copy-then-delete the whole tree non-atomically).
 			self::rrmdir( $base );
 
-			// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+			// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.rename_rename
 			if ( ! @rename( $shadow, $base ) ) {
 				return false;
 			}
@@ -336,8 +340,32 @@ final class MediaSnapshot {
 			is_dir( $path ) ? self::rrmdir( $path ) : wp_delete_file( $path );
 		}
 
-		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_rmdir
-		@rmdir( $dir ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		// Remove the now-empty directory via WP_Filesystem. If it cannot boot
+		// (a non-direct/FTP host), the empty directory is harmless and is simply
+		// left in place rather than risking a fatal on a null filesystem.
+		$fs = self::fs();
+
+		if ( $fs ) {
+			$fs->rmdir( $dir );
+		}
+	}
+
+	/**
+	 * Lazily boots and returns WP_Filesystem (the direct method on hosts whose
+	 * uploads are writable by the web server, which covers rollback's use case).
+	 *
+	 * @return \WP_Filesystem_Base|null
+	 * @since 2.0.0
+	 */
+	private static function fs() {
+		global $wp_filesystem;
+
+		if ( ! $wp_filesystem ) {
+			require_once ABSPATH . 'wp-admin/includes/file.php';
+			WP_Filesystem();
+		}
+
+		return $wp_filesystem;
 	}
 
 	/**
@@ -358,12 +386,15 @@ final class MediaSnapshot {
 			RecursiveIteratorIterator::CHILD_FIRST
 		);
 
+		$fs = self::fs();
+
+		if ( ! $fs ) {
+			return;
+		}
+
 		foreach ( $iterator as $file ) {
 			if ( $file->isDir() && ! $file->isLink() ) {
-				$path = $file->getPathname();
-
-				// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_rmdir
-				@rmdir( $path ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+				$fs->rmdir( $file->getPathname() );
 			}
 		}
 	}
