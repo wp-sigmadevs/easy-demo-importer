@@ -319,9 +319,10 @@ class ManualImport extends Base {
 			wp_delete_file( $dir . '/settings.zip' );
 		}
 
-		// Bundled media → extracted into wp-content/uploads (import skips download).
+		// Bundled media → staged under the working dir; the importer attaches it
+		// locally (no remote download) and creates Media Library entries.
 		if ( is_file( $dir . '/images.zip' ) ) {
-			$this->extractImages( $dir . '/images.zip' );
+			$this->extractImages( $dir . '/images.zip', $dir );
 			wp_delete_file( $dir . '/images.zip' );
 			$has_images = true;
 		}
@@ -338,11 +339,12 @@ class ManualImport extends Base {
 	 * Unzips a bundle and maps its files, by extension, into the standard names.
 	 * `*.xml`→content, `*.dat`→customizer, `*.wie`→widgets, `*.json`→settings
 	 * (a `settings.json` is a flat map; any other JSON is one option keyed by its
-	 * filename), and an `uploads/` folder is extracted into wp-content/uploads.
+	 * filename), and an `uploads/` folder is staged under the working dir for the
+	 * importer's bundled-media path to attach.
 	 *
 	 * @param string $dir Working directory (holds bundle.zip).
 	 *
-	 * @return bool Whether any bundled media was extracted into uploads.
+	 * @return bool Whether any bundled media was staged for import.
 	 * @since 1.2.0
 	 */
 	private function routeBundle( string $dir ): bool {
@@ -357,7 +359,7 @@ class ManualImport extends Base {
 
 		$settings   = [];
 		$has_images = false;
-		$uploads    = wp_get_upload_dir()['basedir'];
+		$staging    = $dir . '/uploads';
 
 		$iterator = new \RecursiveIteratorIterator(
 			new \RecursiveDirectoryIterator( $extract, \FilesystemIterator::SKIP_DOTS )
@@ -376,7 +378,7 @@ class ManualImport extends Base {
 			// Media placed under an uploads/ folder (at any depth — the zip may
 			// nest everything under a wrapper folder) mirrors the live structure.
 			if ( in_array( $ext, $this->imageExtensions(), true ) && preg_match( '#(?:^|/)uploads/(.+)$#i', $rel, $m ) ) {
-				$dest = trailingslashit( $uploads ) . $m[1];
+				$dest = trailingslashit( $staging ) . $m[1];
 				wp_mkdir_p( dirname( $dest ) );
 				// phpcs:ignore WordPress.WP.AlternativeFunctions.rename_rename, WordPress.PHP.NoSilencedErrors.Discouraged
 				@rename( $path, $dest );
@@ -482,18 +484,23 @@ class ManualImport extends Base {
 	}
 
 	/**
-	 * Extracts an images .zip into the uploads directory, preserving its folder
-	 * structure so the imported content's media URLs resolve locally.
+	 * Extracts an images .zip into the working dir's `uploads/` staging folder,
+	 * preserving its structure. The importer's bundled-media path
+	 * (resolve_bundled_media → import_local_file) reads from here to create real
+	 * Media Library attachments — copying each file into wp-content/uploads and
+	 * remapping content URLs — instead of just dropping raw files on disk.
 	 *
 	 * @param string $zip Absolute path to the images zip.
+	 * @param string $dir Working directory.
 	 *
 	 * @return void
 	 * @since 1.2.0
 	 */
-	private function extractImages( string $zip ) {
-		$uploads = wp_get_upload_dir()['basedir'];
+	private function extractImages( string $zip, string $dir ) {
+		$staging = $dir . '/uploads';
+		wp_mkdir_p( $staging );
 
-		if ( is_wp_error( $this->unzip( $zip, $uploads ) ) ) {
+		if ( is_wp_error( $this->unzip( $zip, $staging ) ) ) {
 			$this->fail( esc_html__( 'The images .zip could not be unpacked into the uploads folder.', 'easy-demo-importer' ) );
 		}
 	}

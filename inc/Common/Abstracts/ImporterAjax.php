@@ -242,6 +242,22 @@ abstract class ImporterAjax {
 		// working directory resolve on each request).
 		$this->manual    = ManualContext::isManual();
 		$this->manualKey = ManualContext::requestKey();
+
+		// A manual import that shipped its own media (an images .zip, or a bundle
+		// with an uploads/ folder) stages those files under <working-dir>/uploads.
+		// The UI hides the "Import Demo Images" toggle in that case, so
+		// excludeImages arrives as 'true' and would skip every attachment. Force
+		// it off so the bundled-media path attaches the staged files locally —
+		// creating real Media Library entries — instead of dropping raw files on
+		// disk. Applied on every phase so the content-import and regeneration
+		// steps agree.
+		if ( $this->manual ) {
+			$staged = $this->demoUploadDir( $this->demoDir() ) . '/uploads';
+
+			if ( is_dir( $staged ) && ( new \FilesystemIterator( $staged ) )->valid() ) {
+				$this->excludeImages = 'false';
+			}
+		}
 	}
 
 	/**
