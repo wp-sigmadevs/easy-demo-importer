@@ -887,17 +887,19 @@ class InstallDemo extends ImporterAjax {
 		static $suffix = null;
 
 		if ( null === $suffix ) {
-			$template = trim(
-				wp_strip_all_tags(
-					esc_html__( 'Skipped %1$s &#8220;%2$s&#8221;: image import is turned off.', 'easy-demo-importer' )
-				)
-			);
+			/* translators: 1: item type (e.g. Media), 2: item title. */
+			$message  = esc_html__( 'Skipped %1$s &#8220;%2$s&#8221;: image import is turned off.', 'easy-demo-importer' );
+			$template = trim( wp_strip_all_tags( $message ) );
 			$marker   = '&#8221;:';
 			$pos      = strpos( $template, $marker );
 			$suffix   = false === $pos ? $template : trim( substr( $template, $pos + strlen( $marker ) ) );
 		}
 
-		return '' !== $suffix && str_ends_with( $line, $suffix );
+		$length = strlen( $suffix );
+
+		// substr()-based tail match rather than str_ends_with(), which is only
+		// polyfilled from WordPress 5.9 (this plugin supports 5.5+).
+		return $length > 0 && substr( $line, -$length ) === $suffix;
 	}
 
 	/**
