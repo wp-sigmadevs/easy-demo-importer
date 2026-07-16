@@ -122,6 +122,17 @@ const PROGRESS_BAR_PHASES = ['sd_edi_import_xml', 'sd_edi_regenerate_images'];
 const MAX_AUTO_RESUME = 5;
 
 /**
+ * Maximum consecutive "another import holds the lock" waits before giving up and
+ * surfacing the manual Resume screen. Chunked requests are short and release the
+ * mutex between steps, so a lock held this long (default ~5s apart ≈ 2 min)
+ * signals a crashed holder rather than a genuinely busy import — without this the
+ * client would poll silently until the server's 30-minute stale-lock sweep.
+ *
+ * @type {number}
+ */
+const MAX_MUTEX_WAIT = 24;
+
+/**
  * HTTP statuses treated as transient (gateway/server overload or timeout),
  * including Cloudflare's 52x family. A dropped connection (no response) is
  * treated the same way.
@@ -142,6 +153,7 @@ const TRANSIENT_STATUSES = [408, 429, 500, 502, 503, 504, 520, 522, 524];
  * @param {Function} setResumeRequest     - Save the failed request so Resume can retry it.
  * @param {Function} setImportPercent     - Set the determinate progress percentage (0-100), or null.
  * @param {number}   attempt              - Current auto-resume attempt (internal; starts at 0).
+ * @param {number}   mutexWait            - Consecutive "another import holds the lock" waits (internal; starts at 0).
  */
 export const doAxios = async (
 	request,
@@ -152,7 +164,8 @@ export const doAxios = async (
 	setHint = () => {},
 	setResumeRequest = () => {},
 	setImportPercent = () => {},
-	attempt = 0
+	attempt = 0,
+	mutexWait = 0
 ) => {
 	if (request.nextPhase) {
 		const params = new FormData();
@@ -231,9 +244,43 @@ export const doAxios = async (
 					}
 
 					// retry:true means the PHP mutex was held by a background import.
-					// Re-send the same original request after retryAfter seconds — do NOT
-					// advance the pipeline or touch the progress list.
+					// Re-send the same original request after retryAfter seconds. The
+					// wait is capped and surfaced (not a silent poll): a crashed lock
+					// holder would otherwise leave the user on a frozen screen until
+					// the server's 30-minute stale-lock sweep.
 					if (response.data.retry) {
+						const nextWait = mutexWait + 1;
+
+						if (nextWait > MAX_MUTEX_WAIT) {
+							setMessage(
+								sdEdiAdminParams.importBusyTitle ||
+									'Another import is still running.'
+							);
+							setHint(
+								sdEdiAdminParams.importBusyHint ||
+									'It has held the import lock longer than expected and may have stalled. Resume to keep waiting, or Start Over to begin fresh.'
+							);
+							if (request.sessionId) {
+								setResumeRequest(request);
+							}
+							setCurrentStep(5);
+							return;
+						}
+
+						// Keep a single, updating "waiting" line so the poll is
+						// visible without stacking a new card on every retry.
+						setImportProgress((prevProgress) => [
+							...prevProgress.filter((p) => !p.mutexWait),
+							{
+								message: `${
+									sdEdiAdminParams.importWaitingMessage ||
+									'Waiting for another import to finish'
+								}… (${nextWait}/${MAX_MUTEX_WAIT})`,
+								fade: true,
+								mutexWait: true,
+							},
+						]);
+
 						setTimeout(
 							() => {
 								doAxios(
@@ -244,7 +291,9 @@ export const doAxios = async (
 									setMessage,
 									setHint,
 									setResumeRequest,
-									setImportPercent
+									setImportPercent,
+									attempt,
+									nextWait
 								);
 							},
 							(response.data.retryAfter ?? 5) * 1000
