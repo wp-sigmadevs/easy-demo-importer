@@ -35,6 +35,68 @@ final class ImportLoggerTest extends UnitTestCase {
 			}
 		);
 		Functions\when( 'current_time' )->justReturn( '2026-07-09 12:00:00' );
+		Functions\when( '__' )->returnArg();
+	}
+
+	/**
+	 * Builds one grouped run for the markInterruptedRuns() tests.
+	 *
+	 * @param string $sid    Session id.
+	 * @param string $status Run status.
+	 *
+	 * @return array
+	 */
+	private function makeRun( string $sid, string $status ): array {
+		return [
+			'session_id' => $sid,
+			'demo_slug'  => 'home-01',
+			'started_at' => '2026-07-09 11:00:00',
+			'status'     => $status,
+			'count'      => 1,
+			'entries'    => [
+				[
+					'logged_at' => '2026-07-09 11:00:05',
+					'level'     => ImportLogger::INFO,
+					'message'   => 'Importing…',
+				],
+			],
+		];
+	}
+
+	public function test_mark_interrupted_flags_stale_in_progress_run(): void {
+		$runs = ImportLogger::markInterruptedRuns(
+			[ $this->makeRun( 'sid-A', ImportLogger::INFO ) ],
+			''
+		);
+
+		self::assertSame( ImportLogger::INTERRUPTED, $runs[0]['status'] );
+		// A closing entry was appended…
+		self::assertSame( 2, $runs[0]['count'] );
+		self::assertSame( ImportLogger::INTERRUPTED, end( $runs[0]['entries'] )['level'] );
+		// …reusing the last real entry's timestamp, not "now".
+		self::assertSame( '2026-07-09 11:00:05', end( $runs[0]['entries'] )['logged_at'] );
+	}
+
+	public function test_mark_interrupted_leaves_the_active_session_alone(): void {
+		$runs = ImportLogger::markInterruptedRuns(
+			[ $this->makeRun( 'sid-A', ImportLogger::INFO ) ],
+			'sid-A'
+		);
+
+		self::assertSame( ImportLogger::INFO, $runs[0]['status'] );
+		self::assertSame( 1, $runs[0]['count'] );
+	}
+
+	public function test_mark_interrupted_ignores_finished_runs(): void {
+		foreach ( [ ImportLogger::SUCCESS, ImportLogger::WARNING, ImportLogger::ERROR ] as $status ) {
+			$runs = ImportLogger::markInterruptedRuns(
+				[ $this->makeRun( 'sid-A', $status ) ],
+				''
+			);
+
+			self::assertSame( $status, $runs[0]['status'] );
+			self::assertSame( 1, $runs[0]['count'] );
+		}
 	}
 
 	public function test_levels_are_the_four_known_levels(): void {
