@@ -1605,14 +1605,48 @@ class SD_EDI_WP_Import extends WP_Importer {
 		// make sure we do the longest urls first, in case one is a substring of another.
 		uksort( $this->url_remap, [ &$this, 'cmpr_strlen' ] );
 
+		// Drop identity remaps (from === to): they rewrite nothing, so there is no
+		// point scanning the table for them.
+		$remap = [];
 		foreach ( $this->url_remap as $from_url => $to_url ) {
+			if ( (string) $from_url !== (string) $to_url ) {
+				$remap[ $from_url ] = $to_url;
+			}
+		}
+
+		if ( empty( $remap ) ) {
+			return;
+		}
+
+		// The original importer issued one full-table UPDATE...REPLACE per URL —
+		// two scans (posts.post_content + enclosure postmeta) for every mapped
+		// attachment, i.e. O(attachments × rows). Instead fold a batch of URLs
+		// into a single nested REPLACE(REPLACE(col, f1, t1), f2, t2)... so each
+		// table is scanned once per batch. uksort ordered the map longest-first;
+		// wrapping in that order puts the longest URL innermost (applied first),
+		// preserving the substring-safety guarantee. Batched so the statement
+		// stays well under max_allowed_packet on very large imports.
+		$batch_size = max( 1, (int) apply_filters( 'sd/edi/url_backfill_batch_size', 100 ) ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+
+		foreach ( array_chunk( $remap, $batch_size, true ) as $batch ) {
+			$content_expr = 'post_content';
+			$enclose_expr = 'meta_value';
+			$args         = [];
+
+			foreach ( $batch as $from_url => $to_url ) {
+				$content_expr = "REPLACE($content_expr, %s, %s)";
+				$enclose_expr = "REPLACE($enclose_expr, %s, %s)";
+				$args[]       = $from_url;
+				$args[]       = $to_url;
+			}
+
 			// remap urls in post_content.
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			$wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->posts} SET post_content = REPLACE(post_content, %s, %s)", $from_url, $to_url ) );
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+			$wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->posts} SET post_content = {$content_expr}", $args ) );
 
 			// remap enclosure urls.
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			$result = $wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->postmeta} SET meta_value = REPLACE(meta_value, %s, %s) WHERE meta_key='enclosure'", $from_url, $to_url ) );
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+			$wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->postmeta} SET meta_value = {$enclose_expr} WHERE meta_key='enclosure'", $args ) );
 		}
 	}
 
