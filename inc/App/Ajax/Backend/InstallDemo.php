@@ -230,6 +230,9 @@ class InstallDemo extends ImporterAjax {
 			$this->demoSlug
 		);
 
+		// Parse done — free the lock so the first batch request acquires cleanly.
+		$this->releaseMutex();
+
 		wp_send_json(
 			$this->chunkPayload(
 				[
@@ -276,6 +279,10 @@ class InstallDemo extends ImporterAjax {
 		ob_start();
 		$result = $this->chunkedImporter()->processBatch();
 		$this->logImporterOutput( ob_get_clean() );
+
+		// Work done — free the lock before responding so this import's next
+		// request (fired immediately when retryAfter is 0) re-acquires cleanly.
+		$this->releaseMutex();
 
 		$progress = [
 			'processed' => (int) $result['processed'],
@@ -399,6 +406,10 @@ class InstallDemo extends ImporterAjax {
 		// The batch loop imported originals only. If regeneration wasn't skipped
 		// and this run actually imported media, hand the new attachment IDs to the
 		// dedicated, resumable regeneration phase before moving on to customizer.
+		// Reference fixup + after-import hooks done — free the lock before the
+		// handoff so the next phase acquires cleanly.
+		$this->releaseMutex();
+
 		$attachmentIds = ( $this->skipImageRegeneration || 'true' === $this->excludeImages )
 			? []
 			: $importer->importedAttachmentIds();
@@ -507,6 +518,10 @@ class InstallDemo extends ImporterAjax {
 				break;
 			}
 		}
+
+		// Chunk done — free the lock before the immediate (retryAfter:0) re-fire
+		// so the next regen request re-acquires cleanly.
+		$this->releaseMutex();
 
 		$progress = [
 			'processed' => $cursor,
@@ -980,6 +995,23 @@ class InstallDemo extends ImporterAjax {
 	}
 
 	/**
+	 * Releases the import mutex immediately.
+	 *
+	 * A phase holds the lock only for its own work. Releasing it right before the
+	 * response is sent — rather than waiting for the shutdown handler that runs
+	 * after the response — lets this same import's very next request re-acquire
+	 * without the spurious "another import is running" wait the shutdown-timing
+	 * race would otherwise cause (worst with the retryAfter:0 batch/regen loops).
+	 * The shutdown handler registered in acquireMutex() stays as a crash-safety net.
+	 *
+	 * @return void
+	 * @since 2.0.0
+	 */
+	private function releaseMutex(): void {
+		delete_option( 'sd_edi_xml_import_mutex' );
+	}
+
+	/**
 	 * Emits a "waiting for the previous request to finish" retry response.
 	 *
 	 * The client re-sends the same request after retryAfter seconds without
@@ -997,6 +1029,11 @@ class InstallDemo extends ImporterAjax {
 					'nextPhase'        => $phase,
 					'nextPhaseMessage' => esc_html__( 'Waiting for previous import to finish…', 'easy-demo-importer' ),
 					'retry'            => true,
+					// Distinguishes a genuine lock conflict (this) from the
+					// batch/regen tight-loop continuations, which also set
+					// retry:true. Only this drives the client's visible
+					// "waiting for another import" counter and its cap.
+					'mutexHeld'        => true,
 					// Kept short: the common case here is a benign timing overlap in
 					// the tight batch loop (the previous request's shutdown handler
 					// has not released the lock yet), not real contention — so a brief

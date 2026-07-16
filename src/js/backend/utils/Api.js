@@ -243,12 +243,35 @@ export const doAxios = async (
 						);
 					}
 
-					// retry:true means the PHP mutex was held by a background import.
-					// Re-send the same original request after retryAfter seconds. The
-					// wait is capped and surfaced (not a silent poll): a crashed lock
-					// holder would otherwise leave the user on a frozen screen until
-					// the server's 30-minute stale-lock sweep.
-					if (response.data.retry) {
+					// A retry response has two meanings sharing one flag: the batch and
+					// regen tight loops set retry (retryAfter:0, with progress) only to
+					// re-fire their next chunk, while respondWaiting() additionally sets
+					// mutexHeld for a real lock conflict with another import. A plain
+					// continuation must re-fire silently — counting it as a wait would
+					// falsely surface (and cap out) the 'another import' notice mid-run.
+					if (response.data.retry && !response.data.mutexHeld) {
+						setTimeout(
+							() => {
+								doAxios(
+									request,
+									setImportProgress,
+									setCurrentStep,
+									handleImportResponse,
+									setMessage,
+									setHint,
+									setResumeRequest,
+									setImportPercent
+								);
+							},
+							(response.data.retryAfter ?? 0) * 1000
+						);
+						return;
+					}
+
+					// mutexHeld: another import genuinely holds the lock. Poll with a
+					// visible, capped wait so a crashed holder can't strand the user on a
+					// frozen screen until the server's 30-minute stale-lock sweep.
+					if (response.data.mutexHeld) {
 						const nextWait = mutexWait + 1;
 
 						if (nextWait > MAX_MUTEX_WAIT) {
