@@ -51,6 +51,7 @@ const AppRegenerate = () => {
 	const drainRef = useRef(null);
 	const listRef = useRef(null);
 	const sessionRef = useRef('');
+	const totalRef = useRef(0);
 
 	const post = useCallback((fields) => {
 		const body = new URLSearchParams({
@@ -81,6 +82,7 @@ const AppRegenerate = () => {
 			.then((res) => {
 				if (alive && res && res.success) {
 					setTotal(res.data.total);
+					totalRef.current = res.data.total;
 				}
 			})
 			.catch(() => alive && setTotal(0));
@@ -110,6 +112,7 @@ const AppRegenerate = () => {
 				force: force ? 'true' : 'false',
 				single: single ? 'true' : 'false',
 				session: sessionRef.current,
+				total: totalRef.current,
 				regenerated: state.regenerated,
 				skipped: state.skipped,
 				failed: state.failed,
@@ -132,6 +135,14 @@ const AppRegenerate = () => {
 					// every later request groups under the same activity-log run.
 					if (d.session) {
 						sessionRef.current = d.session;
+					}
+
+					// The server computes the library size once (first request) and
+					// echoes it; round-trip it so later requests skip the COUNT scan,
+					// and keep the progress bar accurate.
+					if (typeof d.total === 'number') {
+						totalRef.current = d.total;
+						setTotal(d.total);
 					}
 
 					if (Array.isArray(d.items) && d.items.length) {
