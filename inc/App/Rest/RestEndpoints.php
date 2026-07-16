@@ -411,6 +411,8 @@ class RestEndpoints extends Base {
 	 * @since 2.0.0
 	 */
 	public function importLog( WP_REST_Request $request ) {
+		ImportLogger::maybeInstall();
+
 		$sessionId = (string) $request->get_param( 'session_id' );
 		$group     = (bool) $request->get_param( 'group' );
 		$limit     = (int) $request->get_param( 'limit' );
