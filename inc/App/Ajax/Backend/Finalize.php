@@ -15,6 +15,7 @@ namespace SigmaDevs\EasyDemoImporter\App\Ajax\Backend;
 use SigmaDevs\EasyDemoImporter\Common\{
 	Traits\Singleton,
 	Functions\Helpers,
+	Functions\ImportLogger,
 	Functions\SessionManager,
 	Abstracts\ImporterAjax
 };
@@ -65,6 +66,29 @@ class Finalize extends ImporterAjax {
 	public function response() {
 		// Verifying AJAX call and user role.
 		Helpers::verifyAjaxCall();
+
+		// Third-party theme scripts hooked to 'sd/edi/after_import' (nav menu
+		// setup, asset generation, dependent-plugin bootstrapping) can be
+		// memory-heavy and are outside our control, so give them headroom.
+		//
+		// Deliberately not restored afterwards. PHP enforces memory_limit at
+		// allocation time, so lowering it back while the hooks' memory is still
+		// held would fatal on the next allocation (flush_rewrite_rules() below)
+		// — the very failure this raise prevents. The limit is per-request and
+		// this is the wizard's last request, so there is nothing to restore for.
+		wp_raise_memory_limit( 'admin' );
+
+		// A host that forbids changing memory_limit is the one case worth
+		// surfacing: an import that dies in the hooks below leaves no other
+		// clue. The other falsy returns of wp_raise_memory_limit() mean the
+		// limit is already unlimited or high enough, which is not a problem.
+		if ( ! wp_is_ini_value_changeable( 'memory_limit' ) ) {
+			ImportLogger::info(
+				esc_html__( 'This host does not allow the PHP memory limit to be raised for the finishing step.', 'easy-demo-importer' ),
+				$this->sessionId,
+				$this->demoSlug
+			);
+		}
 
 		/**
 		 * Action Hook: 'sd/edi/after_import'

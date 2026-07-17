@@ -15,6 +15,7 @@ namespace SigmaDevs\EasyDemoImporter\App\Ajax\Backend;
 use SigmaDevs\EasyDemoImporter\Common\{
 	Traits\Singleton,
 	Functions\Helpers,
+	Functions\Actions,
 	Abstracts\ImporterAjax
 };
 
@@ -64,6 +65,11 @@ class ImportSettings extends ImporterAjax {
 	public function response() {
 		// Verifying AJAX call and user role.
 		Helpers::verifyAjaxCall();
+
+		// Theme-supplied settings/option files (settings.json, or a per-option
+		// {option}.json) can be large, so give this step the same memory/time
+		// headroom the content-import phase already gets.
+		Actions::beforeImportActions();
 
 		$settings = $this->multiple ?
 			Helpers::getDemoData( $this->config['demoData'][ $this->demoSlug ], 'settingsJson', 'array' ) :
