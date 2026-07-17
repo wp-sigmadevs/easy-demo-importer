@@ -15,6 +15,7 @@ namespace SigmaDevs\EasyDemoImporter\Common\Functions;
 use WP_Post;
 use WP_Error;
 use WP_Query;
+use SigmaDevs\EasyDemoImporter\Common\Utils\OutputGuard;
 
 // Do not allow directly accessing this file.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -81,6 +82,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 	 * @since  1.0.0
 	 */
 	public static function verifyAjaxCall() {
+		// Drop anything other code printed before this handler got control, so
+		// the JSON this request answers with stays parseable. Every phase routes
+		// through here, including the error responses below.
+		OutputGuard::reset();
+
 		// Verifies the Ajax request.
 		if ( ! check_ajax_referer( self::nonceText(), self::nonceId(), false ) ) {
 			wp_send_json_error(
