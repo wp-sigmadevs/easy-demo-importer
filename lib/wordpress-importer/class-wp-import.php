@@ -982,12 +982,14 @@ class SD_EDI_WP_Import extends WP_Importer {
 		}
 
 		$menu_slug = false;
+		$menu_name = '';
 
 		if ( isset( $item['terms'] ) ) {
 			// loop through terms, assume first nav_menu term is correct menu.
 			foreach ( $item['terms'] as $term ) {
 				if ( 'nav_menu' == $term['domain'] ) {
 					$menu_slug = $term['slug'];
+					$menu_name = ! empty( $term['name'] ) ? $term['name'] : $term['slug'];
 					break;
 				}
 			}
@@ -1004,11 +1006,24 @@ class SD_EDI_WP_Import extends WP_Importer {
 		$menu_id = term_exists( $menu_slug, 'nav_menu' );
 
 		if ( ! $menu_id ) {
-			/* translators: Menu Slug */
-			printf( esc_html__( 'Menu item skipped due to invalid menu slug: %s', 'easy-demo-importer' ), esc_html( $menu_slug ) );
-			echo '<br />';
+			// The bundled WXR references menus by their nav_menu category but does
+			// not always export the matching <wp:term> definitions, so the menu
+			// term may not exist yet. Upstream (and the original vendored copy)
+			// drops every item in that case, leaving the menu empty. Create the
+			// menu instead — by its display name, so the derived slug still matches
+			// $menu_slug and later items resolve to the same menu. Divergence from
+			// the vendored importer — keep it minimal for future upstream syncs.
+			$created = wp_create_nav_menu( '' !== $menu_name ? $menu_name : $menu_slug );
 
-			return;
+			if ( is_wp_error( $created ) ) {
+				/* translators: Menu Slug */
+				printf( esc_html__( 'Menu item skipped due to invalid menu slug: %s', 'easy-demo-importer' ), esc_html( $menu_slug ) );
+				echo '<br />';
+
+				return;
+			}
+
+			$menu_id = (int) $created;
 		} else {
 			$menu_id = is_array( $menu_id ) ? $menu_id['term_id'] : $menu_id;
 		}
@@ -1252,8 +1267,8 @@ class SD_EDI_WP_Import extends WP_Importer {
 		// from) are filterable so a theme author whose host does this can adjust
 		// them without patching the importer. Divergence from the vendored
 		// importer — keep it minimal for future upstream syncs.
-		$request_args = apply_filters( // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
-			'sd/edi/importer/attachment_request_args',
+		$request_args = apply_filters(
+			'sd/edi/importer/attachment_request_args', // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 			[
 				// A blocked/tarpitted image (e.g. behind a Cloudflare challenge)
 				// can hold the connection open until this timeout. A chunked batch
@@ -1265,8 +1280,8 @@ class SD_EDI_WP_Import extends WP_Importer {
 				'timeout'    => (int) apply_filters( 'sd/edi/importer/attachment_timeout', 40 ), // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 				'stream'     => true,
 				'filename'   => $tmp_file_name,
-				'user-agent' => apply_filters( // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
-					'sd/edi/importer/attachment_user_agent',
+				'user-agent' => apply_filters(
+					'sd/edi/importer/attachment_user_agent', // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 					'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36'
 				),
 				'headers'    => [
@@ -1641,11 +1656,11 @@ class SD_EDI_WP_Import extends WP_Importer {
 			}
 
 			// remap urls in post_content.
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
 			$wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->posts} SET post_content = {$content_expr}", $args ) );
 
 			// remap enclosure urls.
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
 			$wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->postmeta} SET meta_value = {$enclose_expr} WHERE meta_key='enclosure'", $args ) );
 		}
 	}
