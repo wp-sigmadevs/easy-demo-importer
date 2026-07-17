@@ -14,6 +14,7 @@ namespace SigmaDevs\EasyDemoImporter\App\Ajax\Backend;
 
 use SigmaDevs\EasyDemoImporter\Common\{
 	Traits\Singleton,
+	Functions\Actions,
 	Functions\Helpers,
 	Functions\ImportLogger,
 	Functions\SessionManager,
@@ -69,19 +70,21 @@ class Finalize extends ImporterAjax {
 
 		// Third-party theme scripts hooked to 'sd/edi/after_import' (nav menu
 		// setup, asset generation, dependent-plugin bootstrapping) can be
-		// memory-heavy and are outside our control, so give them headroom.
+		// memory-heavy and are outside our control, so give them the same
+		// headroom every content-import phase already gets. Using the shared
+		// boost rather than wp_raise_memory_limit() keeps one mechanism across
+		// the pipeline: the same 'sd/edi/temp_boost_memory_limit' target (which
+		// a theme can filter), not WP_MAX_MEMORY_LIMIT's lower default.
 		//
-		// Deliberately not restored afterwards. PHP enforces memory_limit at
-		// allocation time, so lowering it back while the hooks' memory is still
-		// held would fatal on the next allocation (flush_rewrite_rules() below)
-		// — the very failure this raise prevents. The limit is per-request and
-		// this is the wizard's last request, so there is nothing to restore for.
-		wp_raise_memory_limit( 'admin' );
+		// The boost is deliberately not undone afterwards. PHP enforces
+		// memory_limit at allocation time, so lowering it back while the hooks'
+		// memory is still held would fatal on the next allocation
+		// (flush_rewrite_rules() below) — the very failure the raise prevents.
+		// The limit is per-request and this is the wizard's last request.
+		Actions::beforeImportActions();
 
-		// A host that forbids changing memory_limit is the one case worth
-		// surfacing: an import that dies in the hooks below leaves no other
-		// clue. The other falsy returns of wp_raise_memory_limit() mean the
-		// limit is already unlimited or high enough, which is not a problem.
+		// A host that forbids changing memory_limit is worth surfacing: an
+		// import that dies in the hooks below otherwise leaves no clue why.
 		if ( ! wp_is_ini_value_changeable( 'memory_limit' ) ) {
 			ImportLogger::info(
 				esc_html__( 'This host does not allow the PHP memory limit to be raised for the finishing step.', 'easy-demo-importer' ),
