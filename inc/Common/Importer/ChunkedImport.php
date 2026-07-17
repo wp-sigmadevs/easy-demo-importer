@@ -399,7 +399,17 @@ class ChunkedImport extends SD_EDI_WP_Import {
 	 * @since 2.0.0
 	 */
 	private function recountTerms(): void {
-		$post_ids = array_values( array_filter( array_map( 'intval', (array) $this->processed_posts ) ) );
+		// Menu items are nav_menu_item posts tracked in processed_menu_items, not
+		// processed_posts, and their nav_menu term is attached to them — so recount
+		// must include them or a freshly created menu keeps the deferred count of 0
+		// it was left with, which WordPress renders as an empty menu even though the
+		// items exist and are correctly linked.
+		$post_ids = array_merge(
+			array_values( (array) $this->processed_posts ),
+			array_values( (array) $this->processed_menu_items )
+		);
+
+		$post_ids = array_values( array_filter( array_map( 'intval', $post_ids ) ) );
 
 		if ( empty( $post_ids ) ) {
 			return;
