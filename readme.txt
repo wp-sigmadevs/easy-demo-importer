@@ -140,7 +140,7 @@ For any inquiries, bug reports, or suggestions, please submit your request [here
 
 == Changelog ==
 
-= 2.0.0 (15-July-2026) =
+= 2.0.0 =
 * Feature: Resumable, chunked WXR import — large/WooCommerce demos no longer fail with 524/503 gateway timeouts.
 * Feature: Manual import — upload your own content, media, and settings as separate files or a single .zip bundle.
 * Feature: One-click rollback — a restore point is created before import so you can revert in one click.
@@ -161,6 +161,14 @@ For any inquiries, bug reports, or suggestions, please submit your request [here
 * Fix: Prevented a JavaScript crash when network requests fail or time out.
 * Tweak: Improved Customizer, Widgets, and database search-replace handling; refactored slider import.
 * Tweak: A readiness step shows the "View full system status" link inline; improved uninstall cleanup.
+* Fix: Imported navigation menus could appear empty — menu item counts are now reconciled after import, and a menu missing from the export file is created automatically so its items are no longer dropped.
+* Fix: An import could report success while silently importing nothing when another plugin printed output during the request (for example, WooCommerce right after a database reset) — the import response is now isolated so it stays valid.
+* Fix: The "waiting for the previous import" state no longer hangs indefinitely; it is capped and surfaced, and the batch/regeneration steps no longer flash a false "busy" wait or interrupt their own running import.
+* Fix: Extracted demo files are now removed from the uploads folder after a successful import.
+* Fix: The finalize stage now receives the same temporary resource boost as the other import phases, and the memory limit is only ever raised, never lowered.
+* Fix: The activity-log table is recreated automatically if it is missing before it is read.
+* Performance: Faster media imports and rollbacks — attachment-URL updates are batched, remote-media progress is checkpointed per file, and the restore-point media scan stops early once the file-count cap is reached.
+* Tweak: Per-item import notices (skipped media, failed items) are recorded in the activity log with accurate severities.
 
 = 1.1.6 (28-February-2026) =
 * Add: Full compatibility with WordPress 6.9.
