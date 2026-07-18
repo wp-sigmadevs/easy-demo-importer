@@ -24,7 +24,7 @@ The canonical, WordPress.org-formatted changelog also lives in `readme.txt`.
 - Full compatibility with WordPress 7.0.
 
 ### Security
-- Fixed a Stored XSS in SVG upload handling (CVE-2024-9071).
+- Completed the fix for the SVG-upload Stored XSS (CVE-2024-9071): closed an Author-role restriction bypass that remained exploitable through 1.1.6 via three defects — filename-based type reconstruction without a capability check, sanitization gated on the client-supplied MIME (so declaring an SVG as `image/png` skipped it), and the REST raw-body sideload route (`wp_handle_sideload_prefilter`) never being hooked. Reported by Artus KG.
 - Hardened archive extraction (ZipSlip), plugin-installer downloads, and PHP file loading.
 
 ### Fixed
