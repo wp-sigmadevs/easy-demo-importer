@@ -154,7 +154,7 @@ For any inquiries, bug reports, or suggestions, please submit your request [here
 * Feature: Retry individual failed media downloads from the result screen.
 * Feature: Bundled media import — demo images load from the package instead of downloading.
 * Add: Full compatibility with WordPress 7.0.
-* Security: Completed the fix for the SVG-upload Stored XSS (CVE-2024-9071) — closed an Author-role restriction bypass that remained exploitable through 1.1.6 (filename-based type reconstruction without a capability check, sanitization gated on the client-supplied MIME, and the REST raw-body upload path unhooked). Reported by Artus KG.
+* Security: Completed the fix for the SVG-upload Stored XSS (CVE-2024-9071), closing an Author-role restriction bypass still exploitable through 1.1.6. Reported by Artus KG.
 * Security: Hardened archive extraction (ZipSlip), plugin-installer downloads, and PHP file loading.
 * Fix: Elementor global settings (container width, colors, fonts) are applied correctly after import.
 * Fix: Improved Fluent Forms import, settings validation, demo-file download verification, and AJAX input sanitization.
