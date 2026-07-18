@@ -140,7 +140,7 @@ For any inquiries, bug reports, or suggestions, please submit your request [here
 
 == Changelog ==
 
-= 2.0.0 =
+= 2.0.0 (18-July-2026) =
 * Feature: Resumable, chunked WXR import — large/WooCommerce demos no longer fail with 524/503 gateway timeouts.
 * Feature: Manual import — upload your own content, media, and settings as separate files or a single .zip bundle.
 * Feature: One-click rollback — a restore point is created before import so you can revert in one click.

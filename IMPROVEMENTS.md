@@ -2,12 +2,12 @@
 
 > Comprehensive analysis of bugs, code quality issues, and a prioritized feature roadmap to beat OCDI, Merlin WP, and other demo importers.
 
-## 📍 STATUS AS OF v2.0.0 (in progress — 2026-07-18)
+## 📍 STATUS AS OF v2.0.0 (releasing 2026-07-18)
 
-Written 2026-02-24, pre-1.1.6. The last shipped release is `1.1.6` (2026-02-28); `2.0.0` is the
-next release and is still **in progress** on the `import-improvements` branch (not yet released).
+Written 2026-02-24, pre-1.1.6. The previous release was `1.1.6` (2026-02-28); `2.0.0` is being
+released 2026-07-18 (the jump from 1.1.6 is intentional — no 1.2.x/1.3.x/1.5.x were ever tagged).
 **Note:** there was never a `1.2.0` release — the "Phase 1" hardening pass this doc refers to was
-folded into the upcoming `2.0.0`, so read every "1.2.0" below as "2.0.0".
+folded into `2.0.0`, so read every "1.2.0" below as "2.0.0".
 
 The Bug Fixes, Security, and Performance tables below describe the *pre-2.0.0* codebase and are
 stale as a whole — most of those specific issues have been addressed in the 2.0.0 work so far
