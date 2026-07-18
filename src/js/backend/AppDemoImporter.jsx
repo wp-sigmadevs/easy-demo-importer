@@ -40,6 +40,19 @@ const AppDemoImporter = () => {
 	const resumeHandledRef = useRef(false);
 
 	/**
+	 * The resume request as it was at initial page load. Only a resume left by a
+	 * PREVIOUS page's interrupted import should auto-open the prompt — never the
+	 * resumeRequest that the currently-running import checkpoints through doAxios.
+	 * Reading the live value here would re-fire the auto-open effect the moment an
+	 * import starts and mark its own live session interrupted mid-run. Captured
+	 * once at first render (the store hydrates resumeRequest synchronously from
+	 * localStorage), so it never reflects the in-flight import.
+	 */
+	const initialResumeRef = useRef(
+		useSharedDataStore.getState().resumeRequest
+	);
+
+	/**
 	 * Values from the shared data store.
 	 */
 	const {
@@ -51,7 +64,6 @@ const AppDemoImporter = () => {
 		modalVisible,
 		setModalVisible,
 		handleModalCancel,
-		resumeRequest,
 		searchQuery,
 		setSearchQuery,
 		filteredDemoData,
@@ -68,7 +80,6 @@ const AppDemoImporter = () => {
 			modalVisible: state.modalVisible,
 			setModalVisible: state.setModalVisible,
 			handleModalCancel: state.handleModalCancel,
-			resumeRequest: state.resumeRequest,
 			searchQuery: state.searchQuery,
 			setSearchQuery: state.setSearchQuery,
 			filteredDemoData: state.filteredDemoData,
@@ -117,8 +128,12 @@ const AppDemoImporter = () => {
 			return;
 		}
 
+		// Use the load-time resume only (see initialResumeRef): the live
+		// resumeRequest is also written mid-import as a checkpoint, and reacting to
+		// that would mark the running session interrupted the moment it starts.
+		const resume = initialResumeRef.current;
 		const demos = importList.data && importList.data.demoData;
-		const resumeId = resumeRequest && resumeRequest.demo;
+		const resumeId = resume && resume.demo;
 
 		if (demos && resumeId && demos[resumeId]) {
 			resumeHandledRef.current = true;
@@ -127,13 +142,13 @@ const AppDemoImporter = () => {
 			// Tell the server to flag this session interrupted now, so the Import Log
 			// reflects it immediately instead of after the heartbeat times out.
 			// Resuming refreshes the heartbeat back to live. Fire-and-forget.
-			if (resumeRequest.sessionId) {
+			if (resume.sessionId) {
 				const params = new FormData();
 				params.append('action', 'sd_edi_mark_interrupted');
 				params.append('sd_edi_nonce', sdEdiAdminParams.sd_edi_nonce);
 				// Bootstrap requires 'demo' in POST to load the Ajax\Backend classes.
 				params.append('demo', resumeId);
-				params.append('sessionId', resumeRequest.sessionId);
+				params.append('sessionId', resume.sessionId);
 				Axios.post(sdEdiAdminParams.ajaxUrl, params).catch(() => {});
 			}
 
@@ -147,7 +162,9 @@ const AppDemoImporter = () => {
 				excludeImages: true,
 			});
 		}
-	}, [importList, resumeRequest, setModalVisible]);
+		// resumeRequest intentionally excluded from deps: only the load-time value
+		// (initialResumeRef) may drive auto-open, never the running import's checkpoint.
+	}, [importList, setModalVisible]); // eslint-disable-line react-hooks/exhaustive-deps
 
 	/**
 	 * Set the error message if the import list is not successful.

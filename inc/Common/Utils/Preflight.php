@@ -335,12 +335,12 @@ final class Preflight {
 				? sprintf(
 					/* translators: %s: free disk space. */
 					esc_html__( '%s free', 'easy-demo-importer' ),
-					size_format( $free )
+					size_format( (int) $free )
 				)
 				: sprintf(
 					/* translators: 1: free disk space, 2: recommended minimum. */
 					esc_html__( 'Only %1$s free — %2$s or more is recommended for demo media downloads.', 'easy-demo-importer' ),
-					size_format( $free ),
+					size_format( (int) $free ),
 					self::RECOMMENDED_DISK_SPACE
 				),
 			false

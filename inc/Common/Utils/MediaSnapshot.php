@@ -271,7 +271,11 @@ final class MediaSnapshot {
 				? array_flip( array_map( 'trim', file( $manifest, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES ) ) )
 				: [];
 
-			foreach ( self::files( $base ) as $relative ) {
+			// Materialize the full list before deleting: files() walks the tree
+			// lazily, and mutating a directory mid-walk (removing entries the
+			// iterator has not yet reached) is undefined. Snapshot restore is
+			// safety-critical, so collect first, then delete.
+			foreach ( iterator_to_array( self::files( $base ), false ) as $relative ) {
 				if ( ! isset( $keep[ $relative ] ) ) {
 					wp_delete_file( trailingslashit( $base ) . $relative );
 				}
@@ -312,17 +316,22 @@ final class MediaSnapshot {
 	 * Yields every file under a directory as an uploads-relative path, skipping
 	 * symlinks so a restore can never reach outside the uploads tree.
 	 *
+	 * A generator (not an array) so callers walk lazily: the manifest builder's
+	 * file-count cap can abandon the iteration the moment it is exceeded instead
+	 * of paying to enumerate — and hold in memory — an entire oversized uploads
+	 * tree first. Callers that mutate the tree while consuming it (rollback
+	 * deletes files) must materialize the paths first via iterator_to_array().
+	 *
 	 * @param string $base Directory to walk.
 	 *
-	 * @return string[]
+	 * @return iterable<string>
 	 * @since 2.0.0
 	 */
-	private static function files( string $base ): array {
+	private static function files( string $base ): iterable {
 		if ( ! is_dir( $base ) ) {
-			return [];
+			return;
 		}
 
-		$paths    = [];
 		$baseLen  = strlen( trailingslashit( $base ) );
 		$iterator = new RecursiveIteratorIterator(
 			new RecursiveDirectoryIterator( $base, RecursiveDirectoryIterator::SKIP_DOTS ),
@@ -334,10 +343,8 @@ final class MediaSnapshot {
 				continue;
 			}
 
-			$paths[] = substr( $file->getPathname(), $baseLen );
+			yield substr( $file->getPathname(), $baseLen );
 		}
-
-		return $paths;
 	}
 
 	/**

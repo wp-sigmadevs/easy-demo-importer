@@ -98,9 +98,8 @@ class Actions {
 	 * @since 1.1.1
 	 */
 	public static function beforeImportActions() {
-		// Try to update the PHP memory limit before import.
-		// phpcs:ignore WordPress.PHP.IniSet.memory_limit_Disallowed, Squiz.PHP.DiscouragedFunctions.Discouraged, WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
-		ini_set( 'memory_limit', apply_filters( 'sd/edi/temp_boost_memory_limit', '350M' ) );
+		// Try to raise the PHP memory limit before import.
+		self::raiseMemoryLimit();
 
 		// Try to increase PHP max execution time before import.
 		if ( ( strpos( ini_get( 'disable_functions' ), 'set_time_limit' ) === false ) && ini_get( 'max_execution_time' ) < 300 ) {
@@ -114,6 +113,49 @@ class Actions {
 		 * @since 1.1.5
 		 */
 		add_filter( 'big_image_size_threshold', '__return_false' );
+	}
+
+	/**
+	 * Raises the PHP memory limit for the current import request.
+	 *
+	 * Only ever raises. A plain ini_set() to a fixed target silently *lowers* the
+	 * limit on a site configured above it, and caps a site running unlimited
+	 * (memory_limit = -1) — starving the very imports that need the headroom
+	 * most. wp_raise_memory_limit() is not used here because it is bound to
+	 * WP_MAX_MEMORY_LIMIT and would ignore the long-standing
+	 * 'sd/edi/temp_boost_memory_limit' filter, which stays authoritative.
+	 *
+	 * Not restored afterwards: memory_limit is per-request, and PHP enforces it
+	 * at allocation time, so lowering it back mid-request while the import's
+	 * memory is still held would fatal on the next allocation.
+	 *
+	 * @return void
+	 * @since 2.0.0
+	 */
+	private static function raiseMemoryLimit() {
+		if ( ! wp_is_ini_value_changeable( 'memory_limit' ) ) {
+			return;
+		}
+
+		$current = wp_convert_hr_to_bytes( (string) ini_get( 'memory_limit' ) );
+
+		// Already unlimited — no target can add headroom to that.
+		if ( -1 === $current ) {
+			return;
+		}
+
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+		$target = apply_filters( 'sd/edi/temp_boost_memory_limit', '350M' );
+		$bytes  = wp_convert_hr_to_bytes( (string) $target );
+
+		// Keep the site's own limit when it already meets or beats the target.
+		// A target of -1 (filtered to unlimited) is always an increase.
+		if ( -1 !== $bytes && $bytes <= $current ) {
+			return;
+		}
+
+		// phpcs:ignore WordPress.PHP.IniSet.memory_limit_Disallowed, Squiz.PHP.DiscouragedFunctions.Discouraged -- guarded above to only ever raise the limit; see the method docblock for why wp_raise_memory_limit() does not fit here.
+		ini_set( 'memory_limit', $target );
 	}
 
 	/**

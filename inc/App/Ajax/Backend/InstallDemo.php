@@ -183,9 +183,12 @@ class InstallDemo extends ImporterAjax {
 				);
 			}
 
+			// The importer reports through logImporterEntry (see chunkedImporter());
+			// the buffer only discards any stray output a third-party import hook
+			// might print, keeping the AJAX JSON response parseable.
 			ob_start();
 			$total = $importer->prepare( $xmlFile );
-			$this->logImporterOutput( ob_get_clean() );
+			ob_end_clean();
 		} catch ( \Throwable $e ) {
 			// Parsing/preparation failed — fall back to the single-shot importer so
 			// the import still runs (just without resumability).
@@ -230,6 +233,9 @@ class InstallDemo extends ImporterAjax {
 			$this->demoSlug
 		);
 
+		// Parse done — free the lock so the first batch request acquires cleanly.
+		$this->releaseMutex();
+
 		wp_send_json(
 			$this->chunkPayload(
 				[
@@ -273,9 +279,16 @@ class InstallDemo extends ImporterAjax {
 		// regeneration phase, keeping each batch well under the gateway limit.
 		$this->deferThumbnailGeneration();
 
+		// Structured notices are logged via logImporterEntry (see chunkedImporter());
+		// the buffer only discards any stray third-party import-hook output so the
+		// JSON response stays parseable.
 		ob_start();
 		$result = $this->chunkedImporter()->processBatch();
-		$this->logImporterOutput( ob_get_clean() );
+		ob_end_clean();
+
+		// Work done — free the lock before responding so this import's next
+		// request (fired immediately when retryAfter is 0) re-acquires cleanly.
+		$this->releaseMutex();
 
 		$progress = [
 			'processed' => (int) $result['processed'],
@@ -333,13 +346,11 @@ class InstallDemo extends ImporterAjax {
 
 		$importer = $this->chunkedImporter();
 
-		// finalize() -> import_end() prints the vendored importer's own "All done.
-		// Have fun!" notice. It's the only thing this call ever echoes (the
-		// backfill/remap/recount steps before it are silent), and it would only
-		// duplicate the explicit success entry logged just below — including it
-		// as a warning would misleadingly surface a normal completion in
-		// wp-content/debug.log. Discard rather than route through
-		// logImporterOutput().
+		// finalize() -> import_end() suppresses its "All done. Have fun!" notice
+		// while a log sink is attached (chunkedImporter() sets one), and the
+		// backfill/remap/recount steps are silent, so this call emits nothing. The
+		// buffer stays as a safety net that discards any stray output a third-party
+		// import_end hook might print, keeping the AJAX JSON response parseable.
 		ob_start();
 		$importer->finalize();
 		ob_end_clean();
@@ -399,6 +410,10 @@ class InstallDemo extends ImporterAjax {
 		// The batch loop imported originals only. If regeneration wasn't skipped
 		// and this run actually imported media, hand the new attachment IDs to the
 		// dedicated, resumable regeneration phase before moving on to customizer.
+		// Reference fixup + after-import hooks done — free the lock before the
+		// handoff so the next phase acquires cleanly.
+		$this->releaseMutex();
+
 		$attachmentIds = ( $this->skipImageRegeneration || 'true' === $this->excludeImages )
 			? []
 			: $importer->importedAttachmentIds();
@@ -507,6 +522,10 @@ class InstallDemo extends ImporterAjax {
 				break;
 			}
 		}
+
+		// Chunk done — free the lock before the immediate (retryAfter:0) re-fire
+		// so the next regen request re-acquires cleanly.
+		$this->releaseMutex();
 
 		$progress = [
 			'processed' => $cursor,
@@ -652,6 +671,7 @@ class InstallDemo extends ImporterAjax {
 		$importer                    = new SD_EDI_WP_Import();
 		$importer->fetch_attachments = true;
 		$importer->bundled_media_dir = $this->bundledMediaDir();
+		$importer->log_callback      = [ $this, 'logImporterEntry' ];
 
 		$budget = (float) apply_filters( 'sd/edi/retry_chunk_seconds', 20 ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 		$start  = microtime( true );
@@ -704,7 +724,7 @@ class InstallDemo extends ImporterAjax {
 			update_option( $remap_key, array_merge( $accumulated, $importer->url_remap ), false );
 		}
 
-		$this->logImporterOutput( ob_get_clean() );
+		ob_end_clean();
 
 		if ( $cursor < $total ) {
 			wp_send_json_success(
@@ -788,7 +808,10 @@ class InstallDemo extends ImporterAjax {
 
 		$state = ImportState::forSession( $this->demoUploadDir( $this->demoDir() ), $this->sessionId );
 
-		return new ChunkedImport( $state );
+		$importer               = new ChunkedImport( $state );
+		$importer->log_callback = [ $this, 'logImporterEntry' ];
+
+		return $importer;
 	}
 
 	/**
@@ -828,106 +851,29 @@ class InstallDemo extends ImporterAjax {
 	}
 
 	/**
-	 * Records the bundled importer's printed output to the activity log.
+	 * Records a structured notice from the bundled importer.
 	 *
-	 * The vendored WXR importer reports per-item failures (e.g. an image that
-	 * could not be downloaded) by printing HTML rather than returning them, and
-	 * those prints are otherwise captured and discarded to keep the AJAX JSON
-	 * response clean. Each printed line is surfaced here as a warning so the
-	 * reason a post or attachment was skipped is visible to the user.
+	 * Wired to SD_EDI_WP_Import::$log_callback so the importer reports each
+	 * per-item outcome as an explicit ( message, level ) pair — rather than
+	 * printing HTML this handler would have to capture and re-parse, guessing the
+	 * severity back out of the wording under a locale-dependent match. The
+	 * importer already declares the level (an "already exists" or "image import
+	 * off" skip is info, a real failure is a warning), so it is stored verbatim;
+	 * ImportLogger mirrors warnings and errors to wp-content/debug.log.
 	 *
-	 * @param string|false $output Captured output buffer contents.
+	 * @param string $message Human-readable notice from the importer.
+	 * @param string $level   One of info|success|warning|error.
 	 *
 	 * @return void
 	 * @since 2.0.0
 	 */
-	private function logImporterOutput( $output ): void {
-		if ( ! is_string( $output ) || '' === trim( $output ) ) {
-			return;
-		}
-
-		$lines = preg_split( '/<br\s*\/?>|\r\n|\r|\n/i', $output );
-
-		foreach ( (array) $lines as $line ) {
-			$line = trim( wp_strip_all_tags( $line ) );
-
-			if ( '' === $line || $this->isBenignCompletionNotice( $line ) ) {
-				continue;
-			}
-
-			// An item skipped because image import was turned off is expected,
-			// not a failure — log it at info level so it does not mark the run
-			// "Completed with warnings".
-			if ( $this->isImageSkippedNotice( $line ) ) {
-				ImportLogger::info( $line, $this->sessionId, $this->demoSlug );
-				continue;
-			}
-
-			ImportLogger::warning( $line, $this->sessionId, $this->demoSlug );
-		}
-	}
-
-	/**
-	 * Whether a captured output line is the vendored importer's own "done" notice.
-	 *
-	 * The import_end() method unconditionally prints two adjacent paragraphs (no
-	 * line break between them, so they land as a single line here) announcing a normal,
-	 * successful finish. Logging it as a warning would misleadingly surface a
-	 * routine completion in wp-content/debug.log (WARNING/ERROR entries are
-	 * mirrored there). Built from the same translation calls import_end() uses,
-	 * so the match holds under any locale.
-	 *
-	 * @param string $line A single stripped, trimmed line of captured output.
-	 *
-	 * @return bool
-	 * @since 2.0.0
-	 */
-	private function isBenignCompletionNotice( string $line ): bool {
-		static $notice = null;
-
-		if ( null === $notice ) {
-			$notice = trim(
-				wp_strip_all_tags(
-					esc_html__( 'All done.', 'easy-demo-importer' ) . ' ' .
-					esc_html__( 'Have fun!', 'easy-demo-importer' ) .
-					esc_html__( 'Remember to update the passwords and roles of imported users.', 'easy-demo-importer' )
-				)
-			);
-		}
-
-		return $line === $notice;
-	}
-
-	/**
-	 * Whether a captured line is an "image import turned off" skip notice.
-	 *
-	 * The vendored importer prints these when the user disabled image import, so
-	 * every attachment is intentionally skipped. They are matched on the fixed
-	 * trailing phrase of the printed template (the item name varies) and routed
-	 * to the log at info level rather than warning.
-	 *
-	 * @param string $line A single stripped, trimmed line of captured output.
-	 *
-	 * @return bool
-	 * @since 2.0.0
-	 */
-	private function isImageSkippedNotice( string $line ): bool {
-		static $suffix = null;
-
-		if ( null === $suffix ) {
-			/* translators: 1: item type (e.g. Media), 2: item title. */
-			$message  = esc_html__( 'Skipped %1$s &#8220;%2$s&#8221;: image import is turned off.', 'easy-demo-importer' );
-			$template = trim( wp_strip_all_tags( $message ) );
-			$marker   = '&#8221;:';
-			$pos      = strpos( $template, $marker );
-			$suffix   = false === $pos ? $template : trim( substr( $template, $pos + strlen( $marker ) ) );
-		}
-
-		$length = strlen( $suffix );
-
-		// substr()-based tail match rather than str_ends_with(), which is only
-		// polyfilled from WordPress 5.9 (this plugin supports 5.5+).
-		return $length > 0 && substr( $line, -$length ) === $suffix;
+	public function logImporterEntry( string $message, string $level ): void {
+		ImportLogger::log(
+			$message,
+			ImportLogger::normalizeLevel( $level ),
+			$this->sessionId,
+			$this->demoSlug
+		);
 	}
 
 	/**
@@ -980,6 +926,23 @@ class InstallDemo extends ImporterAjax {
 	}
 
 	/**
+	 * Releases the import mutex immediately.
+	 *
+	 * A phase holds the lock only for its own work. Releasing it right before the
+	 * response is sent — rather than waiting for the shutdown handler that runs
+	 * after the response — lets this same import's very next request re-acquire
+	 * without the spurious "another import is running" wait the shutdown-timing
+	 * race would otherwise cause (worst with the retryAfter:0 batch/regen loops).
+	 * The shutdown handler registered in acquireMutex() stays as a crash-safety net.
+	 *
+	 * @return void
+	 * @since 2.0.0
+	 */
+	private function releaseMutex(): void {
+		delete_option( 'sd_edi_xml_import_mutex' );
+	}
+
+	/**
 	 * Emits a "waiting for the previous request to finish" retry response.
 	 *
 	 * The client re-sends the same request after retryAfter seconds without
@@ -997,6 +960,11 @@ class InstallDemo extends ImporterAjax {
 					'nextPhase'        => $phase,
 					'nextPhaseMessage' => esc_html__( 'Waiting for previous import to finish…', 'easy-demo-importer' ),
 					'retry'            => true,
+					// Distinguishes a genuine lock conflict (this) from the
+					// batch/regen tight-loop continuations, which also set
+					// retry:true. Only this drives the client's visible
+					// "waiting for another import" counter and its cap.
+					'mutexHeld'        => true,
 					// Kept short: the common case here is a benign timing overlap in
 					// the tight batch loop (the previous request's shutdown handler
 					// has not released the lock yet), not real contention — so a brief
@@ -1068,16 +1036,18 @@ class InstallDemo extends ImporterAjax {
 				$wp_import                    = new SD_EDI_WP_Import();
 				$wp_import->fetch_attachments = $excludeImages;
 				$wp_import->bundled_media_dir = $this->bundledMediaDir();
+				$wp_import->log_callback      = [ $this, 'logImporterEntry' ];
 
 				if ( $skipImageRegeneration ) {
 					add_filter( 'intermediate_image_sizes_advanced', '__return_empty_array', 9999 );
 					add_filter( 'wp_generate_attachment_metadata', '__return_empty_array', 9999 );
 				}
 
-				// Import XML.
+				// Import XML. Notices are logged through logImporterEntry (log_callback
+				// set above); the buffer only discards stray third-party hook output.
 				ob_start();
 				$wp_import->import( $xmlFilePath );
-				$this->logImporterOutput( ob_get_clean() );
+				ob_end_clean();
 
 				// Persist failed attachment downloads for the retry flow.
 				FailedMedia::save( $this->sessionId, (array) $wp_import->failed_attachments );

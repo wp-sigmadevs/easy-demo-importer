@@ -152,8 +152,8 @@ final class Snapshot {
 			return true;
 		}
 
-		$exclude = (array) apply_filters( // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
-			'sd/edi/snapshot_exclude_tables',
+		$exclude = (array) apply_filters(
+			'sd/edi/snapshot_exclude_tables', // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 			[ 'users', 'usermeta', ImportLogger::TABLE ]
 		);
 
@@ -283,9 +283,9 @@ final class Snapshot {
 		foreach ( self::tables() as $table ) {
 			$shadow = self::shadowName( $table, $wpdb->prefix );
 
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.SchemaChange
 			$wpdb->query( "CREATE TABLE `{$shadow}` LIKE `{$table}`" );
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.SchemaChange
 			$wpdb->query( "INSERT INTO `{$shadow}` SELECT * FROM `{$table}`" );
 		}
 
@@ -333,7 +333,7 @@ final class Snapshot {
 
 			// Recreate the live table if the import dropped it, so the shadow's
 			// rows always have somewhere to go back to.
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.SchemaChange
 			$wpdb->query( "CREATE TABLE IF NOT EXISTS `{$table}` LIKE `{$shadow}`" );
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared
 			$wpdb->query( "TRUNCATE `{$table}`" );
@@ -398,7 +398,7 @@ final class Snapshot {
 		// `$shadow` is a prefix-derived identifier (see shadowTables()), not user
 		// input; identifiers cannot be bound via prepare().
 		foreach ( self::shadowTables() as $shadow ) {
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.SchemaChange
 			$wpdb->query( "DROP TABLE IF EXISTS `{$shadow}`" );
 		}
 

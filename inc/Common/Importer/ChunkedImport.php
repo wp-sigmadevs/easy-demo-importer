@@ -284,10 +284,48 @@ class ChunkedImport extends SD_EDI_WP_Import {
 			$chunk_count = count( $chunk );
 			$local       = $this->offset - ( $chunk_index * $this->chunkSize );
 
+			// Only remote downloads are slow; bundled-media is a local copy.
+			$downloading = $this->fetch_attachments && ! $this->bundled_media_dir;
+
 			while ( $local < $chunk_count ) {
-				$this->process_posts( $local, $step );
-				$local        = min( $local + $step, $chunk_count );
+				// A remote media download can block for up to the importer's
+				// attachment_timeout (40s) apiece. Running a full step of them
+				// before the budget check below can push one request past the
+				// gateway wall (~100s); because the cursor is otherwise only
+				// persisted at the end of the batch, a request killed mid-step
+				// replays the same slow head and can loop until the client's
+				// auto-resume cap. So when downloading remote media, drop to a
+				// single post as soon as an attachment appears in the upcoming
+				// window — walking up to and through each download one at a
+				// time — and checkpoint the cursor + maps right after each
+				// attachment, so a killed request resumes past the files
+				// already fetched. Text-only windows keep the normal step and
+				// rely on the end-of-batch persist to avoid a file write per
+				// post.
+				$thisStep     = $step;
+				$isAttachment = false;
+
+				if ( $downloading ) {
+					$end = min( $local + $step, $chunk_count );
+
+					for ( $i = $local; $i < $end; $i++ ) {
+						if ( isset( $this->posts[ $i ]['post_type'] ) && 'attachment' === $this->posts[ $i ]['post_type'] ) {
+							$thisStep = 1;
+							break;
+						}
+					}
+
+					$isAttachment = isset( $this->posts[ $local ]['post_type'] )
+						&& 'attachment' === $this->posts[ $local ]['post_type'];
+				}
+
+				$this->process_posts( $local, $thisStep );
+				$local        = min( $local + $thisStep, $chunk_count );
 				$this->offset = ( $chunk_index * $this->chunkSize ) + $local;
+
+				if ( $isAttachment ) {
+					$this->persist();
+				}
 
 				// Always finish the current step, then stop once over budget so the
 				// request returns well under the gateway wall-clock limit.
@@ -361,7 +399,17 @@ class ChunkedImport extends SD_EDI_WP_Import {
 	 * @since 2.0.0
 	 */
 	private function recountTerms(): void {
-		$post_ids = array_values( array_filter( array_map( 'intval', (array) $this->processed_posts ) ) );
+		// Menu items are nav_menu_item posts tracked in processed_menu_items, not
+		// processed_posts, and their nav_menu term is attached to them — so recount
+		// must include them or a freshly created menu keeps the deferred count of 0
+		// it was left with, which WordPress renders as an empty menu even though the
+		// items exist and are correctly linked.
+		$post_ids = array_merge(
+			array_values( (array) $this->processed_posts ),
+			array_values( (array) $this->processed_menu_items )
+		);
+
+		$post_ids = array_values( array_filter( array_map( 'intval', $post_ids ) ) );
 
 		if ( empty( $post_ids ) ) {
 			return;
