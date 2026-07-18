@@ -140,7 +140,7 @@ For any inquiries, bug reports, or suggestions, please submit your request [here
 
 == Changelog ==
 
-= 2.0.0 (15-July-2026) =
+= 2.0.0 (18-July-2026) =
 * Feature: Resumable, chunked WXR import — large/WooCommerce demos no longer fail with 524/503 gateway timeouts.
 * Feature: Manual import — upload your own content, media, and settings as separate files or a single .zip bundle.
 * Feature: One-click rollback — a restore point is created before import so you can revert in one click.
@@ -154,13 +154,19 @@ For any inquiries, bug reports, or suggestions, please submit your request [here
 * Feature: Retry individual failed media downloads from the result screen.
 * Feature: Bundled media import — demo images load from the package instead of downloading.
 * Add: Full compatibility with WordPress 7.0.
-* Security: Fixed a Stored XSS in SVG upload handling (CVE-2024-9071).
+* Security: Completed the fix for the SVG-upload Stored XSS (CVE-2024-9071), closing an Author-role restriction bypass still exploitable through 1.1.6. Reported by Artus KG.
 * Security: Hardened archive extraction (ZipSlip), plugin-installer downloads, and PHP file loading.
 * Fix: Elementor global settings (container width, colors, fonts) are applied correctly after import.
 * Fix: Improved Fluent Forms import, settings validation, demo-file download verification, and AJAX input sanitization.
 * Fix: Prevented a JavaScript crash when network requests fail or time out.
+* Fix: Resolved empty navigation menus by reconciling item counts and auto-creating missing menus.
+* Fix: Isolated import responses to prevent silent failures caused by third-party plugin output.
+* Fix: Ensured extracted demo files are automatically removed after a successful import.
+* Fix: Boosted memory limits and resource allocation during the finalization stage.
+* Performance: Batched attachment-URL updates and checkpointed progress for faster media handling.
 * Tweak: Improved Customizer, Widgets, and database search-replace handling; refactored slider import.
 * Tweak: A readiness step shows the "View full system status" link inline; improved uninstall cleanup.
+* Tweak: Recorded per-item import notices in the activity log with accurate severity levels.
 
 = 1.1.6 (28-February-2026) =
 * Add: Full compatibility with WordPress 6.9.

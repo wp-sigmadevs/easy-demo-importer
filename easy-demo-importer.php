@@ -23,6 +23,7 @@ declare( strict_types=1 );
 use SigmaDevs\EasyDemoImporter\Bootstrap;
 use SigmaDevs\EasyDemoImporter\Config\Setup;
 use SigmaDevs\EasyDemoImporter\Common\Functions\Functions;
+use SigmaDevs\EasyDemoImporter\Common\Utils\OutputGuard;
 
 // Do not allow directly accessing this file.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -55,6 +56,17 @@ register_uninstall_hook( SD_EDI_ROOT_FILE, [ Setup::class, 'uninstall' ] );
 if ( ! class_exists( 'SigmaDevs\EasyDemoImporter\\Bootstrap' ) ) {
 	wp_die( esc_html__( 'Easy Demo Importer is unable to find the Bootstrap class.', 'easy-demo-importer' ) );
 }
+
+/**
+ * Shield the plugin's AJAX responses from output printed by other code.
+ *
+ * Hooked here rather than from the Bootstrap below because the printing happens
+ * on init (WooCommerce prints from priority 5) — earlier than this plugin's own
+ * services load. See OutputGuard for the full story.
+ *
+ * @since 2.0.0
+ */
+add_action( 'plugins_loaded', [ OutputGuard::class, 'start' ], 0 );
 
 /**
  * Bootstrap the plugin.

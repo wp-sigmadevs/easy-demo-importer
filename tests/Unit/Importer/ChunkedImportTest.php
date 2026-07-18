@@ -13,7 +13,9 @@ declare( strict_types=1 );
 
 namespace SigmaDevs\EasyDemoImporter\Tests\Unit\Importer;
 
+use Mockery;
 use RuntimeException;
+use Brain\Monkey\Functions;
 use SigmaDevs\EasyDemoImporter\Common\Importer\ChunkedImport;
 use SigmaDevs\EasyDemoImporter\Common\Importer\ImportState;
 use SigmaDevs\EasyDemoImporter\Tests\Unit\UnitTestCase;
@@ -175,5 +177,69 @@ final class ChunkedImportTest extends UnitTestCase {
 			],
 			$result
 		);
+	}
+
+	/**
+	 * When downloading remote media, an attachment must be processed as its own
+	 * single-post step and the cursor checkpointed straight after it — so a
+	 * request killed by the gateway mid-batch resumes past the file already
+	 * fetched instead of replaying (and re-timing-out on) the same slow head.
+	 */
+	public function test_process_batch_checkpoints_after_each_attachment_download(): void {
+		$state = new ImportState( $this->path );
+
+		// Seed on-disk state: 8 posts, one attachment at index 5, remote
+		// download on (fetch_attachments && no bundled-media dir).
+		$seed                    = new ChunkedImport( $state );
+		$seed->fetch_attachments = true;
+		$seed->bundled_media_dir = '';
+		$this->setPrivate( $seed, 'postsTotal', 8 );
+		$this->setPrivate( $seed, 'chunkSize', 100 );
+		$this->setPrivate( $seed, 'offset', 0 );
+		$this->invoke( $seed, 'persistImmutable' );
+		$this->invoke( $seed, 'persist' );
+
+		$chunk = [];
+		for ( $i = 0; $i < 8; $i++ ) {
+			$chunk[] = [ 'post_type' => 5 === $i ? 'attachment' : 'post' ];
+		}
+		$state->savePostsChunk( 0, $chunk );
+
+		// WP hooks/counters the batch loop touches — no-op under unit tests.
+		Functions\when( 'add_filter' )->justReturn( true );
+		Functions\when( 'wp_defer_term_counting' )->justReturn( null );
+		Functions\when( 'wp_suspend_cache_invalidation' )->justReturn( null );
+		// apply_filters passes the default value (2nd arg) straight through, so
+		// the loop keeps its default budget (10s) and step (5).
+		Functions\when( 'apply_filters' )->returnArg( 2 );
+
+		// Partial mock so process_posts does no real importing; record the
+		// (offset, step) of each call and simulate a gateway kill on the first
+		// post after the attachment.
+		$mock  = Mockery::mock( ChunkedImport::class, [ $state ] )->makePartial();
+		$calls = [];
+		$mock->shouldReceive( 'process_posts' )->andReturnUsing(
+			static function ( $offset, $step ) use ( &$calls ) {
+				$calls[] = [ $offset, $step ];
+				if ( $offset >= 6 ) {
+					throw new RuntimeException( 'gateway killed the request' );
+				}
+			}
+		);
+
+		try {
+			$mock->processBatch();
+			self::fail( 'expected the simulated kill to propagate' );
+		} catch ( RuntimeException $e ) {
+			self::assertSame( 'gateway killed the request', $e->getMessage() );
+		}
+
+		// Text posts before the attachment used the full step of 5...
+		self::assertSame( [ 0, 5 ], $calls[0] );
+		// ...the attachment was walked as its own single-post step...
+		self::assertContains( [ 5, 1 ], $calls );
+		// ...and the cursor was persisted right after it (offset 6), before the
+		// simulated kill, so resume continues past the downloaded file.
+		self::assertSame( 6, $state->load()['offset'] ?? null );
 	}
 }
