@@ -3,15 +3,20 @@
 > Revised with Sequential Thinking, Context7 (WordPress API docs), and 21st.dev UI patterns.
 > Every phase has been cross-checked for architectural dependencies, API correctness, and forward-compatibility.
 
-## 📍 STATUS AS OF v2.0.0 (2026-07-15)
+## 📍 STATUS AS OF v2.0.0 (in progress — 2026-07-18)
 
-This document was written 2026-02-24, pre-1.1.6. The plugin has since shipped straight through
-to `2.0.0` (merged to master, commit `abd5b52`) — but delivery didn't follow the phase→version
-mapping below one-for-one. Some phases shipped as planned, some shipped in a different shape than
-designed, and some were skipped entirely in favor of things not on this roadmap at all (a manual
-ZIP/WXR upload flow, WP-CLI, a pre-import readiness report). Each phase heading below now carries
-a status banner. Treat the checkbox lists as a historical record of the *plan*, not current status
-— the banner + evidence is the current status.
+This document was written 2026-02-24, pre-1.1.6. The code has since been built straight through
+to `2.0.0` (merged to master, commit `abd5b52`; further work continues on `import-improvements`),
+but **`2.0.0` has not been released yet** — the last shipped release is `1.1.6`. Throughout this
+doc "shipped" means *built and merged*, not released to users. The intermediate version labels in
+the phase table (`1.2.0`, `1.3.0`, `1.5.0`) were never tagged releases; that work all collapsed
+into the single upcoming `2.0.0`.
+
+Delivery also didn't follow the phase→version mapping below one-for-one. Some phases shipped as
+planned, some shipped in a different shape than designed, and some were skipped entirely in favor
+of things not on this roadmap at all (a manual ZIP/WXR upload flow, WP-CLI, a pre-import readiness
+report). Each phase heading below now carries a status banner. Treat the checkbox lists as a
+historical record of the *plan*, not current status — the banner + evidence is the current status.
 
 **Headline reality check:**
 - ✅ Session system, uninstall.php, PHPStan, chunked/resumable XML import, activity log (viewable),

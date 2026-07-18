@@ -2,13 +2,30 @@
 
 > Comprehensive analysis of bugs, code quality issues, and a prioritized feature roadmap to beat OCDI, Merlin WP, and other demo importers.
 
-## 📍 STATUS AS OF v2.0.0 (2026-07-15)
+## 📍 STATUS AS OF v2.0.0 (in progress — 2026-07-18)
 
-Written 2026-02-24, pre-1.1.6. The plugin is now at `2.0.0`. This doc's Bug Fixes, Security, and
-Performance tables below describe the *pre-1.2.0* codebase and are stale as a whole — most of
-those specific issues were addressed by the Phase 1 (`1.2.0`) hardening pass (session system,
-uninstall.php, nonce hard-fail, SSL error messaging, capability consistency on `manage_options`,
-PHPStan baseline). They're kept as historical record rather than re-verified line-by-line here.
+Written 2026-02-24, pre-1.1.6. The last shipped release is `1.1.6` (2026-02-28); `2.0.0` is the
+next release and is still **in progress** on the `import-improvements` branch (not yet released).
+**Note:** there was never a `1.2.0` release — the "Phase 1" hardening pass this doc refers to was
+folded into the upcoming `2.0.0`, so read every "1.2.0" below as "2.0.0".
+
+The Bug Fixes, Security, and Performance tables below describe the *pre-2.0.0* codebase and are
+stale as a whole — most of those specific issues have been addressed in the 2.0.0 work so far
+(session system + mutex lock, `uninstall.php`, nonce hard-fail, SSL error messaging, capability
+consistency, PHPStan baseline). They are kept as historical record rather than re-verified
+line-by-line here.
+
+Addressed in the latest 2.0.0 work (see `CHANGELOG.md` for the full list):
+
+- **#10 / Perf #5** — import errors no longer vanish after the AJAX response: a persistent,
+  queryable activity log (`ImportLogger` → `wp_sd_edi_import_log`) records every run, and the
+  bundled importer now reports per-item notices through a structured sink with explicit
+  severities instead of printed HTML.
+- Nav-menu import correctness — imported menus no longer come in empty (term counts reconciled;
+  menus missing from the WXR are created).
+- AJAX responses stay valid even when another plugin prints during the request; the
+  memory limit is only ever raised (never lowered) and the finalize stage shares the boost.
+
 The Feature Roadmap (Tier 1–4) and Competitor Comparison table below **have** been re-verified
 against the current codebase — see inline status markers and the corrected comparison table at
 the bottom.
