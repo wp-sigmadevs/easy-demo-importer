@@ -33,6 +33,19 @@ class SD_EDI_WP_Import extends WP_Importer {
 	public $id;
 
 	/**
+	 * Optional structured log sink.
+	 *
+	 * When set to a callable, per-item notices are reported through it as
+	 * ( string $message, string $level ) instead of being printed as HTML for a
+	 * caller to capture and re-parse. Left null, the importer prints exactly as
+	 * before, so it still works as a standalone WXR importer.
+	 *
+	 * @var callable|null
+	 * @since 2.0.0
+	 */
+	public $log_callback = null;
+
+	/**
 	 * Version
 	 *
 	 * @var int
@@ -248,15 +261,17 @@ class SD_EDI_WP_Import extends WP_Importer {
 	 */
 	public function import_start( $file ) {
 		if ( ! is_file( $file ) ) {
-			echo '<p><strong>' . esc_html__( 'Sorry, there has been an error.', 'easy-demo-importer' ) . '</strong><br />';
-			echo esc_html__( 'The file does not exist, please try again.', 'easy-demo-importer' ) . '</p>';
+			$this->report(
+				esc_html__( 'Sorry, there has been an error.', 'easy-demo-importer' ) . ' ' . esc_html__( 'The file does not exist, please try again.', 'easy-demo-importer' ),
+				'error'
+			);
 			die();
 		}
 
 		$import_data = $this->parse( $file );
 
 		if ( is_wp_error( $import_data ) ) {
-			echo '<p><strong>' . esc_html__( 'Sorry, there has been an error.', 'easy-demo-importer' ) . '</strong><br />';
+			$this->report( esc_html__( 'Sorry, there has been an error.', 'easy-demo-importer' ), 'error' );
 			die();
 		}
 
@@ -292,10 +307,41 @@ class SD_EDI_WP_Import extends WP_Importer {
 		wp_defer_term_counting( false );
 		wp_defer_comment_counting( false );
 
-		echo '<p>' . esc_html__( 'All done.', 'easy-demo-importer' ) . ' <a href="' . esc_url( admin_url() ) . '">' . esc_html__( 'Have fun!', 'easy-demo-importer' ) . '</a></p>';
-		echo '<p>' . esc_html__( 'Remember to update the passwords and roles of imported users.', 'easy-demo-importer' ) . '</p>';
+		// Standalone completion notice only; when a log sink is attached the caller
+		// records its own success entry, so this UI-only markup is skipped.
+		if ( ! is_callable( $this->log_callback ) ) {
+			echo '<p>' . esc_html__( 'All done.', 'easy-demo-importer' ) . ' <a href="' . esc_url( admin_url() ) . '">' . esc_html__( 'Have fun!', 'easy-demo-importer' ) . '</a></p>';
+			echo '<p>' . esc_html__( 'Remember to update the passwords and roles of imported users.', 'easy-demo-importer' ) . '</p>';
+		}
 
 		do_action( 'import_end' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+	}
+
+	/**
+	 * Reports a per-item notice.
+	 *
+	 * Routes the message to the structured log sink when one is attached (see
+	 * $log_callback), so the caller records an explicit ( message, level ) pair
+	 * instead of capturing printed HTML and guessing the severity back out of it.
+	 * With no sink the message is printed as before, keeping this class usable as
+	 * a standalone WXR importer.
+	 *
+	 * @param string $message Already-escaped, human-readable notice.
+	 * @param string $level   One of info|success|warning|error.
+	 *
+	 * @return void
+	 * @since 2.0.0
+	 */
+	protected function report( $message, $level = 'warning' ) {
+		if ( is_callable( $this->log_callback ) ) {
+			call_user_func( $this->log_callback, (string) $message, (string) $level );
+
+			return;
+		}
+
+		// Callers pass strings already escaped with esc_html__()/esc_html(); the
+		// sink path above is the one the plugin uses, this is the standalone fallback.
+		echo $message . '<br />'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 
 	/**
@@ -318,9 +364,14 @@ class SD_EDI_WP_Import extends WP_Importer {
 				$login = sanitize_user( $post['post_author'], true );
 
 				if ( empty( $login ) ) {
-					/* translators: Post Author */
-					printf( esc_html__( 'Failed to import author %s. Their posts will be attributed to the current user.', 'easy-demo-importer' ), esc_html( $post['post_author'] ) );
-					echo '<br />';
+					$this->report(
+						sprintf(
+							/* translators: Post Author */
+							esc_html__( 'Failed to import author %s. Their posts will be attributed to the current user.', 'easy-demo-importer' ),
+							esc_html( $post['post_author'] )
+						),
+						'warning'
+					);
 					continue;
 				}
 
@@ -381,10 +432,14 @@ class SD_EDI_WP_Import extends WP_Importer {
 					$this->processed_terms[ intval( $cat['term_id'] ) ] = $id;
 				}
 			} else {
-				/* translators: Category Name */
-				printf( esc_html__( 'Failed to import category %s', 'easy-demo-importer' ), esc_html( $cat['category_nicename'] ) );
-
-				echo '<br />';
+				$this->report(
+					sprintf(
+						/* translators: Category Name */
+						esc_html__( 'Failed to import category %s', 'easy-demo-importer' ),
+						esc_html( $cat['category_nicename'] )
+					),
+					'warning'
+				);
 				continue;
 			}
 
@@ -437,10 +492,14 @@ class SD_EDI_WP_Import extends WP_Importer {
 					$this->processed_terms[ intval( $tag['term_id'] ) ] = $id['term_id'];
 				}
 			} else {
-				/* translators: Tag Name */
-				printf( esc_html__( 'Failed to import post tag %s', 'easy-demo-importer' ), esc_html( $tag['tag_name'] ) );
-
-				echo '<br />';
+				$this->report(
+					sprintf(
+						/* translators: Tag Name */
+						esc_html__( 'Failed to import post tag %s', 'easy-demo-importer' ),
+						esc_html( $tag['tag_name'] )
+					),
+					'warning'
+				);
 				continue;
 			}
 
@@ -538,10 +597,15 @@ class SD_EDI_WP_Import extends WP_Importer {
 					$this->processed_terms[ intval( $term['term_id'] ) ] = $id['term_id'];
 				}
 			} else {
-				/* translators: 1. Term Taxonomy, 2. Term Name */
-				printf( esc_html__( 'Failed to import %1$s %2$s', 'easy-demo-importer' ), esc_html( $term['term_taxonomy'] ), esc_html( $term['term_name'] ) );
-
-				echo '<br />';
+				$this->report(
+					sprintf(
+						/* translators: 1. Term Taxonomy, 2. Term Name */
+						esc_html__( 'Failed to import %1$s %2$s', 'easy-demo-importer' ),
+						esc_html( $term['term_taxonomy'] ),
+						esc_html( $term['term_name'] )
+					),
+					'warning'
+				);
 				continue;
 			}
 
@@ -638,13 +702,15 @@ class SD_EDI_WP_Import extends WP_Importer {
 			$post = apply_filters( 'wp_import_post_data_raw', $post );
 
 			if ( ! post_type_exists( $post['post_type'] ) ) {
-				printf(
-					/* translators: 1. Post Title, 2. Post Type */
-					esc_html__( 'Failed to import &#8220;%1$s&#8221;: Invalid post type %2$s', 'easy-demo-importer' ),
-					esc_html( $post['post_title'] ),
-					esc_html( $post['post_type'] )
+				$this->report(
+					sprintf(
+						/* translators: 1. Post Title, 2. Post Type */
+						esc_html__( 'Failed to import &#8220;%1$s&#8221;: Invalid post type %2$s', 'easy-demo-importer' ),
+						esc_html( $post['post_title'] ),
+						esc_html( $post['post_type'] )
+					),
+					'warning'
 				);
-				echo '<br />';
 				do_action( 'wp_import_post_exists', $post );
 				continue;
 			}
@@ -689,9 +755,15 @@ class SD_EDI_WP_Import extends WP_Importer {
 			$post_exists = apply_filters( 'wp_import_existing_post', $post_exists, $post );
 
 			if ( $post_exists && get_post_type( $post_exists ) == $post['post_type'] ) {
-				/* translators: 1. Singular Name, 2. Post Title */
-				printf( esc_html__( '%1$s &#8220;%2$s&#8221; already exists.', 'easy-demo-importer' ), esc_html( $post_type_object->labels->singular_name ), esc_html( $post['post_title'] ) );
-				echo '<br />';
+				$this->report(
+					sprintf(
+						/* translators: 1. Singular Name, 2. Post Title */
+						esc_html__( '%1$s &#8220;%2$s&#8221; already exists.', 'easy-demo-importer' ),
+						esc_html( $post_type_object->labels->singular_name ),
+						esc_html( $post['post_title'] )
+					),
+					'info'
+				);
 				$comment_post_id = $post_exists;
 				$post_id         = $post_exists;
 				$this->processed_posts[ intval( $post['post_id'] ) ] = intval( $post_exists );
@@ -772,13 +844,15 @@ class SD_EDI_WP_Import extends WP_Importer {
 					// on. Divergence from the vendored importer — keep it minimal
 					// for future upstream syncs.
 					if ( 'attachment_fetch_disabled' === $post_id->get_error_code() ) {
-						printf(
-							/* translators: 1. Singular Name, 2. Post Title */
-							esc_html__( 'Skipped %1$s &#8220;%2$s&#8221;: image import is turned off.', 'easy-demo-importer' ),
-							esc_html( $post_type_object->labels->singular_name ),
-							esc_html( $post['post_title'] )
+						$this->report(
+							sprintf(
+								/* translators: 1. Singular Name, 2. Post Title */
+								esc_html__( 'Skipped %1$s &#8220;%2$s&#8221;: image import is turned off.', 'easy-demo-importer' ),
+								esc_html( $post_type_object->labels->singular_name ),
+								esc_html( $post['post_title'] )
+							),
+							'info'
 						);
-						echo '<br />';
 						continue;
 					}
 
@@ -798,14 +872,16 @@ class SD_EDI_WP_Import extends WP_Importer {
 					// plugin's activity log can surface *why* the item was skipped, not
 					// just that it was. Divergence from the vendored importer — keep it
 					// minimal for future upstream syncs.
-					printf(
-						/* translators: 1. Singular Name, 2. Post Title, 3. Error reason */
-						esc_html__( 'Failed to import %1$s &#8220;%2$s&#8221;: %3$s', 'easy-demo-importer' ),
-						esc_html( $post_type_object->labels->singular_name ),
-						esc_html( $post['post_title'] ),
-						esc_html( $post_id->get_error_message() )
+					$this->report(
+						sprintf(
+							/* translators: 1. Singular Name, 2. Post Title, 3. Error reason */
+							esc_html__( 'Failed to import %1$s &#8220;%2$s&#8221;: %3$s', 'easy-demo-importer' ),
+							esc_html( $post_type_object->labels->singular_name ),
+							esc_html( $post['post_title'] ),
+							esc_html( $post_id->get_error_message() )
+						),
+						'warning'
 					);
-					echo '<br />';
 					continue;
 				}
 
@@ -840,10 +916,15 @@ class SD_EDI_WP_Import extends WP_Importer {
 							$term_id = $t['term_id'];
 							do_action( 'wp_import_insert_term', $t, $term, $post_id, $post );
 						} else {
-							/* translators: 1. Taxonomy, 2. Name */
-							printf( esc_html__( 'Failed to import %1$s %2$s', 'easy-demo-importer' ), esc_html( $taxonomy ), esc_html( $term['name'] ) );
-
-							echo '<br />';
+							$this->report(
+								sprintf(
+									/* translators: 1. Taxonomy, 2. Name */
+									esc_html__( 'Failed to import %1$s %2$s', 'easy-demo-importer' ),
+									esc_html( $taxonomy ),
+									esc_html( $term['name'] )
+								),
+								'warning'
+							);
 							do_action( 'wp_import_insert_term_failed', $t, $term, $post_id, $post );
 							continue;
 						}
@@ -997,8 +1078,7 @@ class SD_EDI_WP_Import extends WP_Importer {
 
 		// no nav_menu term associated with this menu item.
 		if ( ! $menu_slug ) {
-			esc_html_e( 'Menu item skipped due to missing menu slug', 'easy-demo-importer' );
-			echo '<br />';
+			$this->report( esc_html__( 'Menu item skipped due to missing menu slug', 'easy-demo-importer' ), 'warning' );
 
 			return;
 		}
@@ -1016,9 +1096,14 @@ class SD_EDI_WP_Import extends WP_Importer {
 			$created = wp_create_nav_menu( '' !== $menu_name ? $menu_name : $menu_slug );
 
 			if ( is_wp_error( $created ) ) {
-				/* translators: Menu Slug */
-				printf( esc_html__( 'Menu item skipped due to invalid menu slug: %s', 'easy-demo-importer' ), esc_html( $menu_slug ) );
-				echo '<br />';
+				$this->report(
+					sprintf(
+						/* translators: Menu Slug */
+						esc_html__( 'Menu item skipped due to invalid menu slug: %s', 'easy-demo-importer' ),
+						esc_html( $menu_slug )
+					),
+					'warning'
+				);
 
 				return;
 			}
