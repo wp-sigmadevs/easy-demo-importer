@@ -356,8 +356,8 @@ class Enqueue extends EnqueueBase {
 			'sd/edi/import_modal_texts', // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 			[
 				'stepOne'     => [
-					'introTopText'    => esc_html__( 'We recommend backing up your site before proceeding. A backup plugin can help you restore your site if anything goes wrong during the import.', 'easy-demo-importer' ),
-					'introBottomText' => esc_html__( 'This import will install all required plugins and bring in content, media, settings, customizer data, and widgets needed to replicate the demo site. Please review your existing content, as some data may be overwritten.', 'easy-demo-importer' ),
+					'introTopText'    => esc_html__( 'We recommend creating a restore point before you proceed — enable it on the next step to roll your site back if anything goes wrong. A separate backup plugin can add an extra layer of safety.', 'easy-demo-importer' ),
+					'introBottomText' => esc_html__( 'This import installs the required plugins and brings in content, media, settings, customizer data, and widgets needed to replicate the demo site. On the next step you can choose what to import and whether to reset your existing database first. Please review your existing content, as some data may be overwritten.', 'easy-demo-importer' ),
 					'introExtraText'  => '',
 				],
 				'stepTwo'     => [
