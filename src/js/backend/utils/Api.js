@@ -91,6 +91,137 @@ const httpErrorInfo = (code) => {
 };
 
 /**
+ * The most recent failure awaiting a possible visibilitychange re-send, or null.
+ * Held at module scope so repeated failures replace the pending report rather
+ * than stacking listeners.
+ *
+ * @type {?{demo: string, sessionId: string, status: number, message: string}}
+ */
+let pendingClientError = null;
+
+/**
+ * Whether the one-shot visibilitychange backup listener is currently installed.
+ *
+ * @type {boolean}
+ */
+let visibilityResendArmed = false;
+
+/**
+ * POST a failure report to the sd_edi_log_client_error handler.
+ *
+ * Builds a fresh FormData on every call — sendBeacon consumes the body, so a
+ * queued report cannot be reused for the backup send. `demo` and the nonce are
+ * mandatory: the plugin's AJAX handlers only register when both are present.
+ * Prefers navigator.sendBeacon (survives navigation) and falls back to fetch
+ * with keepalive where it is unavailable.
+ *
+ * @param {{demo: string, sessionId: string, status: number, message: string}} report - The failure to report.
+ * @return {boolean} True if the report was handed off to the transport.
+ */
+const sendClientErrorReport = (report) => {
+	const params = new FormData();
+	params.append('action', 'sd_edi_log_client_error');
+	params.append('demo', report.demo);
+	params.append('sd_edi_nonce', sdEdiAdminParams.sd_edi_nonce);
+	params.append('sessionId', report.sessionId);
+	params.append('status', String(report.status || 0));
+	params.append('message', report.message || '');
+
+	const url = sdEdiAdminParams.ajaxUrl;
+
+	try {
+		if (
+			typeof navigator !== 'undefined' &&
+			typeof navigator.sendBeacon === 'function' &&
+			navigator.sendBeacon(url, params)
+		) {
+			return true;
+		}
+	} catch (e) {
+		// sendBeacon can throw (e.g. payload rejected) — fall through to fetch.
+	}
+
+	if (typeof fetch === 'function') {
+		fetch(url, { method: 'POST', body: params, keepalive: true }).catch(
+			() => {}
+		);
+		return true;
+	}
+
+	return false;
+};
+
+/**
+ * Arms a single, self-removing visibilitychange listener that re-sends the
+ * pending failure report when the page is hidden.
+ *
+ * The immediate beacon can be dropped under load (documented sendBeacon
+ * behaviour), and the moment most likely to lose it is the user navigating away
+ * right after a failed import. visibilitychange → hidden is the reliable signal
+ * for that (unload/beforeunload do not fire on mobile/Safari), so it is used as
+ * a backup delivery. Only one listener is ever installed; later failures just
+ * replace the pending report. The server de-duplicates an identical report, so
+ * the backup never produces a second log row.
+ *
+ * @return {void}
+ */
+const armVisibilityResend = () => {
+	if (
+		typeof document === 'undefined' ||
+		typeof document.addEventListener !== 'function' ||
+		visibilityResendArmed
+	) {
+		return;
+	}
+
+	visibilityResendArmed = true;
+
+	const onHidden = () => {
+		if (document.visibilityState !== 'hidden' || !pendingClientError) {
+			return;
+		}
+
+		sendClientErrorReport(pendingClientError);
+		pendingClientError = null;
+		visibilityResendArmed = false;
+		document.removeEventListener('visibilitychange', onHidden);
+	};
+
+	document.addEventListener('visibilitychange', onHidden);
+};
+
+/**
+ * Report a transport-level failure back to the server so it lands in the
+ * activity log.
+ *
+ * Gateway/edge errors (502/520/523), hard timeouts and dropped connections
+ * never reach PHP, so the origin cannot log them — only the browser sees the
+ * status. Sends the report immediately and arms a visibilitychange backup for
+ * the navigate-away case.
+ *
+ * @param {Object} request - The failed request (carries demo + sessionId).
+ * @param {number} status  - HTTP status observed by the client (0 if none).
+ * @param {string} message - Short human-readable detail for the log entry.
+ * @return {void}
+ */
+const reportClientError = (request, status, message = '') => {
+	if (!request || !request.sessionId) {
+		return;
+	}
+
+	const report = {
+		demo: request.demo,
+		sessionId: request.sessionId,
+		status: status || 0,
+		message: message || '',
+	};
+
+	pendingClientError = report;
+	sendClientErrorReport(report);
+	armVisibilityResend();
+};
+
+/**
  * Import phases that are safe to auto-resume after a transient failure.
  * The batch stage is idempotent server-side (cursor + mutex + post_exists),
  * so re-issuing the same request simply continues where it left off.
@@ -441,6 +572,12 @@ export const doAxios = async (
 					'Check your internet connection. If you are on a local server, ensure it is running correctly. Try refreshing the page.'
 				);
 			}
+
+			// Record the failure in the activity log. This is the only capture
+			// path for gateway/edge errors (502/520/523) and dropped connections,
+			// which never reach PHP — the server sees nothing to log.
+			reportClientError(request, status, error.message || '');
+
 			if (request.sessionId) {
 				setResumeRequest(request);
 			}

@@ -61,6 +61,11 @@ describe('doAxios', () => {
 
 	afterEach(() => {
 		vi.useRealTimers();
+		vi.unstubAllGlobals();
+		Object.defineProperty(document, 'visibilityState', {
+			value: 'visible',
+			configurable: true,
+		});
 	});
 
 	it('reports success without hitting the server when there is no next phase', async () => {
@@ -300,5 +305,83 @@ describe('doAxios', () => {
 
 		expect(cb.spies.setMessage).toHaveBeenCalledWith('Session invalid.');
 		expect(cb.spies.setHint).toHaveBeenCalledWith('Log in again.');
+	});
+
+	it('beacons a transport failure to the client-error log endpoint on a gateway error', async () => {
+		const beacon = vi.fn(() => true);
+		vi.stubGlobal('navigator', { ...global.navigator, sendBeacon: beacon });
+
+		// 523 (Cloudflare origin unreachable) never reaches PHP — only the client
+		// can report it.
+		Axios.post.mockRejectedValue({ response: { status: 523, data: {} } });
+
+		const request = {
+			nextPhase: 'sd_edi_import_xml_batch',
+			demo: 'mydemo',
+			sessionId: 's-99',
+		};
+
+		await doAxios(request, ...cb.args());
+
+		expect(beacon).toHaveBeenCalledTimes(1);
+
+		const [url, body] = beacon.mock.calls[0];
+		expect(url).toBe(sdEdiAdminParams.ajaxUrl);
+		expect(body.get('action')).toBe('sd_edi_log_client_error');
+		expect(body.get('status')).toBe('523');
+		expect(body.get('sessionId')).toBe('s-99');
+		expect(body.get('demo')).toBe('mydemo');
+		expect(body.get('sd_edi_nonce')).toBe(sdEdiAdminParams.sd_edi_nonce);
+	});
+
+	it('does not beacon a failure when the request carries no session', async () => {
+		const beacon = vi.fn(() => true);
+		vi.stubGlobal('navigator', { ...global.navigator, sendBeacon: beacon });
+
+		Axios.post.mockRejectedValue({ response: { status: 500, data: {} } });
+
+		// No sessionId — nothing to attach the entry to, so no report is sent.
+		await doAxios(
+			{ nextPhase: 'sd_edi_import_widgets', demo: 'd' },
+			...cb.args()
+		);
+
+		expect(beacon).not.toHaveBeenCalled();
+	});
+
+	it('re-sends the failure report on visibilitychange when the page is hidden', async () => {
+		const beacon = vi.fn(() => true);
+		vi.stubGlobal('navigator', { ...global.navigator, sendBeacon: beacon });
+
+		// A non-idempotent phase never auto-resumes, so the failure reaches the
+		// report path (the batch phase would swallow a 502 into a retry instead).
+		Axios.post.mockRejectedValue({ response: { status: 502, data: {} } });
+
+		await doAxios(
+			{
+				nextPhase: 'sd_edi_import_widgets',
+				demo: 'd',
+				sessionId: 's-1',
+			},
+			...cb.args()
+		);
+
+		// Immediate send.
+		expect(beacon).toHaveBeenCalledTimes(1);
+
+		// The user navigates away: the page goes hidden and the backup re-sends.
+		Object.defineProperty(document, 'visibilityState', {
+			value: 'hidden',
+			configurable: true,
+		});
+		document.dispatchEvent(new Event('visibilitychange'));
+
+		expect(beacon).toHaveBeenCalledTimes(2);
+		expect(beacon.mock.calls[1][1].get('status')).toBe('502');
+		expect(beacon.mock.calls[1][1].get('sessionId')).toBe('s-1');
+
+		// A second hidden event must not fire a third time (one-shot listener).
+		document.dispatchEvent(new Event('visibilitychange'));
+		expect(beacon).toHaveBeenCalledTimes(2);
 	});
 });

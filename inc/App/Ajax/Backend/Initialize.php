@@ -60,6 +60,71 @@ class Initialize extends ImporterAjax {
 		add_action( 'wp_ajax_sd_edi_install_demo', [ $this, 'response' ] );
 		add_action( 'wp_ajax_sd_edi_cancel_session', [ $this, 'cancelSession' ] );
 		add_action( 'wp_ajax_sd_edi_mark_interrupted', [ $this, 'markInterrupted' ] );
+		add_action( 'wp_ajax_sd_edi_log_client_error', [ $this, 'logClientError' ] );
+	}
+
+	/**
+	 * Records a client-observed transport failure to the activity log.
+	 *
+	 * A gateway or edge error (502/520/523), a hard timeout, or a dropped
+	 * connection never reaches PHP — the origin either never runs or its response
+	 * is discarded — so the server cannot log it. The browser is the only witness,
+	 * and it already knows the HTTP status from the failed request. It beacons that
+	 * status here (navigator.sendBeacon, so the report survives the user navigating
+	 * away) and this handler writes a real ERROR entry for the run, instead of the
+	 * Import Log inferring a bare "interrupted".
+	 *
+	 * @return void
+	 * @since 2.0.0
+	 */
+	public function logClientError() {
+		Helpers::verifyAjaxCall();
+
+		ImportLogger::maybeInstall();
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$posted_session_id = ! empty( $_POST['sessionId'] ) ? sanitize_text_field( wp_unslash( $_POST['sessionId'] ) ) : '';
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$status = isset( $_POST['status'] ) ? absint( wp_unslash( $_POST['status'] ) ) : 0;
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$detail = ! empty( $_POST['message'] ) ? sanitize_text_field( wp_unslash( $_POST['message'] ) ) : '';
+
+		// The server's own record of the running session wins; fall back to the id
+		// the client sent (the lock may already have been swept when this arrives).
+		$active     = SessionManager::get();
+		$session_id = $active['session_id'] ?? $posted_session_id;
+
+		// Without any session to attach it to, the entry would be an orphan row the
+		// Import Log can't group into a run — drop it and let the client's on-screen
+		// message stand.
+		if ( '' === $session_id ) {
+			wp_send_json_success();
+		}
+
+		$message = $status
+			? sprintf(
+				/* translators: %d: HTTP status code. */
+				esc_html__( 'Import stopped: the server returned HTTP %d.', 'easy-demo-importer' ),
+				$status
+			)
+			: esc_html__( 'Import stopped: the connection to the server was lost.', 'easy-demo-importer' );
+
+		if ( '' !== $detail ) {
+			$message .= ' ' . $detail;
+		}
+
+		// The client sends this report immediately and again from a
+		// visibilitychange backup (for the navigate-away case). Collapse the two
+		// into a single row when the newest entry for this run is already the same
+		// error, so a duplicate delivery cannot double-log the failure.
+		$recent = ImportLogger::get( $session_id, 1 );
+
+		if ( ! empty( $recent ) && ImportLogger::ERROR === $recent[0]['level'] && $recent[0]['message'] === $message ) {
+			wp_send_json_success();
+		}
+
+		ImportLogger::error( $message, $session_id, $this->demoSlug );
+		wp_send_json_success();
 	}
 
 	/**
