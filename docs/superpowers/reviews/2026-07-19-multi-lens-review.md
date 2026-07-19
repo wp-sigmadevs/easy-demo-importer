@@ -124,13 +124,33 @@ _None._
 
 ---
 
+## Verification & resolution (2026-07-19, branch `review-fixes-2026-07-19`)
+
+Each finding was independently re-verified against source + web research before fixing.
+
+| # | Verdict | Resolution | Commit |
+|---|---------|------------|--------|
+| S1 | CONFIRMED (Medium stored XSS) | Fixed — `Filters::sanitizeSvgFile()` + gated at both importer copy chokepoints | `fix(security): sanitize imported SVGs…` |
+| C1 | CONFIRMED | Fixed — `unzipAndImportSlider` now returns the callback's real result | `fix(slider): report real import result…` |
+| C2 | CONFIRMED (low-freq) | Fixed — `empty()` guard added to LayerSlider | same commit |
+| C3 | **NEEDS-NUANCE — "will fatal" was a FALSE POSITIVE** | `LS_ImportUtil($file)` is LayerSlider's current documented API; applied light hardening only (`class_exists` + `try/catch`) | same commit |
+| P1 | CONFIRMED | Fixed — request-scoped static cache in `getNewID()`, invalidated in `createEntry()` | `perf(taxonomy): cache getNewID…` |
+| C4 | CONFIRMED (low impact) | Fixed — `! empty($forms) && is_plugin_active(...)` | `fix(settings): only route to Fluent Forms…` |
+| C5 | CONFIRMED (config-gated) | Fixed — `basename()` the revSlider filename | `fix(widgets): normalize revSlider filename` |
+| P3 | CONFIRMED | Fixed — fetch IDs first, batch-load blobs in chunks of 20 | `perf(elementor): batch _elementor_data load` |
+| P2 | CONFIRMED | **Skipped by decision** — per-attachment checkpoint prevents duplicate media on crash; O(n²) is bounded (maps only). Not worth regressing crash recovery. | — |
+
+CONSIDER items (SVG extract-window in ManualImport, `fixProductStock` batching, React memoization) not addressed — deferred.
+
 ## Fix checklist
 
-- [ ] **S1** Sanitize SVG in `fetch_remote_file` / `import_local_file` + `ManualImport` staging.
-- [ ] **C1–C3** LayerSlider hardening (honest reporting, `glob()` guard, class/method verification) — mirror `b2c34e6`.
-- [ ] **P1** Request-level cache for `getNewID()`.
-- [ ] **C4** Fix `ImportSettings` always-true operator.
-- [ ] **C5** `basename()`-normalize revSlider filename in `ImportWidgets`.
-- [ ] **P2** Delta/less-frequent `persist()` writes.
-- [ ] **P3** Page `_elementor_data` load.
-- [ ] CONSIDER: SVG extract-window (ManualImport), `fixProductStock` batching, React memoization.
+- [x] **S1** Sanitize SVG at `fetch_remote_file` / `import_local_file` copy chokepoints (covers bundled + manual).
+- [x] **C1** Honest slider import reporting (both RevSlider & LayerSlider).
+- [x] **C2** LayerSlider `glob()` guard.
+- [x] **C3** LayerSlider light hardening (`class_exists('LS_ImportUtil')` + `try/catch`) — full rewrite **not needed** (API is current).
+- [x] **P1** Request-level cache for `getNewID()`.
+- [x] **C4** Fix `ImportSettings` always-true operator.
+- [x] **C5** `basename()`-normalize revSlider filename in `ImportWidgets`.
+- [x] **P3** Batch `_elementor_data` load.
+- [ ] **P2** Skipped by decision (see table).
+- [ ] CONSIDER items deferred.
