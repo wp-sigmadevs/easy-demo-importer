@@ -171,7 +171,10 @@ class ImportSettings extends ImporterAjax {
 
 		$forms = $this->multiple ? Helpers::getDemoData( $this->config['demoData'][ $this->demoSlug ], 'fluentFormsJson' ) : Helpers::getDemoData( $this->config, 'fluentFormsJson' );
 
-		$formsExists = isset( $forms ) || is_plugin_active( 'fluentform/fluentform.php' );
+		// getDemoData() always returns a string, so isset($forms) is always true;
+		// route to the Fluent Forms phase only when the demo actually ships a
+		// forms file AND the plugin is active.
+		$formsExists = ! empty( $forms ) && is_plugin_active( 'fluentform/fluentform.php' );
 
 		$formsFileExists = false;
 
