@@ -3,7 +3,7 @@
 ![Requires PHP_>_7.4](https://img.shields.io/badge/Requires-PHP_>_7.4-2d74d5)
 ![Tested up to PHP_8.4](https://img.shields.io/badge/Tested-Up_to_PHP_8.4-2d74d5)
 ![Tested up to WordPress 7.0](https://img.shields.io/badge/Tested-Up_to_WordPress_7.0-2d74d5)
-![Stable_Tag 2.0.0](https://img.shields.io/badge/Stable_Tag-2.0.0-2d74d5)
+![Stable_Tag 2.0.1](https://img.shields.io/badge/Stable_Tag-2.0.1-2d74d5)
 ![License GPLv3 or later](https://img.shields.io/badge/License-GPLv3_or_later-2d74d5)
 [![Unit Tests](https://github.com/wp-sigmadevs/easy-demo-importer/actions/workflows/unit-tests.yml/badge.svg)](https://github.com/wp-sigmadevs/easy-demo-importer/actions/workflows/unit-tests.yml)
 
@@ -12,6 +12,16 @@
 The Easy Demo Importer is your go-to solution for effortlessly bringing your WordPress site to life. With its user-friendly interface and robust feature set, it streamlines the process of importing demo content, offering an unparalleled level of convenience for both users and developers.
 
 👉 [wordpress.org Plugin Link](https://wordpress.org/plugins/easy-demo-importer/) | [Plugin Documentation](https://docs.sigmadevs.com/easy-demo-importer) | [Changelog](CHANGELOG.md) 👈
+
+### What's new in 2.0.1
+
+- **Errors surface in the activity log** — fatal PHP errors (HTTP 500) and gateway/edge failures (523/520/502, dropped connections) are now recorded with the actual status, instead of the log stopping at the last successful step.
+- **Security** — imported SVG files are sanitized during demo import to prevent stored XSS.
+- **Slider fixes** — Slider Revolution 6+ imports against the updated API, RevSlider filenames resolve, and slider imports report their true result instead of a false success.
+- **Performance** — Elementor data loads in batches to bound memory on large demos, and taxonomy term-ID lookups are cached to avoid N+1 queries.
+- **Cleaner logs** — image-disabled runs show a single "Skipped N media items" summary, and manual imports read as "your uploaded files".
+
+See the full [CHANGELOG](CHANGELOG.md) for details.
 
 ### What's new in 2.0.0
 
