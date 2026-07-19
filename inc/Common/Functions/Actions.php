@@ -822,40 +822,60 @@ class Actions {
 
 		global $wpdb;
 
-		// Search for the pages that contain '_elementor_data' in postmeta table.
+		// Fetch only the post IDs first (cheap), then load the large
+		// '_elementor_data' blobs in small batches. Pulling every blob into one
+		// result set spikes memory on big Elementor demos (each row can be
+		// hundreds of KB), risking OOM/timeout in this finalize request.
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$postmeta_rows = $wpdb->get_results(
+		$post_ids = $wpdb->get_col(
 			$wpdb->prepare(
-				"SELECT post_id, meta_value FROM $wpdb->postmeta WHERE meta_key = %s",
+				"SELECT post_id FROM $wpdb->postmeta WHERE meta_key = %s",
 				'_elementor_data'
 			)
 		);
 
-		// Iterate through each row and update the category ID.
-		foreach ( $postmeta_rows as $row ) {
-			$post_id    = $row->post_id;
-			$meta_value = $row->meta_value;
+		if ( empty( $post_ids ) ) {
+			return new static();
+		}
 
-			// Decode the JSON data.
-			$data = json_decode( $meta_value, true );
+		foreach ( array_chunk( $post_ids, 20 ) as $batch ) {
+			$placeholders = implode( ',', array_fill( 0, count( $batch ), '%d' ) );
 
-			// Search and replace the IDs.
-			self::searchReplaceID( $data, $obj->config['elementor_data_fix'] );
-
-			// Update the meta_value in the database.
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			$wpdb->update(
-				$wpdb->postmeta,
-				// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
-				[ 'meta_value' => wp_json_encode( $data ) ],
-				[
-					'post_id'  => $post_id,
-					// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
-					'meta_key' => '_elementor_data',
-				],
-				[ '%s' ],
-				[ '%d', '%s' ]
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			$postmeta_rows = $wpdb->get_results(
+				$wpdb->prepare(
+					// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+					"SELECT post_id, meta_value FROM $wpdb->postmeta WHERE meta_key = %s AND post_id IN ( $placeholders )",
+					array_merge( [ '_elementor_data' ], $batch )
+				)
 			);
+
+			// Iterate through each row and update the category ID.
+			foreach ( $postmeta_rows as $row ) {
+				$post_id    = $row->post_id;
+				$meta_value = $row->meta_value;
+
+				// Decode the JSON data.
+				$data = json_decode( $meta_value, true );
+
+				// Search and replace the IDs.
+				self::searchReplaceID( $data, $obj->config['elementor_data_fix'] );
+
+				// Update the meta_value in the database.
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+				$wpdb->update(
+					$wpdb->postmeta,
+					// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
+					[ 'meta_value' => wp_json_encode( $data ) ],
+					[
+						'post_id'  => $post_id,
+						// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+						'meta_key' => '_elementor_data',
+					],
+					[ '%s' ],
+					[ '%d', '%s' ]
+				);
+			}
 		}
 
 		return new static();
