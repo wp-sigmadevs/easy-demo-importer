@@ -116,6 +116,14 @@ class Functions extends Base {
 	}
 
 	/**
+	 * Request-scoped cache of original_id => new_id lookups.
+	 *
+	 * @var array<int,int>
+	 * @since 2.0.1
+	 */
+	private static $newIdCache = [];
+
+	/**
 	 * Get the new ID based on the original ID.
 	 *
 	 * @param int $originalID The original ID.
@@ -126,6 +134,17 @@ class Functions extends Base {
 	public function getNewID( $originalID ) {
 		global $wpdb;
 
+		$originalID = intval( $originalID );
+
+		// Request-scoped memo. getNewID() is called per widget/setting across
+		// every Elementor page during the taxonomy-fix pass, with the same
+		// original IDs repeating heavily -- without this each call is a separate
+		// single-row query (hundreds to thousands per import). The cache is
+		// invalidated in createEntry() when a mapping changes.
+		if ( array_key_exists( $originalID, self::$newIdCache ) ) {
+			return self::$newIdCache[ $originalID ];
+		}
+
 		$tableName = $this->getImportTable();
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
@@ -134,11 +153,13 @@ class Functions extends Base {
 				// phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnquotedComplexPlaceholder
 				'SELECT new_id FROM %1$s WHERE original_id = %2$d',
 				$tableName,
-				intval( $originalID )
+				$originalID
 			)
 		);
 
-		return intval( $newID );
+		self::$newIdCache[ $originalID ] = intval( $newID );
+
+		return self::$newIdCache[ $originalID ];
 	}
 
 
@@ -160,6 +181,9 @@ class Functions extends Base {
 		$originalID = intval( $originalID );
 		$newID      = intval( $newID );
 		$slug       = sanitize_text_field( $slug );
+
+		// Keep the request-scoped getNewID() cache in sync with this write.
+		self::$newIdCache[ $originalID ] = $newID;
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$existingEntry = $wpdb->get_row(
