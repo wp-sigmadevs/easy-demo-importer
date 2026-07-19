@@ -143,4 +143,44 @@ final class FiltersTest extends UnitTestCase {
 
 		$this->assertSame( $in, $out );
 	}
+
+	/**
+	 * A clean SVG passes and the file remains valid SVG markup.
+	 */
+	public function test_sanitize_svg_file_keeps_clean_svg() {
+		$path = $this->tempFile( '<?xml version="1.0"?><svg xmlns="http://www.w3.org/2000/svg"><rect width="10" height="10"/></svg>' );
+
+		$this->assertTrue( Filters::sanitizeSvgFile( $path ) );
+		$this->assertStringContainsString( '<svg', file_get_contents( $path ) );
+	}
+
+	/**
+	 * A malicious SVG is neutralised in place: script/onload stripped, file kept.
+	 */
+	public function test_sanitize_svg_file_strips_scripts_in_place() {
+		$path = $this->tempFile( '<?xml version="1.0"?><svg xmlns="http://www.w3.org/2000/svg"><script>alert(1)</script><rect onload="evil()"/></svg>' );
+
+		$this->assertTrue( Filters::sanitizeSvgFile( $path ) );
+
+		$cleaned = file_get_contents( $path );
+		$this->assertStringNotContainsStringIgnoringCase( 'script', $cleaned );
+		$this->assertStringNotContainsStringIgnoringCase( 'onload', $cleaned );
+	}
+
+	/**
+	 * Content the sanitizer cannot parse is rejected (caller drops the file).
+	 */
+	public function test_sanitize_svg_file_rejects_unparseable_content() {
+		$path = $this->tempFile( 'this is not xml at all <<<' );
+
+		$this->assertFalse( Filters::sanitizeSvgFile( $path ) );
+	}
+
+	/**
+	 * A missing/empty path is rejected without warnings.
+	 */
+	public function test_sanitize_svg_file_rejects_unreadable_path() {
+		$this->assertFalse( Filters::sanitizeSvgFile( '' ) );
+		$this->assertFalse( Filters::sanitizeSvgFile( '/no/such/file/here.svg' ) );
+	}
 }
