@@ -6,6 +6,33 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 The canonical, WordPress.org-formatted changelog also lives in `readme.txt`.
 
+## [2.0.1] - 2026-07-19
+
+### Added
+- Fatal PHP errors (HTTP 500) and gateway/edge failures (523/520/502, dropped connections) are now recorded in the activity log with the actual status, instead of the log stopping at the last successful step before an import is interrupted.
+
+### Security
+- Imported SVG files are sanitized during demo import to prevent stored XSS.
+
+### Fixed
+- Slider Revolution 6+ demos import correctly against the updated import API.
+- RevSlider export filenames are normalized so the extractor can locate them.
+- LayerSlider and other slider imports report their true result — the activity log and UI no longer claim slides were imported when the slider plugin is inactive.
+- The import only routes to the Fluent Forms phase when Fluent Forms is active, avoiding a needless failing step otherwise.
+
+### Performance
+- Elementor `_elementor_data` is loaded in batches during import to bound peak memory on large demos.
+- Term-ID lookups are cached to avoid N+1 queries while remapping taxonomies.
+
+### Changed
+- With image import turned off, the activity log shows a single "Skipped N media items" summary instead of one line per file.
+- Manual imports read as "your uploaded files" in the activity log instead of the internal `__manual__` slug.
+- Updated the wizard's "Before You Proceed" copy for the restore point and configurable import.
+
+### Internal
+- Added a Vitest suite covering the `doAxios` import pipeline and the new client-error reporting beacon.
+- Added integration tests for SVG import sanitization, cached term-ID lookups, the taxonomy remap, and slider imports.
+
 ## [2.0.0] - 2026-07-18
 
 ### Added

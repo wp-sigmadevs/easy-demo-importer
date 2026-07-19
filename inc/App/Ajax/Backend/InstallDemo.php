@@ -98,11 +98,19 @@ class InstallDemo extends ImporterAjax {
 		// pre-date the log), prune old entries, and record the start of this run.
 		ImportLogger::maybeInstall();
 		ImportLogger::prune();
+		// Manual imports carry the reserved ManualContext::SLUG ("__manual__") as
+		// their demo slug so they flow through the demo-keyed pipeline. Show a
+		// human label in the log line, but keep the raw slug in the demo_slug
+		// column so run grouping/keying stays intact.
+		$demoLabel = $this->manual
+			? esc_html__( 'your uploaded files', 'easy-demo-importer' )
+			: $this->demoSlug;
+
 		ImportLogger::info(
 			sprintf(
 				/* translators: %s: demo name. */
 				esc_html__( 'Content import started for “%s”.', 'easy-demo-importer' ),
-				$this->demoSlug
+				$demoLabel
 			),
 			$this->sessionId,
 			$this->demoSlug
