@@ -21,12 +21,38 @@ use SigmaDevs\EasyDemoImporter\Tests\Unit\UnitTestCase;
 final class FunctionsTest extends UnitTestCase {
 
 	/**
+	 * Reset the request-scoped static cache before each test so the memo from
+	 * one test can't leak into another (it would swallow the DB call the next
+	 * test's expectations rely on).
+	 *
+	 * @inheritDoc
+	 */
+	protected function set_up() {
+		parent::set_up();
+
+		$prop = new \ReflectionProperty( EdiFunctions::class, 'newIdCache' );
+		$prop->setAccessible( true );
+		$prop->setValue( null, [] );
+	}
+
+	/**
 	 * Builds a Functions instance without running its parent constructor.
 	 *
 	 * @return EdiFunctions
 	 */
 	private function functions(): EdiFunctions {
 		return ( new ReflectionClass( EdiFunctions::class ) )->newInstanceWithoutConstructor();
+	}
+
+	/**
+	 * Primes the sanitize_key alias used by getImportTable().
+	 *
+	 * @return void
+	 */
+	private function stubSanitizeKey(): void {
+		Functions\when( 'sanitize_key' )->alias(
+			static fn( $key ) => strtolower( preg_replace( '/[^a-z0-9_]/i', '', (string) $key ) )
+		);
 	}
 
 	public function test_get_import_table_is_prefixed_and_sanitised(): void {
@@ -79,5 +105,44 @@ final class FunctionsTest extends UnitTestCase {
 		$wpdb->shouldReceive( 'get_var' )->once()->andReturn( null );
 
 		self::assertSame( 0, $this->functions()->getNewID( 999 ) );
+	}
+
+	public function test_get_new_id_caches_repeat_lookups(): void {
+		global $wpdb;
+		$wpdb         = Mockery::mock();
+		$wpdb->prefix = 'wp_';
+
+		$this->stubSanitizeKey();
+
+		// The DB must be hit exactly once even though we look up ID 7 twice.
+		$wpdb->shouldReceive( 'prepare' )->once()->andReturn( 'SQL' );
+		$wpdb->shouldReceive( 'get_var' )->once()->andReturn( '42' );
+
+		$functions = $this->functions();
+
+		self::assertSame( 42, $functions->getNewID( 7 ) );
+		self::assertSame( 42, $functions->getNewID( 7 ) );
+	}
+
+	public function test_create_entry_primes_the_lookup_cache(): void {
+		global $wpdb;
+		$wpdb         = Mockery::mock();
+		$wpdb->prefix = 'wp_';
+
+		$this->stubSanitizeKey();
+		Functions\when( 'sanitize_text_field' )->returnArg();
+
+		// createEntry writes the mapping...
+		$wpdb->shouldReceive( 'prepare' )->andReturn( 'SQL' );
+		$wpdb->shouldReceive( 'get_row' )->once()->andReturn( null );
+		$wpdb->shouldReceive( 'insert' )->once();
+
+		// ...and getNewID must then resolve it WITHOUT another query.
+		$wpdb->shouldNotReceive( 'get_var' );
+
+		$functions = $this->functions();
+		$functions->createEntry( 7, 42, 'news' );
+
+		self::assertSame( 42, $functions->getNewID( 7 ) );
 	}
 }
