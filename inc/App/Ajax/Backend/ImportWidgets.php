@@ -94,9 +94,14 @@ class ImportWidgets extends ImporterAjax {
 			do_action( 'sd/edi/after_widgets_import', $widgetsFilePath ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 		}
 
-		$slider           = $this->multiple ?
+		// basename() so this routing check matches the extracted filename used
+		// by unzipAndImportSlider() (which basenames too) -- otherwise a config
+		// value with a path segment would silently skip the RevSlider phase.
+		$slider           = basename(
+			$this->multiple ?
 			Helpers::getDemoData( $this->config['demoData'][ $this->demoSlug ], 'revSliderZip' ) :
-			Helpers::getDemoData( $this->config, 'revSliderZip' );
+			Helpers::getDemoData( $this->config, 'revSliderZip' )
+		);
 		$sliderFileExists = file_exists( $this->demoUploadDir( $this->demoDir() ) . '/' . $slider . '.zip' );
 		$hasRevSlider     = $slider && $sliderFileExists;
 
