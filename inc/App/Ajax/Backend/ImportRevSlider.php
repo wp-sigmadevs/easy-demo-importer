@@ -68,7 +68,7 @@ class ImportRevSlider extends ImporterAjax {
 		$sliderImported = $this->unzipAndImportSlider(
 			'revSliderZip',
 			function ( $extractedPath, $sliderName ) {
-				$this->importRevSlider( $extractedPath, $sliderName );
+				return $this->importRevSlider( $extractedPath, $sliderName );
 			},
 			$this->demoUploadDir( $this->demoDir() )
 		);
@@ -94,14 +94,14 @@ class ImportRevSlider extends ImporterAjax {
 	 * @param string $extractedPath Directory where slider files were extracted.
 	 * @param string $sliderName     Slider zip File name.
 	 *
-	 * @return void
+	 * @return bool True if at least one slider was imported, false otherwise.
 	 * @since 1.1.0
 	 */
 	private function importRevSlider( $extractedPath, $sliderName ) {
 		$sliderFiles = glob( $extractedPath . '/' . $sliderName . '/*.zip' );
 
 		if ( empty( $sliderFiles ) ) {
-			return;
+			return false;
 		}
 
 		// Slider Revolution 6+ import API.
@@ -111,7 +111,7 @@ class ImportRevSlider extends ImporterAjax {
 				$import->import_slider( true, $sliderFile );
 			}
 
-			return;
+			return true;
 		}
 
 		// Legacy Slider Revolution (< 6). The 6+ shim keeps the class but drops the method.
@@ -121,6 +121,11 @@ class ImportRevSlider extends ImporterAjax {
 			foreach ( $sliderFiles as $sliderFile ) {
 				$revSlider->importSliderFromPost( true, true, $sliderFile );
 			}
+
+			return true;
 		}
+
+		// Slider Revolution not installed -- nothing imported.
+		return false;
 	}
 }

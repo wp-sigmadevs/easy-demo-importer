@@ -68,7 +68,7 @@ class ImportLayerSlider extends ImporterAjax {
 		$sliderImported = $this->unzipAndImportSlider(
 			'layerSliderZip',
 			function ( $extractDir, $slider ) {
-				$this->importLayerSlider( $extractDir, $slider );
+				return $this->importLayerSlider( $extractDir, $slider );
 			}
 		);
 
@@ -85,24 +85,51 @@ class ImportLayerSlider extends ImporterAjax {
 	 *
 	 * @param string $extractDir Directory where slider files were extracted.
 	 *
-	 * @return void
+	 * @return bool True if at least one slider was imported, false otherwise.
 	 * @since 2.0.0
 	 */
 	private function importLayerSlider( $extractDir ) {
-		if ( class_exists( 'LS_Sliders' ) && defined( 'LS_ROOT_PATH' ) ) {
-			$import_util_path = LS_ROOT_PATH . '/classes/class.ls.importutil.php';
-			$filesystem_path  = LS_ROOT_PATH . '/classes/class.ls.filesystem.php';
+		// LayerSlider must be active to import into it.
+		if ( ! class_exists( 'LS_Sliders' ) || ! defined( 'LS_ROOT_PATH' ) ) {
+			return false;
+		}
 
-			if ( file_exists( $import_util_path ) && file_exists( $filesystem_path ) ) {
-				require_once $import_util_path;
-				require_once $filesystem_path;
+		$import_util_path = LS_ROOT_PATH . '/classes/class.ls.importutil.php';
+		$filesystem_path  = LS_ROOT_PATH . '/classes/class.ls.filesystem.php';
 
-				$sliderFiles = glob( $extractDir . '/*.zip' );
+		if ( ! file_exists( $import_util_path ) || ! file_exists( $filesystem_path ) ) {
+			return false;
+		}
 
-				foreach ( $sliderFiles as $sliderFile ) {
-					new \LS_ImportUtil( $sliderFile );
-				}
+		require_once $import_util_path;
+		require_once $filesystem_path;
+
+		// Verify the import class the required file is expected to define, so a
+		// future LayerSlider restructure degrades gracefully instead of fataling.
+		if ( ! class_exists( 'LS_ImportUtil' ) ) {
+			return false;
+		}
+
+		$sliderFiles = glob( $extractDir . '/*.zip' );
+
+		// glob() returns false on error; guard before iterating.
+		if ( empty( $sliderFiles ) ) {
+			return false;
+		}
+
+		$imported = false;
+
+		foreach ( $sliderFiles as $sliderFile ) {
+			// LS_ImportUtil runs the import in its constructor; a malformed
+			// export shouldn't abort the whole AJAX request.
+			try {
+				new \LS_ImportUtil( $sliderFile );
+				$imported = true;
+			} catch ( \Throwable $e ) {
+				continue;
 			}
 		}
+
+		return $imported;
 	}
 }

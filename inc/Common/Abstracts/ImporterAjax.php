@@ -461,9 +461,11 @@ abstract class ImporterAjax {
 			$zip->extractTo( $targetExtractDir );
 			$zip->close();
 
-			call_user_func( $importCallback, $targetExtractDir, $slider );
-
-			return true;
+			// Report success based on what the callback actually imported, not
+			// merely that the ZIP extracted -- otherwise the UI and activity log
+			// claim slides were imported even when the slider plugin is inactive
+			// and the callback imported nothing.
+			return (bool) call_user_func( $importCallback, $targetExtractDir, $slider );
 		}
 
 		return false;
