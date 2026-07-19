@@ -4,7 +4,7 @@ Donate link:
 Tags: demo importer, one click demo importer, theme demo importer, WordPress demo importer, content import plugin
 Requires at least: 5.5
 Tested up to: 7.0
-Stable tag: 2.0.0
+Stable tag: 2.0.1
 Requires PHP: 7.4
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -139,6 +139,17 @@ For any inquiries, bug reports, or suggestions, please submit your request [here
 6. Example of how the system status page looks.
 
 == Changelog ==
+
+= 2.0.1 (19-July-2026) =
+* Security: Imported SVG files are now sanitized during demo import to prevent stored XSS.
+* Feature: Fatal errors (HTTP 500) and gateway/edge failures (523/520/502, dropped connections) are recorded in the activity log with the real status, instead of the log stopping at the last successful step.
+* Fix: Slider Revolution 6+ demos import correctly against the updated API, and RevSlider filenames are normalized so the extractor can locate them.
+* Fix: LayerSlider and other slider imports report their true result instead of falsely claiming success when the slider plugin is inactive.
+* Fix: The import only runs the Fluent Forms step when Fluent Forms is active.
+* Performance: Elementor data is loaded in batches to bound memory on large demos, and taxonomy term-ID lookups are cached to avoid N+1 queries.
+* Tweak: With image import turned off, the log shows a single "Skipped N media items" summary instead of one line per file.
+* Tweak: Manual imports read as "your uploaded files" in the log instead of the internal slug.
+* Tweak: Updated the wizard's "Before You Proceed" copy for the restore point and configurable import.
 
 = 2.0.0 (18-July-2026) =
 * Feature: Resumable, chunked WXR import — large/WooCommerce demos no longer fail with 524/503 gateway timeouts.
