@@ -207,6 +207,19 @@ class SD_EDI_WP_Import extends WP_Importer {
 	public $failed_attachments = [];
 
 	/**
+	 * Count of attachments skipped because image import is disabled for this run.
+	 *
+	 * Every attachment is skipped for the identical reason, so rather than log one
+	 * notice per file — which buries the activity log under hundreds of duplicate
+	 * lines — they are tallied here and reported as a single summary at
+	 * import_end(). Persisted across chunked batches via ChunkedImport::MUTABLE_PROPS.
+	 *
+	 * @var int
+	 * @since 2.0.0
+	 */
+	public $attachments_skipped_disabled = 0;
+
+	/**
 	 * URL Remap
 	 *
 	 * @var array
@@ -306,6 +319,26 @@ class SD_EDI_WP_Import extends WP_Importer {
 
 		wp_defer_term_counting( false );
 		wp_defer_comment_counting( false );
+
+		// One line for every attachment skipped because image import was turned off
+		// for this run, in place of the per-file notices suppressed in
+		// process_posts().
+		if ( $this->attachments_skipped_disabled > 0 ) {
+			$count = $this->attachments_skipped_disabled;
+
+			/* translators: %s: number of media items skipped. */
+			$notice = _n(
+				'Skipped %s media item — image import is turned off for this import.',
+				'Skipped %s media items — image import is turned off for this import.',
+				$count,
+				'easy-demo-importer'
+			);
+
+			$this->report(
+				esc_html( sprintf( $notice, number_format_i18n( $count ) ) ),
+				'info'
+			);
+		}
 
 		// Standalone completion notice only; when a log sink is attached the caller
 		// records its own success entry, so this UI-only markup is skipped.
@@ -844,15 +877,11 @@ class SD_EDI_WP_Import extends WP_Importer {
 					// on. Divergence from the vendored importer — keep it minimal
 					// for future upstream syncs.
 					if ( 'attachment_fetch_disabled' === $post_id->get_error_code() ) {
-						$this->report(
-							sprintf(
-								/* translators: 1. Singular Name, 2. Post Title */
-								esc_html__( 'Skipped %1$s &#8220;%2$s&#8221;: image import is turned off.', 'easy-demo-importer' ),
-								esc_html( $post_type_object->labels->singular_name ),
-								esc_html( $post['post_title'] )
-							),
-							'info'
-						);
+						// Images are disabled for this run, so every attachment is
+						// skipped for the same reason. Tally it and emit one summary
+						// line at import_end() instead of a notice per file, which
+						// would bury the log under hundreds of identical entries.
+						++$this->attachments_skipped_disabled;
 						continue;
 					}
 

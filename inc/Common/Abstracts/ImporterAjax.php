@@ -144,6 +144,83 @@ abstract class ImporterAjax {
 
 		// Handle the Post submission.
 		$this->handlePostSubmission();
+
+		// Capture a PHP fatal (500) into the activity log before the worker dies.
+		$this->registerFatalLogger();
+	}
+
+	/**
+	 * Registers a shutdown probe that records a PHP fatal to the activity log.
+	 *
+	 * A fatal error (out of memory, max execution time, uncaught Error, parse
+	 * error) kills the request before any phase can log it, so the Import Log
+	 * would otherwise show only the last successful step and infer "interrupted"
+	 * — never the actual cause. PHP still runs shutdown functions after a fatal,
+	 * so this probe inspects error_get_last() and, when the last error is a fatal
+	 * type, appends a real ERROR entry for the active session. This mirrors how
+	 * WordPress core's own WP_Fatal_Error_Handler captures fatals; the
+	 * wp_should_handle_php_error filter cannot be used here because core returns
+	 * early for these error types before that filter ever fires.
+	 *
+	 * @return void
+	 * @since 2.0.0
+	 */
+	protected function registerFatalLogger() {
+		static $registered = false;
+
+		if ( $registered ) {
+			return;
+		}
+
+		$registered = true;
+
+		$demo_slug = $this->demoSlug;
+
+		register_shutdown_function(
+			static function () use ( $demo_slug ) {
+				$error = error_get_last();
+
+				if ( null === $error ) {
+					return;
+				}
+
+				$fatal_types = [
+					E_ERROR,
+					E_PARSE,
+					E_CORE_ERROR,
+					E_COMPILE_ERROR,
+					E_USER_ERROR,
+					E_RECOVERABLE_ERROR,
+				];
+
+				if ( ! in_array( $error['type'], $fatal_types, true ) ) {
+					return;
+				}
+
+				// A fatal outside an active import (no session) belongs to some
+				// other admin request — leave it out of the import timeline.
+				$active     = SessionManager::get();
+				$session_id = $active['session_id'] ?? '';
+
+				if ( '' === $session_id ) {
+					return;
+				}
+
+				// The message can carry an absolute file path; that is acceptable
+				// in a technical record, but keep it single-line and bounded so a
+				// giant stack-style message can't bloat the log row.
+				$message = sprintf(
+					/* translators: 1: error message, 2: file, 3: line. */
+					esc_html__( 'Import failed with a fatal error: %1$s (in %2$s on line %3$d).', 'easy-demo-importer' ),
+					trim( preg_replace( '/\s+/', ' ', (string) $error['message'] ) ),
+					(string) $error['file'],
+					(int) $error['line']
+				);
+
+				ImportLogger::maybeInstall();
+				ImportLogger::error( $message, $session_id, $demo_slug );
+			}
+		);
 	}
 
 	/**
