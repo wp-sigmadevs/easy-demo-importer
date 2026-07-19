@@ -90,6 +90,7 @@ class ChunkedImport extends SD_EDI_WP_Import {
 		'bundled_media_dir',
 		'bundled_media_imported',
 		'failed_attachments',
+		'attachments_skipped_disabled',
 	];
 
 	/**
