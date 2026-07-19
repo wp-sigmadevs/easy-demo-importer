@@ -98,9 +98,25 @@ class ImportRevSlider extends ImporterAjax {
 	 * @since 1.1.0
 	 */
 	private function importRevSlider( $extractedPath, $sliderName ) {
-		if ( class_exists( 'RevSlider' ) ) {
-			$revSlider   = new \RevSlider();
-			$sliderFiles = glob( $extractedPath . '/' . $sliderName . '/*.zip' );
+		$sliderFiles = glob( $extractedPath . '/' . $sliderName . '/*.zip' );
+
+		if ( empty( $sliderFiles ) ) {
+			return;
+		}
+
+		// Slider Revolution 6+ import API.
+		if ( class_exists( 'RevSliderSliderImport' ) ) {
+			foreach ( $sliderFiles as $sliderFile ) {
+				$import = new \RevSliderSliderImport();
+				$import->import_slider( true, $sliderFile );
+			}
+
+			return;
+		}
+
+		// Legacy Slider Revolution (< 6). The 6+ shim keeps the class but drops the method.
+		if ( method_exists( 'RevSlider', 'importSliderFromPost' ) ) {
+			$revSlider = new \RevSlider();
 
 			foreach ( $sliderFiles as $sliderFile ) {
 				$revSlider->importSliderFromPost( true, true, $sliderFile );
