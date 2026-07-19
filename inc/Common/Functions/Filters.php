@@ -143,6 +143,51 @@ class Filters {
 	}
 
 	/**
+	 * Sanitize an SVG file already written to disk, in place.
+	 *
+	 * The importer's attachment paths (fetch_remote_file / import_local_file)
+	 * write files with a raw copy() and never pass through the upload
+	 * prefilters that run sanitizeSVG(), so an SVG shipped inside a demo
+	 * package or manual bundle would otherwise be stored unsanitized and
+	 * served as a public attachment (stored XSS). This is the file-path
+	 * counterpart of sanitizeSVG() -- callers pass the just-copied file and
+	 * must remove it when this returns false.
+	 *
+	 * @param string $path Absolute path to an SVG file on disk.
+	 *
+	 * @return bool True when the file is safe (rewritten cleaned); false when
+	 *              the content is unsafe or unreadable.
+	 * @since 2.0.1
+	 */
+	public static function sanitizeSvgFile( $path ) {
+		if ( empty( $path ) || ! is_readable( $path ) ) {
+			return false;
+		}
+
+		$sanitizer = new Sanitizer();
+		$sanitizer->removeRemoteReferences( true );
+		$sanitizer->removeXMLTag( true );
+		$sanitizer->minify( true );
+
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+		$svg_content = file_get_contents( $path );
+
+		if ( false === $svg_content ) {
+			return false;
+		}
+
+		$clean_svg = $sanitizer->sanitize( $svg_content );
+
+		// Unsafe content -- signal the caller to drop the file.
+		if ( false === $clean_svg ) {
+			return false;
+		}
+
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
+		return false !== file_put_contents( $path, $clean_svg );
+	}
+
+	/**
 	 * Fix SVG file detection in WordPress.
 	 *
 	 * @param array  $data     Array containing file data.

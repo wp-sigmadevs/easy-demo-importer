@@ -1504,6 +1504,15 @@ class SD_EDI_WP_Import extends WP_Importer {
 		$perms = $stat['mode'] & 0000666;
 		chmod( $new_file, $perms ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_chmod
 
+		// A raw copy() bypasses the upload prefilters that sanitize SVGs, so a
+		// demo-supplied SVG would land unsanitized in the web-served uploads dir
+		// (stored XSS). Sanitize in place or drop the file.
+		if ( 'image/svg+xml' === $type && ! \SigmaDevs\EasyDemoImporter\Common\Functions\Filters::sanitizeSvgFile( $new_file ) ) {
+			@unlink( $new_file ); // phpcs:ignore WordPress.WP.AlternativeFunctions.unlink_unlink
+
+			return new WP_Error( 'import_file_error', esc_html__( 'The imported SVG contains unsafe content and was skipped.', 'easy-demo-importer' ) );
+		}
+
 		$upload = [
 			'file'  => $new_file,
 			'url'   => $uploads['url'] . "/$file_name",
@@ -1614,6 +1623,15 @@ class SD_EDI_WP_Import extends WP_Importer {
 		if ( false !== $stat ) {
 			$perms = $stat['mode'] & 0000666;
 			chmod( $new_file, $perms ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_chmod
+		}
+
+		// The bundled copy() bypasses the upload prefilters that sanitize SVGs,
+		// so a demo-supplied SVG would land unsanitized in the web-served
+		// uploads dir (stored XSS). Sanitize in place or drop the file.
+		if ( 'image/svg+xml' === $filetype['type'] && ! \SigmaDevs\EasyDemoImporter\Common\Functions\Filters::sanitizeSvgFile( $new_file ) ) {
+			@unlink( $new_file ); // phpcs:ignore WordPress.WP.AlternativeFunctions.unlink_unlink
+
+			return new WP_Error( 'import_file_type_error', esc_html__( 'The bundled SVG contains unsafe content and was skipped.', 'easy-demo-importer' ) );
 		}
 
 		$upload = [
