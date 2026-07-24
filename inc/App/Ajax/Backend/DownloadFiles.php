@@ -154,15 +154,24 @@ class DownloadFiles extends ImporterAjax {
 		$sslverify = (bool) apply_filters( 'sd/edi/download_sslverify', true ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 		$demoData  = $this->demoUploadDir() . 'imported-demo-data.zip';
 
+		// Stream the archive straight to disk instead of buffering it in a PHP
+		// string. A large (WooCommerce) demo can exceed the host memory_limit
+		// and fatal before a single post is imported; streaming keeps peak
+		// memory flat regardless of archive size.
 		$response = wp_remote_get(
 			$external_url,
 			[
 				'timeout'   => $timeout,
 				'sslverify' => $sslverify,
+				'stream'    => true,
+				'filename'  => $demoData,
 			]
 		);
 
 		if ( is_wp_error( $response ) ) {
+			// A streamed request may leave a partial file behind on failure.
+			$wp_filesystem->delete( $demoData );
+
 			$error_message = $response->get_error_message();
 			$is_ssl_error  = (bool) preg_match( '/ssl|certificate|curl error 60|curl error 35/i', $error_message );
 
@@ -188,13 +197,14 @@ class DownloadFiles extends ImporterAjax {
 		$http_code = wp_remote_retrieve_response_code( $response );
 
 		if ( 200 !== $http_code ) {
+			// On a non-200, the streamed file holds the error body, not the zip.
+			$wp_filesystem->delete( $demoData );
+
 			return $this->httpCodeToError( (int) $http_code );
 		}
 
-		$file = wp_remote_retrieve_body( $response );
-
-		$wp_filesystem->put_contents( $demoData, $file );
-
+		// With 'stream' => true the body is written to $demoData directly and
+		// wp_remote_retrieve_body() is empty, so no put_contents() is needed.
 		if ( ! $wp_filesystem->exists( $demoData ) ) {
 			return [
 				'success' => false,
