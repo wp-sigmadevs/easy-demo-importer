@@ -153,8 +153,16 @@ class DownloadFiles extends ImporterAjax {
 		$timeout   = (int) apply_filters( 'sd/edi/download_timeout', 120 ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 		$sslverify = (bool) apply_filters( 'sd/edi/download_sslverify', true ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 		$demoData  = $this->demoUploadDir() . 'imported-demo-data.zip';
-		$partFile  = $demoData . '.part';
-		$chunkFile = $demoData . '.chunk';
+
+		// Key the resume files to the source URL. demoUploadDir() is shared
+		// across demos, so a fixed .part name would let a partial left by an
+		// interrupted Demo A download be resumed against Demo B's URL — a Range
+		// request from A's offset then appends B's tail onto A's head, silently
+		// producing a corrupt zip. Hashing the URL means a different (or
+		// replaced) source simply finds no match and downloads fresh.
+		$resumeKey = md5( $external_url );
+		$partFile  = $demoData . '.' . $resumeKey . '.part';
+		$chunkFile = $demoData . '.' . $resumeKey . '.chunk';
 
 		// Resume an interrupted download. If a partial file from a previous
 		// attempt is on disk, request only the remaining bytes with a Range
