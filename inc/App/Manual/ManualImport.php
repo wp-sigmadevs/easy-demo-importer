@@ -104,8 +104,11 @@ class ManualImport extends Base {
 	}
 
 	/**
-	 * Deletes abandoned manual working dirs (an upload begun but never
-	 * finished/imported). TTL filterable.
+	 * Deletes abandoned import artifacts (a manual upload begun but never
+	 * finished, or an interrupted demo download's resume files). TTL filterable.
+	 * Both live in the shared easy-demo-importer/ dir; this is the only cron
+	 * that runs unconditionally, so it also owns the download-resume sweep
+	 * (DownloadFiles loads only during an import and cannot host a cron).
 	 *
 	 * @return void
 	 * @since 2.0.0
@@ -120,9 +123,17 @@ class ManualImport extends Base {
 		$ttl = (int) apply_filters( 'sd/edi/manual_artifact_ttl', 6 * HOUR_IN_SECONDS ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 		$now = time();
 
+		// Manual-upload chunk assembly files.
 		foreach ( (array) glob( $base . '/.manual-tmp-*.part' ) as $part ) {
 			if ( is_file( $part ) && ( $now - (int) filemtime( $part ) ) > $ttl ) {
 				wp_delete_file( $part );
+			}
+		}
+
+		// Interrupted demo-download resume files (imported-demo-data.zip.<hash>.part|.chunk).
+		foreach ( (array) glob( $base . '/imported-demo-data.zip.*.{part,chunk}', GLOB_BRACE ) as $resume ) {
+			if ( is_file( $resume ) && ( $now - (int) filemtime( $resume ) ) > $ttl ) {
+				wp_delete_file( $resume );
 			}
 		}
 
