@@ -183,7 +183,67 @@ class Actions {
 			->updatePermalinks()
 
 			// Update a rewrite flag.
-			->rewriteFlag();
+			->rewriteFlag()
+
+			// Purge caching plugins so the imported site is served, not stale HTML.
+			->flushCaches();
+	}
+
+	/**
+	 * Purges known page/object caches after an import.
+	 *
+	 * WordPress silently serves cached HTML from whatever caching plugin is
+	 * active, so a fresh import can look broken (old pages, missing styles)
+	 * until a cache the user does not know exists is cleared — the single
+	 * largest "my site looks wrong after import" support category. Every call
+	 * is best-effort and guarded; a missing plugin is a no-op. Elementor's
+	 * own cache is cleared separately in elementorActions().
+	 *
+	 * @return void
+	 * @since 2.1.0
+	 */
+	public static function flushCaches() {
+		// WordPress object cache (also covers Redis/Memcached drop-ins).
+		wp_cache_flush();
+
+		// W3 Total Cache.
+		if ( function_exists( 'w3tc_flush_all' ) ) {
+			w3tc_flush_all();
+		}
+
+		// WP Super Cache.
+		if ( function_exists( 'wp_cache_clear_cache' ) ) {
+			wp_cache_clear_cache();
+		}
+
+		// WP Rocket.
+		if ( function_exists( 'rocket_clean_domain' ) ) {
+			rocket_clean_domain();
+		}
+
+		// SG Optimizer (SiteGround).
+		if ( function_exists( 'sg_cachepress_purge_cache' ) ) {
+			sg_cachepress_purge_cache();
+		}
+
+		// Autoptimize.
+		if ( class_exists( '\autoptimizeCache' ) ) {
+			\autoptimizeCache::clearall();
+		}
+
+		// WP Fastest Cache.
+		if ( ! empty( $GLOBALS['wp_fastest_cache'] ) && method_exists( $GLOBALS['wp_fastest_cache'], 'deleteCache' ) ) {
+			$GLOBALS['wp_fastest_cache']->deleteCache( true );
+		}
+
+		// LiteSpeed Cache, Cache Enabler, Hummingbird — action-driven purges,
+		// safe no-ops when the plugin is inactive.
+		do_action( 'litespeed_purge_all' );
+		do_action( 'cache_enabler_clear_complete_cache' );
+		do_action( 'wphb_clear_page_cache' );
+
+		// Let theme authors purge any additional/custom cache layer.
+		do_action( 'sd/edi/flush_caches' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 	}
 
 	/**
