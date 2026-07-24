@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
-import { Button, Space, Skeleton, Image } from 'antd';
-import { DownloadOutlined, FullscreenOutlined } from '@ant-design/icons';
+import { Button, Space, Skeleton, Image, Tooltip } from 'antd';
+import {
+	DownloadOutlined,
+	FullscreenOutlined,
+	LockOutlined,
+} from '@ant-design/icons';
 
 /* global sdEdiAdminParams */
 
@@ -18,8 +22,36 @@ const DemoCard = ({ data, showModal }) => {
 		setImageLoaded(true);
 	};
 
+	// Server-computed: false when the demo's `requires` block is unmet.
+	// Legacy configs omit the field, so treat undefined as met.
+	const missing = data?.missingRequirements ?? [];
+	const requirementsMet = data?.requirementsMet !== false;
+
+	const importButton = (
+		<Button
+			className="edi-modal-button"
+			type="primary"
+			disabled={!requirementsMet}
+			onClick={() =>
+				showModal({
+					id: data.id,
+					data,
+					reset: true,
+					excludeImages: true,
+				})
+			}
+		>
+			<span>{sdEdiAdminParams.btnImport}</span>{' '}
+			{requirementsMet ? <DownloadOutlined /> : <LockOutlined />}
+		</Button>
+	);
+
 	return (
-		<div className="demo-card">
+		<div
+			className={
+				requirementsMet ? 'demo-card' : 'demo-card requirements-unmet'
+			}
+		>
 			<header>
 				{imageLoaded ? (
 					<>
@@ -64,21 +96,35 @@ const DemoCard = ({ data, showModal }) => {
 					<h2>{data?.name}</h2>
 				</div>
 				<div className="edi-demo-actions">
-					<Button
-						className="edi-modal-button"
-						type="primary"
-						onClick={() =>
-							showModal({
-								id: data.id,
-								data,
-								reset: true,
-								excludeImages: true,
-							})
-						}
-					>
-						<span>{sdEdiAdminParams.btnImport}</span>{' '}
-						<DownloadOutlined />
-					</Button>
+					{requirementsMet ? (
+						importButton
+					) : (
+						<Tooltip
+							title={
+								<>
+									<div>
+										{sdEdiAdminParams.requirementsNotMet}
+									</div>
+									<ul className="edi-requirements-list">
+										{missing.map((item) => (
+											<li key={item}>{item}</li>
+										))}
+									</ul>
+									<div>
+										{
+											sdEdiAdminParams.requirementsNotMetHint
+										}
+									</div>
+								</>
+							}
+						>
+							{/* span wrapper: Tooltip needs a hoverable node
+							    while the button is disabled. */}
+							<span className="edi-disabled-wrap">
+								{importButton}
+							</span>
+						</Tooltip>
+					)}
 				</div>
 			</div>
 		</div>
