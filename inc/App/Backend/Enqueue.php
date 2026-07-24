@@ -314,6 +314,8 @@ class Enqueue extends EnqueueBase {
 				'importBusyTitle'            => esc_html__( 'Another import is still running.', 'easy-demo-importer' ),
 				'importBusyHint'             => esc_html__( 'It has held the import lock longer than expected and may have stalled. Resume to keep waiting, or Start Over to begin fresh.', 'easy-demo-importer' ),
 				'clickEnlarge'               => esc_html__( 'Click to Enlarge', 'easy-demo-importer' ),
+				'requirementsNotMet'         => esc_html__( 'This demo needs:', 'easy-demo-importer' ),
+				'requirementsNotMetHint'     => esc_html__( 'Import is unavailable until these are met.', 'easy-demo-importer' ),
 				'createATicket'              => esc_html__( 'Contact Us', 'easy-demo-importer' ),
 				'viewDocumentation'          => esc_html__( 'View Documentation', 'easy-demo-importer' ),
 				'needHelp'                   => esc_html__( 'Need help?', 'easy-demo-importer' ),

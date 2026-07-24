@@ -194,6 +194,24 @@ class SD_EDI_Demo_Importer {
 						'primary' => 'Main Menu',
 						'footer'  => 'Secondary',
 					],
+
+					/*
+					 * Optional. Gate this demo on prerequisites the importer
+					 * cannot resolve on its own (unlike 'plugins' below, which are
+					 * installed automatically). When any check fails the demo card
+					 * is greyed out with a tooltip listing what is missing, instead
+					 * of letting a guaranteed-to-fail import start. Every key is
+					 * optional.
+					 *
+					 * 'requires' => [
+					 *     'php'        => '8.0',                 // minimum PHP version
+					 *     'extensions' => [ 'imagick' ],        // PHP extensions that must be loaded
+					 *     'plugins'    => [                     // plugins that must already be ACTIVE
+					 *         'advanced-custom-fields-pro/acf.php' => 'ACF Pro',
+					 *     ],
+					 * ],
+					 */
+
 					'plugins'               => [
 						'elementor'   => [
 							'name'     => 'Elementor Page Builder',

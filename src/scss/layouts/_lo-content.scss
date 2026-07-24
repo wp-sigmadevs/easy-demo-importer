@@ -21,6 +21,20 @@
 
 			@include transition();
 
+			// Demo whose `requires` block is unmet: dim the preview and let the
+			// disabled Import button (with its tooltip) carry the explanation.
+			&.requirements-unmet {
+				header {
+					opacity: 0.55;
+					filter: grayscale(70%);
+				}
+
+				.edi-disabled-wrap {
+					display: inline-block;
+					cursor: not-allowed;
+				}
+			}
+
 			header {
 				overflow: hidden;
 
