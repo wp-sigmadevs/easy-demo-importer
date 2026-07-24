@@ -19,6 +19,7 @@ use SigmaDevs\EasyDemoImporter\Common\{
 	Abstracts\Base,
 	Traits\Singleton,
 	Utils\Preflight,
+	Utils\DemoRequirements,
 	Utils\FailedMedia,
 	Utils\Snapshot,
 	Functions\Helpers,
@@ -473,6 +474,18 @@ class RestEndpoints extends Base {
 
 		if ( empty( $themeConfig ) ) {
 			return $this->sendError( $errorData );
+		}
+
+		// Attach per-demo requirement status so the UI can grey out demos whose
+		// prerequisites (PHP version, extensions, must-be-active plugins) are
+		// not met. Evaluated server-side because the client cannot see them.
+		if ( ! empty( $themeConfig['demoData'] ) && is_array( $themeConfig['demoData'] ) ) {
+			foreach ( $themeConfig['demoData'] as $slug => $demo ) {
+				$status = DemoRequirements::evaluate( $demo['requires'] ?? [] );
+
+				$themeConfig['demoData'][ $slug ]['requirementsMet']     = $status['met'];
+				$themeConfig['demoData'][ $slug ]['missingRequirements'] = $status['missing'];
+			}
 		}
 
 		return $this->sendResponse( $themeConfig, esc_html__( 'Data is ready to fetch', 'easy-demo-importer' ) );

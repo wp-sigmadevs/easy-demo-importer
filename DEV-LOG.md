@@ -3,6 +3,19 @@
 Running log of architectural decisions, non-obvious context, and rationale.
 Most recent entries at the top.
 
+## 2026-07-23 — Conditional demo visibility (`requires` block)
+
+**What:** Demos can declare an optional `requires` block (`php` min version, `extensions`, must-be-active `plugins`). `DemoRequirements::evaluate()` grades it server-side; `buildList()` attaches `requirementsMet` + `missingRequirements` per demo; `DemoCard.jsx` greys the card and disables Import with a tooltip listing what's missing.
+
+**Why:** Per `IMPROVEMENTS.md` #16 — showing a demo whose prerequisites can't be met produces a guaranteed mid-import failure and a support ticket. This is the same failure-prevention class as the cache flush, so it ships **free**, not Pro.
+
+**Non-obvious context:**
+- `requires` is deliberately **separate** from the existing `plugins` array. `plugins` are auto-installed during import; `requires` is only for prerequisites the importer *cannot* resolve (PHP version, extensions, premium/bundled plugins that must already be active). Folding them together would grey out every demo that lists plugins.
+- Evaluation is server-side because the client can't see active plugins / PHP build. The result is injected into the existing `buildList` REST payload — no new endpoint.
+- Named `DemoRequirements`, not `Requirements`, to avoid confusion with the pre-existing `Config\Requirements` (which gates whether the *plugin itself* can run). Different concept, different layer.
+- Legacy configs omit the field; `DemoCard` treats `requirementsMet !== false` as met, so demos without a `requires` block are unaffected.
+- The `.pot` was left untouched: a hook regenerated it wholesale (~2000 lines — it was long stale), confirming it's a release-time artifact, not per-commit maintained. New strings get picked up at the next release regen.
+
 ## 2026-07-23 — Post-import cache flush
 
 **What:** Added `Actions::flushCaches()` to the `afterImportActions()` chain — purges the WP object cache plus the common page-cache plugins (W3TC, WP Super Cache, WP Rocket, SG Optimizer, Autoptimize, WP Fastest Cache, and action-driven LiteSpeed/Cache Enabler/Hummingbird), and fires `sd/edi/flush_caches` for custom layers.
