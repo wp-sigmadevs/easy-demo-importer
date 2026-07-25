@@ -3,6 +3,18 @@
 Running log of architectural decisions, non-obvious context, and rationale.
 Most recent entries at the top.
 
+## 2026-07-25 — Fix: disabled set_time_limit fatals the readiness report
+
+**What:** `Preflight::attemptRaiseExecutionTime()` now checks `function_exists('set_time_limit')` before calling it (and `attemptRaiseMemory()` does the same for `ini_set`). When the function is unavailable the tuner returns an unchanged outcome, which the existing graders already report as a refusal.
+
+**Why:** a function listed in PHP's `disable_functions` is removed from the function table entirely, so calling it raises **`Error: Call to undefined function`** — a fatal, not a warning, which the `@` suppression operator cannot catch. Inside a namespace the failed lookup is even reported under the namespaced name (`SigmaDevs\EasyDemoImporter\Common\Utils\set_time_limit()`), which makes it read like a missing method. Shared hosts disable `set_time_limit` routinely, so on those hosts `/preflight` returned **HTTP 500** and the Readiness step of the wizard broke outright — the readiness report was the thing breaking the page it reported on.
+
+**Non-obvious context:**
+- Introduced by the auto-tuner (`f981385`, merged in `ce56bf2`) and shipped on master. Not caught earlier because every prior test host allowed `set_time_limit`; it only surfaced once a `disable_functions = set_time_limit` php.ini was applied.
+- `Actions::beforeImportActions()` already guarded this correctly with `strpos(ini_get('disable_functions'), 'set_time_limit')` — the pre-existing code had the right instinct and the new code simply failed to copy it. `function_exists()` is the more robust form (immune to spacing and substring false-positives in the ini string), so the new guards use that.
+- The `@` operator was actively misleading here: it implied the failure mode was a warning. Removed, since with the guard in place there is nothing left to suppress.
+- Not unit-testable — a disabled function cannot be simulated from PHPUnit. Verified live instead against a host with `disable_functions = set_time_limit`: `/preflight` returns 200, execution time reports the honest refusal, and a full 835-item import completed at `memory_limit = 48M` / `max_execution_time = 20`.
+
 ## 2026-07-25 — Wire honest limits reporting into import start
 
 **What:** `InstallDemo::logEffectiveLimits()` runs right after `do_action('sd/edi/before_import')` and records, once per session, the *effective* (post-raise) `memory_limit` / `max_execution_time` into the activity log via a new pure grader `Preflight::limitsLogEntry()` — an `info` line when both meet the floor, a `warning` naming the host-enforced value when either was refused/capped.
