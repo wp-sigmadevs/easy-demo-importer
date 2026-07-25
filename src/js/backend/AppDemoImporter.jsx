@@ -190,6 +190,18 @@ const AppDemoImporter = () => {
 	}, [fetchServerData]);
 
 	/**
+	 * Extracting the server data.
+	 *
+	 * Declared above the effect below, which lists it as a dependency: a
+	 * dependency array is evaluated during render, so a `const` declared further
+	 * down is still in its temporal dead zone at that point. Babel's transpile
+	 * hid this in the browser build (`const` became a hoisted `var`, so the dep
+	 * silently read `undefined` on every render and never actually tracked
+	 * anything); untranspiled it throws outright.
+	 */
+	const serverInfo = serverData.success && serverData.data;
+
+	/**
 	 * Handle server data response and potential errors.
 	 */
 	useEffect(() => {
@@ -205,6 +217,15 @@ const AppDemoImporter = () => {
 			setIsModalVisible(true);
 		}
 	}, [serverData, serverInfo, reqAcknowledged]);
+
+	/**
+	 * Extracting the demo data from the import list.
+	 *
+	 * Declared above the effect that lists it as a dependency — see the note on
+	 * serverInfo above for why the ordering matters.
+	 */
+	const demoData =
+		importList.success && importList.data && importList.data.demoData;
 
 	/**
 	 * Filter demo data based on search query.
@@ -233,12 +254,6 @@ const AppDemoImporter = () => {
 	useEffect(() => {
 		setIsSearchQueryEmpty(searchQuery.trim() === '');
 	}, [searchQuery, setIsSearchQueryEmpty]);
-
-	/**
-	 * Extracting the demo data from the import list.
-	 */
-	const demoData =
-		importList.success && importList.data && importList.data.demoData;
 
 	/**
 	 * Grouping demoData by category.
@@ -291,11 +306,6 @@ const AppDemoImporter = () => {
 			</Tooltip>
 		</Button>
 	);
-
-	/**
-	 * Extracting the server data.
-	 */
-	const serverInfo = serverData.success && serverData.data;
 
 	/**
 	 * Checks for errors in the provided server information object.
