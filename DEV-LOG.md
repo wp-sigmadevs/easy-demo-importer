@@ -3,6 +3,20 @@
 Running log of architectural decisions, non-obvious context, and rationale.
 Most recent entries at the top.
 
+## 2026-07-25 — Honest limits auto-tuner (Preflight)
+
+**What:** `Preflight::report()` now attempts to raise `memory_limit` (to `RECOMMENDED_MEMORY`) and `max_execution_time` (to `RECOMMENDED_EXECUTION_TIME`) via `attemptRaiseMemory()` / `attemptRaiseExecutionTime()`, then **re-reads** the effective value. The System Status memory/execution-time rows now say what actually happened — "raised for this import (was 128M)", "the host would not raise it", or "raised … but still below the recommended" — instead of only reporting the raw ini value.
+
+**Why:** `ini_set('memory_limit', …)` and `set_time_limit()` are silently no-ops on many managed/locked hosts. Reporting the *requested* value (or claiming a raise) would be a lie the user later pays for mid-import. The tuner tells the truth: requested X, host granted Y. This is also the free-core groundwork that makes a future Pro "Background Import" pitch credible — we can prove the host caps limits before selling the workaround.
+
+**Non-obvious context:**
+- The side-effecting `attemptRaise*` methods are thin: mutate + re-read. All grading is in the pure `memoryTuneOutcome()` / `execTuneOutcome()` graders (unit-tested without the environment), returning `raised` / `reached` / `refused` flags.
+- `memoryCheck()` / `executionTimeCheck()` gained an optional trailing `?array $tune = null`, so the existing unit-test call sites (no tune arg) behave exactly as before — no test churn, message unchanged when null.
+- Memory uses `-1` for unlimited, execution time uses `0` — the two graders don't share a sentinel, hence two methods rather than one generic.
+- The tune runs inside the cached `/preflight` GET, so it only proves the host *allows* raising; it does **not** raise limits for the actual import request. Wiring an `attemptRaise*` call at import start (in the AJAX bootstrap) is the natural follow-up — deliberately left out of this branch to keep it scoped to the status report.
+- `ini_set` needs a `phpcs:ignore WordPress.PHP.IniSet.memory_limit_Disallowed`; `set_time_limit` is `@`-silenced (with a `NoSilencedErrors` ignore) because a host with it in `disable_functions` would otherwise emit a warning.
+- Pre-existing (not introduced here): `Preflight.php:186` trips `Generic.Commenting.DocComment.ShortNotCapital` (doc starts with lowercase `max_execution_time`). Left untouched — out of scope.
+
 ## 2026-07-23 — Conditional demo visibility (`requires` block)
 
 **What:** Demos can declare an optional `requires` block (`php` min version, `extensions`, must-be-active `plugins`). `DemoRequirements::evaluate()` grades it server-side; `buildList()` attaches `requirementsMet` + `missingRequirements` per demo; `DemoCard.jsx` greys the card and disables Import with a tooltip listing what's missing.

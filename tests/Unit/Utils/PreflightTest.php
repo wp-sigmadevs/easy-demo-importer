@@ -69,6 +69,69 @@ final class PreflightTest extends UnitTestCase {
 		self::assertFalse( $warn['blocking'] );
 	}
 
+	public function test_memory_tune_outcome_raised_and_reached(): void {
+		$out = Preflight::memoryTuneOutcome( '128M', '256M', '256M' );
+		self::assertTrue( $out['raised'] );
+		self::assertTrue( $out['reached'] );
+		self::assertFalse( $out['refused'] );
+	}
+
+	public function test_memory_tune_outcome_host_refused(): void {
+		// Requested more, host didn't move it.
+		$out = Preflight::memoryTuneOutcome( '128M', '256M', '128M' );
+		self::assertFalse( $out['raised'] );
+		self::assertFalse( $out['reached'] );
+		self::assertTrue( $out['refused'] );
+	}
+
+	public function test_memory_tune_outcome_raised_but_capped_short(): void {
+		$out = Preflight::memoryTuneOutcome( '128M', '256M', '192M' );
+		self::assertTrue( $out['raised'] );
+		self::assertFalse( $out['reached'] );
+		self::assertFalse( $out['refused'] );
+	}
+
+	public function test_memory_tune_outcome_unlimited_is_reached(): void {
+		$out = Preflight::memoryTuneOutcome( '128M', '256M', '-1' );
+		self::assertFalse( $out['raised'] );
+		self::assertTrue( $out['reached'] );
+	}
+
+	public function test_memory_check_reports_raised(): void {
+		$tune  = Preflight::memoryTuneOutcome( '128M', '256M', '256M' );
+		$check = Preflight::memoryCheck( '256M', '256M', $tune );
+		self::assertSame( Preflight::PASS, $check['status'] );
+		self::assertStringContainsString( '128M', $check['message'] );
+	}
+
+	public function test_memory_check_reports_host_refusal_as_warn(): void {
+		$tune  = Preflight::memoryTuneOutcome( '128M', '256M', '128M' );
+		$check = Preflight::memoryCheck( '128M', '256M', $tune );
+		self::assertSame( Preflight::WARN, $check['status'] );
+		self::assertFalse( $check['blocking'] );
+	}
+
+	public function test_exec_tune_outcome_raised_and_reached(): void {
+		$out = Preflight::execTuneOutcome( 15, 30, 30 );
+		self::assertTrue( $out['raised'] );
+		self::assertTrue( $out['reached'] );
+		self::assertFalse( $out['refused'] );
+	}
+
+	public function test_exec_tune_outcome_host_refused(): void {
+		$out = Preflight::execTuneOutcome( 15, 30, 15 );
+		self::assertFalse( $out['raised'] );
+		self::assertTrue( $out['refused'] );
+	}
+
+	public function test_exec_tune_outcome_unlimited_before_is_untouched(): void {
+		// 0 = unlimited; never counted as a raise or refusal.
+		$out = Preflight::execTuneOutcome( 0, 0, 0 );
+		self::assertFalse( $out['raised'] );
+		self::assertFalse( $out['refused'] );
+		self::assertTrue( $out['reached'] );
+	}
+
 	public function test_extension_check_present_and_absent(): void {
 		$present = Preflight::extensionCheck( 'ZipArchive', true, true );
 		self::assertSame( Preflight::PASS, $present['status'] );
