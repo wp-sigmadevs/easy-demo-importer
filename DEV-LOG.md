@@ -3,6 +3,18 @@
 Running log of architectural decisions, non-obvious context, and rationale.
 Most recent entries at the top.
 
+## 2026-07-25 — Fix: "Server Requirements Not Met" modal re-stacking
+
+**What:** The requirements warning now stays dismissed. `AppDemoImporter.jsx` gained a `reqAcknowledged` flag: the effect that raises the modal is gated on `!reqAcknowledged`, and `handleCloseModal()` sets it when the user clicks "Continue Anyway".
+
+**Why:** The raising effect runs on `[serverData, serverInfo]` and unconditionally called `setIsModalVisible(true)` whenever `hasErrors(serverInfo)` was true. It had no memory of the dismissal, so any later re-render that changed either dependency re-opened the warning — on top of an import wizard the user had already advanced. Observed live on a 128M host: after dismissing, the modal was back over the Configure step, and a second dismissal was needed.
+
+**Non-obvious context:**
+- Found while live-testing the limits reporting under reduced PHP resources — the low `memory_limit` is what makes the pre-existing `systemRequirements` gate (256M/300s) fire in the first place, which is why this had gone unnoticed.
+- The warning is deliberately still raised once per page load; only *re-raising after acknowledgement* is suppressed. Acknowledgement is per page load (component state), not persisted — a reload legitimately re-warns.
+- After close, antd keeps the modal node mounted but `display:none`. A DOM query for its buttons therefore still finds them; visibility must be asserted via `getClientRects()` / computed style, not node presence. (This tripped up the first verification pass.)
+- No unit test: the project has no React Testing Library, and adding one is a dependency decision. Verified instead by live browser run against a genuinely constrained host — warning appears once, one dismissal sticks, and it never re-stacks across the full wizard to Start Import.
+
 ## 2026-07-25 — Wire honest limits reporting into import start
 
 **What:** `InstallDemo::logEffectiveLimits()` runs right after `do_action('sd/edi/before_import')` and records, once per session, the *effective* (post-raise) `memory_limit` / `max_execution_time` into the activity log via a new pure grader `Preflight::limitsLogEntry()` — an `info` line when both meet the floor, a `warning` naming the host-enforced value when either was refused/capped.
