@@ -32,6 +32,8 @@
   "devDependencies": {
     "@babel/eslint-parser": "^7.25.1",
     "@babel/preset-react": "^7.24.7",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/react": "^16.3.2",
     "@wordpress/eslint-plugin": "^20.1.0",
     "@wordpress/prettier-config": "^4.4.0",
     "archiver": "^7.0.1",

@@ -15,6 +15,26 @@ Most recent entries at the top.
 - The `@` operator was actively misleading here: it implied the failure mode was a warning. Removed, since with the guard in place there is nothing left to suppress.
 - Not unit-testable — a disabled function cannot be simulated from PHPUnit. Verified live instead against a host with `disable_functions = set_time_limit`: `/preflight` returns 200, execution time reports the honest refusal, and a full 835-item import completed at `memory_limit = 48M` / `max_execution_time = 20`.
 
+## 2026-07-25 — Fix: "Server Requirements Not Met" modal re-stacking
+
+**What:** The requirements warning now stays dismissed. `AppDemoImporter.jsx` gained a `reqAcknowledged` flag: the effect that raises the modal is gated on `!reqAcknowledged`, and `handleCloseModal()` sets it when the user clicks "Continue Anyway".
+
+**Why:** The raising effect runs on `[serverData, serverInfo]` and unconditionally called `setIsModalVisible(true)` whenever `hasErrors(serverInfo)` was true. It had no memory of the dismissal, so any later re-render that changed either dependency re-opened the warning — on top of an import wizard the user had already advanced. Observed live on a 128M host: after dismissing, the modal was back over the Configure step, and a second dismissal was needed.
+
+**Also fixed here — two latent temporal-dead-zone bugs.** `serverInfo` and `demoData` were listed in `useEffect` dependency arrays (lines ~207 and ~240) but declared with `const` further down the component. A dependency array is evaluated *during render*, so both were still in their TDZ at that point. Babel's transpile masked it in the browser build — `const` became a hoisted `var`, so each dep silently read `undefined` on every render and never actually tracked its value — but untranspiled (Vitest/esbuild) it throws `ReferenceError: Cannot access 'X' before initialization`, which is how it surfaced. Both declarations moved above their effects. Net effect in production: those deps now genuinely track their values instead of being permanently `undefined`.
+
+**Tests:** `tests/js/AppDemoImporter.requirements.test.jsx` — 4 tests driving the real component against a real test-local Zustand store, so the store update that used to re-raise the modal is reproduced rather than simulated. Verified to fail without the fix (2 of 4 fail) and pass with it.
+
+**Non-obvious context:**
+- Found while live-testing the limits reporting under reduced PHP resources — the low `memory_limit` is what makes the pre-existing `systemRequirements` gate (256M/300s) fire in the first place, which is why this had gone unnoticed.
+- Added `@testing-library/react` + `@testing-library/dom` as devDependencies (the project had no component-test tooling), and `tests/js/**/*.test.jsx` to the Vitest `include` so tests may contain JSX.
+- `tests/js/setup.js` gained a `window.matchMedia` stub — jsdom has none, and antd's responsive `Grid` subscribes to it on mount.
+- The Vitest config does not set `globals: true`, so Testing Library cannot auto-register its `afterEach` cleanup. Without an explicit `cleanup()` antd's body portals leak into the next test and assertions read a stale modal. This cost a debugging cycle.
+- The test stubs `ModaRequirements` and asserts on the `isVisible` prop rather than the rendered antd Modal: a closed antd Modal stays mounted and only hides when its leave animation ends, which never happens in jsdom (no `transitionend`). Asserting our own prop keeps the test about our logic instead of antd's motion.
+- The warning is deliberately still raised once per page load; only *re-raising after acknowledgement* is suppressed. Acknowledgement is per page load (component state), not persisted — a reload legitimately re-warns.
+- After close, antd keeps the modal node mounted but `display:none`. A DOM query for its buttons therefore still finds them; visibility must be asserted via `getClientRects()` / computed style, not node presence. (This tripped up the first verification pass.)
+- Also verified by live browser run against a genuinely constrained host — the warning appears once, one dismissal sticks, and it never re-stacks across the full wizard to Start Import.
+
 ## 2026-07-25 — Wire honest limits reporting into import start
 
 **What:** `InstallDemo::logEffectiveLimits()` runs right after `do_action('sd/edi/before_import')` and records, once per session, the *effective* (post-raise) `memory_limit` / `max_execution_time` into the activity log via a new pure grader `Preflight::limitsLogEntry()` — an `info` line when both meet the floor, a `warning` naming the host-enforced value when either was refused/capped.

@@ -28,6 +28,7 @@ const AppDemoImporter = () => {
 	const [modalData, setModalData] = useState(null);
 	const [errorMessage, setErrorMessage] = useState(null);
 	const [isModalVisible, setIsModalVisible] = useState(false);
+	const [reqAcknowledged, setReqAcknowledged] = useState(false);
 	const [manualVisible, setManualVisible] = useState(false);
 	const [restoreRefresh, setRestoreRefresh] = useState(0);
 	const resetStore = useSharedDataStore((state) => state.resetStore);
@@ -189,6 +190,18 @@ const AppDemoImporter = () => {
 	}, [fetchServerData]);
 
 	/**
+	 * Extracting the server data.
+	 *
+	 * Declared above the effect below, which lists it as a dependency: a
+	 * dependency array is evaluated during render, so a `const` declared further
+	 * down is still in its temporal dead zone at that point. Babel's transpile
+	 * hid this in the browser build (`const` became a hoisted `var`, so the dep
+	 * silently read `undefined` on every render and never actually tracked
+	 * anything); untranspiled it throws outright.
+	 */
+	const serverInfo = serverData.success && serverData.data;
+
+	/**
 	 * Handle server data response and potential errors.
 	 */
 	useEffect(() => {
@@ -196,10 +209,23 @@ const AppDemoImporter = () => {
 			setErrorMessage(serverData.message);
 		}
 
-		if (hasErrors(serverInfo)) {
+		// Only raise the warning until the user acknowledges it. This effect
+		// re-runs on every serverData/serverInfo change, so without the guard a
+		// dismissed warning re-opened itself — stacking on top of an import
+		// wizard the user had already moved on to.
+		if (!reqAcknowledged && hasErrors(serverInfo)) {
 			setIsModalVisible(true);
 		}
-	}, [serverData, serverInfo]);
+	}, [serverData, serverInfo, reqAcknowledged]);
+
+	/**
+	 * Extracting the demo data from the import list.
+	 *
+	 * Declared above the effect that lists it as a dependency — see the note on
+	 * serverInfo above for why the ordering matters.
+	 */
+	const demoData =
+		importList.success && importList.data && importList.data.demoData;
 
 	/**
 	 * Filter demo data based on search query.
@@ -228,12 +254,6 @@ const AppDemoImporter = () => {
 	useEffect(() => {
 		setIsSearchQueryEmpty(searchQuery.trim() === '');
 	}, [searchQuery, setIsSearchQueryEmpty]);
-
-	/**
-	 * Extracting the demo data from the import list.
-	 */
-	const demoData =
-		importList.success && importList.data && importList.data.demoData;
 
 	/**
 	 * Grouping demoData by category.
@@ -286,11 +306,6 @@ const AppDemoImporter = () => {
 			</Tooltip>
 		</Button>
 	);
-
-	/**
-	 * Extracting the server data.
-	 */
-	const serverInfo = serverData.success && serverData.data;
 
 	/**
 	 * Checks for errors in the provided server information object.
@@ -347,6 +362,7 @@ const AppDemoImporter = () => {
 	 */
 	const handleCloseModal = () => {
 		setIsModalVisible(false);
+		setReqAcknowledged(true);
 	};
 
 	let containerClassName = 'edi-container';
