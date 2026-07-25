@@ -252,9 +252,8 @@ No existing demo importer does this. Competitors either let WordPress handle it 
 - **What:** Show `Importing post X of Y`, `Downloading image X of Y`, `Installing plugin X of Y` inside each step in real time.
 
 #### 13. Demo Preview Button
-**Status: ❌ Not done.** No `liveUrl`/preview-button code found.
+**Status: ✅ Done — already shipped.** The config key is `previewUrl` (not `liveUrl`, which is why an earlier search missed it). Each demo card renders a "Live Preview" hover-overlay link that opens the live URL in a new tab — see `DemoCard.jsx:73-80` (`href={data?.previewUrl}`, `target="_blank"`, `rel="noreferrer"`, label `sdEdiAdminParams.btnLivePreview`). Demos supply `previewUrl` in the config (see `samples/sample-config.php`).
 - **Why:** Users want to see the demo before committing to the import.
-- **What:** Add `liveUrl` key to demo config. Show a "Preview Demo" button on each demo card that opens the live URL in a new tab.
 
 #### 14. Multisite Support
 **Status: ❌ Not done — detection only.** `is_multisite()` is used only to display "Multisite: Yes/No" on the System Status page and as a guard in `DBSearchReplace.php`. No per-subsite import/session/history, no network-admin push.
