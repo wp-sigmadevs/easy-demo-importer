@@ -28,6 +28,7 @@ const AppDemoImporter = () => {
 	const [modalData, setModalData] = useState(null);
 	const [errorMessage, setErrorMessage] = useState(null);
 	const [isModalVisible, setIsModalVisible] = useState(false);
+	const [reqAcknowledged, setReqAcknowledged] = useState(false);
 	const [manualVisible, setManualVisible] = useState(false);
 	const [restoreRefresh, setRestoreRefresh] = useState(0);
 	const resetStore = useSharedDataStore((state) => state.resetStore);
@@ -196,10 +197,14 @@ const AppDemoImporter = () => {
 			setErrorMessage(serverData.message);
 		}
 
-		if (hasErrors(serverInfo)) {
+		// Only raise the warning until the user acknowledges it. This effect
+		// re-runs on every serverData/serverInfo change, so without the guard a
+		// dismissed warning re-opened itself — stacking on top of an import
+		// wizard the user had already moved on to.
+		if (!reqAcknowledged && hasErrors(serverInfo)) {
 			setIsModalVisible(true);
 		}
-	}, [serverData, serverInfo]);
+	}, [serverData, serverInfo, reqAcknowledged]);
 
 	/**
 	 * Filter demo data based on search query.
@@ -347,6 +352,7 @@ const AppDemoImporter = () => {
 	 */
 	const handleCloseModal = () => {
 		setIsModalVisible(false);
+		setReqAcknowledged(true);
 	};
 
 	let containerClassName = 'edi-container';
