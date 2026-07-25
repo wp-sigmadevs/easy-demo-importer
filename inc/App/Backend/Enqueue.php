@@ -173,6 +173,8 @@ class Enqueue extends EnqueueBase {
 				'requiredPluginsTitle'       => esc_html__( 'Required Plugins', 'easy-demo-importer' ),
 				'readinessTitle'             => esc_html__( 'Environment Readiness', 'easy-demo-importer' ),
 				'readinessIntro'             => esc_html__( 'These checks confirm your server can run the import. Resolve any blocking issue before you continue.', 'easy-demo-importer' ),
+				'readinessAdjusted'          => esc_html__( 'Adjusted', 'easy-demo-importer' ),
+				'readinessAdjustedHint'      => esc_html__( 'This plugin raised this limit for the import — your server default is unchanged.', 'easy-demo-importer' ),
 				'configureImportTitle'       => esc_html__( 'Configure Your Import', 'easy-demo-importer' ),
 				'configurePerformanceLabel'  => esc_html__( 'Performance', 'easy-demo-importer' ),
 				'configureSafetyLabel'       => esc_html__( 'Safety', 'easy-demo-importer' ),
