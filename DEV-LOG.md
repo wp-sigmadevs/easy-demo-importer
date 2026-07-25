@@ -34,6 +34,18 @@ Most recent entries at the top.
 - The warning is deliberately still raised once per page load; only *re-raising after acknowledgement* is suppressed. Acknowledgement is per page load (component state), not persisted — a reload legitimately re-warns.
 - After close, antd keeps the modal node mounted but `display:none`. A DOM query for its buttons therefore still finds them; visibility must be asserted via `getClientRects()` / computed style, not node presence. (This tripped up the first verification pass.)
 - Also verified by live browser run against a genuinely constrained host — the warning appears once, one dismissal sticks, and it never re-stacks across the full wizard to Start Import.
+## 2026-07-25 — Flag plugin-adjusted limits in the readiness list
+
+**What:** Readiness rows whose value the plugin raised itself now carry a small blue "Adjusted" pill beside the label, with a tooltip explaining the server default is unchanged. `Preflight::check()` gained an `adjusted` flag, set by `memoryCheck()`/`executionTimeCheck()` when the tune outcome reports `raised`.
+
+**Why:** the tune outcome only existed inside the message prose ("256M — raised for this import (was 128M)"), so a row the plugin had modified rendered identically to every other passing check — same green tick, same grey subtext — and the change went unnoticed.
+
+**Non-obvious context:**
+- The flag is deliberately separate from the message: the UI needs something machine-readable to style on, and re-parsing the localized sentence would be fragile.
+- `adjusted` defaults to `false` in `check()`, so every other builder is unaffected — asserted directly in `test_untuned_checks_are_never_flagged_adjusted`.
+- Only `raised` sets it. A refusal or an already-sufficient limit means the plugin changed nothing, so there is nothing to flag.
+- Treatment chosen (of four offered) to be purely additive: the pass/warn/fail icon language shared with the Required Plugins list beside it stays intact, and no existing row changes appearance. `PreflightPanel` renders only in the Readiness modal step — the System Status page is untouched.
+- Pre-existing, not introduced here: `_cp-preflight.scss:68` trips stylelint's `CssSyntaxError: Unclosed string` on an apostrophe in a `//` comment ("list's"). Also note the `stylelint` npm script globs `src/sass/**`, but the directory is `src/scss/**` — so stylelint currently never runs against these files.
 
 ## 2026-07-25 — Wire honest limits reporting into import start
 

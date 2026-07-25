@@ -71,6 +71,22 @@
 		color: rgba(0, 0, 0, 0.45);
 	}
 
+	// Marks a limit the plugin raised itself. Sits inline after the label so the
+	// row keeps the shared pass/warn/fail icon language of the list beside it.
+	.edi-preflight-adjusted {
+		display: inline-block;
+		margin-left: 8px;
+		padding: 1px 8px;
+		border-radius: 10px;
+		background: rgba(22, 119, 255, 0.1);
+		color: #1677ff;
+		font-size: 11px;
+		font-weight: 600;
+		line-height: 1.6;
+		vertical-align: middle;
+		cursor: help;
+	}
+
 	// Draw attention to the rows that actually need action.
 	.ant-list-item.is-fail .edi-preflight-item-msg {
 		color: $c-fail;

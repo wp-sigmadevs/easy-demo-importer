@@ -178,7 +178,8 @@ final class Preflight {
 			esc_html__( 'PHP memory limit', 'easy-demo-importer' ),
 			$ok ? self::PASS : self::WARN,
 			$message,
-			false
+			false,
+			(bool) ( $tune && ! empty( $tune['raised'] ) )
 		);
 	}
 
@@ -217,7 +218,8 @@ final class Preflight {
 			esc_html__( 'PHP execution time', 'easy-demo-importer' ),
 			$ok ? self::PASS : self::WARN,
 			$message,
-			false
+			false,
+			(bool) ( $tune && ! empty( $tune['raised'] ) )
 		);
 	}
 
@@ -651,17 +653,22 @@ final class Preflight {
 	 * @param string $status   pass|warn|fail.
 	 * @param string $message  Detail message.
 	 * @param bool   $blocking Whether a fail blocks the import.
+	 * @param bool   $adjusted Whether the plugin changed this value itself.
 	 *
 	 * @return array
 	 * @since 2.0.0
 	 */
-	private static function check( string $id, string $label, string $status, string $message, bool $blocking ): array {
+	private static function check( string $id, string $label, string $status, string $message, bool $blocking, bool $adjusted = false ): array {
 		return [
 			'id'       => $id,
 			'label'    => $label,
 			'status'   => $status,
 			'message'  => $message,
 			'blocking' => $blocking,
+			// Set when the plugin raised this limit rather than merely reading it.
+			// The message already says so in prose, but the UI needs a flag it can
+			// style on — a raised row otherwise looks like any other passing check.
+			'adjusted' => $adjusted,
 		];
 	}
 }
