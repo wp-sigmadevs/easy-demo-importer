@@ -22,6 +22,7 @@ use SigmaDevs\EasyDemoImporter\Common\{
 	Importer\ImportState,
 	Importer\ThumbnailRegenerator,
 	Utils\FailedMedia,
+	Utils\Preflight,
 	Utils\Snapshot
 };
 
@@ -150,6 +151,12 @@ class InstallDemo extends ImporterAjax {
 		 * @since 1.0.0
 		 */
 		do_action( 'sd/edi/before_import', $xmlFile, $this ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+
+		// before_import raised memory_limit / max_execution_time, but ini_set()
+		// and set_time_limit() are silent no-ops on locked hosts. Re-read the
+		// effective values and record honestly what the host granted — once per
+		// session, since before_import fires on every chunk.
+		$this->logEffectiveLimits();
 
 		// Clear any nav menus left by a previous (possibly partial) run so the
 		// importer always starts from a clean slate.
@@ -882,6 +889,38 @@ class InstallDemo extends ImporterAjax {
 			$this->sessionId,
 			$this->demoSlug
 		);
+	}
+
+	/**
+	 * Records the host-granted resource limits once per import session.
+	 *
+	 * Called after 'sd/edi/before_import' has attempted to raise the limits, so
+	 * the values read here are the effective, post-raise ones. A per-session
+	 * transient guard keeps this to a single log line even though before_import
+	 * fires on every chunk request.
+	 *
+	 * @return void
+	 * @since 2.0.1
+	 */
+	private function logEffectiveLimits(): void {
+		$guard = 'sd_edi_limits_logged_' . $this->sessionId;
+
+		if ( get_transient( $guard ) ) {
+			return;
+		}
+
+		set_transient( $guard, 1, HOUR_IN_SECONDS );
+
+		$entry = Preflight::limitsLogEntry(
+			(string) ini_get( 'memory_limit' ),
+			(int) ini_get( 'max_execution_time' )
+		);
+
+		if ( 'warning' === $entry['level'] ) {
+			ImportLogger::warning( $entry['message'], $this->sessionId, $this->demoSlug );
+		} else {
+			ImportLogger::info( $entry['message'], $this->sessionId, $this->demoSlug );
+		}
 	}
 
 	/**
