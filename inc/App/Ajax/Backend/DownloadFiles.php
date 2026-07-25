@@ -150,7 +150,14 @@ class DownloadFiles extends ImporterAjax {
 			}
 		}
 
-		$timeout   = (int) apply_filters( 'sd/edi/download_timeout', 120 ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+		// A timeout is a ceiling, not a duration — the request ends as soon as the
+		// transfer does, so a generous default costs a fast host nothing while
+		// giving a slow one room to finish. At 300s a 100MB archive only needs
+		// ~350KB/s, which is a realistic floor for cheap shared hosting. Not set
+		// higher: WP's cURL transport maps this to CURLOPT_TIMEOUT (total
+		// operation time), so a server that connects and then stalls burns the
+		// whole budget before the user sees any error.
+		$timeout   = (int) apply_filters( 'sd/edi/download_timeout', 300 ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 		$sslverify = (bool) apply_filters( 'sd/edi/download_sslverify', true ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 		$demoData  = $this->demoUploadDir() . 'imported-demo-data.zip';
 
@@ -174,6 +181,32 @@ class DownloadFiles extends ImporterAjax {
 
 			$error_message = $response->get_error_message();
 			$is_ssl_error  = (bool) preg_match( '/ssl|certificate|curl error 60|curl error 35/i', $error_message );
+
+			// cURL reports a timeout as error 28 ("Operation timed out after N
+			// milliseconds with M bytes received"). Without this branch it fell
+			// through to the connection-failure message below, which told users
+			// on a slow link to check their outbound internet access — a wrong
+			// diagnosis that sends them chasing a problem they do not have.
+			if ( ! $is_ssl_error && preg_match( '/timed out|timeout|curl error 28/i', $error_message ) ) {
+				return [
+					'success' => false,
+					'message' => sprintf(
+						/* translators: %d: timeout in seconds. */
+						_n(
+							'The demo file download timed out after %d second.',
+							'The demo file download timed out after %d seconds.',
+							$timeout,
+							'easy-demo-importer'
+						),
+						$timeout
+					),
+					'hint'    => sprintf(
+						/* translators: %s: WordPress filter snippet. */
+						__( "The archive may be large, or the connection between your server and the demo file server slow. Allow more time by adding %s to your theme's functions.php. If your site sits behind Cloudflare or a similar proxy, its own gateway timeout may cut the request short regardless.", 'easy-demo-importer' ),
+						"add_filter('sd/edi/download_timeout', function() { return 600; });"
+					),
+				];
+			}
 
 			if ( $is_ssl_error ) {
 				return [
@@ -283,7 +316,7 @@ class DownloadFiles extends ImporterAjax {
 			],
 			408 => [
 				'message' => __( 'The demo file server took too long to respond (408 Request Timeout).', 'easy-demo-importer' ),
-				'hint'    => __( 'The file server may be temporarily overloaded. Try again in a few minutes. You can also increase the timeout by adding add_filter(\'sd/edi/download_timeout\', fn() => 300); to your theme\'s functions.php.', 'easy-demo-importer' ),
+				'hint'    => __( 'The file server may be temporarily overloaded. Try again in a few minutes. You can also increase the timeout by adding add_filter(\'sd/edi/download_timeout\', function() { return 600; }); to your theme\'s functions.php.', 'easy-demo-importer' ),
 			],
 			429 => [
 				'message' => __( 'Too many download requests were made (429 Too Many Requests).', 'easy-demo-importer' ),
