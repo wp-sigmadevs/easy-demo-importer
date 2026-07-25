@@ -241,10 +241,9 @@ No existing demo importer does this. Competitors either let WordPress handle it 
 - **OCDI gap:** OCDI doesn't do this at all. Elementor URL issues are their #1 complaint.
 
 #### 11. Post-Import Cache Flush
-**Status: ❌ Not done.** No cache-plugin flush calls (W3TC/LiteSpeed/WP Rocket/Elementor/WooCommerce) found anywhere in `inc/`.
+**Status: ✅ Done.** `Actions::flushCaches()` runs in the `afterImportActions()` chain — purges the WP object cache plus W3TC, WP Super Cache, WP Rocket, SG Optimizer, Autoptimize, WP Fastest Cache, and action-driven LiteSpeed / Cache Enabler / Hummingbird, and fires `sd/edi/flush_caches` for custom layers (Elementor's own cache was already cleared in `elementorActions()`). Every purge is guarded, so it's safe on any site.
 - **Why:** After import, cached pages show old content. Users think the import failed.
-- **What:** Automatically detect and flush popular caching plugins after import: WP Super Cache, W3 Total Cache, LiteSpeed Cache, WP Rocket, Elementor CSS cache, WooCommerce transients.
-- **What to show:** `"Cleared cache: LiteSpeed Cache ✓, Elementor CSS ✓"` in the completion report.
+- **Note:** Flushes are silent/best-effort (no per-cache line in the completion report) — matching the other `afterImportActions` siblings, which run outside the importer's log sink.
 
 #### 12. Real-Time Progress with Step Details
 **Status: ⚠️ Partial.** The chunked import returns `done`/`total` counts per batch, but no per-item detail text ("Importing page 34 of 87 — Our Services") was found in `InstallDemo.php`. The image regen tool does show per-item filenames.
@@ -271,10 +270,9 @@ No existing demo importer does this. Competitors either let WordPress handle it 
 - **Competitive edge:** Merlin WP offers this. You don't yet. It's a major selling point for premium theme developers.
 
 #### 16. Conditional Demo Visibility
-**Status: ❌ Not done.** No `requires`-key gating against active plugins found.
+**Status: ✅ Done.** A demo can declare an optional `requires` block — `php` (min version), `extensions` (must be loaded), and `plugins` (must already be active). `DemoRequirements::evaluate()` grades it server-side; `RestEndpoints::buildList()` attaches `requirementsMet` + `missingRequirements` per demo; `DemoCard.jsx` greys the card and disables Import with a tooltip listing what's missing. Schema documented in `samples/sample-config.php`; 8 unit tests in `DemoRequirementsTest`.
 - **Why:** Showing WooCommerce demos to users who don't have WooCommerce installed is confusing. Showing Elementor demos when WPML is missing creates failed imports.
-- **What:** Theme authors can attach conditions to each demo: `requires: ['woocommerce', 'elementor']`. Demos that don't meet conditions are greyed out with a tooltip explaining what's missing.
-- **Impact:** Reduces failed imports caused by missing plugins.
+- **Note:** `requires` is deliberately separate from the auto-installed `plugins` array (which the importer resolves itself) — it gates only prerequisites the importer *cannot* resolve (PHP version, extensions, premium/bundled plugins that must already be active).
 
 #### 17. Background Import via WP-Cron / Action Scheduler
 **Status: ❌ Not done.** Import is still fully synchronous via chunked AJAX polling from an open tab. The only cron in the import surface area is `ManualImport.php`'s daily cleanup of stale upload temp files — not a background import mechanism.
