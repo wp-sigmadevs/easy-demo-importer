@@ -1,10 +1,12 @@
 import React from 'react';
-import { List } from 'antd';
+import { List, Tooltip } from 'antd';
 import {
 	CheckCircleTwoTone,
 	ExclamationCircleTwoTone,
 	CloseCircleTwoTone,
 } from '@ant-design/icons';
+
+/* global sdEdiAdminParams */
 
 /**
  * Per-status icon for a readiness row. Same colors as the Required Plugins
@@ -44,6 +46,19 @@ const PreflightPanel = ({ checks = [] }) => {
 						</span>
 						<span className="edi-preflight-item-label">
 							{check.label}
+							{/* Only on rows the plugin changed itself: without it
+							    a raised limit reads as an ordinary passing check. */}
+							{check.adjusted && (
+								<Tooltip
+									title={
+										sdEdiAdminParams.readinessAdjustedHint
+									}
+								>
+									<span className="edi-preflight-adjusted">
+										{sdEdiAdminParams.readinessAdjusted}
+									</span>
+								</Tooltip>
+							)}
 						</span>
 						<span className="edi-preflight-item-msg">
 							{check.message}
