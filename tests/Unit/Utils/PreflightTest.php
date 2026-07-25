@@ -132,6 +132,29 @@ final class PreflightTest extends UnitTestCase {
 		self::assertTrue( $out['reached'] );
 	}
 
+	public function test_limits_log_entry_both_ok_is_info(): void {
+		$entry = Preflight::limitsLogEntry( '256M', 60 );
+		self::assertSame( 'info', $entry['level'] );
+
+		// Unlimited memory (-1) and unlimited exec (0) also read as ready.
+		self::assertSame( 'info', Preflight::limitsLogEntry( '-1', 0 )['level'] );
+	}
+
+	public function test_limits_log_entry_memory_short_is_warning(): void {
+		$entry = Preflight::limitsLogEntry( '128M', 60 );
+		self::assertSame( 'warning', $entry['level'] );
+		self::assertStringContainsString( '128M', $entry['message'] );
+	}
+
+	public function test_limits_log_entry_exec_short_is_warning(): void {
+		self::assertSame( 'warning', Preflight::limitsLogEntry( '256M', 10 )['level'] );
+	}
+
+	public function test_limits_log_entry_both_short_is_warning(): void {
+		$entry = Preflight::limitsLogEntry( '128M', 10 );
+		self::assertSame( 'warning', $entry['level'] );
+	}
+
 	public function test_extension_check_present_and_absent(): void {
 		$present = Preflight::extensionCheck( 'ZipArchive', true, true );
 		self::assertSame( Preflight::PASS, $present['status'] );

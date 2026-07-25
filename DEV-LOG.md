@@ -3,6 +3,18 @@
 Running log of architectural decisions, non-obvious context, and rationale.
 Most recent entries at the top.
 
+## 2026-07-25 — Wire honest limits reporting into import start
+
+**What:** `InstallDemo::logEffectiveLimits()` runs right after `do_action('sd/edi/before_import')` and records, once per session, the *effective* (post-raise) `memory_limit` / `max_execution_time` into the activity log via a new pure grader `Preflight::limitsLogEntry()` — an `info` line when both meet the floor, a `warning` naming the host-enforced value when either was refused/capped.
+
+**Why:** `beforeImportActions()` already raises both limits, but `ini_set()`/`set_time_limit()` are silent no-ops on locked hosts — a refusal was previously invisible until a mid-import fatal. This surfaces the truth at import start, in the log the user is already watching.
+
+**Non-obvious context:**
+- The existing `Actions::raiseMemoryLimit()` was left untouched — its only-ever-raise semantics and the authoritative `sd/edi/temp_boost_memory_limit` (350M) / `sd/edi/temp_boost_max_execution_time` (300) filters are superior to Preflight's fixed-target attemptRaise and must not be regressed. We report the outcome of *its* raise, we don't replace it.
+- `before_import` fires on **every** chunk request (prepare/batch/finalize), so the log call is guarded by a per-session transient (`sd_edi_limits_logged_{sessionId}`, 1h) → one line per import, not per chunk.
+- Placed in `InstallDemo` (not `Actions`) because that's where `sessionId`/`demoSlug` and the `ImportLogger` sink are in scope; `beforeImportActions()` is an arg-less static hook callback with neither.
+- `limitsLogEntry()` is pure (params in, `['level','message']` out) → unit-tested without the environment; the side-effecting read/guard/log stays in `InstallDemo`.
+
 ## 2026-07-25 — Honest limits auto-tuner (Preflight)
 
 **What:** `Preflight::report()` now attempts to raise `memory_limit` (to `RECOMMENDED_MEMORY`) and `max_execution_time` (to `RECOMMENDED_EXECUTION_TIME`) via `attemptRaiseMemory()` / `attemptRaiseExecutionTime()`, then **re-reads** the effective value. The System Status memory/execution-time rows now say what actually happened — "raised for this import (was 128M)", "the host would not raise it", or "raised … but still below the recommended" — instead of only reporting the raw ini value.

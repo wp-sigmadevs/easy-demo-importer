@@ -311,6 +311,62 @@ final class Preflight {
 	}
 
 	/**
+	 * Honest post-raise limits report for the activity log (pure — no side
+	 * effects). The import pipeline raises `memory_limit` / `max_execution_time`
+	 * at the start of every chunk, but `ini_set()`/`set_time_limit()` are silent
+	 * no-ops on locked hosts. Grading the *effective* (already-raised) values
+	 * against the recommended floors records what the host actually granted, so a
+	 * refusal surfaces in the log up front instead of only as a mid-import fatal.
+	 *
+	 * @param string $memory Effective memory_limit ini value (post-raise).
+	 * @param int    $exec   Effective max_execution_time, in seconds (post-raise).
+	 *
+	 * @return array{level:string,message:string} 'info' when both meet the floor, else 'warning'.
+	 * @since 2.0.1
+	 */
+	public static function limitsLogEntry( string $memory, int $exec ): array {
+		$mem_bytes = self::toBytes( $memory );
+		$mem_ok    = -1 === $mem_bytes || $mem_bytes >= self::toBytes( self::RECOMMENDED_MEMORY );
+		$exec_ok   = 0 === $exec || $exec >= self::RECOMMENDED_EXECUTION_TIME;
+
+		$mem_label  = -1 === $mem_bytes ? esc_html__( 'unlimited', 'easy-demo-importer' ) : $memory;
+		$exec_label = 0 === $exec
+			? esc_html__( 'unlimited', 'easy-demo-importer' )
+			/* translators: %d: seconds. */
+			: sprintf( esc_html__( '%ds', 'easy-demo-importer' ), $exec );
+
+		if ( $mem_ok && $exec_ok ) {
+			return [
+				'level'   => 'info',
+				/* translators: 1: memory limit, 2: execution time. */
+				'message' => sprintf( esc_html__( 'Resource limits ready — memory %1$s, execution time %2$s.', 'easy-demo-importer' ), $mem_label, $exec_label ),
+			];
+		}
+
+		if ( ! $mem_ok && ! $exec_ok ) {
+			return [
+				'level'   => 'warning',
+				/* translators: 1: memory limit, 2: recommended memory, 3: execution time, 4: recommended execution time. */
+				'message' => sprintf( esc_html__( 'The host would not raise resource limits — memory %1$s (%2$s recommended) and execution time %3$s (%4$ds recommended). Large imports may fail; a bundled media package is the most reliable option.', 'easy-demo-importer' ), $mem_label, self::RECOMMENDED_MEMORY, $exec_label, self::RECOMMENDED_EXECUTION_TIME ),
+			];
+		}
+
+		if ( ! $mem_ok ) {
+			return [
+				'level'   => 'warning',
+				/* translators: 1: memory limit, 2: recommended memory. */
+				'message' => sprintf( esc_html__( 'The host capped the memory limit at %1$s (%2$s recommended); the import will continue, but a very large demo may run short of memory.', 'easy-demo-importer' ), $mem_label, self::RECOMMENDED_MEMORY ),
+			];
+		}
+
+		return [
+			'level'   => 'warning',
+			/* translators: 1: execution time, 2: recommended execution time. */
+			'message' => sprintf( esc_html__( 'The host capped the execution time at %1$s (%2$ds recommended); the import runs in resumable chunks to work around this.', 'easy-demo-importer' ), $exec_label, self::RECOMMENDED_EXECUTION_TIME ),
+		];
+	}
+
+	/**
 	 * Grades a memory-limit tune attempt (pure — no side effects).
 	 *
 	 * @param string $before    Limit before the attempt.
