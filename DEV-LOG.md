@@ -3,6 +3,21 @@
 Running log of architectural decisions, non-obvious context, and rationale.
 Most recent entries at the top.
 
+## 2026-07-25 — Larger download timeout, and an honest timeout error
+
+**What:** `sd/edi/download_timeout` default raised 120 → 300 seconds, and a cURL timeout is now classified separately from a connection failure, with a message that names the elapsed limit and points at the filter.
+
+**Why:** a timeout is a ceiling, not a duration — the request ends the moment the transfer does, so a larger default costs a fast host nothing while giving a slow one room to finish. At 300s a 100MB archive only needs ~350KB/s, a realistic floor for cheap shared hosting. More importantly, a timeout previously fell through to *"Lost connection to the demo file server — check that your server has outbound internet access."* For someone pulling a large archive over a slow link that diagnosis is simply wrong, and it sends them chasing a problem they do not have.
+
+**Non-obvious context:**
+- Deliberately **not** raised beyond 300s. WP's cURL transport maps `timeout` to `CURLOPT_TIMEOUT` (total operation time), so a server that connects and then stalls burns the entire budget before the user sees anything. A 600s default would mean a ten-minute spinner on a pathological host.
+- The ceiling is frequently moot anyway: nginx `fastcgi_read_timeout` defaults to 60s and Cloudflare caps around 100s, both wall-clock and unreachable from PHP. Past a point a higher PHP timeout buys a worse failure (raw 504) rather than more reliability. The hint says so.
+- `max_execution_time` is *not* a factor — on Unix PHP excludes time spent waiting on stream operations, so even a 20s limit will not kill a slow download.
+- Detection is a regex over the `WP_Error` message (`timed out|timeout|curl error 28`), checked after the SSL branch so an SSL failure that mentions a timeout is still reported as SSL.
+- The pre-existing 504 hint suggested raising the timeout *to 300* — now the default, so it was about to become a no-op. Bumped to 600, and its `fn() =>` shorthand replaced with a closure, since the plugin supports PHP 7.4.
+- No unit test: the branch sits in a private method of an AJAX class that needs a WP bootstrap. Verified live instead by forcing `sd/edi/download_timeout` to 1 against a 19.9MB archive, producing a genuine cURL error 28 — the new message rendered and the old misleading wording was gone. The normal path was then re-verified end-to-end at the 300s default.
+- Message uses `_n()` — the first live run read "timed out after 1 seconds".
+
 ## 2026-07-25 — Fix: disabled set_time_limit fatals the readiness report
 
 **What:** `Preflight::attemptRaiseExecutionTime()` now checks `function_exists('set_time_limit')` before calling it (and `attemptRaiseMemory()` does the same for `ini_set`). When the function is unavailable the tuner returns an unchanged outcome, which the existing graders already report as a refusal.
