@@ -278,6 +278,14 @@ final class Preflight {
 			return self::memoryTuneOutcome( $before, $before, $before );
 		}
 
+		// Same hazard as set_time_limit() below: a disabled function is a fatal
+		// undefined-function call, not a silent failure. ini_set is rarer to
+		// disable, but the guard costs nothing and the report must never be the
+		// thing that breaks the page it is reporting on.
+		if ( ! function_exists( 'ini_set' ) ) {
+			return self::memoryTuneOutcome( $before, $target, $before );
+		}
+
 		ini_set( 'memory_limit', $target ); // phpcs:ignore WordPress.PHP.IniSet.memory_limit_Disallowed -- best-effort raise, verified by the re-read below.
 		$after = (string) ini_get( 'memory_limit' );
 
@@ -303,8 +311,17 @@ final class Preflight {
 			return self::execTuneOutcome( $before, $before, $before );
 		}
 
-		// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged -- suppresses the warning when the host disables this function; the effect is verified by the re-read below.
-		@set_time_limit( $target );
+		// A function listed in `disable_functions` is removed from the function
+		// table entirely, so calling it is a fatal "undefined function" — not a
+		// warning, and the error-suppression operator cannot catch it. Inside a
+		// namespace the failed lookup is even reported under the namespaced name.
+		// Shared hosts disable set_time_limit routinely, so this guard is what
+		// keeps the readiness report from taking the whole endpoint down with it.
+		if ( ! function_exists( 'set_time_limit' ) ) {
+			return self::execTuneOutcome( $before, $target, $before );
+		}
+
+		set_time_limit( $target ); // phpcs:ignore Squiz.PHP.DiscouragedFunctions.Discouraged -- best-effort raise, verified by the re-read below.
 		$after = (int) ini_get( 'max_execution_time' );
 
 		return self::execTuneOutcome( $before, $target, $after );
