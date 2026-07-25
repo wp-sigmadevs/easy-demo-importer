@@ -104,6 +104,40 @@ final class PreflightTest extends UnitTestCase {
 		self::assertStringContainsString( '128M', $check['message'] );
 	}
 
+	public function test_checks_flag_adjusted_only_when_the_plugin_raised_them(): void {
+		$raised = Preflight::memoryTuneOutcome( '128M', '256M', '256M' );
+		self::assertTrue( Preflight::memoryCheck( '256M', '256M', $raised )['adjusted'] );
+
+		// Host refused: nothing was changed, so nothing to flag.
+		$refused = Preflight::memoryTuneOutcome( '128M', '256M', '128M' );
+		self::assertFalse( Preflight::memoryCheck( '128M', '256M', $refused )['adjusted'] );
+
+		// Already high enough: no raise was attempted.
+		$untouched = Preflight::memoryTuneOutcome( '512M', '512M', '512M' );
+		self::assertFalse( Preflight::memoryCheck( '512M', '256M', $untouched )['adjusted'] );
+
+		// No tune data at all (System Status renders checks without it).
+		self::assertFalse( Preflight::memoryCheck( '512M', '256M' )['adjusted'] );
+	}
+
+	public function test_execution_time_check_flags_adjusted_when_raised(): void {
+		$raised = Preflight::execTuneOutcome( 15, 30, 30 );
+		self::assertTrue( Preflight::executionTimeCheck( 30, $raised )['adjusted'] );
+
+		$refused = Preflight::execTuneOutcome( 15, 30, 15 );
+		self::assertFalse( Preflight::executionTimeCheck( 15, $refused )['adjusted'] );
+
+		self::assertFalse( Preflight::executionTimeCheck( 60 )['adjusted'] );
+	}
+
+	public function test_untuned_checks_are_never_flagged_adjusted(): void {
+		// Every other check builder must default the flag off.
+		self::assertFalse( Preflight::phpVersionCheck( '8.1', '7.4' )['adjusted'] );
+		self::assertFalse( Preflight::extensionCheck( 'ZipArchive', true, true )['adjusted'] );
+		self::assertFalse( Preflight::imageLibraryCheck( true, false )['adjusted'] );
+		self::assertFalse( Preflight::requiredPluginsCheck( [] )['adjusted'] );
+	}
+
 	public function test_memory_check_reports_host_refusal_as_warn(): void {
 		$tune  = Preflight::memoryTuneOutcome( '128M', '256M', '128M' );
 		$check = Preflight::memoryCheck( '128M', '256M', $tune );
