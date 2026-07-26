@@ -441,6 +441,15 @@
 							font-style: normal;
 						}
 					}
+
+					// Cost notice under the restore point: its own line, amber
+					// rather than the reset option's red — a storage trade-off
+					// to weigh, not a destructive action to fear.
+					p.storage-note {
+						margin-top: 8px;
+						color: #b54708;
+						font-style: normal;
+					}
 				}
 
 				.import-option {
