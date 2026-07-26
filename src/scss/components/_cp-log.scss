@@ -380,8 +380,19 @@ $edi-log-accent: linear-gradient(
 			}
 		}
 
-		&.level-warning .edi-log-entry-msg {
-			color: #b54708;
+		// Warnings are item-level failures inside a run that still finished, so
+		// they stay warnings rather than errors — promoting them would flip the
+		// run's status pill to "failed" for an import that worked. The halo
+		// gives them the weight the wording implies, and stops an amber dot
+		// sitting inside the default blue ring.
+		&.level-warning {
+			.edi-log-entry-dot {
+				box-shadow: 0 0 0 3px #fff, 0 0 0 5px rgba(219, 166, 23, 0.14);
+			}
+
+			.edi-log-entry-msg {
+				color: #b54708;
+			}
 		}
 	}
 
