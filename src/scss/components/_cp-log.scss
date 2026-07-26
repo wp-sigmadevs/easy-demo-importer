@@ -223,6 +223,23 @@
 	}
 }
 
+// "Export all" bar above the run list — right-aligned so it sits over the
+// accordion's expand-icon column.
+.edi-log-toolbar {
+	display: flex;
+	justify-content: flex-end;
+	margin-bottom: 12px;
+}
+
+// Expanded run body: the per-run share action sits above its timeline.
+.edi-log-run-body {
+	.edi-log-run-actions {
+		display: flex;
+		justify-content: flex-end;
+		margin-bottom: 6px;
+	}
+}
+
 // Entry timeline inside an expanded run.
 .edi-log-timeline {
 	position: relative;
