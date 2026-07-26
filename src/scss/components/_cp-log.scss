@@ -297,6 +297,13 @@ $edi-log-accent: linear-gradient(
 	}
 }
 
+// During the accordion's expand/collapse motion antd toggles overflow on the
+// content, which would otherwise make it the sticky scroll-root and snap the
+// floating button. Drop back to static for the animation so it stays put.
+.edi-log-panel.is-animating .edi-log-run-actions {
+	position: static;
+}
+
 // Round floating share button — plugin gradient, elevated, icon only. Scoped
 // under the page class for the same specificity reason as the export button.
 .appearance_page_sd-easy-demo-importer .edi-log-share-fab.ant-btn.ant-btn-primary {
