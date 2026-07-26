@@ -10,11 +10,10 @@ import {
 	ExportOutlined,
 } from '@ant-design/icons';
 import useSharedDataStore from '../utils/sharedDataStore';
-import { decodeEntities } from '../utils/decodeEntities';
+import RunTimeline from './RunTimeline';
 import {
 	REGEN_SLUG,
 	formatDuration,
-	formatEntryTime,
 	formatRunTime,
 	runName,
 	runStatusText,
@@ -27,17 +26,6 @@ import {
 } from '../utils/logShare';
 
 /* global sdEdiAdminParams */
-
-/**
- * Per-level accent colours for entry dots and the run status pill.
- */
-const LEVEL_COLORS = {
-	error: '#d63638',
-	warning: '#dba617',
-	success: '#00a32a',
-	info: '#2d74d5',
-	interrupted: '#e8830c',
-};
 
 /**
  * Header row for one import run.
@@ -78,34 +66,6 @@ const runLabel = (run) => {
 		</div>
 	);
 };
-
-/**
- * Timeline of entries for one run.
- *
- * @param {Array} entries - Log entries for the run.
- * @return {JSX.Element} Entry list.
- */
-const runEntries = (entries) => (
-	<ul className="edi-log-timeline">
-		{entries.map((entry, index) => (
-			<li key={index} className={`edi-log-entry level-${entry.level}`}>
-				<span
-					className="edi-log-entry-dot"
-					style={{
-						'--edi-dot':
-							LEVEL_COLORS[entry.level] || LEVEL_COLORS.info,
-					}}
-				/>
-				<time className="edi-log-entry-time" title={entry.logged_at}>
-					{formatEntryTime(entry.logged_at)}
-				</time>
-				<span className="edi-log-entry-msg">
-					{decodeEntities(entry.message)}
-				</span>
-			</li>
-		))}
-	</ul>
-);
 
 /**
  * The Import Log tab — all import runs, newest first, each expandable to its
@@ -313,7 +273,7 @@ const ImportLogPanel = () => {
 						/>
 					</Dropdown>
 				</div>
-				{runEntries(run.entries)}
+				<RunTimeline entries={run.entries} />
 			</div>
 		),
 	}));
