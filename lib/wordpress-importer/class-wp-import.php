@@ -400,7 +400,7 @@ class SD_EDI_WP_Import extends WP_Importer {
 					$this->report(
 						sprintf(
 							/* translators: Post Author */
-							esc_html__( 'Failed to import author %s. Their posts will be attributed to the current user.', 'easy-demo-importer' ),
+							esc_html__( 'Failed to import author &#8220;%s&#8221;. Their posts will be attributed to the current user.', 'easy-demo-importer' ),
 							esc_html( $post['post_author'] )
 						),
 						'warning'
@@ -468,7 +468,7 @@ class SD_EDI_WP_Import extends WP_Importer {
 				$this->report(
 					sprintf(
 						/* translators: Category Name */
-						esc_html__( 'Failed to import category %s', 'easy-demo-importer' ),
+						esc_html__( 'Failed to import category &#8220;%s&#8221;', 'easy-demo-importer' ),
 						esc_html( $cat['category_nicename'] )
 					),
 					'warning'
@@ -528,7 +528,7 @@ class SD_EDI_WP_Import extends WP_Importer {
 				$this->report(
 					sprintf(
 						/* translators: Tag Name */
-						esc_html__( 'Failed to import post tag %s', 'easy-demo-importer' ),
+						esc_html__( 'Failed to import post tag &#8220;%s&#8221;', 'easy-demo-importer' ),
 						esc_html( $tag['tag_name'] )
 					),
 					'warning'
@@ -633,7 +633,7 @@ class SD_EDI_WP_Import extends WP_Importer {
 				$this->report(
 					sprintf(
 						/* translators: 1. Term Taxonomy, 2. Term Name */
-						esc_html__( 'Failed to import %1$s %2$s', 'easy-demo-importer' ),
+						esc_html__( 'Failed to import %1$s &#8220;%2$s&#8221;', 'easy-demo-importer' ),
 						esc_html( $term['term_taxonomy'] ),
 						esc_html( $term['term_name'] )
 					),
@@ -948,7 +948,7 @@ class SD_EDI_WP_Import extends WP_Importer {
 							$this->report(
 								sprintf(
 									/* translators: 1. Taxonomy, 2. Name */
-									esc_html__( 'Failed to import %1$s %2$s', 'easy-demo-importer' ),
+									esc_html__( 'Failed to import %1$s &#8220;%2$s&#8221;', 'easy-demo-importer' ),
 									esc_html( $taxonomy ),
 									esc_html( $term['name'] )
 								),

@@ -380,8 +380,19 @@ $edi-log-accent: linear-gradient(
 			}
 		}
 
-		&.level-warning .edi-log-entry-msg {
-			color: #b54708;
+		// Warnings are item-level failures inside a run that still finished, so
+		// they stay warnings rather than errors — promoting them would flip the
+		// run's status pill to "failed" for an import that worked. The halo
+		// gives them the weight the wording implies, and stops an amber dot
+		// sitting inside the default blue ring.
+		&.level-warning {
+			.edi-log-entry-dot {
+				box-shadow: 0 0 0 3px #fff, 0 0 0 5px rgba(219, 166, 23, 0.14);
+			}
+
+			.edi-log-entry-msg {
+				color: #b54708;
+			}
 		}
 	}
 
@@ -408,6 +419,17 @@ $edi-log-accent: linear-gradient(
 			line-height: 1.55;
 			text-align: left;
 			cursor: pointer;
+		}
+
+		// A folded run of failures must read as failures — without this the
+		// summary row falls back to neutral text, so collapsing 12 warnings
+		// made them look calmer than the 12 rows it replaced.
+		&.level-error .edi-log-group-toggle {
+			color: #b42318;
+		}
+
+		&.level-warning .edi-log-group-toggle {
+			color: #b54708;
 		}
 
 		.edi-log-group-toggle-label {
@@ -448,9 +470,20 @@ $edi-log-accent: linear-gradient(
 			align-items: start;
 			gap: 10px;
 
+			// Smaller than a top-level entry, but still coloured by level —
+			// expanding a group should reveal the same failures, not turn
+			// them into neutral grey text.
 			.edi-log-entry-msg {
 				font-size: 13px;
 				color: #667085;
+			}
+
+			&.level-error .edi-log-entry-msg {
+				color: #b42318;
+			}
+
+			&.level-warning .edi-log-entry-msg {
+				color: #b54708;
 			}
 		}
 	}
