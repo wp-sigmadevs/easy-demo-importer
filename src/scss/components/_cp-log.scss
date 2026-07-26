@@ -78,7 +78,10 @@
 		border-radius: 14px !important;
 		background: #fff;
 		box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
-		overflow: hidden;
+		// Not `overflow: hidden` — that would clip the sticky share FAB inside
+		// the expanded body. Corners are rounded on the children instead (the
+		// header sits on the item's own rounded background; the content rounds
+		// its own bottom corners below).
 		transition: box-shadow 0.25s ease, border-color 0.25s ease,
 			transform 0.25s ease;
 
@@ -103,6 +106,8 @@
 		> .ant-collapse-content {
 			border-top: 1px solid #f2f4f7;
 			background: #fcfdfe;
+			border-bottom-left-radius: 14px;
+			border-bottom-right-radius: 14px;
 
 			> .ant-collapse-content-box {
 				padding: 14px 22px 16px;
@@ -223,6 +228,31 @@
 	}
 }
 
+// Plugin accent gradient, reused by the share controls to match the primary
+// buttons elsewhere (the floating "back" button, the Copy System Data button).
+$edi-log-accent: linear-gradient(
+	109.6deg,
+	rgb(45, 116, 213) 11.2%,
+	rgb(121, 137, 212) 91.2%
+);
+
+// Shared gradient-button hover, identical to the "Back to Demo Importer" button
+// (`.edi-server-status-btn`): the 200%-wide gradient slides on hover and the
+// button scales up slightly, all under a single `transition: all 0.3s`.
+@mixin edi-log-gradient-button {
+	border: none;
+	background-image: $edi-log-accent;
+	background-size: 200% auto;
+	transition: all 0.3s;
+
+	&:hover,
+	&:focus,
+	&:focus-visible {
+		background-position: right center;
+		transform: scale(1.03);
+	}
+}
+
 // "Export all" bar above the run list — right-aligned so it sits over the
 // accordion's expand-icon column.
 .edi-log-toolbar {
@@ -231,13 +261,53 @@
 	margin-bottom: 12px;
 }
 
-// Expanded run body: the per-run share action sits above its timeline.
+// Export-all button: a compact gradient pill matching the plugin's primary
+// buttons, rather than the default bordered antd button. Scoped under the page
+// class so it outweighs antd's own hover rule (which otherwise resets
+// background-size and kills the gradient slide).
+.appearance_page_sd-easy-demo-importer .edi-log-export-btn.ant-btn.ant-btn-primary {
+	@include edi-log-gradient-button;
+
+	height: 34px;
+	padding: 0 18px;
+	border-radius: 999px;
+	font-weight: 500;
+	box-shadow: 0 4px 12px rgba(16, 24, 40, 0.14);
+}
+
+// Expanded run body: the per-run share control floats as a round button at the
+// top-right and sticks while the (often long) timeline scrolls past, so it
+// stays reachable without scrolling back up.
 .edi-log-run-body {
+	position: relative;
+
 	.edi-log-run-actions {
+		position: sticky;
+		// Sits just below the sticky page header. The header renders under the
+		// fixed WP admin bar and is ~85px tall, so the offset is the admin-bar
+		// height (WP exposes it as a CSS var; 32px desktop fallback) + ~93px.
+		top: calc(var(--wp-admin--admin-bar--height, 32px) + 93px);
+		z-index: 6;
 		display: flex;
 		justify-content: flex-end;
-		margin-bottom: 6px;
+		// Zero height so the floating button overlays the timeline's empty
+		// right gutter instead of pushing the first entries down.
+		height: 0;
+		pointer-events: none;
 	}
+}
+
+// Round floating share button — plugin gradient, elevated, icon only. Scoped
+// under the page class for the same specificity reason as the export button.
+.appearance_page_sd-easy-demo-importer .edi-log-share-fab.ant-btn.ant-btn-primary {
+	@include edi-log-gradient-button;
+
+	pointer-events: auto;
+	width: 42px;
+	height: 42px;
+	min-width: 42px;
+	font-size: 16px;
+	box-shadow: 0 6px 18px rgba(16, 24, 40, 0.22);
 }
 
 // Entry timeline inside an expanded run.
