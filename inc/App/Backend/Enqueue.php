@@ -277,7 +277,7 @@ class Enqueue extends EnqueueBase {
 				'logShareStarted'            => esc_html__( 'Started', 'easy-demo-importer' ),
 				'logShareFinished'           => esc_html__( 'Finished', 'easy-demo-importer' ),
 				'logShareEntries'            => esc_html__( 'Entries', 'easy-demo-importer' ),
-				'logGroupSkippedMedia'       => esc_html__( 'media skipped', 'easy-demo-importer' ),
+				'logGroupRepeated'           => esc_html__( 'similar entries', 'easy-demo-importer' ),
 				'logGroupShowAll'            => esc_html__( 'Show all', 'easy-demo-importer' ),
 				'logGroupHide'               => esc_html__( 'Hide', 'easy-demo-importer' ),
 				'logUnknownDemo'             => esc_html__( 'Import', 'easy-demo-importer' ),
