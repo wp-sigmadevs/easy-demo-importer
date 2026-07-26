@@ -19,6 +19,7 @@ use SigmaDevs\EasyDemoImporter\Common\{
 	Abstracts\Base,
 	Traits\Singleton,
 	Utils\Preflight,
+	Utils\DownloadProgress,
 	Utils\DemoRequirements,
 	Utils\FailedMedia,
 	Utils\Snapshot,
@@ -153,6 +154,50 @@ class RestEndpoints extends Base {
 		$this->addFailedMediaEndpoint();
 		$this->addRollbackEndpoint();
 		$this->addDiscardEndpoint();
+		$this->addDownloadProgressEndpoint();
+	}
+
+	/**
+	 * Add Download Progress route.
+	 *
+	 * Polled by the modal while the demo archive download is in flight. Reads
+	 * a transient only — it must never take the import mutex, or it would
+	 * block behind the very download it is reporting on.
+	 *
+	 * @return void
+	 * @since 2.0.1
+	 */
+	public function addDownloadProgressEndpoint() {
+		register_rest_route(
+			$this->getNamespace(),
+			'/download-progress',
+			[
+				'methods'             => 'GET',
+				'callback'            => [ $this, 'downloadProgress' ],
+				'permission_callback' => [ $this, 'permission' ],
+				'args'                => [
+					'sessionId' => [
+						'required'          => true,
+						'sanitize_callback' => 'sanitize_text_field',
+					],
+				],
+			]
+		);
+	}
+
+	/**
+	 * Current byte progress for a session's demo download.
+	 *
+	 * @param \WP_REST_Request $request Request object.
+	 *
+	 * @return WP_REST_Response
+	 * @since 2.0.1
+	 */
+	public function downloadProgress( $request ) {
+		return $this->sendResponse(
+			DownloadProgress::read( (string) $request->get_param( 'sessionId' ) ),
+			esc_html__( 'Data is ready to fetch', 'easy-demo-importer' )
+		);
 	}
 
 	/**

@@ -242,7 +242,76 @@ const AUTO_RESUME_PHASES = [
  *
  * @type {string[]}
  */
-const PROGRESS_BAR_PHASES = ['sd_edi_import_xml', 'sd_edi_regenerate_images'];
+const PROGRESS_BAR_PHASES = [
+	'sd_edi_download_demo_files',
+	'sd_edi_import_xml',
+	'sd_edi_regenerate_images',
+];
+
+/**
+ * The one phase whose progress cannot ride back on its own response: the demo
+ * download is a single blocking request, so its bytes are published server-side
+ * and polled from here while that request is in flight.
+ *
+ * @type {string}
+ */
+const POLLED_PHASE = 'sd_edi_download_demo_files';
+
+/**
+ * How often to poll download progress, in milliseconds. Slow enough to stay
+ * well under the server's 1s write throttle, fast enough to feel live.
+ *
+ * @type {number}
+ */
+const DOWNLOAD_POLL_MS = 900;
+
+/**
+ * Polls download byte progress until stopped.
+ *
+ * Returns a stop function rather than a handle so callers cannot forget which
+ * timer to clear. Poll failures are swallowed on purpose — this drives a
+ * cosmetic bar, and the download itself reports its own errors. A response
+ * with a null percent (no Content-Length) leaves the bar indeterminate rather
+ * than inventing a number.
+ *
+ * @param {string}   sessionId        - Active import session id.
+ * @param {Function} setImportPercent - Receives 0-100, or null.
+ * @return {Function} Stops the poll.
+ */
+const pollDownloadProgress = (sessionId, setImportPercent) => {
+	if (!sessionId) {
+		return () => {};
+	}
+
+	let stopped = false;
+
+	const tick = async () => {
+		try {
+			const { data } = await Api.get('sd/edi/v1/download-progress', {
+				params: { sessionId },
+			});
+
+			if (stopped || !data.success || !data.data.tracking) {
+				return;
+			}
+
+			if (data.data.percent !== null) {
+				setImportPercent(data.data.percent);
+			}
+		} catch {
+			// Cosmetic only — keep polling; the download reports real failures.
+		}
+	};
+
+	const timer = setInterval(tick, DOWNLOAD_POLL_MS);
+
+	tick();
+
+	return () => {
+		stopped = true;
+		clearInterval(timer);
+	};
+};
 
 /**
  * Maximum consecutive automatic resume attempts before surfacing the manual
@@ -356,6 +425,14 @@ export const doAxios = async (
 			request.sessionId &&
 			attempt < MAX_AUTO_RESUME &&
 			(status === 0 || TRANSIENT_STATUSES.includes(status));
+
+		// The download blocks until the whole archive lands, so its bar is fed
+		// by polling rather than by the response. Started before the request
+		// and stopped in every exit path below.
+		const stopDownloadPoll =
+			request.nextPhase === POLLED_PHASE
+				? pollDownloadProgress(request.sessionId, setImportPercent)
+				: () => {};
 
 		try {
 			const response = await Axios.post(requestUrl, params);
@@ -582,6 +659,11 @@ export const doAxios = async (
 				setResumeRequest(request);
 			}
 			setCurrentStep(5);
+		} finally {
+			// finally, not a call per exit path: the try block returns early on
+			// every retry and mutex-wait branch, and any of those would
+			// otherwise leak a timer that keeps polling for the whole import.
+			stopDownloadPoll();
 		}
 	} else {
 		setMessage(sdEdiAdminParams.importSuccess);
