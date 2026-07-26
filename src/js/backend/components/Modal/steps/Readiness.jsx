@@ -13,6 +13,34 @@ import {
 /* global sdEdiAdminParams */
 
 /**
+ * Loading placeholder for either readiness column. Both sides resolve to an
+ * icon-plus-label list — required plugins and readiness checks alike — so both
+ * wait behind the same avatar row rather than one mirroring its real content
+ * and the other showing flat full-width bars.
+ *
+ * @param {Object} props      - Component props.
+ * @param {number} props.rows - How many placeholder rows to render.
+ * @return {JSX.Element} Skeleton list.
+ */
+const ColumnSkeleton = ({ rows }) => (
+	<div className="skeleton-list">
+		{Array.from({ length: rows }, (_, index) => (
+			<Skeleton
+				key={index}
+				active
+				avatar
+				paragraph={{ rows: 1, width: '25%' }}
+				style={
+					index < rows - 1
+						? { borderBottom: '1px solid rgba(5, 5, 5, 0.06)' }
+						: undefined
+				}
+			/>
+		))}
+	</div>
+);
+
+/**
  * Readiness step: the required-plugins list and the pre-import environment
  * checklist, shown together before the user configures the import. Splitting
  * these "what's needed / will this work" diagnostics onto their own step keeps
@@ -104,22 +132,7 @@ const Readiness = ({ modalData, handleReset }) => {
 							<h3>{sdEdiAdminParams.requiredPluginsTitle}</h3>
 							<p>{sdEdiAdminParams.requiredPluginsIntro}</p>
 							{loading ? (
-								<div className="skeleton-list">
-									<Skeleton
-										active
-										avatar
-										paragraph={{ rows: 1, width: '25%' }}
-										style={{
-											borderBottom:
-												'1px solid rgba(5, 5, 5, 0.06)',
-										}}
-									/>
-									<Skeleton
-										active
-										avatar
-										paragraph={{ rows: 1, width: '25%' }}
-									/>
-								</div>
+								<ColumnSkeleton rows={2} />
 							) : (
 								<PluginList plugins={filteredPluginDataArray} />
 							)}
@@ -157,9 +170,7 @@ const Readiness = ({ modalData, handleReset }) => {
 							{preflightChecks.length > 0 ? (
 								<PreflightPanel checks={preflightChecks} />
 							) : (
-								<div className="skeleton-list">
-									<Skeleton active paragraph={{ rows: 4 }} />
-								</div>
+								<ColumnSkeleton rows={4} />
 							)}
 						</div>
 					</Col>
