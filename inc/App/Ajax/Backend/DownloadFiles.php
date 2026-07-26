@@ -163,6 +163,11 @@ class DownloadFiles extends ImporterAjax {
 		// string. A large (WooCommerce) demo can exceed the host memory_limit
 		// and fatal before a single post is imported; streaming keeps peak
 		// memory flat regardless of archive size.
+		// Publish byte progress for the modal to poll. This request blocks until
+		// the whole archive has landed, so without a side channel the user sees
+		// an unchanging spinner for the entire transfer.
+		Utils\DownloadProgress::start( $this->sessionId );
+
 		$response = Utils\RemoteUrl::get(
 			$external_url,
 			[
@@ -172,6 +177,8 @@ class DownloadFiles extends ImporterAjax {
 				'filename'  => $demoData,
 			]
 		);
+
+		Utils\DownloadProgress::stop( $this->sessionId );
 
 		if ( is_wp_error( $response ) ) {
 			// A streamed request may leave a partial file behind on failure.
