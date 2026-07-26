@@ -421,6 +421,17 @@ $edi-log-accent: linear-gradient(
 			cursor: pointer;
 		}
 
+		// A folded run of failures must read as failures — without this the
+		// summary row falls back to neutral text, so collapsing 12 warnings
+		// made them look calmer than the 12 rows it replaced.
+		&.level-error .edi-log-group-toggle {
+			color: #b42318;
+		}
+
+		&.level-warning .edi-log-group-toggle {
+			color: #b54708;
+		}
+
 		.edi-log-group-toggle-label {
 			display: inline-flex;
 			align-items: center;
@@ -459,9 +470,20 @@ $edi-log-accent: linear-gradient(
 			align-items: start;
 			gap: 10px;
 
+			// Smaller than a top-level entry, but still coloured by level —
+			// expanding a group should reveal the same failures, not turn
+			// them into neutral grey text.
 			.edi-log-entry-msg {
 				font-size: 13px;
 				color: #667085;
+			}
+
+			&.level-error .edi-log-entry-msg {
+				color: #b42318;
+			}
+
+			&.level-warning .edi-log-entry-msg {
+				color: #b54708;
 			}
 		}
 	}
