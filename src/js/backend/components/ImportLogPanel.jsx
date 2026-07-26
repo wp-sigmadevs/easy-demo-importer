@@ -7,6 +7,7 @@ import {
 	ShareAltOutlined,
 	CopyOutlined,
 	FileTextOutlined,
+	ExportOutlined,
 } from '@ant-design/icons';
 import useSharedDataStore from '../utils/sharedDataStore';
 import { decodeEntities } from '../utils/decodeEntities';
@@ -235,16 +236,24 @@ const ImportLogPanel = () => {
 
 		const copied = await copyText(report);
 
+		// Center the toast (marginTop: 40vh) to match the Copy System Data
+		// confirmation on the sibling System Status tab.
 		if (copied) {
-			message.success(
-				sdEdiAdminParams.logShareCopied ||
-					'Import log copied to clipboard.'
-			);
+			message.success({
+				content:
+					sdEdiAdminParams.logShareCopied ||
+					'Import log copied to clipboard.',
+				duration: 3,
+				style: { marginTop: '40vh' },
+			});
 		} else {
-			message.error(
-				sdEdiAdminParams.logShareCopyFailed ||
-					'Could not copy — use Download instead.'
-			);
+			message.error({
+				content:
+					sdEdiAdminParams.logShareCopyFailed ||
+					'Could not copy — use Download instead.',
+				duration: 3,
+				style: { marginTop: '40vh' },
+			});
 		}
 	};
 
@@ -285,9 +294,16 @@ const ImportLogPanel = () => {
 						trigger={['click']}
 						placement="bottomRight"
 					>
-						<Button size="small" icon={<ShareAltOutlined />}>
-							{sdEdiAdminParams.logShareLabel || 'Share'}
-						</Button>
+						<Button
+							type="primary"
+							shape="circle"
+							className="edi-log-share-fab"
+							icon={<ShareAltOutlined />}
+							aria-label={
+								sdEdiAdminParams.logShareLabel || 'Share'
+							}
+							title={sdEdiAdminParams.logShareLabel || 'Share'}
+						/>
 					</Dropdown>
 				</div>
 				{runEntries(run.entries)}
@@ -339,7 +355,11 @@ const ImportLogPanel = () => {
 						trigger={['click']}
 						placement="bottomRight"
 					>
-						<Button size="small" icon={<ShareAltOutlined />}>
+						<Button
+							type="primary"
+							className="edi-log-export-btn"
+							icon={<ExportOutlined />}
+						>
 							{sdEdiAdminParams.logExportAll || 'Export all'}
 						</Button>
 					</Dropdown>
