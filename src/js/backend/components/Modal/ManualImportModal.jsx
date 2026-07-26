@@ -39,7 +39,9 @@ import Success from './steps/Success';
 const ManualImportModal = ({ visible, onClose }) => {
 	const [mode, setMode] = useState('separate');
 	const [step, setStep] = useState(1);
-	const [snapshot, setSnapshot] = useState(true);
+	// Off by default, matching the auto importer — a restore point duplicates
+	// every plugin-related database table, so it is opt-in rather than implied.
+	const [snapshot, setSnapshot] = useState(false);
 	const [excludeImages, setExcludeImages] = useState(false);
 	const [busy, setBusy] = useState(false);
 	const [uploadPct, setUploadPct] = useState(0);
