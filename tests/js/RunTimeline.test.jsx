@@ -115,6 +115,33 @@ describe('groupEntries', () => {
 		expect(items[2].entry.message).toBe('Content imported.');
 	});
 
+	it('groups failed-term lines, which name the taxonomy outside the quotes', () => {
+		// `Failed to import %1$s "%2$s"` — the taxonomy stays, so lines from
+		// different taxonomies must not merge.
+		const term = (taxonomy, name) => ({
+			level: 'warning',
+			logged_at: '2026-07-26 10:00:00',
+			message: `Failed to import ${taxonomy} &#8220;${name}&#8221;`,
+		});
+
+		const items = groupEntries([
+			term('store_category', 'Electronics'),
+			term('store_category', 'Fashion'),
+			term('store_category', 'Vehicle'),
+		]);
+
+		expect(items).toHaveLength(1);
+		expect(items[0].summary).toBe('Failed to import store_category “…”');
+
+		expect(
+			groupEntries([
+				term('store_category', 'Electronics'),
+				term('product_tag', 'Fashion'),
+				term('store_category', 'Vehicle'),
+			]).every((item) => 'entry' === item.kind)
+		).toBe(true);
+	});
+
 	it('collapses repeated identical lines that carry no quoted name', () => {
 		const entries = Array.from({ length: 3 }, () => ({
 			level: 'warning',
