@@ -1,18 +1,31 @@
 import React, { useState, useEffect } from 'react';
-import { Collapse, Skeleton, Empty } from 'antd';
+import { Collapse, Skeleton, Empty, Dropdown, Button, message } from 'antd';
 import {
 	PictureOutlined,
 	DownloadOutlined,
 	ClockCircleOutlined,
+	ShareAltOutlined,
+	CopyOutlined,
+	FileTextOutlined,
 } from '@ant-design/icons';
 import useSharedDataStore from '../utils/sharedDataStore';
 import { decodeEntities } from '../utils/decodeEntities';
+import {
+	REGEN_SLUG,
+	formatDuration,
+	formatEntryTime,
+	formatRunTime,
+	runName,
+	runStatusText,
+} from '../utils/logFormat';
+import {
+	buildReport,
+	copyText,
+	downloadText,
+	runFileName,
+} from '../utils/logShare';
 
 /* global sdEdiAdminParams */
-
-// Runs the thumbnail tool records under this slug, shown distinctly from imports.
-const REGEN_SLUG = 'thumbnail-regeneration';
-const MANUAL_SLUG = '__manual__';
 
 /**
  * Per-level accent colours for entry dots and the run status pill.
@@ -26,162 +39,14 @@ const LEVEL_COLORS = {
 };
 
 /**
- * Turns a raw demo slug ("home-01") into a display label ("Home-1"):
- * capitalizes the first letter and drops leading zeros from numeric segments.
- * Display only — the raw slug is still what's sent to the server/grouped by.
- *
- * @param {string} slug - Raw demo slug.
- * @return {string} Humanized label.
- */
-const humanizeSlug = (slug) => {
-	if (!slug) {
-		return slug;
-	}
-
-	return slug
-		.replace(/(^|-)0*(\d+)/g, (_match, sep, digits) => `${sep}${digits}`)
-		.replace(/^./, (c) => c.toUpperCase());
-};
-
-/**
- * Parses a "YYYY-MM-DD HH:MM:SS" (UTC) stamp into a Date. Returns null for an
- * unexpected format rather than an Invalid Date, so callers can fall back to
- * the raw string.
- *
- * @param {string} stamp - Stored timestamp.
- * @return {?Date} Parsed date, or null.
- */
-const parseStamp = (stamp) => {
-	if (typeof stamp !== 'string') {
-		return null;
-	}
-
-	const iso = stamp.includes('T') ? stamp : `${stamp.replace(' ', 'T')}Z`;
-	const date = new Date(iso);
-
-	return Number.isNaN(date.getTime()) ? null : date;
-};
-
-/**
- * Human-readable run start, e.g. "Jul 11, 2026, 10:56 AM". Falls back to the
- * raw stamp if it can't be parsed.
- *
- * @param {string} stamp - Run's started_at stamp.
- * @return {string} Formatted date/time.
- */
-const formatRunTime = (stamp) => {
-	const date = parseStamp(stamp);
-
-	if (!date) {
-		return stamp;
-	}
-
-	return date.toLocaleString(undefined, {
-		year: 'numeric',
-		month: 'short',
-		day: 'numeric',
-		hour: 'numeric',
-		minute: '2-digit',
-	});
-};
-
-/**
- * Human-readable entry time, e.g. "10:56:01 AM". The run header already
- * carries the date, so entry rows stay to the clock only.
- *
- * @param {string} stamp - Entry's logged_at stamp.
- * @return {string} Formatted time.
- */
-const formatEntryTime = (stamp) => {
-	const date = parseStamp(stamp);
-
-	if (!date) {
-		return stamp;
-	}
-
-	return date.toLocaleTimeString(undefined, {
-		hour: 'numeric',
-		minute: '2-digit',
-		second: '2-digit',
-	});
-};
-
-/**
- * Elapsed run time as a compact label, e.g. "45s", "1m 12s", "1h 3m". Measured
- * from the run's first entry (started_at) to its last entry's logged_at — the
- * log carries no explicit finish stamp, so the final entry is the finish. In
- * progress runs (status "info") have no meaningful end yet, so returns null;
- * also returns null when either stamp is unparseable or the span is negative.
- *
- * @param {Object} run - The run record.
- * @return {?string} Formatted duration, or null when not applicable.
- */
-const formatDuration = (run) => {
-	if (run.status === 'info' || !run.entries || !run.entries.length) {
-		return null;
-	}
-
-	const start = parseStamp(run.started_at);
-	const end = parseStamp(run.entries[run.entries.length - 1].logged_at);
-
-	if (!start || !end) {
-		return null;
-	}
-
-	const seconds = Math.round((end.getTime() - start.getTime()) / 1000);
-
-	if (seconds < 0) {
-		return null;
-	}
-
-	if (seconds < 60) {
-		return `${seconds}s`;
-	}
-
-	const minutes = Math.floor(seconds / 60);
-	const remSeconds = seconds % 60;
-
-	if (minutes < 60) {
-		return remSeconds ? `${minutes}m ${remSeconds}s` : `${minutes}m`;
-	}
-
-	const hours = Math.floor(minutes / 60);
-	const remMinutes = minutes % 60;
-
-	return remMinutes ? `${hours}h ${remMinutes}m` : `${hours}h`;
-};
-
-/**
  * Header row for one import run.
  *
  * @param {Object} run - The run record.
  * @return {JSX.Element} Header node.
  */
 const runLabel = (run) => {
-	const statusText = {
-		success: sdEdiAdminParams.logSuccess || 'Success',
-		warning: sdEdiAdminParams.logWarning || 'Completed with warnings',
-		error: sdEdiAdminParams.logFailed || 'Failed',
-		info: sdEdiAdminParams.logInProgress || 'In progress',
-		interrupted: sdEdiAdminParams.logInterrupted || 'Interrupted',
-	};
-
-	const status = statusText[run.status] || run.status;
 	const isRegen = run.demo_slug === REGEN_SLUG;
-	const isManual = run.demo_slug === MANUAL_SLUG;
 	const duration = formatDuration(run);
-
-	let name;
-	if (isRegen) {
-		name = sdEdiAdminParams.logRegenLabel || 'Thumbnail Regeneration';
-	} else if (isManual) {
-		name = sdEdiAdminParams.logManualLabel || 'Manual Import';
-	} else {
-		name =
-			humanizeSlug(run.demo_slug) ||
-			sdEdiAdminParams.logUnknownDemo ||
-			'Import';
-	}
 
 	return (
 		<div className="edi-log-run" data-panel-key={run.session_id}>
@@ -190,12 +55,12 @@ const runLabel = (run) => {
 			>
 				{isRegen ? <PictureOutlined /> : <DownloadOutlined />}
 			</span>
-			<span className="edi-log-run-name">{name}</span>
+			<span className="edi-log-run-name">{runName(run)}</span>
 			<span className="edi-log-run-time">
 				{formatRunTime(run.started_at)}
 			</span>
 			<span className={`edi-log-run-status is-${run.status}`}>
-				{status}
+				{runStatusText(run)}
 			</span>
 			{duration && (
 				<span
@@ -250,7 +115,7 @@ const ImportLogPanel = () => {
 	const [loading, setLoading] = useState(true);
 	const [errorMessage, setErrorMessage] = useState('');
 	const [activePanel, setActivePanel] = useState('');
-	const { logData, fetchLogData } = useSharedDataStore();
+	const { logData, fetchLogData, fetchServerData } = useSharedDataStore();
 
 	useEffect(() => {
 		let ignore = false;
@@ -327,10 +192,107 @@ const ImportLogPanel = () => {
 		});
 	};
 
+	/**
+	 * Resolves the System Status data for the support bundle, fetching it on
+	 * demand when the sibling tab was never opened. The environment block is
+	 * optional — a failed fetch just yields a runs-only report.
+	 *
+	 * @return {Promise<?Object>} The server info map, or null.
+	 */
+	const ensureServerInfo = async () => {
+		const current = useSharedDataStore.getState().serverData;
+
+		if (current && current.success && current.data) {
+			return current.data;
+		}
+
+		try {
+			await fetchServerData('/sd/edi/v1/server/status');
+		} catch {
+			// Environment is a best-effort addition; proceed without it.
+		}
+
+		const fresh = useSharedDataStore.getState().serverData;
+
+		return fresh && fresh.success ? fresh.data : null;
+	};
+
+	/**
+	 * Copies or downloads a support bundle for the given runs.
+	 *
+	 * @param {Array}  runsToShare - Runs to include in the bundle.
+	 * @param {string} action      - 'copy' or 'download'.
+	 * @param {string} filename    - File name for the download action.
+	 */
+	const shareRuns = async (runsToShare, action, filename) => {
+		const serverInfo = await ensureServerInfo();
+		const report = buildReport(runsToShare, serverInfo);
+
+		if (action === 'download') {
+			downloadText(filename, report);
+			return;
+		}
+
+		const copied = await copyText(report);
+
+		if (copied) {
+			message.success(
+				sdEdiAdminParams.logShareCopied ||
+					'Import log copied to clipboard.'
+			);
+		} else {
+			message.error(
+				sdEdiAdminParams.logShareCopyFailed ||
+					'Could not copy — use Download instead.'
+			);
+		}
+	};
+
+	/**
+	 * Builds the antd dropdown menu config for a share control.
+	 *
+	 * @param {Array}  runsToShare - Runs the control shares.
+	 * @param {string} filename    - Download file name.
+	 * @return {Object} Menu prop for antd Dropdown.
+	 */
+	const shareMenu = (runsToShare, filename) => ({
+		items: [
+			{
+				key: 'copy',
+				icon: <CopyOutlined />,
+				label: sdEdiAdminParams.logShareCopy || 'Copy to clipboard',
+			},
+			{
+				key: 'download',
+				icon: <FileTextOutlined />,
+				label: sdEdiAdminParams.logShareDownload || 'Download .txt',
+			},
+		],
+		onClick: ({ key, domEvent }) => {
+			domEvent.stopPropagation();
+			shareRuns(runsToShare, key, filename);
+		},
+	});
+
 	const items = runs.map((run) => ({
 		key: run.session_id,
 		label: runLabel(run),
-		children: runEntries(run.entries),
+		children: (
+			<div className="edi-log-run-body">
+				<div className="edi-log-run-actions">
+					<Dropdown
+						menu={shareMenu([run], runFileName(run))}
+						trigger={['click']}
+						placement="bottomRight"
+					>
+						<Button size="small" icon={<ShareAltOutlined />}>
+							{sdEdiAdminParams.logShareLabel || 'Share'}
+						</Button>
+					</Dropdown>
+				</div>
+				{runEntries(run.entries)}
+			</div>
+		),
 	}));
 
 	let content;
@@ -370,15 +332,28 @@ const ImportLogPanel = () => {
 		);
 	} else {
 		content = (
-			<Collapse
-				className="edi-log-collapse edi-fade-in"
-				bordered={false}
-				accordion
-				expandIconPosition="end"
-				items={items}
-				activeKey={activePanel}
-				onChange={handleAccordionChange}
-			/>
+			<>
+				<div className="edi-log-toolbar">
+					<Dropdown
+						menu={shareMenu(runs, 'edi-import-log-all.txt')}
+						trigger={['click']}
+						placement="bottomRight"
+					>
+						<Button size="small" icon={<ShareAltOutlined />}>
+							{sdEdiAdminParams.logExportAll || 'Export all'}
+						</Button>
+					</Dropdown>
+				</div>
+				<Collapse
+					className="edi-log-collapse edi-fade-in"
+					bordered={false}
+					accordion
+					expandIconPosition="end"
+					items={items}
+					activeKey={activePanel}
+					onChange={handleAccordionChange}
+				/>
+			</>
 		);
 	}
 
