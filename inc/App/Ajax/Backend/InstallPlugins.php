@@ -19,6 +19,7 @@ use WP_Ajax_Upgrader_Skin;
 use RecursiveIteratorIterator;
 use RecursiveDirectoryIterator;
 use SigmaDevs\EasyDemoImporter\Common\{
+	Utils,
 	Traits\Singleton,
 	Functions\Helpers,
 	Abstracts\ImporterAjax
@@ -264,33 +265,18 @@ class InstallPlugins extends ImporterAjax {
 			global $wp_filesystem;
 
 			// Validate the plugin ZIP URL before making any network request.
-			if ( ! wp_http_validate_url( $externalUrl ) ) {
+			// Same gate as the demo ZIP download, including the link-local
+			// range WordPress' own URL validation lets through.
+			if ( null !== Utils\RemoteUrl::validate( $externalUrl ) ) {
 				$this->installErrors[] = basename( $path );
 				return;
-			}
-
-			$parsed_scheme = wp_parse_url( $externalUrl, PHP_URL_SCHEME );
-			if ( ! in_array( $parsed_scheme, [ 'http', 'https' ], true ) ) {
-				$this->installErrors[] = basename( $path );
-				return;
-			}
-
-			// Allow theme authors to restrict which domains may serve plugin files.
-			$allowed_domains = (array) apply_filters( 'sd/edi/allowed_download_domains', [] ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
-			if ( ! empty( $allowed_domains ) ) {
-				$host = (string) wp_parse_url( $externalUrl, PHP_URL_HOST );
-
-				if ( ! in_array( $host, $allowed_domains, true ) ) {
-					$this->installErrors[] = basename( $path );
-					return;
-				}
 			}
 
 			$plugin    = $this->demoUploadDir() . 'plugin.zip';
-			$timeout   = (int) apply_filters( 'sd/edi/download_timeout', 120 ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+			$timeout   = (int) apply_filters( 'sd/edi/download_timeout', 300 ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 			$sslverify = (bool) apply_filters( 'sd/edi/download_sslverify', true ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
-			$response = wp_remote_get(
+			$response = Utils\RemoteUrl::get(
 				$externalUrl,
 				[
 					'timeout'   => $timeout,

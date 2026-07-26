@@ -16,6 +16,7 @@ use FilesystemIterator;
 use RecursiveIteratorIterator;
 use RecursiveDirectoryIterator;
 use SigmaDevs\EasyDemoImporter\Common\{
+	Utils,
 	Traits\Singleton,
 	Functions\Helpers,
 	Abstracts\ImporterAjax
@@ -118,36 +119,33 @@ class DownloadFiles extends ImporterAjax {
 		}
 
 		// Validate the demo ZIP URL before making any network request.
-		if ( ! wp_http_validate_url( $external_url ) ) {
+		$url_error = Utils\RemoteUrl::validate( $external_url );
+
+		if ( null !== $url_error ) {
+			$errors = [
+				Utils\RemoteUrl::INVALID_URL    => [
+					__( 'The demo ZIP URL is not a valid URL.', 'easy-demo-importer' ),
+					__( 'Check the demoZip value in your theme configuration.', 'easy-demo-importer' ),
+				],
+				Utils\RemoteUrl::INVALID_SCHEME => [
+					__( 'The demo ZIP URL must use http or https.', 'easy-demo-importer' ),
+					__( 'Check the demoZip value in your theme configuration.', 'easy-demo-importer' ),
+				],
+				Utils\RemoteUrl::BLOCKED_DOMAIN => [
+					__( 'The demo ZIP URL is not on an allowed domain.', 'easy-demo-importer' ),
+					__( 'The demo file host is not in the sd/edi/allowed_download_domains allowlist. Contact the theme author.', 'easy-demo-importer' ),
+				],
+				Utils\RemoteUrl::LINK_LOCAL     => [
+					__( 'The demo ZIP URL points to a restricted network address.', 'easy-demo-importer' ),
+					__( 'The host resolves to a link-local address, which is reserved for cloud instance metadata and is never a valid demo file location.', 'easy-demo-importer' ),
+				],
+			];
+
 			return [
 				'success' => false,
-				'message' => __( 'The demo ZIP URL is not a valid URL.', 'easy-demo-importer' ),
-				'hint'    => __( 'Check the demoZip value in your theme configuration.', 'easy-demo-importer' ),
+				'message' => $errors[ $url_error ][0],
+				'hint'    => $errors[ $url_error ][1],
 			];
-		}
-
-		$parsed_scheme = wp_parse_url( $external_url, PHP_URL_SCHEME );
-		if ( ! in_array( $parsed_scheme, [ 'http', 'https' ], true ) ) {
-			return [
-				'success' => false,
-				'message' => __( 'The demo ZIP URL must use http or https.', 'easy-demo-importer' ),
-				'hint'    => __( 'Check the demoZip value in your theme configuration.', 'easy-demo-importer' ),
-			];
-		}
-
-		// Allow theme authors to restrict which domains may serve demo files.
-		// Return a non-empty array of hostnames to enable the allowlist.
-		$allowed_domains = (array) apply_filters( 'sd/edi/allowed_download_domains', [] ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
-		if ( ! empty( $allowed_domains ) ) {
-			$host = (string) wp_parse_url( $external_url, PHP_URL_HOST );
-
-			if ( ! in_array( $host, $allowed_domains, true ) ) {
-				return [
-					'success' => false,
-					'message' => __( 'The demo ZIP URL is not on an allowed domain.', 'easy-demo-importer' ),
-					'hint'    => __( 'The demo file host is not in the sd/edi/allowed_download_domains allowlist. Contact the theme author.', 'easy-demo-importer' ),
-				];
-			}
 		}
 
 		// A timeout is a ceiling, not a duration — the request ends as soon as the
@@ -165,7 +163,7 @@ class DownloadFiles extends ImporterAjax {
 		// string. A large (WooCommerce) demo can exceed the host memory_limit
 		// and fatal before a single post is imported; streaming keeps peak
 		// memory flat regardless of archive size.
-		$response = wp_remote_get(
+		$response = Utils\RemoteUrl::get(
 			$external_url,
 			[
 				'timeout'   => $timeout,
