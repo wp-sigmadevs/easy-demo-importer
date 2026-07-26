@@ -384,4 +384,74 @@ $edi-log-accent: linear-gradient(
 			color: #b54708;
 		}
 	}
+
+	// Collapsed group: a run of repeated same-reason media skips folded into one
+	// summary row with an expandable list. Keeps the three-column entry grid
+	// (dot · time · body) so it lines up with the surrounding entries.
+	.edi-log-group {
+		.edi-log-group-body {
+			min-width: 0;
+		}
+
+		.edi-log-group-toggle {
+			display: inline-flex;
+			flex-wrap: wrap;
+			align-items: center;
+			gap: 6px 10px;
+			margin: 0;
+			padding: 0;
+			border: 0;
+			background: none;
+			color: #344054;
+			font: inherit;
+			font-size: 14px;
+			line-height: 1.55;
+			text-align: left;
+			cursor: pointer;
+		}
+
+		.edi-log-group-toggle-label {
+			display: inline-flex;
+			align-items: center;
+			gap: 4px;
+			color: #2d74d5;
+			font-size: 12px;
+			font-weight: 600;
+			white-space: nowrap;
+		}
+
+		.edi-log-group-caret {
+			font-size: 10px;
+			transition: transform 0.2s ease;
+		}
+
+		&.is-open .edi-log-group-caret {
+			transform: rotate(180deg);
+		}
+
+		.edi-log-group-toggle:hover .edi-log-group-toggle-label {
+			text-decoration: underline;
+		}
+
+		// Revealed individual skips, indented under the summary.
+		.edi-log-group-list {
+			margin: 10px 0 2px;
+			padding: 0;
+			list-style: none;
+			display: grid;
+			gap: 6px;
+		}
+
+		.edi-log-group-item {
+			display: grid;
+			grid-template-columns: auto 1fr;
+			align-items: start;
+			gap: 10px;
+
+			.edi-log-entry-msg {
+				font-size: 13px;
+				color: #667085;
+			}
+		}
+	}
 }
