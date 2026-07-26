@@ -150,6 +150,19 @@ class DownloadFiles extends ImporterAjax {
 			}
 		}
 
+		// SSRF guard: reject a host that resolves to a private or reserved IP
+		// range (RFC-1918, loopback, and — unlike wp_http_validate_url — the
+		// 169.254.0.0/16 link-local range used by cloud metadata endpoints).
+		// wp_safe_remote_get() below re-validates redirect hops for the same
+		// ranges; this covers the initial hop's link-local gap.
+		if ( $this->resolvesToBlockedIp( $external_url ) ) {
+			return [
+				'success' => false,
+				'message' => __( 'The demo ZIP URL points to a disallowed network address.', 'easy-demo-importer' ),
+				'hint'    => __( 'The host resolves to a private or reserved IP. Check the demoZip value in your theme configuration.', 'easy-demo-importer' ),
+			];
+		}
+
 		// A timeout is a ceiling, not a duration — the request ends as soon as the
 		// transfer does, so a generous default costs a fast host nothing while
 		// giving a slow one room to finish. At 300s a 100MB archive only needs
@@ -165,13 +178,16 @@ class DownloadFiles extends ImporterAjax {
 		// string. A large (WooCommerce) demo can exceed the host memory_limit
 		// and fatal before a single post is imported; streaming keeps peak
 		// memory flat regardless of archive size.
-		$response = wp_remote_get(
+		$response = wp_safe_remote_get(
 			$external_url,
 			[
-				'timeout'   => $timeout,
-				'sslverify' => $sslverify,
-				'stream'    => true,
-				'filename'  => $demoData,
+				'timeout'            => $timeout,
+				'sslverify'          => $sslverify,
+				'stream'             => true,
+				'filename'           => $demoData,
+				// Re-validate every redirect hop against loopback/private ranges
+				// rather than blindly following a 302 to an internal host.
+				'reject_unsafe_urls' => true,
 			]
 		);
 
@@ -290,6 +306,73 @@ class DownloadFiles extends ImporterAjax {
 			'message' => '',
 			'hint'    => '',
 		];
+	}
+
+	/**
+	 * Whether a URL's host resolves to a private or reserved IP address.
+	 *
+	 * Complements wp_http_validate_url() (which blocks loopback and RFC-1918 but
+	 * not the 169.254.0.0/16 link-local range) by rejecting any address that is
+	 * not globally routable — private, loopback, link-local and other reserved
+	 * ranges, for both IPv4 and IPv6. A literal-IP host is checked directly; a
+	 * hostname is resolved to every A/AAAA record and blocked if ANY is unsafe.
+	 *
+	 * Note: this validates at check time, so a DNS-rebinding host could still
+	 * resolve differently at request time — an accepted residual for an
+	 * admin-gated, theme-configured URL.
+	 *
+	 * @param string $url The URL to inspect.
+	 *
+	 * @return bool True when the host resolves to a blocked address (or cannot
+	 *              be resolved), false when every resolved address is public.
+	 * @since 2.0.2
+	 */
+	private function resolvesToBlockedIp( string $url ): bool {
+		$host = (string) wp_parse_url( $url, PHP_URL_HOST );
+
+		if ( '' === $host ) {
+			return true;
+		}
+
+		// Strip IPv6 brackets, e.g. "[::1]" → "::1".
+		$host = trim( $host, '[]' );
+		$ips  = [];
+
+		if ( filter_var( $host, FILTER_VALIDATE_IP ) ) {
+			$ips[] = $host;
+		} else {
+			foreach ( (array) @dns_get_record( $host, DNS_A + DNS_AAAA ) as $record ) {
+				if ( ! empty( $record['ip'] ) ) {
+					$ips[] = $record['ip'];
+				}
+				if ( ! empty( $record['ipv6'] ) ) {
+					$ips[] = $record['ipv6'];
+				}
+			}
+
+			if ( empty( $ips ) ) {
+				$resolved = gethostbyname( $host );
+
+				if ( $resolved && $resolved !== $host ) {
+					$ips[] = $resolved;
+				}
+			}
+		}
+
+		// Unresolvable host: fail closed.
+		if ( empty( $ips ) ) {
+			return true;
+		}
+
+		foreach ( $ips as $ip ) {
+			// A public address survives BOTH no-private and no-reserved flags;
+			// anything private/reserved (incl. 169.254.0.0/16) returns false here.
+			if ( ! filter_var( $ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE ) ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**

@@ -26,6 +26,7 @@ use SigmaDevs\EasyDemoImporter\Config\Setup;
 use SigmaDevs\EasyDemoImporter\Common\{
 	Abstracts\Base,
 	Traits\Singleton,
+	Functions\Filters,
 	Functions\Helpers,
 	Functions\SessionManager,
 	Utils\ManualContext
@@ -539,6 +540,15 @@ class ManualImport extends Base {
 
 			if ( ! in_array( $ext, $allowed, true ) ) {
 				wp_delete_file( $file->getPathname() );
+				continue;
+			}
+
+			// Sanitize kept SVGs in place so a scripted SVG is neutralized even
+			// during the staging window (the dir is only guarded by an .htaccess,
+			// which nginx ignores). sanitizeSvgFile() rewrites the cleaned file
+			// and returns false when it is unsafe/unreadable — drop those.
+			if ( 'svg' === $ext && ! Filters::sanitizeSvgFile( $file->getPathname() ) ) {
+				wp_delete_file( $file->getPathname() );
 			}
 		}
 	}
@@ -556,7 +566,59 @@ class ManualImport extends Base {
 		require_once ABSPATH . 'wp-admin/includes/file.php';
 		$this->fs();
 
-		return unzip_file( $zip, $dest );
+		$result = unzip_file( $zip, $dest );
+
+		if ( is_wp_error( $result ) ) {
+			return $result;
+		}
+
+		// Defense-in-depth ZipSlip guard for user-uploaded archives: confirm no
+		// extracted entry resolved outside $dest, rather than trusting WP core
+		// unzip_file() alone. Mirrors the realpath sweep on the remote-download
+		// path (DownloadFiles::downloadDemoFiles). A WP_Error return makes every
+		// caller clean up and fail — see routeBundle/expandSettingsZip/extractImages.
+		if ( ! $this->extractedWithin( $dest ) ) {
+			return new \WP_Error(
+				'sd_edi_unsafe_zip',
+				esc_html__( 'The archive contained unsafe file paths and was rejected.', 'easy-demo-importer' )
+			);
+		}
+
+		return true;
+	}
+
+	/**
+	 * Whether every file under $dir resolves to a real path inside $dir — i.e.
+	 * nothing escaped via a `../` entry or an out-of-tree symlink during
+	 * extraction (ZipSlip).
+	 *
+	 * @param string $dir Destination directory that was just extracted into.
+	 *
+	 * @return bool True when the tree is confined to $dir, false on any escape
+	 *              (or when $dir itself cannot be resolved).
+	 * @since 2.0.2
+	 */
+	private function extractedWithin( string $dir ): bool {
+		$real = realpath( $dir );
+
+		if ( false === $real ) {
+			return false;
+		}
+
+		$iterator = new \RecursiveIteratorIterator(
+			new \RecursiveDirectoryIterator( $real, \FilesystemIterator::SKIP_DOTS ),
+			\RecursiveIteratorIterator::SELF_FIRST
+		);
+
+		foreach ( $iterator as $item ) {
+			$item_real = realpath( $item->getPathname() );
+
+			if ( false !== $item_real && 0 !== strpos( $item_real, $real ) ) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	/**
