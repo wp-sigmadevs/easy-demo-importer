@@ -116,6 +116,7 @@ const ImportLogPanel = () => {
 	const [loading, setLoading] = useState(true);
 	const [errorMessage, setErrorMessage] = useState('');
 	const [activePanel, setActivePanel] = useState('');
+	const [animating, setAnimating] = useState(false);
 	const { logData, fetchLogData, fetchServerData } = useSharedDataStore();
 
 	useEffect(() => {
@@ -163,6 +164,12 @@ const ImportLogPanel = () => {
 	 */
 	const handleAccordionChange = (key) => {
 		setActivePanel(key);
+		// While the panel height animates, antd sets overflow:hidden on the
+		// content, which momentarily makes it the sticky scroll-root and shifts
+		// the floating share button — snapping it back when the animation ends.
+		// Suspend sticky for the duration so it stays put through the motion.
+		setAnimating(true);
+		setTimeout(() => setAnimating(false), 340);
 		setTimeout(() => {
 			scrollToPanel(key);
 		}, 300);
@@ -315,13 +322,20 @@ const ImportLogPanel = () => {
 
 	if (loading && !runs.length) {
 		content = (
-			<div className="skeleton-wrapper">
-				{Array.from({ length: 4 }).map((_, i) => (
-					<div className="list-skeleton details" key={i}>
-						<Skeleton paragraph={{ rows: 1 }} active />
-					</div>
-				))}
-			</div>
+			<>
+				{/* Reserve the toolbar row so the layout doesn't jump when the
+				    real "Export all" button appears after loading. */}
+				<div className="edi-log-toolbar">
+					<Skeleton.Button active size="small" shape="round" />
+				</div>
+				<div className="skeleton-wrapper">
+					{Array.from({ length: 4 }).map((_, i) => (
+						<div className="list-skeleton details" key={i}>
+							<Skeleton paragraph={{ rows: 1 }} active />
+						</div>
+					))}
+				</div>
+			</>
 		);
 	} else if (logData && logData.success === false) {
 		// Never render blank on a failed fetch. ErrorMessage expects an
@@ -377,7 +391,11 @@ const ImportLogPanel = () => {
 		);
 	}
 
-	return <div className="edi-log-panel">{content}</div>;
+	return (
+		<div className={`edi-log-panel${animating ? ' is-animating' : ''}`}>
+			{content}
+		</div>
+	);
 };
 
 export default ImportLogPanel;
