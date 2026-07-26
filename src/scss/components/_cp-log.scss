@@ -189,6 +189,25 @@
 		}
 	}
 
+	.edi-log-run-duration {
+		display: inline-flex;
+		align-items: center;
+		gap: 5px;
+		height: 22px;
+		padding: 0 10px;
+		border-radius: 999px;
+		background: #f2f4f7;
+		color: #475467;
+		font-size: 12px;
+		font-weight: 600;
+		font-variant-numeric: tabular-nums;
+
+		.anticon {
+			font-size: 12px;
+			color: #667085;
+		}
+	}
+
 	.edi-log-run-count {
 		display: inline-flex;
 		align-items: center;

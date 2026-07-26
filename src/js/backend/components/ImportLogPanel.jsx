@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Collapse, Skeleton, Empty } from 'antd';
-import { PictureOutlined, DownloadOutlined } from '@ant-design/icons';
+import {
+	PictureOutlined,
+	DownloadOutlined,
+	ClockCircleOutlined,
+} from '@ant-design/icons';
 import useSharedDataStore from '../utils/sharedDataStore';
 import { decodeEntities } from '../utils/decodeEntities';
 
@@ -103,6 +107,51 @@ const formatEntryTime = (stamp) => {
 };
 
 /**
+ * Elapsed run time as a compact label, e.g. "45s", "1m 12s", "1h 3m". Measured
+ * from the run's first entry (started_at) to its last entry's logged_at — the
+ * log carries no explicit finish stamp, so the final entry is the finish. In
+ * progress runs (status "info") have no meaningful end yet, so returns null;
+ * also returns null when either stamp is unparseable or the span is negative.
+ *
+ * @param {Object} run - The run record.
+ * @return {?string} Formatted duration, or null when not applicable.
+ */
+const formatDuration = (run) => {
+	if (run.status === 'info' || !run.entries || !run.entries.length) {
+		return null;
+	}
+
+	const start = parseStamp(run.started_at);
+	const end = parseStamp(run.entries[run.entries.length - 1].logged_at);
+
+	if (!start || !end) {
+		return null;
+	}
+
+	const seconds = Math.round((end.getTime() - start.getTime()) / 1000);
+
+	if (seconds < 0) {
+		return null;
+	}
+
+	if (seconds < 60) {
+		return `${seconds}s`;
+	}
+
+	const minutes = Math.floor(seconds / 60);
+	const remSeconds = seconds % 60;
+
+	if (minutes < 60) {
+		return remSeconds ? `${minutes}m ${remSeconds}s` : `${minutes}m`;
+	}
+
+	const hours = Math.floor(minutes / 60);
+	const remMinutes = minutes % 60;
+
+	return remMinutes ? `${hours}h ${remMinutes}m` : `${hours}h`;
+};
+
+/**
  * Header row for one import run.
  *
  * @param {Object} run - The run record.
@@ -120,6 +169,7 @@ const runLabel = (run) => {
 	const status = statusText[run.status] || run.status;
 	const isRegen = run.demo_slug === REGEN_SLUG;
 	const isManual = run.demo_slug === MANUAL_SLUG;
+	const duration = formatDuration(run);
 
 	let name;
 	if (isRegen) {
@@ -147,6 +197,17 @@ const runLabel = (run) => {
 			<span className={`edi-log-run-status is-${run.status}`}>
 				{status}
 			</span>
+			{duration && (
+				<span
+					className="edi-log-run-duration"
+					title={
+						sdEdiAdminParams.logDurationLabel || 'Import duration'
+					}
+				>
+					<ClockCircleOutlined />
+					{duration}
+				</span>
+			)}
 			<span className="edi-log-run-count">{run.count}</span>
 		</div>
 	);
