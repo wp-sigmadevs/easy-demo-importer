@@ -199,8 +199,8 @@ class Enqueue extends EnqueueBase {
 
 				// Server Page Button.
 				'serverPageBtnText'          => esc_html__( 'Status & Activity', 'easy-demo-importer' ),
-				'serverPageUrl'              => sd_edi()->getData()['system_status_page'],
-				'logPageUrl'                 => sd_edi()->getData()['import_log_page'],
+				'serverPageUrl'              => esc_url_raw( sd_edi()->getData()['system_status_page'] ),
+				'logPageUrl'                 => esc_url_raw( sd_edi()->getData()['import_log_page'] ),
 				'restLogUrl'                 => esc_url_raw( rest_url( 'sd/edi/v1/import/log' ) ),
 				'logPageHeading'             => esc_html__( 'Activity', 'easy-demo-importer' ),
 				'statusTabLabel'             => esc_html__( 'System Status', 'easy-demo-importer' ),
