@@ -92,9 +92,10 @@ const useSharedDataStore = create((set) => ({
 	skipImageRegeneration: false,
 	importComplete: false,
 	reset: true,
-	// On by default: reset is on by default and is destructive, so the restore
-	// point (the parachute) should be armed too rather than left off.
-	snapshot: true,
+	// Off by default: a restore point duplicates every plugin-related database
+	// table, so arming it silently grows the database. Opt-in keeps that cost a
+	// deliberate choice — the Start step recommends enabling it.
+	snapshot: false,
 	message: '',
 	hint: '',
 	resumeRequest: loadResumeRequest(),
@@ -198,7 +199,7 @@ const useSharedDataStore = create((set) => ({
 			skipImageRegeneration: false,
 			importComplete: false,
 			reset: true,
-			snapshot: true,
+			snapshot: false,
 			message: '',
 			hint: '',
 			// resumeRequest is intentionally persisted across page reloads — do not clear it here.
