@@ -293,6 +293,45 @@
 					font-size: 15px;
 				}
 
+				// Both columns resolve to an icon-plus-label list, so both wait
+				// behind the same placeholder. These rules used to sit under
+				// .required-plugins alone, which left the readiness column on
+				// antd's defaults — oversized avatars, full-width bars and a
+				// stray title border the left column was explicitly clearing.
+				.skeleton-list {
+					margin-top: 30px;
+					height: 260px;
+					overflow-y: auto;
+
+					@media only screen and (min-height: 680px) {
+						height: 340px;
+					}
+
+					@media only screen and (min-height: 765px) {
+						height: 400px;
+					}
+				}
+
+				.ant-skeleton {
+					padding: 6px 0 10px;
+					margin-bottom: 6px;
+				}
+
+				.ant-skeleton-title {
+					margin-top: 0 !important;
+					border: 0 !important;
+				}
+
+				.ant-skeleton-paragraph {
+					margin-top: 0 !important;
+					margin-bottom: 0 !important;
+				}
+
+				.ant-skeleton-avatar {
+					width: 20px !important;
+					height: 20px !important;
+				}
+
 				.ant-list {
 					max-height: 145px;
 					overflow-y: auto;
