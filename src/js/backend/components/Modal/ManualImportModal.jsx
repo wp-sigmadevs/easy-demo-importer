@@ -628,6 +628,16 @@ const ManualImportModal = ({ visible, onClose }) => {
 																{sdEdiAdminParams.snapshotDetails ||
 																	'Saves a full backup — content, media files, and settings — before importing. One click restores this exact state from the result screen or the restore-point banner. Rolling back also removes anything created after the import.'}
 															</p>
+															<p className="storage-note">
+																<b>
+																	<i>
+																		{sdEdiAdminParams.snapshotStorageLabel ||
+																			'Storage: '}
+																	</i>
+																</b>
+																{sdEdiAdminParams.snapshotStorageNotice ||
+																	'a duplicate copy of every table this plugin can touch is written alongside your live ones, so your database roughly doubles in size until the restore point is discarded. Media files are recorded rather than copied, so they add no extra disk use.'}
+															</p>
 														</div>
 													</div>
 
