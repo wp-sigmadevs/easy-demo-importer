@@ -7,6 +7,7 @@ import {
 	ShareAltOutlined,
 	CopyOutlined,
 	FileTextOutlined,
+	ExportOutlined,
 } from '@ant-design/icons';
 import useSharedDataStore from '../utils/sharedDataStore';
 import { decodeEntities } from '../utils/decodeEntities';
@@ -115,6 +116,7 @@ const ImportLogPanel = () => {
 	const [loading, setLoading] = useState(true);
 	const [errorMessage, setErrorMessage] = useState('');
 	const [activePanel, setActivePanel] = useState('');
+	const [animating, setAnimating] = useState(false);
 	const { logData, fetchLogData, fetchServerData } = useSharedDataStore();
 
 	useEffect(() => {
@@ -162,6 +164,12 @@ const ImportLogPanel = () => {
 	 */
 	const handleAccordionChange = (key) => {
 		setActivePanel(key);
+		// While the panel height animates, antd sets overflow:hidden on the
+		// content, which momentarily makes it the sticky scroll-root and shifts
+		// the floating share button — snapping it back when the animation ends.
+		// Suspend sticky for the duration so it stays put through the motion.
+		setAnimating(true);
+		setTimeout(() => setAnimating(false), 340);
 		setTimeout(() => {
 			scrollToPanel(key);
 		}, 300);
@@ -235,16 +243,24 @@ const ImportLogPanel = () => {
 
 		const copied = await copyText(report);
 
+		// Center the toast (marginTop: 40vh) to match the Copy System Data
+		// confirmation on the sibling System Status tab.
 		if (copied) {
-			message.success(
-				sdEdiAdminParams.logShareCopied ||
-					'Import log copied to clipboard.'
-			);
+			message.success({
+				content:
+					sdEdiAdminParams.logShareCopied ||
+					'Import log copied to clipboard.',
+				duration: 3,
+				style: { marginTop: '40vh' },
+			});
 		} else {
-			message.error(
-				sdEdiAdminParams.logShareCopyFailed ||
-					'Could not copy — use Download instead.'
-			);
+			message.error({
+				content:
+					sdEdiAdminParams.logShareCopyFailed ||
+					'Could not copy — use Download instead.',
+				duration: 3,
+				style: { marginTop: '40vh' },
+			});
 		}
 	};
 
@@ -285,9 +301,16 @@ const ImportLogPanel = () => {
 						trigger={['click']}
 						placement="bottomRight"
 					>
-						<Button size="small" icon={<ShareAltOutlined />}>
-							{sdEdiAdminParams.logShareLabel || 'Share'}
-						</Button>
+						<Button
+							type="primary"
+							shape="circle"
+							className="edi-log-share-fab"
+							icon={<ShareAltOutlined />}
+							aria-label={
+								sdEdiAdminParams.logShareLabel || 'Share'
+							}
+							title={sdEdiAdminParams.logShareLabel || 'Share'}
+						/>
 					</Dropdown>
 				</div>
 				{runEntries(run.entries)}
@@ -299,13 +322,20 @@ const ImportLogPanel = () => {
 
 	if (loading && !runs.length) {
 		content = (
-			<div className="skeleton-wrapper">
-				{Array.from({ length: 4 }).map((_, i) => (
-					<div className="list-skeleton details" key={i}>
-						<Skeleton paragraph={{ rows: 1 }} active />
-					</div>
-				))}
-			</div>
+			<>
+				{/* Reserve the toolbar row so the layout doesn't jump when the
+				    real "Export all" button appears after loading. */}
+				<div className="edi-log-toolbar">
+					<Skeleton.Button active size="small" shape="round" />
+				</div>
+				<div className="skeleton-wrapper">
+					{Array.from({ length: 4 }).map((_, i) => (
+						<div className="list-skeleton details" key={i}>
+							<Skeleton paragraph={{ rows: 1 }} active />
+						</div>
+					))}
+				</div>
+			</>
 		);
 	} else if (logData && logData.success === false) {
 		// Never render blank on a failed fetch. ErrorMessage expects an
@@ -339,7 +369,11 @@ const ImportLogPanel = () => {
 						trigger={['click']}
 						placement="bottomRight"
 					>
-						<Button size="small" icon={<ShareAltOutlined />}>
+						<Button
+							type="primary"
+							className="edi-log-export-btn"
+							icon={<ExportOutlined />}
+						>
 							{sdEdiAdminParams.logExportAll || 'Export all'}
 						</Button>
 					</Dropdown>
@@ -357,7 +391,11 @@ const ImportLogPanel = () => {
 		);
 	}
 
-	return <div className="edi-log-panel">{content}</div>;
+	return (
+		<div className={`edi-log-panel${animating ? ' is-animating' : ''}`}>
+			{content}
+		</div>
+	);
 };
 
 export default ImportLogPanel;
