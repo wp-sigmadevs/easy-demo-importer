@@ -32,13 +32,15 @@ The canonical, WordPress.org-formatted changelog also lives in `readme.txt`.
 - A content import that loses its saved progress mid-run (a cancel or cleanup between batches) now reports an error and stops, instead of silently claiming completion without finishing the reference fix-up.
 - The Activity log now lists your recent import runs instead of only the latest one — the run list is windowed by run rather than by a flat entry count, so a single large import no longer crowds older runs out of the view.
 - Uninstalling now also drops any restore-point shadow tables (`sd_edi_snap_*`) left by a snapshot kept for roll-back, instead of orphaning a clone of every imported table in the database.
+- Error notices sent as plain text rendered as an empty box — both plain-text and call-to-action error messages now display their text.
 
 ### Performance
 - The demo picker no longer re-renders every card on each search keystroke or unrelated state change — cards are memoized against stable per-demo data and keyed by demo id.
 
 ### Internal
-- Documented a full-plugin OWASP security review.
-- Added unit coverage for the SSRF guard (`RemoteUrl`), the download-progress channel, log formatting/share helpers, and activity-log grouping.
+- Documented a full-plugin OWASP security review, a full-plugin consistency audit, and a PHPCS/Plugin Check report.
+- Added unit coverage for the SSRF guard (`RemoteUrl`), the download-progress channel, log formatting/share helpers, activity-log grouping, and error-message rendering.
+- Resolved all PHPCS errors under `inc/` and added a `.distignore` manifest for WordPress.org packaging.
 
 ## [2.0.1] - 2026-07-19
 
