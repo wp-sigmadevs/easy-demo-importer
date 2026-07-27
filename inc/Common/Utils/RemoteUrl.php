@@ -195,12 +195,20 @@ class RemoteUrl {
 	}
 
 	/**
-	 * Fetches a validated URL.
+	 * Fetches a validated URL, re-validating every redirect hop.
 	 *
-	 * Uses `wp_safe_remote_get()` with `reject_unsafe_urls`, so every redirect
-	 * hop is re-validated rather than only the first URL. Redirects are still
-	 * allowed — demo files are commonly served from a CDN or through an
-	 * http→https hop — but capped, and each target must pass the same check.
+	 * `wp_safe_remote_get()`'s own per-hop check is core's
+	 * `wp_http_validate_url()`, which does not cover the link-local metadata
+	 * range this class exists to block (see isBlockedIp()). So we never let the
+	 * transport follow the redirect itself: each request is issued with
+	 * `redirection => 0`, and every `Location` is run back through validate()
+	 * — scheme, allowlist and link-local — before it is followed. Redirects are
+	 * still honoured (demo files are commonly served from a CDN or through an
+	 * http→https hop) but capped by the caller's `redirection` value.
+	 *
+	 * Residual: a hostname that rebinds between validate()'s DNS lookup and the
+	 * transport's own lookup is not closed here; pinning the connected IP would
+	 * need an http_api_curl callback and is out of scope for this guard.
 	 *
 	 * @param string              $url  Validated URL.
 	 * @param array<string,mixed> $args Extra wp_remote_get arguments.
@@ -209,11 +217,49 @@ class RemoteUrl {
 	 * @since 2.0.1
 	 */
 	public static function get( string $url, array $args = [] ) {
-		$defaults = [
-			'reject_unsafe_urls' => true,
-			'redirection'        => 3,
-		];
+		$max_hops = isset( $args['redirection'] ) ? max( 0, (int) $args['redirection'] ) : 3;
+		unset( $args['redirection'] );
 
-		return wp_safe_remote_get( $url, array_merge( $defaults, $args ) );
+		$args    = array_merge( [ 'reject_unsafe_urls' => true ], $args );
+		$current = $url;
+
+		for ( $hop = 0; $hop <= $max_hops; $hop++ ) {
+			$response = wp_safe_remote_get( $current, array_merge( $args, [ 'redirection' => 0 ] ) );
+
+			if ( is_wp_error( $response ) ) {
+				return $response;
+			}
+
+			$code = (int) wp_remote_retrieve_response_code( $response );
+
+			// Anything that is not a redirect is the final response.
+			if ( $code < 300 || $code >= 400 ) {
+				return $response;
+			}
+
+			$location = (string) wp_remote_retrieve_header( $response, 'location' );
+
+			if ( '' === $location ) {
+				return $response;
+			}
+
+			// Resolve relative redirects against the URL that issued them.
+			$location = \WP_Http::make_absolute_url( $location, $current );
+
+			// Re-run the full guard on the hop target before following it.
+			if ( null !== static::validate( $location ) ) {
+				return new \WP_Error(
+					'edi_unsafe_redirect',
+					__( 'The download was redirected to a disallowed address.', 'easy-demo-importer' )
+				);
+			}
+
+			$current = $location;
+		}
+
+		return new \WP_Error(
+			'http_request_failed',
+			__( 'Too many redirects.', 'easy-demo-importer' )
+		);
 	}
 }
