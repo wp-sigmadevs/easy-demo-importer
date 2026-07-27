@@ -3,7 +3,13 @@ import Header from './Layouts/Header';
 import Support from './components/Support';
 import DemoCard from './components/DemoCard';
 import { useShallow } from 'zustand/react/shallow';
-import React, { useState, useEffect, useRef } from 'react';
+import React, {
+	useState,
+	useEffect,
+	useRef,
+	useMemo,
+	useCallback,
+} from 'react';
 import GridSkeleton from './components/GridSkeleton';
 import ErrorMessage from './components/ErrorMessage';
 import RestorePointBanner from './components/RestorePointBanner';
@@ -258,27 +264,34 @@ const AppDemoImporter = () => {
 	/**
 	 * Grouping demoData by category.
 	 */
-	const groupedDemoData = {};
+	// Memoized on demoData so the per-demo objects keep a stable identity across
+	// unrelated renders (search typing, modal open/close, server-data arrival) —
+	// which is what lets the memoized DemoCard actually skip re-rendering.
+	const groupedDemoData = useMemo(() => {
+		const grouped = {};
 
-	if (demoData) {
-		groupedDemoData.All = Object.keys(demoData).map((key) => ({
-			...demoData[key],
-			id: key,
-		}));
+		if (demoData) {
+			grouped.All = Object.keys(demoData).map((key) => ({
+				...demoData[key],
+				id: key,
+			}));
 
-		if (sdEdiAdminParams.hasTabCategories) {
-			Object.keys(demoData).forEach((key) => {
-				const demo = demoData[key];
-				const category = demo.category;
+			if (sdEdiAdminParams.hasTabCategories) {
+				Object.keys(demoData).forEach((key) => {
+					const demo = demoData[key];
+					const category = demo.category;
 
-				if (!groupedDemoData[category]) {
-					groupedDemoData[category] = [];
-				}
+					if (!grouped[category]) {
+						grouped[category] = [];
+					}
 
-				groupedDemoData[category].push({ ...demo, id: key });
-			});
+					grouped[category].push({ ...demo, id: key });
+				});
+			}
 		}
-	}
+
+		return grouped;
+	}, [demoData]);
 
 	/**
 	 * Manual-import control — a subtle secondary action with a help tooltip,
@@ -344,10 +357,10 @@ const AppDemoImporter = () => {
 	 *
 	 * @param {Object} data - The data to be passed to the modal component.
 	 */
-	const showModal = (data) => {
+	const showModal = useCallback((data) => {
 		setModalVisible(true);
 		setModalData(data);
-	};
+	}, []);
 
 	/**
 	 * Handle 'Server Page' button behavior.
@@ -394,21 +407,14 @@ const AppDemoImporter = () => {
 	 */
 	const generateAllDemoCards = () => (
 		<Row gutter={[30, 30]}>
-			{Object.keys(demoData).map((key, index) => {
-				const demoItem = {
-					...demoData[key],
-					id: key,
-				};
-
-				return (
-					<Col
-						className="gutter-row edi-demo-card edi-fade-in"
-						key={`demo-${index}`}
-					>
-						<DemoCard data={demoItem} showModal={showModal} />
-					</Col>
-				);
-			})}
+			{(groupedDemoData.All || []).map((demoItem) => (
+				<Col
+					className="gutter-row edi-demo-card edi-fade-in"
+					key={demoItem.id}
+				>
+					<DemoCard data={demoItem} showModal={showModal} />
+				</Col>
+			))}
 		</Row>
 	);
 
@@ -420,21 +426,14 @@ const AppDemoImporter = () => {
 	 */
 	const generateFilteredDemoCards = (demoItems) => (
 		<Row gutter={[30, 30]}>
-			{demoItems.map((demo, index) => {
-				const demoItem = {
-					...demo,
-					id: demo.id,
-				};
-
-				return (
-					<Col
-						className="gutter-row edi-demo-card edi-fade-in"
-						key={`demo-${index}`}
-					>
-						<DemoCard data={demoItem} showModal={showModal} />
-					</Col>
-				);
-			})}
+			{demoItems.map((demo) => (
+				<Col
+					className="gutter-row edi-demo-card edi-fade-in"
+					key={demo.id}
+				>
+					<DemoCard data={demo} showModal={showModal} />
+				</Col>
+			))}
 		</Row>
 	);
 
