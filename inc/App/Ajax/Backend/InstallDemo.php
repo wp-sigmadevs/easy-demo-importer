@@ -367,8 +367,26 @@ class InstallDemo extends ImporterAjax {
 		// buffer stays as a safety net that discards any stray output a third-party
 		// import_end hook might print, keeping the AJAX JSON response parseable.
 		ob_start();
-		$importer->finalize();
+		$finalized = $importer->finalize();
 		ob_end_clean();
+
+		// finalize() returns false only when its saved state has vanished — a
+		// concurrent cancel, or a cleanup sweep between batches. Nothing was
+		// backfilled, remapped or recounted, so this run must not be reported as
+		// completed; surface an error and stop instead of advancing.
+		if ( ! $finalized ) {
+			$this->releaseMutex();
+
+			$this->prepareResponse(
+				'',
+				'',
+				'',
+				true,
+				esc_html__( 'The import could not be finalized because its saved progress was missing — it may have been cancelled. Please start the import again.', 'easy-demo-importer' ),
+				esc_html__( 'Start the import again from the beginning.', 'easy-demo-importer' )
+			);
+			return;
+		}
 
 		// When images were excluded, strip the now-dangling featured-image links.
 		if ( 'true' === $this->excludeImages ) {
