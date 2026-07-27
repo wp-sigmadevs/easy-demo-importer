@@ -375,7 +375,7 @@ final class ImportLogger {
 	 * first, each run carrying its derived demo label, start time and pass/fail
 	 * status.
 	 *
-	 * @param int $limit Maximum entries to scan.
+	 * @param int $maxRuns Maximum number of recent runs (sessions) to return.
 	 *
 	 * @return array<int,array{session_id:string,demo_slug:string,started_at:string,status:string,count:int,entries:array<int,array{logged_at:string,level:string,message:string}>}>
 	 * @since 2.0.0

@@ -9,7 +9,7 @@
  * re-validate redirect targets.
  *
  * @package SigmaDevs\EasyDemoImporter
- * @since   2.0.1
+ * @since   2.0.2
  */
 
 declare( strict_types=1 );
@@ -24,14 +24,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Utility Class: RemoteUrl
  *
- * @since 2.0.1
+ * @since 2.0.2
  */
 class RemoteUrl {
 
 	/**
 	 * Reason codes returned by validate().
 	 *
-	 * @since 2.0.1
+	 * @since 2.0.2
 	 */
 	const INVALID_URL    = 'invalid_url';
 	const INVALID_SCHEME = 'invalid_scheme';
@@ -52,7 +52,7 @@ class RemoteUrl {
 	 * @param string $ip IP address.
 	 *
 	 * @return bool
-	 * @since 2.0.1
+	 * @since 2.0.2
 	 */
 	public static function isBlockedIp( string $ip ): bool {
 		$ip = trim( $ip );
@@ -97,7 +97,7 @@ class RemoteUrl {
 	 * @param string $host Hostname or IP.
 	 *
 	 * @return bool
-	 * @since 2.0.1
+	 * @since 2.0.2
 	 */
 	public static function hostIsBlocked( string $host ): bool {
 		$host = trim( $host, " \t\n\r\0\x0B[]" );
@@ -127,7 +127,7 @@ class RemoteUrl {
 	 * @param string $host Hostname.
 	 *
 	 * @return array<int,string> Resolved IPs, possibly empty.
-	 * @since 2.0.1
+	 * @since 2.0.2
 	 */
 	protected static function resolve( string $host ): array {
 		$ips = [];
@@ -166,7 +166,7 @@ class RemoteUrl {
 	 * @param string $url The URL to validate.
 	 *
 	 * @return string|null A reason code, or null when the URL is acceptable.
-	 * @since 2.0.1
+	 * @since 2.0.2
 	 */
 	public static function validate( string $url ): ?string {
 		if ( ! wp_http_validate_url( $url ) ) {
@@ -214,7 +214,7 @@ class RemoteUrl {
 	 * @param array<string,mixed> $args Extra wp_remote_get arguments.
 	 *
 	 * @return array<string,mixed>|\WP_Error
-	 * @since 2.0.1
+	 * @since 2.0.2
 	 */
 	public static function get( string $url, array $args = [] ) {
 		$max_hops = isset( $args['redirection'] ) ? max( 0, (int) $args['redirection'] ) : 3;
