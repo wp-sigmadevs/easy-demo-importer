@@ -10,11 +10,13 @@
 .idea
 .vscode
 .claude
+.codex
 .mcp.json
 .superpowers
 .wp-env.json
 .editorconfig
 .browserslistrc
+.distignore
 
 # Linters / formatters / build config
 .eslintrc.js
@@ -28,8 +30,13 @@ phpcs.xml.dist
 webpack.mix.js
 package.json
 package-lock.json
+composer.json
 composer.lock
 vitest.config.js
+phpstan.neon
+phpstan-baseline.neon
+rector.php
+mix-manifest.json
 
 # Tests
 tests
@@ -47,14 +54,17 @@ tmp
 
 # Developer docs (readme.txt is the shipped one)
 docs
+docs-drafts
 readme.md
 CHANGELOG.md
 ROADMAP.md
 DEV-LOG.md
 ASSESSMENT.md
 IMPROVEMENTS.md
+MONETIZATION.md
 SECURITY-AUDIT.md
 gemini-security-audit.md
+todo.txt
 
 # OS cruft
 .DS_Store
