@@ -4,7 +4,7 @@
   "type": "wordpress-plugin",
   "keywords": ["WordPress", "Demo Importer", "One Click", "One Click Demo Importer", "Theme Demo Importer", "WordPress Importer"],
   "homepage": "https://github.com/wp-sigmadevs/easy-demo-importer",
-  "license": "GPL",
+  "license": "GPL-3.0-or-later",
   "authors": [
     {
       "name": "S.M. Rafiz",
