@@ -288,7 +288,7 @@ final class Preflight {
 			return self::memoryTuneOutcome( $before, $target, $before );
 		}
 
-		ini_set( 'memory_limit', $target ); // phpcs:ignore WordPress.PHP.IniSet.memory_limit_Disallowed -- best-effort raise, verified by the re-read below.
+		ini_set( 'memory_limit', $target ); // phpcs:ignore Squiz.PHP.DiscouragedFunctions.Discouraged, WordPress.PHP.IniSet.memory_limit_Disallowed
 		$after = (string) ini_get( 'memory_limit' );
 
 		return self::memoryTuneOutcome( $before, $target, $after );
