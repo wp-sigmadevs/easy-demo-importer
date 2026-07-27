@@ -313,7 +313,7 @@
 			display: flex;
 			align-items: center;
 			column-gap: 12px;
-			padding: 12px 14px;
+			padding: 9px 14px;
 			text-align: left;
 		}
 
@@ -391,7 +391,7 @@
 		// Hero variant — the required content slot / the bundle dropzone.
 		&.is-wide {
 			.manual-slot-body {
-				padding: 20px;
+				padding: 18px 20px;
 			}
 
 			.manual-slot-icon {
