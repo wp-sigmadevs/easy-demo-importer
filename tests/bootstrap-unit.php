@@ -22,3 +22,7 @@ require_once dirname( __DIR__ ) . '/vendor/autoload.php';
 // Parent-class stubs so ChunkedImport (extends SD_EDI_WP_Import extends
 // WP_Importer) can be instantiated without loading WordPress core.
 require_once __DIR__ . '/stubs/wp-importer-stub.php';
+
+// Global WP_Error / is_wp_error / WP_Http primitives for the few paths that
+// return a WP_Error or resolve a redirect (e.g. RemoteUrl::get()).
+require_once __DIR__ . '/stubs/wp-runtime-stub.php';
