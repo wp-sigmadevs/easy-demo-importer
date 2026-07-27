@@ -168,6 +168,7 @@ final class MediaSnapshot {
 	 * @param string $base      Uploads base directory.
 	 * @param string $root      Shadow root directory.
 	 * @param string $sessionId Import session ID.
+	 * @param string $demoSlug  Demo slug this snapshot belongs to.
 	 *
 	 * @return bool
 	 * @since 2.0.0

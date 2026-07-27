@@ -184,7 +184,7 @@ final class Preflight {
 	}
 
 	/**
-	 * max_execution_time check. A low limit warns rather than blocks — the
+	 * The max_execution_time check. A low limit warns rather than blocks — the
 	 * importer runs in resumable chunks specifically to survive this.
 	 *
 	 * @param int        $current Effective max_execution_time ini value (post-tune), in seconds.
