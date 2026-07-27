@@ -131,4 +131,8 @@ const DemoCard = ({ data, showModal }) => {
 	);
 };
 
-export default DemoCard;
+// Memoized: the card grid can be dozens of items, and the parent re-renders on
+// every search keystroke and unrelated state change. With stable `data` (see
+// groupedDemoData's useMemo) and a stable `showModal`, each card re-renders only
+// when its own demo changes.
+export default React.memo(DemoCard);
