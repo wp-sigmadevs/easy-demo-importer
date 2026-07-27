@@ -15,7 +15,7 @@
  * unit-testable and reusable by REST, CLI, or preflight.
  *
  * @package SigmaDevs\EasyDemoImporter
- * @since   2.1.0
+ * @since   2.0.2
  */
 
 declare( strict_types=1 );
@@ -32,7 +32,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Utility Class: DemoRequirements
  *
- * @since 2.1.0
+ * @since 2.0.2
  */
 final class DemoRequirements {
 
@@ -57,7 +57,7 @@ final class DemoRequirements {
 	 * @param mixed $requires The demo's `requires` value (array or absent).
 	 *
 	 * @return array{met: bool, missing: string[]} Met flag + missing labels.
-	 * @since 2.1.0
+	 * @since 2.0.2
 	 */
 	public static function evaluate( $requires ): array {
 		if ( ! is_array( $requires ) || empty( $requires ) ) {
@@ -86,7 +86,7 @@ final class DemoRequirements {
 	 * @param string[] $missing  Missing-labels accumulator, by reference.
 	 *
 	 * @return void
-	 * @since 2.1.0
+	 * @since 2.0.2
 	 */
 	private static function checkPhp( array $requires, array &$missing ): void {
 		if ( empty( $requires['php'] ) ) {
@@ -112,7 +112,7 @@ final class DemoRequirements {
 	 * @param string[] $missing  Missing-labels accumulator, by reference.
 	 *
 	 * @return void
-	 * @since 2.1.0
+	 * @since 2.0.2
 	 */
 	private static function checkExtensions( array $requires, array &$missing ): void {
 		if ( empty( $requires['extensions'] ) || ! is_array( $requires['extensions'] ) ) {
@@ -140,7 +140,7 @@ final class DemoRequirements {
 	 * @param string[] $missing  Missing-labels accumulator, by reference.
 	 *
 	 * @return void
-	 * @since 2.1.0
+	 * @since 2.0.2
 	 */
 	private static function checkPlugins( array $requires, array &$missing ): void {
 		if ( empty( $requires['plugins'] ) || ! is_array( $requires['plugins'] ) ) {

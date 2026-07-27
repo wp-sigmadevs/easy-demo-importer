@@ -200,7 +200,7 @@ class Actions {
 	 * own cache is cleared separately in elementorActions().
 	 *
 	 * @return void
-	 * @since 2.1.0
+	 * @since 2.0.2
 	 */
 	public static function flushCaches() {
 		// WordPress object cache (also covers Redis/Memcached drop-ins).
