@@ -30,6 +30,7 @@ The canonical, WordPress.org-formatted changelog also lives in `readme.txt`.
 - The server-requirements warning stays dismissed once dismissed.
 - Failed-term log lines group correctly — term names are quoted and grouping is keyed by the normalized message rather than an English literal.
 - A content import that loses its saved progress mid-run (a cancel or cleanup between batches) now reports an error and stops, instead of silently claiming completion without finishing the reference fix-up.
+- The Activity log now lists your recent import runs instead of only the latest one — the run list is windowed by run rather than by a flat entry count, so a single large import no longer crowds older runs out of the view.
 
 ### Performance
 - The demo picker no longer re-renders every card on each search keystroke or unrelated state change — cards are memoized against stable per-demo data and keyed by demo id.

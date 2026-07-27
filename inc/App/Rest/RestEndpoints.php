@@ -464,10 +464,12 @@ class RestEndpoints extends Base {
 		$limit     = (int) $request->get_param( 'limit' );
 		$limit     = $limit > 0 ? $limit : 500;
 
-		// Grouped view (admin page): runs, newest first. Flat view (modal result
-		// screen): entries for a single session, or all when no session given.
+		// Grouped view (admin page): the newest import runs, newest first — windowed
+		// by run so one large import can't crowd older runs out (getRuns manages its
+		// own run cap). Flat view (modal result screen): entries for a single
+		// session, or all when no session given, bounded by $limit.
 		$data = $group
-			? ImportLogger::getRuns( $limit )
+			? ImportLogger::getRuns()
 			: ImportLogger::get( $sessionId, $limit );
 
 		return $this->sendResponse( $data, esc_html__( 'Import log fetched.', 'easy-demo-importer' ) );

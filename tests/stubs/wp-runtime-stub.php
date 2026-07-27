@@ -12,6 +12,10 @@
 
 declare( strict_types=1 );
 
+if ( ! defined( 'ARRAY_A' ) ) {
+	define( 'ARRAY_A', 'ARRAY_A' );
+}
+
 if ( ! class_exists( 'WP_Error' ) ) {
 	/**
 	 * Bare stand-in for core's WP_Error.
