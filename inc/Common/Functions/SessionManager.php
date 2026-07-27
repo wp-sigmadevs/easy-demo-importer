@@ -206,7 +206,7 @@ class SessionManager {
 		}
 
 		// Tie sessions to user IDs: only the user who started the import can proceed with it.
-		return (int) $active['user_id'] === get_current_user_id();
+		return get_current_user_id() === (int) $active['user_id'];
 	}
 
 	/**
