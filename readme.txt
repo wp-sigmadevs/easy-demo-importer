@@ -31,7 +31,10 @@ Are you tired of the complex and time-consuming process of setting up your WordP
 * **Resumable, Timeout-Proof Import:** Large and WooCommerce demos import in time-boxed batches that survive gateway timeouts and auto-resume if interrupted.
 * **Manual Import:** Upload your own content, media, and settings — as separate files or a single .zip bundle — without a theme configuration.
 * **One-Click Rollback:** Create a restore point before importing and revert your site with a single click.
-* **Activity Log:** Every import and thumbnail run is recorded with a live, per-item log for easy troubleshooting.
+* **Status & Activity Page:** A single tabbed page pairing a live, per-item log of every import and thumbnail run with a system status checklist that flags server issues before you start.
+* **Regenerate Thumbnails:** A built-in, resumable thumbnail regenerator with force-all-sizes and one-at-a-time modes.
+* **WP-CLI Support:** Manage imports from the command line — `wp edi demos`, `wp edi regenerate` and `wp edi rollback`.
+* **Security-Hardened Import:** Imported SVGs are sanitized against stored XSS, and every remote download is checked against SSRF on each redirect hop.
 * **User-Friendly Interface:** Our intuitive interface makes it easy for users of all skill levels to import demo data.
 * **Universal Theme Compatibility:** Can be configured to work seamlessly with a wide range of WordPress themes, ensuring broad compatibility.
 * **Developer Hooks:** offers a wide range of hooks that give theme developers full control to perform advanced custom actions. These hooks allow for precise adjustments and customizations in the import process.
@@ -40,10 +43,9 @@ Are you tired of the complex and time-consuming process of setting up your WordP
 * **Plugin Settings and Theme Options:** Can be configured to import any plugin settings and theme options, ensuring a cohesive website setup.
 * **Tabbed Categories & Search feature:** Includes a convenient tabbed interface that categorizes demos into various categories with a powerful search feature.
 * **Fluent Forms Import:** Can be configured to automatically import Fluent Forms, retaining your forms' integrity.
-* **Slider Revolution Import:** Can be configured to automatically import Slider Revolution slides, ensuring the slides' functionalities.
+* **Slider Revolution & LayerSlider Import:** Can be configured to automatically import Slider Revolution and LayerSlider slides, ensuring the slides' functionalities.
 * **Modern React-Powered Pages:** Enjoy modern, React-powered admin pages for a seamless user experience.
 * **Built-in Required Plugins Installer:** Features a built-in Required Plugins Installer that can be configured for hassle-free import process.
-* **System Status Checker:** Our built-in system status checker acts as a helpful pre-import checklist, alerting you to any potential issues that need addressing.
 * **Automatic URL and Commenter Email Replacement:** Designed for developers, our plugin has a versatile built-in tool for updating URLs and email addresses in your imported content.
 * **Elementor Taxonomy Data Fix:** Resolve Elementor widgets data import issues with our automatic taxonomy data fix.
 
