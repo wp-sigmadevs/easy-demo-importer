@@ -18,7 +18,7 @@ The canonical, WordPress.org-formatted changelog also lives in `readme.txt`.
 - Caching plugins are flushed after import so the imported site renders correctly right away.
 
 ### Security
-- Both remote-download paths (the demo archive and the plugin installer) are hardened against SSRF — requests that resolve to internal, private, or link-local addresses are rejected.
+- Both remote-download paths (the demo archive and the plugin installer) are hardened against SSRF — requests that resolve to internal, private, or link-local addresses are rejected, and every redirect hop is re-validated (not just the first URL) so a redirect to a link-local address can't slip through.
 
 ### Changed
 - The restore point now defaults to off, with its storage cost stated up front.
@@ -29,6 +29,10 @@ The canonical, WordPress.org-formatted changelog also lives in `readme.txt`.
 - Preflight no longer errors on hosts where `set_time_limit`/`ini_set` are disabled.
 - The server-requirements warning stays dismissed once dismissed.
 - Failed-term log lines group correctly — term names are quoted and grouping is keyed by the normalized message rather than an English literal.
+- A content import that loses its saved progress mid-run (a cancel or cleanup between batches) now reports an error and stops, instead of silently claiming completion without finishing the reference fix-up.
+
+### Performance
+- The demo picker no longer re-renders every card on each search keystroke or unrelated state change — cards are memoized against stable per-demo data and keyed by demo id.
 
 ### Internal
 - Documented a full-plugin OWASP security review.

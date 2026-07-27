@@ -145,10 +145,12 @@ For any inquiries, bug reports, or suggestions, please submit your request [here
 * Feature: Share or export any import-log run (copy or download .txt), plus a run-duration badge and a collapsed "Skipped N media items" summary.
 * Feature: Preflight auto-tuner raises PHP time/memory limits where allowed and flags plugin-adjusted limits.
 * Feature: Demos with missing required plugins are greyed out; caching plugins are flushed after import.
-* Security: Both remote-download paths (demo archive and plugin installer) are hardened against SSRF.
+* Security: Both remote-download paths (demo archive and plugin installer) are hardened against SSRF, re-validating every redirect hop.
 * Fix: Large archives stream to disk instead of buffering in memory, avoiding out-of-memory crashes.
 * Fix: Preflight no longer errors when set_time_limit/ini_set are disabled.
 * Fix: The server-requirements warning stays dismissed, and failed-term log lines group correctly.
+* Fix: A content import that loses its saved progress mid-run now reports an error and stops instead of falsely claiming completion.
+* Performance: The demo picker no longer re-renders every card on each search keystroke.
 * Tweak: Restore point now defaults off; download timeout raised to 300s and reported honestly.
 
 = 2.0.1 (19-July-2026) =
