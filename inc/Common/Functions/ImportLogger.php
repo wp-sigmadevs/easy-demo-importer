@@ -526,7 +526,7 @@ final class ImportLogger {
 	 * left untouched so a live import is never mislabelled.
 	 *
 	 * @param array<int,array{session_id:string,status:string,count:int,entries:array<int,array{logged_at:string,level:string,message:string}>}> $runs       Grouped runs, newest first.
-	 * @param string                                                                                                                              $active_sid Session id of the running import, or '' if none.
+	 * @param string                                                                                                                             $active_sid Session id of the running import, or '' if none.
 	 *
 	 * @return array Runs with interrupted ones flagged.
 	 * @since 2.0.0
