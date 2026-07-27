@@ -238,9 +238,9 @@ class Actions {
 
 		// LiteSpeed Cache, Cache Enabler, Hummingbird — action-driven purges,
 		// safe no-ops when the plugin is inactive.
-		do_action( 'litespeed_purge_all' );
-		do_action( 'cache_enabler_clear_complete_cache' );
-		do_action( 'wphb_clear_page_cache' );
+		do_action( 'litespeed_purge_all' ); //phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+		do_action( 'cache_enabler_clear_complete_cache' ); //phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+		do_action( 'wphb_clear_page_cache' ); //phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
 		// Let theme authors purge any additional/custom cache layer.
 		do_action( 'sd/edi/flush_caches' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
