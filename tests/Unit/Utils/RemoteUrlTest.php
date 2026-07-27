@@ -71,6 +71,9 @@ final class RemoteUrlTest extends UnitTestCase {
 				return $value;
 			}
 		);
+
+		// get()'s redirect-rejection path builds a translated WP_Error message.
+		Functions\when( '__' )->returnArg();
 	}
 
 	public function test_ipv4_link_local_is_blocked(): void {
@@ -188,7 +191,7 @@ final class RemoteUrlTest extends UnitTestCase {
 		);
 	}
 
-	public function test_get_forces_redirect_revalidation(): void {
+	public function test_get_never_lets_the_transport_follow_redirects(): void {
 		$captured = null;
 
 		Functions\when( 'wp_safe_remote_get' )->alias(
@@ -197,26 +200,112 @@ final class RemoteUrlTest extends UnitTestCase {
 				return [ 'response' => [ 'code' => 200 ] ];
 			}
 		);
-
-		RemoteUrl::get( 'https://example.test/demo.zip', [ 'timeout' => 300 ] );
-
-		self::assertTrue( $captured['reject_unsafe_urls'] );
-		self::assertSame( 3, $captured['redirection'] );
-		self::assertSame( 300, $captured['timeout'] );
-	}
-
-	public function test_get_lets_callers_override_the_defaults(): void {
-		$captured = null;
-
-		Functions\when( 'wp_safe_remote_get' )->alias(
-			static function ( $url, $args ) use ( &$captured ) {
-				$captured = $args;
-				return [];
+		Functions\when( 'wp_remote_retrieve_response_code' )->alias(
+			static function ( $response ) {
+				return $response['response']['code'] ?? 0;
 			}
 		);
+		Functions\when( 'wp_remote_retrieve_header' )->justReturn( '' );
 
-		RemoteUrl::get( 'https://example.test/demo.zip', [ 'redirection' => 0 ] );
+		$response = RemoteUrl::get( 'https://example.test/demo.zip', [ 'timeout' => 300 ] );
 
+		// The transport is always told not to follow — we re-validate each hop
+		// ourselves — and the caller's other args survive.
+		self::assertTrue( $captured['reject_unsafe_urls'] );
 		self::assertSame( 0, $captured['redirection'] );
+		self::assertSame( 300, $captured['timeout'] );
+		self::assertSame( 200, $response['response']['code'] );
+	}
+
+	public function test_get_follows_a_redirect_to_a_safe_host(): void {
+		FakeResolvingRemoteUrl::$map = [
+			'cdn.example.test' => [ '93.184.216.34' ],
+		];
+
+		$urls = [];
+
+		Functions\when( 'wp_safe_remote_get' )->alias(
+			static function ( $url, $args ) use ( &$urls ) {
+				$urls[] = $url;
+
+				if ( 1 === count( $urls ) ) {
+					return [
+						'response' => [ 'code' => 302 ],
+						'headers'  => [ 'location' => 'https://cdn.example.test/demo.zip' ],
+					];
+				}
+
+				return [ 'response' => [ 'code' => 200 ] ];
+			}
+		);
+		$this->stubRemoteRetrieve();
+
+		$response = FakeResolvingRemoteUrl::get( 'https://example.test/demo.zip' );
+
+		self::assertSame( 200, $response['response']['code'] );
+		self::assertSame(
+			[ 'https://example.test/demo.zip', 'https://cdn.example.test/demo.zip' ],
+			$urls
+		);
+	}
+
+	public function test_get_rejects_a_redirect_to_a_link_local_host(): void {
+		FakeResolvingRemoteUrl::$map = [
+			'metadata.example.test' => [ '169.254.169.254' ],
+		];
+
+		Functions\when( 'wp_safe_remote_get' )->alias(
+			static function () {
+				return [
+					'response' => [ 'code' => 302 ],
+					'headers'  => [ 'location' => 'http://metadata.example.test/latest/meta-data/' ],
+				];
+			}
+		);
+		$this->stubRemoteRetrieve();
+
+		$response = FakeResolvingRemoteUrl::get( 'https://example.test/demo.zip' );
+
+		self::assertInstanceOf( \WP_Error::class, $response );
+		self::assertSame( 'edi_unsafe_redirect', $response->get_error_code() );
+	}
+
+	public function test_get_stops_after_the_redirect_cap(): void {
+		FakeResolvingRemoteUrl::$map = [
+			'loop.example.test' => [ '93.184.216.34' ],
+		];
+
+		Functions\when( 'wp_safe_remote_get' )->alias(
+			static function () {
+				return [
+					'response' => [ 'code' => 302 ],
+					'headers'  => [ 'location' => 'https://loop.example.test/next' ],
+				];
+			}
+		);
+		$this->stubRemoteRetrieve();
+
+		$response = FakeResolvingRemoteUrl::get( 'https://loop.example.test/start', [ 'redirection' => 2 ] );
+
+		self::assertInstanceOf( \WP_Error::class, $response );
+		self::assertSame( 'http_request_failed', $response->get_error_code() );
+	}
+
+	/**
+	 * Stubs the two accessors get() reads off a response.
+	 *
+	 * @return void
+	 */
+	private function stubRemoteRetrieve(): void {
+		Functions\when( 'wp_remote_retrieve_response_code' )->alias(
+			static function ( $response ) {
+				return $response['response']['code'] ?? 0;
+			}
+		);
+		Functions\when( 'wp_remote_retrieve_header' )->alias(
+			static function ( $response, $header ) {
+				return $response['headers'][ $header ] ?? '';
+			}
+		);
 	}
 }
