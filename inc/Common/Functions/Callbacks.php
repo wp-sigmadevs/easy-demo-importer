@@ -42,5 +42,4 @@ class Callbacks {
 	public static function renderServerStatusPage() {
 		Helpers::renderView( 'server-status' );
 	}
-
 }

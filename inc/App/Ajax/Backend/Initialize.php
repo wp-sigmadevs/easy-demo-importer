@@ -311,7 +311,7 @@ class Initialize extends ImporterAjax {
 	private function databaseReset() {
 		global $wpdb;
 
-		$coreTables    = [
+		$coreTables = [
 			'commentmeta',
 			'comments',
 			'links',

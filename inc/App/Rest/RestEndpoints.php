@@ -100,7 +100,7 @@ class RestEndpoints extends Base {
 	 *                            carries a call-to-action; ErrorMessage.jsx renders
 	 *                            both shapes.
 	 * @param array        $errorData An optional array of additional error data.
-	 * @param int    $code The HTTP status code to be returned in the response.
+	 * @param int          $code The HTTP status code to be returned in the response.
 	 *
 	 * @return WP_REST_Response
 	 * @since 1.0.0

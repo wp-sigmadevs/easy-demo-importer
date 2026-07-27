@@ -27,7 +27,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 1.0.0
  */
-	class Helpers {
+class Helpers {
 	/**
 	 * Whitelist of allowed view names for renderView().
 	 *

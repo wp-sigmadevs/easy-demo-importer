@@ -68,13 +68,13 @@ class ManualImport extends Base {
 	 */
 	private function targets(): array {
 		return [
-			'content'    => 'content.xml',
-			'customizer' => 'customizer.dat',
-			'widgets'    => 'widget.wie',
-			'settings'   => 'settings.json',
+			'content'     => 'content.xml',
+			'customizer'  => 'customizer.dat',
+			'widgets'     => 'widget.wie',
+			'settings'    => 'settings.json',
 			'settingsZip' => 'settings.zip',
-			'images'     => 'images.zip',
-			'bundle'     => 'bundle.zip',
+			'images'      => 'images.zip',
+			'bundle'      => 'bundle.zip',
 		];
 	}
 
@@ -304,9 +304,9 @@ class ManualImport extends Base {
 	 * @since 2.0.0
 	 */
 	private function finalize() {
-		$context     = $this->workingDir();
-		$dir         = $context['dir'];
-		$has_images  = false;
+		$context    = $this->workingDir();
+		$dir        = $context['dir'];
+		$has_images = false;
 
 		// Single bundle → unzip and map its contents into the standard files.
 		if ( is_file( $dir . '/bundle.zip' ) ) {
