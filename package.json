@@ -11,8 +11,8 @@
     "Theme Demo Importer",
     "WordPress Importer"
   ],
-  "author": "SM Rafiz",
-  "license": "MIT",
+  "author": "Sigma Devs",
+  "license": "GPL-3.0-or-later",
   "repository": {
     "type": "git",
     "url": "https://github.com/wp-sigmadevs/easy-demo-importer"
