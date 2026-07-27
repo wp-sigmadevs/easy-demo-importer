@@ -28,11 +28,25 @@ $wpdb->query(
 	"DELETE FROM {$wpdb->options} WHERE option_name LIKE '\_transient\_sd\_edi\_%' OR option_name LIKE '\_transient\_timeout\_sd\_edi\_%'"
 );
 
-// Drop the plugin's tables (taxonomy import tracking + activity log).
-$edi_tables = [ // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
-	$wpdb->prefix . 'sd_edi_taxonomy_import',
-	$wpdb->prefix . 'sd_edi_import_log',
-];
+// Discover any live restore-point shadow tables ({prefix}sd_edi_snap_*). A
+// snapshot kept for roll-back at delete time is only dropped on Roll Back or
+// Discard, so without this it would orphan a full clone of every table the
+// import touched. Names are dynamic (one shadow per snapshotted table), so they
+// must be found rather than hard-coded.
+$edi_snap_like = $wpdb->esc_like( $wpdb->prefix . 'sd_edi_snap_' ) . '%'; // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
+
+// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+$edi_snap_tables = $wpdb->get_col( $wpdb->prepare( 'SHOW TABLES LIKE %s', $edi_snap_like ) ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
+
+// Drop the plugin's tables (taxonomy import tracking + activity log + any live
+// restore-point shadow tables).
+$edi_tables = array_merge( // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
+	[
+		$wpdb->prefix . 'sd_edi_taxonomy_import',
+		$wpdb->prefix . 'sd_edi_import_log',
+	],
+	is_array( $edi_snap_tables ) ? $edi_snap_tables : []
+);
 
 foreach ( $edi_tables as $table_name ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
 	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQLPlaceholders.UnquotedComplexPlaceholder
