@@ -95,8 +95,11 @@ class RestEndpoints extends Base {
 	/**
 	 * Sends a REST response with an error status.
 	 *
-	 * @param string $error The error message to be included in the response.
-	 * @param array  $errorData An optional array of additional error data.
+	 * @param string|array $error The error message. Either a plain string, or an
+	 *                            array `{ text, btnUrl?, btnText? }` when the error
+	 *                            carries a call-to-action; ErrorMessage.jsx renders
+	 *                            both shapes.
+	 * @param array        $errorData An optional array of additional error data.
 	 * @param int    $code The HTTP status code to be returned in the response.
 	 *
 	 * @return WP_REST_Response
