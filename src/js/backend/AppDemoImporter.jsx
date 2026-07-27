@@ -451,15 +451,20 @@ const AppDemoImporter = () => {
 			);
 		}
 
+		// Mirror the filter effect, including the id: this fallback renders on the
+		// first keystroke render before that effect has set filteredDemoData, and
+		// the cards are keyed by demo.id — Object.values() would drop the key.
 		const filteredData =
 			filteredDemoData ||
-			Object.values(demoData).filter((demo) => {
-				const searchWords = searchQuery.toLowerCase().split(' ');
+			Object.keys(demoData)
+				.filter((key) => {
+					const searchWords = searchQuery.toLowerCase().split(' ');
 
-				return searchWords.every((word) =>
-					demo.name.toLowerCase().includes(word)
-				);
-			});
+					return searchWords.every((word) =>
+						demoData[key].name.toLowerCase().includes(word)
+					);
+				})
+				.map((key) => ({ ...demoData[key], id: key }));
 
 		if (filteredData.length === 0) {
 			return <Empty description={sdEdiAdminParams.searchNoResults} />;
