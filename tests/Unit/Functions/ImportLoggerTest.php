@@ -250,6 +250,45 @@ final class ImportLoggerTest extends UnitTestCase {
 	public function test_group_rows_empty_returns_empty(): void {
 		self::assertSame( [], ImportLogger::groupRows( [] ) );
 	}
+
+	public function test_recent_run_rows_windows_by_session_not_entry_count(): void {
+		$sql          = [];
+		$wpdb         = Mockery::mock();
+		$wpdb->prefix = 'wp_';
+
+		// prepare(): record the SQL, ignore the bound values.
+		$wpdb->shouldReceive( 'prepare' )->andReturnUsing(
+			static function ( $query ) use ( &$sql ) {
+				$sql[] = $query;
+				return $query;
+			}
+		);
+
+		// First query: newest sessions. Second: those sessions' entries.
+		$rows = [
+			[ 'id' => 40, 'session_id' => 'sess-new', 'demo_slug' => 'home-2', 'logged_at' => '2026-07-09 12:00:10', 'level' => 'success', 'message' => 'done' ],
+			[ 'id' => 39, 'session_id' => 'sess-new', 'demo_slug' => 'home-2', 'logged_at' => '2026-07-09 12:00:00', 'level' => 'info', 'message' => 'start' ],
+			[ 'id' => 10, 'session_id' => 'sess-old', 'demo_slug' => 'home-1', 'logged_at' => '2026-07-08 12:00:00', 'level' => 'info', 'message' => 'start' ],
+		];
+		$wpdb->shouldReceive( 'get_col' )->once()->andReturn( [ 'sess-new', 'sess-old' ] );
+		$wpdb->shouldReceive( 'get_results' )->once()->andReturn( $rows );
+		$GLOBALS['wpdb'] = $wpdb;
+
+		// entry-ceiling filter returns its default.
+		Functions\when( 'apply_filters' )->returnArg( 2 );
+
+		$ref = new \ReflectionMethod( ImportLogger::class, 'recentRunRows' );
+		$ref->setAccessible( true );
+		$out = $ref->invoke( null, 5 );
+
+		// The fix: sessions are selected first (GROUP BY … ORDER BY MAX(id)), then
+		// their entries fetched (WHERE session_id IN) — not a flat newest-N-entries
+		// scan that one large run would exhaust.
+		self::assertStringContainsString( 'GROUP BY session_id', $sql[0] );
+		self::assertStringContainsString( 'ORDER BY MAX(id) DESC', $sql[0] );
+		self::assertStringContainsString( 'WHERE session_id IN (%s,%s)', $sql[1] );
+		self::assertSame( $rows, $out );
+	}
 }
 
 /**

@@ -316,6 +316,61 @@ final class ImportLogger {
 	}
 
 	/**
+	 * Fetches raw rows (newest first) for the newest $maxRuns import runs.
+	 *
+	 * Selects the most recent sessions by their latest row id, then pulls their
+	 * entries — so windowing is by RUN, not by a flat entry count that a single
+	 * large import would exhaust on its own. A generous overall entry ceiling
+	 * still bounds the payload; because rows come back newest-first, tripping it
+	 * drops the oldest run's oldest rows, never the newest runs.
+	 *
+	 * @param int $maxRuns Maximum number of recent runs (sessions) to include.
+	 *
+	 * @return array<int,array{id:int,session_id:string,demo_slug:string,logged_at:string,level:string,message:string}>
+	 * @since 2.0.2
+	 */
+	private static function recentRunRows( int $maxRuns ): array {
+		global $wpdb;
+
+		$table   = self::tableName();
+		$maxRuns = max( 1, $maxRuns );
+
+		// Newest distinct sessions by their latest row id. `$table` is a
+		// prefix-derived identifier (see tableName()), never user input.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
+		$sessions = $wpdb->get_col(
+			$wpdb->prepare(
+				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				"SELECT session_id FROM {$table} GROUP BY session_id ORDER BY MAX(id) DESC LIMIT %d",
+				$maxRuns
+			)
+		);
+
+		if ( empty( $sessions ) ) {
+			return [];
+		}
+
+		// Bound the payload regardless of how large the selected runs are.
+		$ceiling = max( 1, (int) apply_filters( 'sd/edi/log_runs_entry_ceiling', 5000 ) ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+
+		// One %s per selected session; the count is fixed by the query above, so
+		// the placeholder list is code-built, never user input.
+		$placeholders = implode( ',', array_fill( 0, count( $sessions ), '%s' ) );
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
+		$rows = $wpdb->get_results(
+			$wpdb->prepare(
+				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				"SELECT id, session_id, demo_slug, logged_at, level, message FROM {$table} WHERE session_id IN ({$placeholders}) ORDER BY id DESC LIMIT %d",
+				array_merge( $sessions, [ $ceiling ] )
+			),
+			ARRAY_A
+		);
+
+		return is_array( $rows ) ? $rows : [];
+	}
+
+	/**
 	 * Fetches log entries grouped into import runs (one per session), newest run
 	 * first, each run carrying its derived demo label, start time and pass/fail
 	 * status.
@@ -325,7 +380,14 @@ final class ImportLogger {
 	 * @return array<int,array{session_id:string,demo_slug:string,started_at:string,status:string,count:int,entries:array<int,array{logged_at:string,level:string,message:string}>}>
 	 * @since 2.0.0
 	 */
-	public static function getRuns( int $limit = 1000 ): array {
+	public static function getRuns( int $maxRuns = 10 ): array {
+		// Window by RUN, not by entry count: a single large import writes hundreds
+		// of rows, so a flat newest-N-entries fetch lets one run crowd every older
+		// run out of the view (that is why only the latest import used to show).
+		// $maxRuns caps how many recent runs come back; recentRunRows() selects the
+		// newest sessions first so each of them appears in full.
+		$maxRuns = max( 1, (int) apply_filters( 'sd/edi/log_max_runs', $maxRuns ) ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+
 		// A live import refreshes its session heartbeat every phase; one that was
 		// interrupted goes quiet while still holding the 30-minute lock. Treat a
 		// session whose heartbeat has gone stale as no longer active so its run is
@@ -348,7 +410,7 @@ final class ImportLogger {
 		// while a live import is pending, a per-minute bucket bounds how long the
 		// "In progress" view can linger after the heartbeat actually goes stale.
 		$bucket    = '' !== $live_sid ? (int) floor( time() / MINUTE_IN_SECONDS ) : 0;
-		$cache_key = 'sd_edi_runs_' . self::latestId() . '_' . $limit . '_' . ( '' !== $live_sid ? $live_sid : 'none' ) . '_' . $bucket;
+		$cache_key = 'sd_edi_runs_' . self::latestId() . '_r' . $maxRuns . '_' . ( '' !== $live_sid ? $live_sid : 'none' ) . '_' . $bucket;
 		$cached    = get_transient( $cache_key );
 
 		if ( is_array( $cached ) ) {
@@ -358,7 +420,7 @@ final class ImportLogger {
 		// Pull entries oldest-first within the scanned window so each run's
 		// timeline reads top-to-bottom in the order things happened.
 		$runs = self::markInterruptedRuns(
-			self::groupRows( array_reverse( self::get( '', $limit ) ) ),
+			self::groupRows( array_reverse( self::recentRunRows( $maxRuns ) ) ),
 			$live_sid
 		);
 
