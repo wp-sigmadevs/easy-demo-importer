@@ -1,0 +1,61 @@
+# Files and directories excluded from the distributed plugin (WordPress.org / wp dist-archive).
+# The npm build (`npm run package`) uses an allowlist and already excludes these;
+# this manifest keeps the exclusion explicit for `wp dist-archive` and the WP.org deploy action.
+
+# Version control / CI / editor / AI tooling
+.git
+.github
+.gitignore
+.gitattributes
+.idea
+.vscode
+.claude
+.mcp.json
+.superpowers
+.wp-env.json
+.editorconfig
+.browserslistrc
+
+# Linters / formatters / build config
+.eslintrc.js
+.eslintignore
+.prettierrc.js
+.prettierignore
+.stylelintrc.js
+phpcs.xml
+phpcs.xml.dist
+.phpcs.xml.dist
+webpack.mix.js
+package.json
+package-lock.json
+composer.lock
+vitest.config.js
+
+# Tests
+tests
+bin
+phpunit.xml
+phpunit.xml.dist
+phpunit-integration.xml
+phpunit-integration.xml.dist
+
+# Source (compiled into assets/) and build output
+src
+node_modules
+dist
+tmp
+
+# Developer docs (readme.txt is the shipped one)
+docs
+readme.md
+CHANGELOG.md
+ROADMAP.md
+DEV-LOG.md
+ASSESSMENT.md
+IMPROVEMENTS.md
+SECURITY-AUDIT.md
+gemini-security-audit.md
+
+# OS cruft
+.DS_Store
+Thumbs.db
