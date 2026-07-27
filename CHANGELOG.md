@@ -23,6 +23,8 @@ The canonical, WordPress.org-formatted changelog also lives in `readme.txt`.
 ### Changed
 - The restore point now defaults to off, with its storage cost stated up front.
 - The demo-archive download timeout is raised to 300s and timeouts are reported honestly instead of reading as a silent hang.
+- The restore-point description is about half its former length — it still states that the site is backed up, that one click restores it, that anything added afterwards is lost, and what it costs in storage.
+- The import log's run header drops the raw entry count; the demo name, timestamp, status and duration remain.
 
 ### Fixed
 - Large demo archives stream to disk instead of buffering in memory, preventing out-of-memory crashes on big/WooCommerce demos.
@@ -33,6 +35,7 @@ The canonical, WordPress.org-formatted changelog also lives in `readme.txt`.
 - The Activity log now lists your recent import runs instead of only the latest one — the run list is windowed by run rather than by a flat entry count, so a single large import no longer crowds older runs out of the view.
 - Uninstalling now also drops any restore-point shadow tables (`sd_edi_snap_*`) left by a snapshot kept for roll-back, instead of orphaning a clone of every imported table in the database.
 - Error notices sent as plain text rendered as an empty box — both plain-text and call-to-action error messages now display their text.
+- The wizard's Configure step and the Manual Import dialog no longer scroll on a standard screen — the restore-point copy and the file-slot spacing were pushing the last option below the fold.
 
 ### Performance
 - The demo picker no longer re-renders every card on each search keystroke or unrelated state change — cards are memoized against stable per-demo data and keyed by demo id.

@@ -155,8 +155,10 @@ For any inquiries, bug reports, or suggestions, please submit your request [here
 * Fix: The Activity log lists your recent import runs instead of only the latest one.
 * Fix: Uninstalling removes leftover restore-point shadow tables instead of orphaning them in the database.
 * Fix: Error notices sent as plain text no longer render as an empty box.
+* Fix: The Configure step and the Manual Import dialog no longer scroll on a standard screen.
 * Performance: The demo picker no longer re-renders every card on each search keystroke.
 * Tweak: Restore point now defaults off; download timeout raised to 300s and reported honestly.
+* Tweak: Shortened the restore-point description and removed the raw entry count from the import log's run header.
 
 = 2.0.1 (19-July-2026) =
 * Security: Imported SVG files are now sanitized during demo import to prevent stored XSS.
