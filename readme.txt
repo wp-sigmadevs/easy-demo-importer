@@ -151,6 +151,7 @@ For any inquiries, bug reports, or suggestions, please submit your request [here
 * Fix: The server-requirements warning stays dismissed, and failed-term log lines group correctly.
 * Fix: A content import that loses its saved progress mid-run now reports an error and stops instead of falsely claiming completion.
 * Fix: The Activity log lists your recent import runs instead of only the latest one.
+* Fix: Uninstalling removes leftover restore-point shadow tables instead of orphaning them in the database.
 * Performance: The demo picker no longer re-renders every card on each search keystroke.
 * Tweak: Restore point now defaults off; download timeout raised to 300s and reported honestly.
 
