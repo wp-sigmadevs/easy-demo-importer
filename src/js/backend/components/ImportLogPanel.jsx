@@ -62,7 +62,6 @@ const runLabel = (run) => {
 					{duration}
 				</span>
 			)}
-			<span className="edi-log-run-count">{run.count}</span>
 		</div>
 	);
 };
