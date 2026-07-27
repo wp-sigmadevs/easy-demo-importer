@@ -4,7 +4,7 @@ Donate link:
 Tags: demo importer, one click demo importer, theme demo importer, WordPress demo importer, content import plugin
 Requires at least: 5.5
 Tested up to: 7.0
-Stable tag: 2.0.1
+Stable tag: 2.0.2
 Requires PHP: 7.4
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -139,6 +139,17 @@ For any inquiries, bug reports, or suggestions, please submit your request [here
 6. Example of how the system status page looks.
 
 == Changelog ==
+
+= 2.0.2 (27-July-2026) =
+* Feature: Live progress bar for the demo-archive download.
+* Feature: Share or export any import-log run (copy or download .txt), plus a run-duration badge and a collapsed "Skipped N media items" summary.
+* Feature: Preflight auto-tuner raises PHP time/memory limits where allowed and flags plugin-adjusted limits.
+* Feature: Demos with missing required plugins are greyed out; caching plugins are flushed after import.
+* Security: Both remote-download paths (demo archive and plugin installer) are hardened against SSRF.
+* Fix: Large archives stream to disk instead of buffering in memory, avoiding out-of-memory crashes.
+* Fix: Preflight no longer errors when set_time_limit/ini_set are disabled.
+* Fix: The server-requirements warning stays dismissed, and failed-term log lines group correctly.
+* Tweak: Restore point now defaults off; download timeout raised to 300s and reported honestly.
 
 = 2.0.1 (19-July-2026) =
 * Security: Imported SVG files are now sanitized during demo import to prevent stored XSS.

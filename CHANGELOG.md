@@ -6,6 +6,34 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 The canonical, WordPress.org-formatted changelog also lives in `readme.txt`.
 
+## [2.0.2] - 2026-07-27
+
+### Added
+- Live, byte-level progress bar for the demo-archive download — the one import phase that previously gave no feedback until the whole file had landed.
+- Import log: share or export any run — copy to clipboard or download a `.txt` — plus an "Export all" for the whole log.
+- Import log: an import-duration badge in each run's header.
+- Import log: repeated media-skip lines collapse into a single expandable summary ("Skipped N media items") instead of one line per file.
+- Preflight auto-tuner: raises PHP time and memory limits where the host permits, flags plugin-adjusted limits with an "Adjusted" badge, and records the host-granted limits at import start.
+- Demos whose required plugins aren't available are greyed out in the picker.
+- Caching plugins are flushed after import so the imported site renders correctly right away.
+
+### Security
+- Both remote-download paths (the demo archive and the plugin installer) are hardened against SSRF — requests that resolve to internal, private, or link-local addresses are rejected.
+
+### Changed
+- The restore point now defaults to off, with its storage cost stated up front.
+- The demo-archive download timeout is raised to 300s and timeouts are reported honestly instead of reading as a silent hang.
+
+### Fixed
+- Large demo archives stream to disk instead of buffering in memory, preventing out-of-memory crashes on big/WooCommerce demos.
+- Preflight no longer errors on hosts where `set_time_limit`/`ini_set` are disabled.
+- The server-requirements warning stays dismissed once dismissed.
+- Failed-term log lines group correctly — term names are quoted and grouping is keyed by the normalized message rather than an English literal.
+
+### Internal
+- Documented a full-plugin OWASP security review.
+- Added unit coverage for the SSRF guard (`RemoteUrl`), the download-progress channel, log formatting/share helpers, and activity-log grouping.
+
 ## [2.0.1] - 2026-07-19
 
 ### Added
@@ -210,6 +238,8 @@ The canonical, WordPress.org-formatted changelog also lives in `readme.txt`.
 
 - Initial release.
 
+[2.0.2]: https://github.com/wp-sigmadevs/easy-demo-importer/compare/2.0.1...2.0.2
+[2.0.1]: https://github.com/wp-sigmadevs/easy-demo-importer/compare/2.0.0...2.0.1
 [2.0.0]: https://github.com/wp-sigmadevs/easy-demo-importer/compare/1.1.6...2.0.0
 [1.1.6]: https://github.com/wp-sigmadevs/easy-demo-importer/compare/1.1.5...1.1.6
 [1.1.5]: https://github.com/wp-sigmadevs/easy-demo-importer/compare/1.1.4...1.1.5
