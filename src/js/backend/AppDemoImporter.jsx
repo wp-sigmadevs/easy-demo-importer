@@ -293,12 +293,9 @@ const AppDemoImporter = () => {
 		return grouped;
 	}, [demoData]);
 
-	/**
-	 * Manual-import control — a subtle secondary action with a help tooltip,
-	 * shown inline in the demo-grid header (and above the grid when tabs and
-	 * search are disabled), so it stays discoverable without a separate strip.
-	 * @param e
-	 */
+	// Manual-import control — a subtle secondary action with a help tooltip,
+	// shown inline in the demo-grid header (and above the grid when tabs and
+	// search are disabled), so it stays discoverable without a separate strip.
 	const manualImportControl = (
 		<Button
 			className="edi-manual-import-btn"

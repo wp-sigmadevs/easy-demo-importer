@@ -69,12 +69,12 @@
     "zip": "bun run package && npm_config_zip=true mix",
     "test:js": "vitest run",
     "test:js:watch": "vitest",
-    "eslint": "eslint src/js/**/*.js",
-    "eslint:fix": "eslint src/js/**/*.js --fix",
+    "eslint": "eslint 'src/js/**/*.{js,jsx}'",
+    "eslint:fix": "eslint 'src/js/**/*.{js,jsx}' --fix",
     "stylelint": "stylelint src/sass/**/**/*.{css,scss}",
     "stylelint:fix": "stylelint src/sass/**/**/*.{css,scss} --fix",
-    "prettier": "prettier src/js/**/*.js",
-    "prettier:fix": "prettier --write src/js/**/*.jsx",
+    "prettier": "prettier 'src/js/**/*.{js,jsx}'",
+    "prettier:fix": "prettier --write 'src/js/**/*.{js,jsx}'",
     "translate": "wp-pot --src '**/**/**/*.php' --dest-file 'languages/easy-demo-importer.pot' --package 'easy-demo-importer' --domain 'easy-demo-importer' --last-translator 'SM Rafiz <s.m.rafiz@gmail.com>' --team 'SM Rafiz <s.m.rafiz@gmail.com>' --bug-report 'https://github.com/wp-sigmadevs/easy-demo-importer/issues'"
   },
   "eslintConfig": {

@@ -13,8 +13,9 @@ import useSharedDataStore from '../../../utils/sharedDataStore';
 /**
  * Component representing the "Begin" step in the modal.
  *
- * @param {Function} handleReset - Handles resetting the modal.
- * @param {Object}   modalData   - Data for the Modal.
+ * @param {Object}   props             - Component props.
+ * @param {Function} props.handleReset - Handles resetting the modal.
+ * @param {Object}   props.modalData   - Data for the Modal.
  */
 const Begin = ({ handleReset, modalData }) => {
 	/**

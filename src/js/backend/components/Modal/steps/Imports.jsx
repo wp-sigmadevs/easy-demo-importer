@@ -8,11 +8,12 @@ import { ImportBar } from '../../ImportBar';
 /**
  * Component representing the imports step in the modal.
  *
- * @param {string}   importStatus       - The import status.
- * @param {Array}    importProgress     - The progress of the import.
- * @param {?number}  importPercent      - Determinate content-import progress (0-100), or null to hide the bar.
- * @param {boolean}  showImportProgress - Flag indicating whether to show the import progress.
- * @param {Function} handleImport       - Function to handle the import process.
+ * @param {Object}   props                    - Component props.
+ * @param {string}   props.importStatus       - The import status.
+ * @param {Array}    props.importProgress     - The progress of the import.
+ * @param {?number}  props.importPercent      - Determinate content-import progress (0-100), or null to hide the bar.
+ * @param {boolean}  props.showImportProgress - Flag indicating whether to show the import progress.
+ * @param {Function} props.handleImport       - Function to handle the import process.
  */
 const Imports = ({
 	importStatus,

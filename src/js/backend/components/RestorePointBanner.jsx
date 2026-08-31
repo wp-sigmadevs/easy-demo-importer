@@ -15,9 +15,9 @@ import useSharedDataStore from '../utils/sharedDataStore';
  * exists, so a rollback is reachable outside the one-time result screen.
  *
  * @param {Object} props            - Component props.
- * @param {number} props.refreshKey - Bumped by the parent when a modal closes,
- *                                    so a just-created restore point shows
- *                                    without a page reload.
+ * @param {number} props.refreshKey - Bumped by the parent when a modal closes, so
+ *                                  a just-created restore point shows without a
+ *                                  page reload.
  * @return {JSX.Element|null} The banner, or null when no restore point exists.
  */
 const RestorePointBanner = ({ refreshKey = 0 }) => {
