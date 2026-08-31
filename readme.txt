@@ -3,7 +3,7 @@ Contributors: sigmadevs
 Donate link:
 Tags: demo importer, one click demo importer, theme demo importer, WordPress demo importer, content import plugin
 Requires at least: 5.5
-Tested up to: 7.0
+Tested up to: 7.1
 Stable tag: 2.0.2
 Requires PHP: 7.4
 License: GPLv3 or later
