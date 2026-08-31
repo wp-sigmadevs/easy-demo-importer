@@ -29,7 +29,9 @@
 
     <rule ref="WordPress.WP.I18n">
         <properties>
-            <property name="text_domain" type="array" value="easy-demo-importer" />
+            <property name="text_domain" type="array">
+                <element value="easy-demo-importer"/>
+            </property>
         </properties>
     </rule>
 
@@ -85,6 +87,18 @@
         <exclude-pattern>*/index\.php</exclude-pattern>
     </rule>
 
+    <!--
+        The sample config is a documented template: the commented-out filter calls and
+        Elementor/Fluent Forms stanzas are alternatives the integrator uncomments, not
+        dead code left behind. Adding full stops would corrupt the lines being copied.
+    -->
+    <rule ref="Squiz.Commenting.InlineComment.InvalidEndChar">
+        <exclude-pattern>/samples/*</exclude-pattern>
+    </rule>
+    <rule ref="Squiz.PHP.CommentedOutCode">
+        <exclude-pattern>/samples/*</exclude-pattern>
+    </rule>
+
     <!-- Exclude WP Core folders and files from being checked. -->
     <exclude-pattern>/docroot/wp-admin/*</exclude-pattern>
     <exclude-pattern>/docroot/wp-includes/*</exclude-pattern>
@@ -95,6 +109,7 @@
 
     <!-- Directories and third party library exclusions. -->
     <exclude-pattern>/vendor/*</exclude-pattern>
+    <exclude-pattern>/lib/*</exclude-pattern>
     <exclude-pattern>/node_modules/*</exclude-pattern>
     <exclude-pattern>/tests/*</exclude-pattern>
     <exclude-pattern>/docker/*</exclude-pattern>
