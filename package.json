@@ -45,6 +45,7 @@
     "jsdom": "^29.1.1",
     "laravel-mix": "^6.0.49",
     "postcss": "^8.4.40",
+    "postcss-scss": "^4.0.9",
     "rtlcss": "^4.2.0",
     "sass": "1.77.2",
     "sass-loader": "^16.0.0",
@@ -71,8 +72,8 @@
     "test:js:watch": "vitest",
     "eslint": "eslint 'src/js/**/*.{js,jsx}'",
     "eslint:fix": "eslint 'src/js/**/*.{js,jsx}' --fix",
-    "stylelint": "stylelint src/sass/**/**/*.{css,scss}",
-    "stylelint:fix": "stylelint src/sass/**/**/*.{css,scss} --fix",
+    "stylelint": "stylelint 'src/scss/**/*.{css,scss}'",
+    "stylelint:fix": "stylelint 'src/scss/**/*.{css,scss}' --fix",
     "prettier": "prettier 'src/js/**/*.{js,jsx}'",
     "prettier:fix": "prettier --write 'src/js/**/*.{js,jsx}'",
     "translate": "wp-pot --src '**/**/**/*.php' --dest-file 'languages/easy-demo-importer.pot' --package 'easy-demo-importer' --domain 'easy-demo-importer' --last-translator 'SM Rafiz <s.m.rafiz@gmail.com>' --team 'SM Rafiz <s.m.rafiz@gmail.com>' --bug-report 'https://github.com/wp-sigmadevs/easy-demo-importer/issues'"
