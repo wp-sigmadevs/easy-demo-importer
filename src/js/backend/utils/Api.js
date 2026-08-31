@@ -22,7 +22,8 @@ export const Api = Axios.create({
  * Map an HTTP status code to a user-facing message and hint.
  *
  * @param {number} code - HTTP status code.
- * @return {{ message: string, hint: string }}
+ * @return {{ message: string, hint: string }} The user-facing message and the
+ * accompanying hint for that status code.
  */
 const httpErrorInfo = (code) => {
 	const map = {

@@ -47,31 +47,31 @@ const ServerStatusPanel = () => {
 		containerClassName += ' server-config-found';
 	}
 
+	let content = (
+		<Col className="gutter-row edi-server-info edi-fade-in">
+			<ServerInfoCollapse serverInfo={serverInfo} />
+		</Col>
+	);
+
+	if (loading && !serverInfo) {
+		content = (
+			<Col className="gutter-row">
+				<div className="skeleton-wrapper">
+					{Array.from({ length: 6 }).map((_, i) => (
+						<div className="list-skeleton details" key={i}>
+							<Skeleton avatar paragraph={{ rows: 0 }} active />
+						</div>
+					))}
+				</div>
+			</Col>
+		);
+	} else if (!serverData.success) {
+		content = <ErrorMessage message={errorMessage} />;
+	}
+
 	return (
 		<div className={containerClassName}>
-			<Row gutter={[30, 30]}>
-				{loading && !serverInfo ? (
-					<Col className="gutter-row">
-						<div className="skeleton-wrapper">
-							{Array.from({ length: 6 }).map((_, i) => (
-								<div className="list-skeleton details" key={i}>
-									<Skeleton
-										avatar
-										paragraph={{ rows: 0 }}
-										active
-									/>
-								</div>
-							))}
-						</div>
-					</Col>
-				) : !serverData.success ? (
-					<ErrorMessage message={errorMessage} />
-				) : (
-					<Col className="gutter-row edi-server-info edi-fade-in">
-						<ServerInfoCollapse serverInfo={serverInfo} />
-					</Col>
-				)}
-			</Row>
+			<Row gutter={[30, 30]}>{content}</Row>
 		</div>
 	);
 };

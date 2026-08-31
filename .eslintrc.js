@@ -21,6 +21,10 @@ module.exports = {
 		'plugin:@wordpress/eslint-plugin/recommended',
 	],
 	rules: {
+		// console.error/warn are this plugin's diagnostic channel: the React error
+		// boundary, the clipboard fallbacks and the store's fetch failures all need
+		// to reach a developer's console. console.log stays banned.
+		'no-console': [ 'error', { allow: [ 'error', 'warn' ] } ],
 		'prettier/prettier': [
 			'error',
 			{

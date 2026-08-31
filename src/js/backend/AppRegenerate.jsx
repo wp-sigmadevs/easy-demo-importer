@@ -233,11 +233,13 @@ const AppRegenerate = () => {
 	const done = phase === 'done';
 	const isEmpty = total === 0;
 
-	const startLabel = running
-		? sdEdiAdminParams.regenRunningBtn
-		: done
-			? sdEdiAdminParams.regenDoneBtn
-			: sdEdiAdminParams.regenStartBtn;
+	let startLabel = sdEdiAdminParams.regenStartBtn;
+
+	if (running) {
+		startLabel = sdEdiAdminParams.regenRunningBtn;
+	} else if (done) {
+		startLabel = sdEdiAdminParams.regenDoneBtn;
+	}
 
 	const statLabels = {
 		processed: sdEdiAdminParams.regenStatProcessed,
@@ -302,8 +304,11 @@ const AppRegenerate = () => {
 
 								{!isEmpty && (
 									<div className="edi-regenerate-options">
-										<label className="edi-regenerate-option">
-											<span className="edi-regenerate-option-text">
+										<div className="edi-regenerate-option">
+											<span
+												className="edi-regenerate-option-text"
+												id="edi-regen-force-label"
+											>
 												{
 													sdEdiAdminParams.regenForceLabel
 												}
@@ -320,11 +325,15 @@ const AppRegenerate = () => {
 												checked={force}
 												disabled={running}
 												onChange={setForce}
+												aria-labelledby="edi-regen-force-label"
 											/>
-										</label>
+										</div>
 
-										<label className="edi-regenerate-option">
-											<span className="edi-regenerate-option-text">
+										<div className="edi-regenerate-option">
+											<span
+												className="edi-regenerate-option-text"
+												id="edi-regen-single-label"
+											>
 												{
 													sdEdiAdminParams.regenSingleLabel
 												}
@@ -341,8 +350,9 @@ const AppRegenerate = () => {
 												checked={single}
 												disabled={running}
 												onChange={setSingle}
+												aria-labelledby="edi-regen-single-label"
 											/>
-										</label>
+										</div>
 									</div>
 								)}
 
