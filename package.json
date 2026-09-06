@@ -51,6 +51,7 @@
     "sass-loader": "^16.0.0",
     "stylelint": "^16.8.0",
     "stylelint-scss": "^6.4.1",
+    "typescript": "^5.9.3",
     "vitest": "^2.1.9",
     "webpack": "5.93.0",
     "wp-pot": "^1.10.2"
