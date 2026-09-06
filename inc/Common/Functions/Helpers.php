@@ -89,6 +89,8 @@ class Helpers {
 
 		// Verifies the Ajax request.
 		if ( ! check_ajax_referer( self::nonceText(), self::nonceId(), false ) ) {
+			self::logDenial( 'nonce' );
+
 			wp_send_json_error(
 				[
 					'errorMessage' => esc_html__( 'Security check failed. Access denied.', 'easy-demo-importer' ),
@@ -111,6 +113,8 @@ class Helpers {
 	 */
 	public static function verifyUserRole() {
 		if ( ! current_user_can( 'manage_options' ) ) {
+			self::logDenial( 'capability' );
+
 			wp_send_json_error(
 				[
 					'errorMessage' => esc_html__( 'You don\'t have permission to perform this action.', 'easy-demo-importer' ),
@@ -120,6 +124,73 @@ class Helpers {
 			// @phpstan-ignore deadCode.unreachable
 			wp_die();
 		}
+	}
+
+	/**
+	 * Records a rejected request so a failed nonce or capability check leaves a trace.
+	 *
+	 * Both denial paths previously returned 403 and wrote nothing anywhere, so a
+	 * probe against the plugin's Ajax actions or REST routes was invisible after
+	 * the fact.
+	 *
+	 * Routing is deliberate. Entries are only written to the activity log when an
+	 * import session is actually running, because ImportLogger::getRuns() groups
+	 * by `session_id` and caps the view at ten runs - a stream of session-less
+	 * denial rows would collapse into one phantom "run" and push real imports out
+	 * of the Activity tab. A denial *during* an import is exactly what belongs in
+	 * that run's timeline (an expired nonce mid-import is the "page left open too
+	 * long" case the error message itself describes); a denial outside one is a
+	 * probe, and goes to the PHP error log instead.
+	 *
+	 * The `sd/edi/security_denial` action fires in both cases so a site can route
+	 * these into its own audit sink without depending on either default.
+	 *
+	 * @param string $reason Which gate rejected the request: 'nonce' or 'capability'.
+	 *
+	 * @return void
+	 * @since 2.0.3
+	 */
+	private static function logDenial( string $reason ) {
+		// Read only to name the rejected action; the request is being refused, and
+		// this value is never trusted or acted on beyond being logged.
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$action  = isset( $_REQUEST['action'] ) ? sanitize_key( wp_unslash( $_REQUEST['action'] ) ) : 'unknown';
+		$user_id = get_current_user_id();
+
+		/**
+		 * Fires when the plugin refuses a request on a nonce or capability check.
+		 *
+		 * @param string $reason  'nonce' or 'capability'.
+		 * @param string $action  The rejected Ajax action name.
+		 * @param int    $user_id Current user ID, 0 when logged out.
+		 *
+		 * @since 2.0.3
+		 */
+		do_action( 'sd/edi/security_denial', $reason, $action, $user_id ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+
+		$message = sprintf(
+			/* translators: 1: denial reason, 2: ajax action name, 3: user ID. */
+			esc_html__( 'Request denied on %1$s check (action: %2$s, user: %3$d).', 'easy-demo-importer' ),
+			$reason,
+			$action,
+			$user_id
+		);
+
+		$active     = SessionManager::get();
+		$session_id = is_array( $active ) && ! empty( $active['session_id'] ) ? (string) $active['session_id'] : '';
+
+		if ( '' !== $session_id ) {
+			ImportLogger::warning( $message, $session_id );
+
+			return;
+		}
+
+		// No run to attach to. error_log() is the correct sink for a security
+		// event: it is host-rotated, reaches log aggregation, and cannot bloat a
+		// database table that an authenticated low-privilege user could otherwise
+		// drive writes into by spamming a rejected action.
+		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+		error_log( '[easy-demo-importer] ' . $message );
 	}
 
 	/**

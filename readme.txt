@@ -150,6 +150,7 @@ For any inquiries, bug reports, or suggestions, please submit your request [here
 * Fix: Uninstall now removes the per-attachment tracking data written during import (one row per imported image).
 * Fix: Deleting the plugin no longer risks a fatal error on hosts where WordPress cannot resolve filesystem credentials, or via WP-CLI.
 * Fix: Both toggles on the Regenerate Thumbnails screen now announce their labels to screen readers, and clicking the option text toggles them again.
+* Security: Rejected requests are now recorded. A failed security or permission check previously returned an error and logged nothing, leaving no trace of a probe against the plugin's admin endpoints. Developers can hook sd/edi/security_denial to route these into their own audit trail.
 * Tweak: The plugin package now ships the GPLv3 LICENSE text.
 * Tweak: Development dependencies refreshed and the ESLint toolchain pinned so a fresh install lints correctly. No runtime dependency changed.
 
