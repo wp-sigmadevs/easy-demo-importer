@@ -4,7 +4,7 @@ Donate link:
 Tags: demo importer, one click demo importer, theme demo importer, WordPress demo importer, content import plugin
 Requires at least: 5.5
 Tested up to: 7.1
-Stable tag: 2.0.2
+Stable tag: 2.0.3
 Requires PHP: 7.4
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -141,6 +141,11 @@ For any inquiries, bug reports, or suggestions, please submit your request [here
 6. Example of how the system status page looks.
 
 == Changelog ==
+
+= 2.0.3 (06-September-2026) =
+* Compatibility: Tested and verified against WordPress 7.1. No code changes were required; 7.1's new client-side media processing does not affect the import pipeline.
+* Fix: Both toggles on the Regenerate Thumbnails screen now announce their labels to screen readers.
+* Tweak: Development dependencies refreshed and the ESLint toolchain pinned so a fresh install lints correctly. No runtime dependency changed.
 
 = 2.0.2 (27-July-2026) =
 * Feature: Live progress bar for the demo-archive download.
