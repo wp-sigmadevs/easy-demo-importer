@@ -42,7 +42,14 @@ if (process.env.npm_config_package) {
 			'views',
 			'composer.json',
 			'index.php',
+			// GPLv3 requires the licence text to travel with the distribution;
+			// the plugin header and readme.txt only reference it.
+			'LICENSE',
 			'readme.txt',
+			// WordPress runs uninstall.php on delete and it takes precedence
+			// over the registered uninstall hook, whose callback is an empty
+			// stub. Omitting it here shipped a plugin that cleaned up nothing.
+			'uninstall.php',
 			`${package_slug}.php`,
 		];
 

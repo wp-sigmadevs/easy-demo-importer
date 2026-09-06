@@ -49,8 +49,14 @@ $edi_tables = array_merge( // phpcs:ignore WordPress.NamingConventions.PrefixAll
 );
 
 foreach ( $edi_tables as $table_name ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
-	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQLPlaceholders.UnquotedComplexPlaceholder
-	$wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %1$s', $table_name ) );
+	// The table name is never passed through prepare(): a %s placeholder quotes
+	// it as a string literal, which makes the statement a syntax error, so the
+	// table was never dropped. %i would fix that but needs WP 6.2+, and this
+	// plugin supports 5.5. Every name here is built from $wpdb->prefix or comes
+	// back from SHOW TABLES, so it is server-side and safe to interpolate.
+	// Matches the existing convention in inc/Common/Utils/Snapshot.php:402.
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
+	$wpdb->query( "DROP TABLE IF EXISTS `{$table_name}`" );
 }
 
 // Clear any scheduled cron events registered by the plugin.
