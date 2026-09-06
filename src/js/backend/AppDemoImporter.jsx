@@ -354,10 +354,15 @@ const AppDemoImporter = () => {
 	 *
 	 * @param {Object} data - The data to be passed to the modal component.
 	 */
-	const showModal = useCallback((data) => {
-		setModalVisible(true);
-		setModalData(data);
-	}, []);
+	// setModalVisible is a zustand store action, so its identity is stable and
+	// listing it never re-creates this callback; setModalData is a useState setter.
+	const showModal = useCallback(
+		(data) => {
+			setModalVisible(true);
+			setModalData(data);
+		},
+		[setModalVisible]
+	);
 
 	/**
 	 * Handle 'Server Page' button behavior.

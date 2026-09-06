@@ -2,7 +2,7 @@
 <ruleset name="WordPress Coding Standards">
     <description>A custom set of rules to check for WP projects</description>
 
-    <config name="minimum_supported_wp_version" value="5.0.0" />
+    <config name="minimum_supported_wp_version" value="5.5" />
 
     <rule ref="WordPress" />
     <rule ref="WordPress-Docs" />
