@@ -144,7 +144,13 @@ For any inquiries, bug reports, or suggestions, please submit your request [here
 
 = 2.0.3 (06-September-2026) =
 * Compatibility: Tested and verified against WordPress 7.1. No code changes were required; 7.1's new client-side media processing does not affect the import pipeline.
-* Fix: Both toggles on the Regenerate Thumbnails screen now announce their labels to screen readers.
+* Fix: Deleting the plugin now actually removes its data. uninstall.php was missing from the packaged plugin in 2.0.0 through 2.0.2, so nothing was ever cleaned up - options, transients, the plugin's tables, restore-point data and the staging folder all stayed behind. This corrects the 2.0.2 note below, which claimed otherwise.
+* Fix: Uninstall no longer leaves a copy of your media library on disk when a restore point was still open at deletion time.
+* Fix: Uninstall now clears the daily manual-import cleanup task, which previously stayed scheduled forever after deletion.
+* Fix: Uninstall now removes the per-attachment tracking data written during import (one row per imported image).
+* Fix: Deleting the plugin no longer risks a fatal error on hosts where WordPress cannot resolve filesystem credentials, or via WP-CLI.
+* Fix: Both toggles on the Regenerate Thumbnails screen now announce their labels to screen readers, and clicking the option text toggles them again.
+* Tweak: The plugin package now ships the GPLv3 LICENSE text.
 * Tweak: Development dependencies refreshed and the ESLint toolchain pinned so a fresh install lints correctly. No runtime dependency changed.
 
 = 2.0.2 (27-July-2026) =

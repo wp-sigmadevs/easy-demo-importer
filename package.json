@@ -76,7 +76,7 @@
     "stylelint:fix": "stylelint 'src/scss/**/*.{css,scss}' --fix",
     "prettier": "prettier 'src/js/**/*.{js,jsx}'",
     "prettier:fix": "prettier --write 'src/js/**/*.{js,jsx}'",
-    "translate": "wp i18n make-pot . languages/easy-demo-importer.pot --exclude=node_modules,vendor,tests,docs,assets"
+    "translate": "wp i18n make-pot . languages/easy-demo-importer.pot --exclude=node_modules,vendor,tests,docs,assets,dist,bin,tmp"
   },
   "eslintConfig": {
     "extends": [
