@@ -107,9 +107,40 @@
     <exclude-pattern>/docroot/xmlrpc.php</exclude-pattern>
     <exclude-pattern>/docroot/wp-content/plugins/*</exclude-pattern>
 
+    <!--
+        lib/wordpress-importer/ is NOT untouched upstream code. Its strings are
+        re-domained to easy-demo-importer and it carries first-party fixes,
+        including the imported-SVG stored-XSS fix and the attachment-URL backfill
+        queries. It was previously excluded wholesale, which left ~3.4k lines of
+        security-sensitive WXR parsing with no PHP linting at all - PHPStan's
+        paths: is `inc` only, so nothing else covered it.
+
+        The security and database sniffs report zero violations there today, so
+        they are switched back on at no cost. Only the style, metrics and docs
+        sniffs that the upstream code legitimately trips are excluded, and only
+        for that path.
+    -->
+    <rule ref="WordPress.PHP.NoSilencedErrors.Discouraged">
+        <exclude-pattern>/lib/*</exclude-pattern>
+    </rule>
+    <rule ref="Generic.PHP.DeprecatedFunctions.Deprecated">
+        <exclude-pattern>/lib/*</exclude-pattern>
+    </rule>
+    <rule ref="Squiz.Commenting.FunctionComment.MissingParamTag">
+        <exclude-pattern>/lib/*</exclude-pattern>
+    </rule>
+    <rule ref="Generic.Metrics.CyclomaticComplexity.MaxExceeded">
+        <exclude-pattern>/lib/*</exclude-pattern>
+    </rule>
+    <rule ref="Generic.Metrics.NestingLevel.TooHigh">
+        <exclude-pattern>/lib/*</exclude-pattern>
+    </rule>
+    <rule ref="PSR2.Methods.MethodDeclaration.Underscore">
+        <exclude-pattern>/lib/*</exclude-pattern>
+    </rule>
+
     <!-- Directories and third party library exclusions. -->
     <exclude-pattern>/vendor/*</exclude-pattern>
-    <exclude-pattern>/lib/*</exclude-pattern>
     <exclude-pattern>/node_modules/*</exclude-pattern>
     <exclude-pattern>/tests/*</exclude-pattern>
     <exclude-pattern>/docker/*</exclude-pattern>

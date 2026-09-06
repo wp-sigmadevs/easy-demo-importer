@@ -304,20 +304,22 @@ const AppRegenerate = () => {
 
 								{!isEmpty && (
 									<div className="edi-regenerate-options">
-										<div className="edi-regenerate-option">
-											<span
-												className="edi-regenerate-option-text"
-												id="edi-regen-force-label"
-											>
-												{
-													sdEdiAdminParams.regenForceLabel
-												}
+										<label className="edi-regenerate-option">
+											<span className="edi-regenerate-option-text">
+												<span id="edi-regen-force-label">
+													{
+														sdEdiAdminParams.regenForceLabel
+													}
+												</span>
 												<Tooltip
 													title={
 														sdEdiAdminParams.regenForceHint
 													}
 												>
-													<InfoCircleOutlined className="edi-regenerate-option-help" />
+													<InfoCircleOutlined
+														className="edi-regenerate-option-help"
+														aria-hidden="true"
+													/>
 												</Tooltip>
 											</span>
 											<Switch
@@ -327,22 +329,24 @@ const AppRegenerate = () => {
 												onChange={setForce}
 												aria-labelledby="edi-regen-force-label"
 											/>
-										</div>
+										</label>
 
-										<div className="edi-regenerate-option">
-											<span
-												className="edi-regenerate-option-text"
-												id="edi-regen-single-label"
-											>
-												{
-													sdEdiAdminParams.regenSingleLabel
-												}
+										<label className="edi-regenerate-option">
+											<span className="edi-regenerate-option-text">
+												<span id="edi-regen-single-label">
+													{
+														sdEdiAdminParams.regenSingleLabel
+													}
+												</span>
 												<Tooltip
 													title={
 														sdEdiAdminParams.regenSingleHint
 													}
 												>
-													<InfoCircleOutlined className="edi-regenerate-option-help" />
+													<InfoCircleOutlined
+														className="edi-regenerate-option-help"
+														aria-hidden="true"
+													/>
 												</Tooltip>
 											</span>
 											<Switch
@@ -352,7 +356,7 @@ const AppRegenerate = () => {
 												onChange={setSingle}
 												aria-labelledby="edi-regen-single-label"
 											/>
-										</div>
+										</label>
 									</div>
 								)}
 

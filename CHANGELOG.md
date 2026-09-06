@@ -12,9 +12,15 @@ The canonical, WordPress.org-formatted changelog also lives in `readme.txt`.
 - Declared compatibility with WordPress 7.1. Every 7.1 change was traced to this plugin's call sites; none required a code change. Notably, the new client-side media processing cannot engage during an import, because no import path goes through the REST attachments endpoint.
 
 ### Fixed
-- Both toggles on the Regenerate Thumbnails screen now announce their labels to screen readers. Ant Design renders a switch as a `<button>`, which a wrapping `<label>` cannot be associated with, so neither toggle had an accessible name.
+- **Deleting the plugin now actually removes its data.** `uninstall.php` was missing from the packaged plugin in every release from 2.0.0 onward, so WordPress fell back to a registered hook whose callback does nothing. Nothing was ever cleaned up: options, transients, the taxonomy-import and activity-log tables, restore-point shadow tables and the staging directory were all left behind. This corrects the 2.0.2 entry below, which claimed uninstall removed restore-point shadow tables - it could not, because the file was not shipped.
+- Uninstall no longer strands a copy of your media library. If a restore point was still open when the plugin was deleted, the database half was removed but the media half - which can be your entire pre-import uploads folder - was left on disk with nothing pointing at it. It is now discarded first.
+- Uninstall now clears the daily manual-import cleanup task. It previously targeted a task name that does not exist, leaving the real one scheduled forever, firing every day against code that had been deleted.
+- Uninstall now removes the per-attachment tracking data written during import, which previously stayed in the database permanently - one row per imported image.
+- Deleting the plugin no longer risks a fatal error on hosts where WordPress cannot resolve filesystem credentials, or when deleting via WP-CLI. The failure aborted the deletion partway through.
+- Both toggles on the Regenerate Thumbnails screen now announce their labels to screen readers, and clicking the option text toggles them again. Ant Design renders a switch as a `<button>`, whose accessible name comes from its own contents, so neither toggle previously had a name.
 
 ### Changed
+- The plugin package now includes `LICENSE`, so the GPLv3 text ships with the plugin rather than only being referenced.
 - Development dependencies updated within their existing ranges, and `typescript` is now pinned to v5. It was an unconstrained transitive that resolved to v7, which removed an API the bundled ESLint toolchain depends on — enough to break linting on a fresh install. No runtime dependency changed.
 
 ## [2.0.2] - 2026-07-27
@@ -260,6 +266,7 @@ The canonical, WordPress.org-formatted changelog also lives in `readme.txt`.
 
 - Initial release.
 
+[2.0.3]: https://github.com/wp-sigmadevs/easy-demo-importer/compare/2.0.2...2.0.3
 [2.0.2]: https://github.com/wp-sigmadevs/easy-demo-importer/compare/2.0.1...2.0.2
 [2.0.1]: https://github.com/wp-sigmadevs/easy-demo-importer/compare/2.0.0...2.0.1
 [2.0.0]: https://github.com/wp-sigmadevs/easy-demo-importer/compare/1.1.6...2.0.0
