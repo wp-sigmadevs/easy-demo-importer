@@ -133,6 +133,35 @@ if (
 		);
 	}
 
+	/*
+	 * The RTL chain below consumes this run's own outputs as inputs: postCss()
+	 * reads assets/css/backend.min.css, which mix.sass() above produces, and
+	 * combine() reads compiled-rtl.css, which postCss() produces. Webpack
+	 * resolves those inputs before the producing steps have written them, so on a
+	 * tree without a previous build both reads fail - and the build still exits 0,
+	 * reporting success while producing no artifact.
+	 *
+	 * Both asset directories are gitignored, so this is the state of every fresh
+	 * clone: `npm run dev` fails with "Can't resolve .../backend.min.css" until
+	 * some earlier build happens to have left the files behind. Seeding empty
+	 * placeholders lets the first build resolve them; the real content is written
+	 * over the top during the same run.
+	 *
+	 * This also replaces the manual `touch assets/css/rtl/compiled-rtl.css` the
+	 * release steps used to require before every production build.
+	 */
+	fs.ensureDirSync(path.resolve(__dirname, 'assets/css/rtl'));
+
+	['assets/css/backend.min.css', 'assets/css/rtl/compiled-rtl.css'].forEach(
+		(seed) => {
+			const target = path.resolve(__dirname, seed);
+
+			if (!fs.existsSync(target)) {
+				fs.writeFileSync(target, '');
+			}
+		}
+	);
+
 	mix.postCss(
 		'assets/css/backend.min.css',
 		'assets/css/rtl/compiled-rtl.css',

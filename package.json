@@ -64,7 +64,7 @@
     "prod": "npm run production && npm run cleanmap && npm run cleanrtl",
     "production": "mix --production",
     "package": "bun run clean && bun run dev && bun run prod && composer install --no-dev --optimize-autoloader && npm_config_package=true mix && composer install --optimize-autoloader",
-    "clean": "rm -rf tmp/* dist/",
+    "clean": "rm -rf tmp/* dist/ assets/css assets/js",
     "cleanmap": "rm -rf assets/**/*.map",
     "cleanrtl": "rm -rf assets/css/rtl",
     "zip": "bun run package && npm_config_zip=true mix",

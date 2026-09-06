@@ -1240,6 +1240,7 @@ return array(
     'SigmaDevs\\EasyDemoImporter\\Tests\\Integration\\Functions\\ElementorTaxonomyFixIntegrationTest' => $baseDir . '/tests/Integration/Functions/ElementorTaxonomyFixIntegrationTest.php',
     'SigmaDevs\\EasyDemoImporter\\Tests\\Integration\\Importer\\ChunkedImportIntegrationTest' => $baseDir . '/tests/Integration/Importer/ChunkedImportIntegrationTest.php',
     'SigmaDevs\\EasyDemoImporter\\Tests\\Integration\\Importer\\SvgImportSanitizeIntegrationTest' => $baseDir . '/tests/Integration/Importer/SvgImportSanitizeIntegrationTest.php',
+    'SigmaDevs\\EasyDemoImporter\\Tests\\Integration\\UninstallIntegrationTest' => $baseDir . '/tests/Integration/UninstallIntegrationTest.php',
     'SigmaDevs\\EasyDemoImporter\\Tests\\Unit\\Ajax\\ImportLayerSliderTest' => $baseDir . '/tests/Unit/Ajax/ImportLayerSliderTest.php',
     'SigmaDevs\\EasyDemoImporter\\Tests\\Unit\\Ajax\\ImportRevSliderTest' => $baseDir . '/tests/Unit/Ajax/ImportRevSliderTest.php',
     'SigmaDevs\\EasyDemoImporter\\Tests\\Unit\\Functions\\ActionsTest' => $baseDir . '/tests/Unit/Functions/ActionsTest.php',

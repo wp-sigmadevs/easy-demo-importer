@@ -1326,6 +1326,7 @@ class ComposerStaticInita3a0f0cbb9b6e205034676f5e8e4d4d6
         'SigmaDevs\\EasyDemoImporter\\Tests\\Integration\\Functions\\ElementorTaxonomyFixIntegrationTest' => __DIR__ . '/../..' . '/tests/Integration/Functions/ElementorTaxonomyFixIntegrationTest.php',
         'SigmaDevs\\EasyDemoImporter\\Tests\\Integration\\Importer\\ChunkedImportIntegrationTest' => __DIR__ . '/../..' . '/tests/Integration/Importer/ChunkedImportIntegrationTest.php',
         'SigmaDevs\\EasyDemoImporter\\Tests\\Integration\\Importer\\SvgImportSanitizeIntegrationTest' => __DIR__ . '/../..' . '/tests/Integration/Importer/SvgImportSanitizeIntegrationTest.php',
+        'SigmaDevs\\EasyDemoImporter\\Tests\\Integration\\UninstallIntegrationTest' => __DIR__ . '/../..' . '/tests/Integration/UninstallIntegrationTest.php',
         'SigmaDevs\\EasyDemoImporter\\Tests\\Unit\\Ajax\\ImportLayerSliderTest' => __DIR__ . '/../..' . '/tests/Unit/Ajax/ImportLayerSliderTest.php',
         'SigmaDevs\\EasyDemoImporter\\Tests\\Unit\\Ajax\\ImportRevSliderTest' => __DIR__ . '/../..' . '/tests/Unit/Ajax/ImportRevSliderTest.php',
         'SigmaDevs\\EasyDemoImporter\\Tests\\Unit\\Functions\\ActionsTest' => __DIR__ . '/../..' . '/tests/Unit/Functions/ActionsTest.php',
