@@ -3,13 +3,19 @@
 > Revised with Sequential Thinking, Context7 (WordPress API docs), and 21st.dev UI patterns.
 > Every phase has been cross-checked for architectural dependencies, API correctness, and forward-compatibility.
 
-## 📍 STATUS AS OF v2.0.0 (releasing 2026-07-18)
+## 📍 STATUS AS OF v2.0.2 (2.0.3 in preparation)
 
 This document was written 2026-02-24, pre-1.1.6. The code has since been built straight through
-to `2.0.0` (merged to master, commit `abd5b52`; final work on `import-improvements`), and `2.0.0`
-is being released 2026-07-18 — the previous release was `1.1.6`. The intermediate version labels
+to `2.0.0` (merged to master, commit `abd5b52`; final work on `import-improvements`), which shipped
+2026-07-18 — the previous release was `1.1.6`. `2.0.1` and `2.0.2` followed; `2.0.3` is the
+WordPress 7.1 compatibility release currently in preparation
+(`docs/superpowers/plans/2026-08-31-wp-7.1-release.md`). The intermediate version labels
 in the phase table (`1.2.0`, `1.3.0`, `1.5.0`) were never tagged releases; that work all collapsed
 into the single `2.0.0`.
+
+**The phase numbering below is historical, not status.** It records what was planned in
+February 2026 and how each phase actually landed. Current release state lives in the plan
+above and in `CHANGELOG.md`.
 
 Delivery also didn't follow the phase→version mapping below one-for-one. Some phases shipped as
 planned, some shipped in a different shape than designed, and some were skipped entirely in favor
@@ -19,8 +25,8 @@ historical record of the *plan*, not current status — the banner + evidence is
 
 **Headline reality check:**
 - ✅ Session system, uninstall.php, PHPStan, chunked/resumable XML import, activity log (viewable),
-  image regen tool, rollback/restore points, pre-import readiness checks, WP-CLI (partial), PHPUnit
-  suite (102 tests) — all shipped.
+  image regen tool, rollback/restore points, pre-import readiness checks, post-import cache flush,
+  conditional demo visibility, WP-CLI (partial), PHPUnit suite (186 tests) — all shipped.
 - ❌ The full-page wizard was never built — the UI is still the modal-based flow
   (`src/js/backend/components/Modal/`). Selective/per-item import, dependency resolver, white
   label, demo badges, builder auto-detection beyond Elementor, multisite (real support, not just
@@ -44,7 +50,7 @@ historical record of the *plan*, not current status — the banner + evidence is
 |-------|---------|-------|-------|--------|
 | [0](#phase-0--emergency-compatibility-hotfix) | `1.1.6` | 🚨 Emergency | WP 6.9 + PHP 8.4 + critical runtime bugs | ✅ Shipped |
 | [1](#phase-1--foundation--stability) | `1.2.0` | 🔧 Stability | Session management, bug hardening, uninstall, static analysis | ✅ Shipped |
-| [2](#phase-2--wizard--xml-engine) | `1.3.0` | 🧙 Wizard + XML | Onboarding wizard, XMLReader chunker, live log, cache flush | ⚠️ Partial — chunker + log shipped, wizard/cache-flush/dry-run/conditional-demos did not |
+| [2](#phase-2--wizard--xml-engine) | `1.3.0` | 🧙 Wizard + XML | Onboarding wizard, XMLReader chunker, live log, cache flush | ⚠️ Partial — chunker, log, cache flush and conditional demos shipped; wizard and dry-run did not |
 | [3](#phase-3--image-regeneration-engine) | `1.4.0` | 🖼️ Image Engine | Plugin-owned regen, per-image count, failure tracking | 🔀 Shipped differently — standalone tool, suppression still opt-in |
 | [4](#phase-4--power-import) | `1.5.0` | ⚡ Power Import | Selective items, dependency resolver, rollback, auto URL fix | ⚠️ Partial — rollback + preflight + auto URL fix shipped, selective import/dependency resolver did not |
 | [5](#phase-5--polish--competitive-edge) | `1.6.0` | ✨ Polish | White label, badges, builder detection, Elementor fixes | ❌ Not started |
@@ -360,9 +366,9 @@ Fixing real bugs surfaced by static analysis. These were baselined in §1.4 but 
 > **Goal:** The release that overtakes OCDI. Wizard UI, streaming XML import, live activity log, dry-run stats, cache flush, conditional demos.
 > **Key architectural decisions baked in here that P4 depends on — do not cut corners.**
 
-**⚠️ Partial.** Of the six sub-goals: chunked import (§2.3) and activity log (§2.4) shipped.
-Wizard UI (§2.1), dry-run stats (§2.2), conditional demo visibility (§2.5), and post-import cache
-flush (§2.6) did not. See per-section banners below.
+**⚠️ Partial.** Of the six sub-goals: chunked import (§2.3), activity log (§2.4), conditional
+demo visibility (§2.5) and post-import cache flush (§2.6) shipped. Wizard UI (§2.1) and dry-run
+stats (§2.2) did not. See per-section banners below.
 
 ---
 
@@ -540,8 +546,12 @@ Status+Log page. Not verified: 2-second live polling *during* an active import, 
 
 ### 2.5 — Conditional Demo Visibility
 
-**❌ Not done.** No `requires`-key gating against active plugins found in the demo grid/card
-components or in `inc/`.
+**✅ Done.** `inc/Common/Utils/DemoRequirements.php` grades an optional `requires` block
+(`php`, `extensions`, `plugins`) server-side; `RestEndpoints.php:534-536` attaches
+`requirementsMet` + `missingRequirements` per demo; `DemoCard.jsx:28-52` greys the card, swaps in
+a lock icon and disables Import with a tooltip listing what is missing. The earlier "not done"
+verdict here was wrong — the search looked for a plugins-only `requires` array, but the shipped
+schema is a keyed block. The "Show incompatible demos" toggle below was not built.
 
 Moved here from Phase 5 — this belongs at the demo selection step.
 
@@ -557,9 +567,12 @@ Moved here from Phase 5 — this belongs at the demo selection step.
 
 ### 2.6 — Post-Import Cache Flush
 
-**❌ Not done.** `inc/App/Ajax/Backend/Finalize.php` does not call any cache-plugin flush hooks —
-no `wp_cache_clear_cache`, `w3tc_flush_all`, `litespeed_purge_all`, `rocket_clean_domain`, or
-`wc_delete_product_transients` anywhere in `inc/`.
+**✅ Done.** Shipped in `Actions::flushCaches()` (`inc/Common/Functions/Actions.php:205`), called
+from the `afterImportActions()` chain at `:189` — not in `Finalize.php`, which is why the earlier
+search missed it. Purges the WP object cache plus W3TC, WP Super Cache, WP Rocket, SG Optimizer,
+Autoptimize and WP Fastest Cache, fires the action-driven LiteSpeed / Cache Enabler / Hummingbird
+hooks, and exposes `sd/edi/flush_caches` for custom layers. Every purge is guarded, so it is safe
+on any site.
 
 Moved here from Phase 5 — this is part of the `Finalize` step and belongs in the same release as the wizard.
 
@@ -834,9 +847,8 @@ Expand Requirements step to surface these before import starts:
 
 **❌ Not started.** No white-label branding filter, demo badges/tags, builder auto-detection
 beyond the pre-existing Elementor handling, or ShopBuilder integration found anywhere in `inc/` or
-`src/js/backend/`. (Note: "cache flush and conditional demos already shipped in Phase 2" in the
-line above is the original plan's assumption — per the Phase 2 banners, neither actually shipped,
-so this phase's true remaining scope is larger than the note implies.) §5.4 (Elementor multi-ZIP
+`src/js/backend/`. (The "cache flush and conditional demos already shipped in Phase 2" note above
+is correct — a previous sweep disputed it, but both are verified shipped; see §2.5 and §2.6.) §5.4 (Elementor multi-ZIP
 taxonomy fix) was not re-verified in this sweep — Elementor taxonomy remapping exists
 (`Actions::elementorTaxonomyFix()`) but whether it specifically handles the multi-ZIP failure mode
 described below is unconfirmed.
@@ -1087,7 +1099,7 @@ Doubles the target audience. Helps theme authors create demo packages without ma
 
 ### 7.4 — PHPUnit Test Suite
 
-**✅ Done.** 102 unit tests pass (`composer test:unit`), covering `ChunkedImport`,
+**✅ Done.** 186 tests / 384 assertions pass (`composer test`), covering `ChunkedImport`,
 `ThumbnailRegenerator`, `BundledMedia`, `Preflight`, `Snapshot`, `DBSearchReplace`, `ImportLogger`,
 `SessionManager`, `Helpers`, `Filters`, plus an `Importer` integration suite (`tests/Integration/`).
 `DependencyResolver` has no coverage since it was never built. GitHub Actions CI matrix across PHP
@@ -1116,9 +1128,9 @@ Original per-version plan (left) vs. what actually shipped as of `2.0.0` (right)
 
 | Version | Planned headline deliverable | Actually shipped |
 |---------|---------------------|-------------------|
-| `1.1.6` | WP 6.9 + PHP 8.4 compat, Rector auto-fix, critical runtime bugs | ✅ Surpassed — plugin is at `2.0.0` |
+| `1.1.6` | WP 6.9 + PHP 8.4 compat, Rector auto-fix, critical runtime bugs | ✅ Surpassed — plugin is at `2.0.2` |
 | `1.2.0` | Session system, mutex lock, uninstall, PHPStan baseline, code quality fixes | ✅ Shipped as planned |
-| `1.3.0` | 8-step wizard, XMLReader chunker, activity log, cache flush, conditional demos | ⚠️ Chunker + activity log shipped; wizard, cache flush, conditional demos did not |
+| `1.3.0` | 8-step wizard, XMLReader chunker, activity log, cache flush, conditional demos | ⚠️ Chunker, activity log, cache flush and conditional demos shipped; wizard did not |
 | `1.4.0` | Plugin-owned image regen — counted, named, failure-tracked | 🔀 Shipped as a standalone tool, not a wizard step; suppression still opt-in |
 | `1.5.0` | Selective item import, dependency resolver, rollback, auto URL fix | ⚠️ Rollback + auto URL fix shipped; selective import + dependency resolver did not |
 | `1.6.0` | White label, badges, builder-specific fixes, Elementor multi-ZIP | ❌ Not started |
@@ -1145,3 +1157,6 @@ Original per-version plan (left) vs. what actually shipped as of `2.0.0` (right)
 
 *Revised: 2026-02-24 — consulted Sequential Thinking (architectural analysis), Context7/WordPress API docs (hook signatures, script strategy API, REST patterns), 21st.dev Magic (wizard UI patterns)*
 *Swept against actual `2.0.0` codebase state: 2026-07-15*
+*Swept against `2.0.2` during 2.0.3 release prep: 2026-09-06 — corrected the Phase 2 row and the
+headline (cache flush and conditional demos had shipped but were recorded as not done) and marked
+the phase numbering as historical.*

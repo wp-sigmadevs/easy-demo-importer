@@ -2,10 +2,12 @@
 
 > Comprehensive analysis of bugs, code quality issues, and a prioritized feature roadmap to beat OCDI, Merlin WP, and other demo importers.
 
-## 📍 STATUS AS OF v2.0.0 (releasing 2026-07-18)
+## 📍 STATUS AS OF v2.0.2 (2.0.3 in preparation)
 
-Written 2026-02-24, pre-1.1.6. The previous release was `1.1.6` (2026-02-28); `2.0.0` is being
-released 2026-07-18 (the jump from 1.1.6 is intentional — no 1.2.x/1.3.x/1.5.x were ever tagged).
+Written 2026-02-24, pre-1.1.6. The previous release was `1.1.6` (2026-02-28); `2.0.0` shipped
+2026-07-18 (the jump from 1.1.6 is intentional — no 1.2.x/1.3.x/1.5.x were ever tagged), followed
+by `2.0.1` and `2.0.2`. `2.0.3` is the WordPress 7.1 compatibility release currently in preparation
+— see `docs/superpowers/plans/2026-08-31-wp-7.1-release.md`.
 **Note:** there was never a `1.2.0` release — the "Phase 1" hardening pass this doc refers to was
 folded into `2.0.0`, so read every "1.2.0" below as "2.0.0".
 
@@ -196,7 +198,7 @@ No existing demo importer does this. Competitors either let WordPress handle it 
 - **Impact:** Reduces failed imports and support tickets dramatically.
 
 #### 5. Dedicated Image Regeneration Step (Plugin-Owned, Not WordPress)
-**Status: 🔀 Shipped differently.** `RegenerateThumbnails.php` + `AppRegenerate.jsx` — a standalone admin tool with per-image progress and failure tracking, but not a wizard step, and suppression during import is still opt-in (defaults `false`), not the default-on behavior this design called for. `big_image_size_threshold` is still not suppressed.
+**Status: 🔀 Shipped differently.** `RegenerateThumbnails.php` + `AppRegenerate.jsx` — a standalone admin tool with per-image progress and failure tracking, but not a wizard step, and sub-size suppression during import is still opt-in (defaults `false`), not the default-on behavior this design called for. `big_image_size_threshold`, however, **is** now forced to `false` for every import (`Actions.php:115`), so the big-image-scaling half of this design did land.
 - **Why:** WordPress silently regenerates thumbnails during XML import — slow, opaque, no count, no failures visible. See the full design in the [Image Regeneration section](#image-regeneration--dedicated-design) above.
 - **What:** Suppress all regeneration during import. After import, run a dedicated step that shows `Regenerating image 14 of 47 — hero-banner.jpg` with failure tracking and skip/background options.
 - **Competitive edge:** No competitor does this. Eliminates the entire "why are my images wrong size" support category.
@@ -344,11 +346,11 @@ No existing demo importer does this. Competitors either let WordPress handle it 
 - **What:** Detect ACF/Meta Box field keys in imported content and auto-map them to existing fields. Show unmapped fields as warnings.
 
 #### 29. PHPUnit Test Suite
-**Status: ✅ Done.** 102 unit tests pass (`composer test:unit`) covering `ChunkedImport`, `ThumbnailRegenerator`, `BundledMedia`, `Preflight`, `Snapshot`, `DBSearchReplace`, `ImportLogger`, `SessionManager`, `Helpers`, `Filters`, plus an `Integration/Importer` suite.
+**Status: ✅ Done.** 186 tests / 384 assertions pass (`composer test`) covering `ChunkedImport`, `ThumbnailRegenerator`, `BundledMedia`, `Preflight`, `Snapshot`, `DBSearchReplace`, `ImportLogger`, `SessionManager`, `Helpers`, `Filters`, plus an `Integration/Importer` suite.
 - **Why:** Required for long-term stability and contributor confidence. Cover DB reset, AJAX handlers, and the import pipeline.
 
 #### 30. Accessibility (WCAG 2.1 AA)
-**Status: ❓ Unverified.** Not spot-checked in this sweep.
+**Status: ⚠️ Partial — now linted, not audited.** The 2.0.3 lint-gate repair put `jsx-a11y` rules (via `@wordpress/eslint-plugin`) over every `.jsx` file for the first time; they had been silently skipped by a broken glob. That surfaced and fixed one real defect — both `AppRegenerate.jsx` toggles announced no label to a screen reader, since antd's `Switch` renders `role="switch"` on a `<button>` that a wrapping `<label>` cannot be associated with (now bound via `aria-labelledby`). A full keyboard/screen-reader audit has still not been run.
 - **Why:** The React UI should be fully keyboard-navigable with screen reader support. Required for enterprise/government theme clients.
 
 ---
@@ -379,11 +381,11 @@ No existing demo importer does this. Competitors either let WordPress handle it 
 | Import rollback / undo | ✅ | ❌ | ❌ |
 | Demo content stats preview | ❌ | ❌ | ❌ |
 | Auto URL fix (silent) | ✅ | ❌ | ❌ |
-| Post-import cache flush | ❌ | ❌ | ❌ |
+| Post-import cache flush | ✅ | ❌ | ❌ |
 | White label / rebrandable UI | ❌ | ❌ | ✅ |
-| Conditional demo visibility | ❌ | ❌ | ❌ |
+| Conditional demo visibility | ✅ | ❌ | ❌ |
 | Background import | ❌ | ❌ | ❌ |
-| Multisite support | ❌ (detection only) | ❌ | ❌ |
+| Multisite support | ❌ (detection only — see note) | ❌ | ❌ |
 | FSE / theme.json import | ❌ | ❌ | ❌ |
 | Demo content export (author tool) | ❌ | ❌ | ❌ |
 | Manual WXR/settings upload (no theme config needed) | ✅ | ❌ | ❌ |
@@ -393,15 +395,23 @@ No existing demo importer does this. Competitors either let WordPress handle it 
 
 > **You lead** on integrations (Fluent Forms, Rev Slider, SVG sanitization, Elementor taxonomy fix,
 > React UI) **and** on the items that shipped since the original comparison: import log, chunked
-> import, image regen tooling, rollback, auto URL fix, pre-import conflict detection, partial
-> WP-CLI, and manual WXR upload (unique — no competitor offers this).
+> import, image regen tooling, rollback, auto URL fix, pre-import conflict detection, post-import
+> cache flush, conditional demo visibility, partial WP-CLI, and manual WXR upload (unique — no
+> competitor offers this).
 >
 > **Still open, in priority order:** wizard onboarding (biggest remaining UX gap vs. Merlin WP),
-> selective/per-item import (biggest remaining gap vs. OCDI), post-import cache flush, white label,
-> conditional demo visibility, dry-run stats, background import, import history, demo badges,
-> multisite (real), and the Tier 4 items (FSE, export tool, ACF mapping, multi-language, a11y).
+> selective/per-item import (biggest remaining gap vs. OCDI), white label, dry-run stats,
+> background import, import history, demo badges, multisite (real), and the Tier 4 items
+> (FSE, export tool, ACF mapping, multi-language, a11y).
+>
+> **Multisite note:** real support is built, but only on the unmerged `origin/multi-site` branch
+> (46 ahead / 301 behind `master`, 14 conflicting files, QA matrix unfilled). It is tracked in
+> §7 of the 7.1 release plan, not here.
 
 ---
 
 *Last updated: 2026-02-24 — original write-up*
 *Re-verified against `2.0.0` codebase: 2026-07-15*
+*Swept against `2.0.2` codebase during 2.0.3 release prep: 2026-09-06 — corrected the comparison
+table where it contradicted its own item entries (cache flush, conditional demo visibility),
+the `big_image_size_threshold` claim in #5, and the test count in #29.*
