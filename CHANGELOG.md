@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 The canonical, WordPress.org-formatted changelog also lives in `readme.txt`.
 
+## [2.0.3] - 2026-09-06
+
+### Added
+- Declared compatibility with WordPress 7.1. Every 7.1 change was traced to this plugin's call sites; none required a code change. Notably, the new client-side media processing cannot engage during an import, because no import path goes through the REST attachments endpoint.
+
+### Fixed
+- Both toggles on the Regenerate Thumbnails screen now announce their labels to screen readers. Ant Design renders a switch as a `<button>`, which a wrapping `<label>` cannot be associated with, so neither toggle had an accessible name.
+
+### Changed
+- Development dependencies updated within their existing ranges, and `typescript` is now pinned to v5. It was an unconstrained transitive that resolved to v7, which removed an API the bundled ESLint toolchain depends on — enough to break linting on a fresh install. No runtime dependency changed.
+
 ## [2.0.2] - 2026-07-27
 
 ### Added
