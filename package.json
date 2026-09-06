@@ -53,8 +53,7 @@
     "stylelint-scss": "^6.4.1",
     "typescript": "^5.9.3",
     "vitest": "^2.1.9",
-    "webpack": "5.93.0",
-    "wp-pot": "^1.10.2"
+    "webpack": "5.93.0"
   },
   "scripts": {
     "dev": "npm run development",
@@ -77,7 +76,7 @@
     "stylelint:fix": "stylelint 'src/scss/**/*.{css,scss}' --fix",
     "prettier": "prettier 'src/js/**/*.{js,jsx}'",
     "prettier:fix": "prettier --write 'src/js/**/*.{js,jsx}'",
-    "translate": "wp-pot --src '**/**/**/*.php' --dest-file 'languages/easy-demo-importer.pot' --package 'easy-demo-importer' --domain 'easy-demo-importer' --last-translator 'SM Rafiz <s.m.rafiz@gmail.com>' --team 'SM Rafiz <s.m.rafiz@gmail.com>' --bug-report 'https://github.com/wp-sigmadevs/easy-demo-importer/issues'"
+    "translate": "wp i18n make-pot . languages/easy-demo-importer.pot --exclude=node_modules,vendor,tests,docs,assets"
   },
   "eslintConfig": {
     "extends": [

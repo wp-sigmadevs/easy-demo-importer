@@ -7,7 +7,6 @@ const fs = require('fs-extra');
 const path = require('path');
 const cliColor = require('cli-color');
 const emojic = require('emojic');
-const wpPot = require('wp-pot');
 const archiver = require('archiver');
 const min = mix.inProduction() ? '.min' : '';
 
@@ -94,27 +93,13 @@ if (
 	(process.env.NODE_ENV === 'development' ||
 		process.env.NODE_ENV === 'production')
 ) {
-	if (mix.inProduction()) {
-		let languages = path.resolve('languages');
-		fs.ensureDir(languages, function (err) {
-			if (err) return console.error(err); // if file or folder does not exist
-			wpPot({
-				package:
-					'Easy Demo Importer - A one-click, user-friendly WordPress plugin importing theme demos.',
-				bugReport:
-					'https://github.com/wp-sigmadevs/easy-demo-importer/issues',
-				src: [
-					'inc/**/*.php',
-					'lib/**/*.php',
-					'views/**/*.php',
-					'easy-demo-importer.php',
-					'uninstall.php',
-				],
-				domain: 'easy-demo-importer',
-				destFile: 'languages/easy-demo-importer.pot',
-			});
-		});
-	}
+	/*
+	 * The translation template is NOT generated here. `wp-pot` dropped the
+	 * WordPress.org-standard headers (X-Domain, Last-Translator, Language-Team,
+	 * PO-Revision-Date) and missed the plugin-header metadata strings, so every
+	 * build silently degraded the committed POT. Run `npm run translate`
+	 * (wp i18n make-pot) instead.
+	 */
 
 	/**
 	 * JS
