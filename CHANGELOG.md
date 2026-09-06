@@ -19,6 +19,9 @@ The canonical, WordPress.org-formatted changelog also lives in `readme.txt`.
 - Deleting the plugin no longer risks a fatal error on hosts where WordPress cannot resolve filesystem credentials, or when deleting via WP-CLI. The failure aborted the deletion partway through.
 - Both toggles on the Regenerate Thumbnails screen now announce their labels to screen readers, and clicking the option text toggles them again. Ant Design renders a switch as a `<button>`, whose accessible name comes from its own contents, so neither toggle previously had a name.
 
+### Security
+- Rejected requests are now recorded. A failed nonce or capability check previously returned `403` and wrote nothing anywhere, so a probe against the plugin's admin endpoints left no trace. Denials during an import are added to that run's activity log; denials outside one go to the PHP error log. A new `sd/edi/security_denial` action lets a site route them into its own audit trail.
+
 ### Changed
 - The plugin package now includes `LICENSE`, so the GPLv3 text ships with the plugin rather than only being referenced.
 - Development dependencies updated within their existing ranges, and `typescript` is now pinned to v5. It was an unconstrained transitive that resolved to v7, which removed an API the bundled ESLint toolchain depends on — enough to break linting on a fresh install. No runtime dependency changed.
