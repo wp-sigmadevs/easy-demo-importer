@@ -94,3 +94,7 @@ _ext_**
 # Claude tooling #
 ##################
 .claude/
+
+# MCP / AI tooling (may contain credentials) #
+########################################
+.mcp.json
