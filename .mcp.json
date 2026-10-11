@@ -55,6 +55,11 @@
       "command": "uvx",
       "args": ["duckduckgo-mcp-server"]
     },
+    "you-search": {
+      "url": "https://api.you.com/mcp?profile=free",
+      "type": "http",
+      "description": "You.com - live web search for agents (keyless free profile)"
+    },
     "mcp-compass": {
       "command": "npx",
       "args": ["-y", "@liuyoshio/mcp-compass"]
